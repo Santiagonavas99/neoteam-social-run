@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
+import { Host_Grotesk } from "next/font/google";
 import "./globals.css";
+
+const hostGrotesk = Host_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-host-grotesk",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Social Run · NeoTeam",
@@ -8,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es">
+    <html lang="es" className={hostGrotesk.variable}>
       <body>{children}</body>
     </html>
   );
