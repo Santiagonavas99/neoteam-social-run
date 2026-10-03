@@ -1,14 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
+import { supabasePublishableKey, supabaseUrl } from "@/lib/supabase/config";
 
 export function createServerSupabaseClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-
-  if (!url || !publishableKey) {
-    throw new Error("Supabase no está configurado todavía.");
-  }
-
-  return createClient(url, publishableKey, {
+  return createClient(supabaseUrl, supabasePublishableKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
