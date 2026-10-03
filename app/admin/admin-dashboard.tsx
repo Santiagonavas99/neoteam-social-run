@@ -1,8 +1,7 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import type { HomeFeatureCard } from "@/lib/home-features";
-import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 
 const metrics = [
   ["REGISTRADOS", "—", "Métricas en la siguiente iteración"],
@@ -11,21 +10,56 @@ const metrics = [
   ["RIFAS", "—", "Premios configurados"],
 ];
 
-type AdminProfile = {
-  display_name: string | null;
-  role: "owner" | "admin" | "staff" | "checkin";
-  active: boolean;
+const ADMIN_SESSION_KEY = "neoteam_admin_pin_session";
+
+type AdminApiResponse = {
+  ok?: boolean;
+  configured?: boolean;
+  valid?: boolean;
+  token?: string;
+  expiresAt?: string;
+  cards?: HomeFeatureCard[];
+  error?: string;
 };
 
+async function callAdminApi(action: string, payload: Record<string, unknown> = {}) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+  if (!supabaseUrl) throw new Error("Supabase no está configurado.");
+
+  const response = await fetch(`${supabaseUrl}/functions/v1/admin-pin`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(publishableKey
+        ? {
+            apikey: publishableKey,
+            Authorization: `Bearer ${publishableKey}`,
+          }
+        : {}),
+    },
+    body: JSON.stringify({ action, ...payload }),
+  });
+
+  const data = (await response.json().catch(() => ({}))) as AdminApiResponse;
+  if (!response.ok) throw new Error(data.error || "No pudimos completar la operación.");
+  return data;
+}
+
+function normalizePin(value: string) {
+  return value.replace(/\D/g, "").slice(0, 6);
+}
+
 export function AdminDashboard() {
-  const supabase = useMemo(() => createBrowserSupabaseClient(), []);
   const [authReady, setAuthReady] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [userEmail, setUserEmail] = useState("");
-  const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [accessSent, setAccessSent] = useState(false);
-  const [profile, setProfile] = useState<AdminProfile | null>(null);
+  const [configured, setConfigured] = useState<boolean | null>(null);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [pin, setPin] = useState("");
+  const [confirmPin, setConfirmPin] = useState("");
+  const [newPin, setNewPin] = useState("");
+  const [confirmNewPin, setConfirmNewPin] = useState("");
   const [cards, setCards] = useState<HomeFeatureCard[]>([]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -33,114 +67,100 @@ export function AdminDashboard() {
   useEffect(() => {
     let active = true;
 
-    void supabase.auth.getSession().then(({ data }) => {
-      if (!active) return;
-      setUserId(data.session?.user.id ?? null);
-      setUserEmail(data.session?.user.email ?? "");
-      setAuthReady(true);
-    });
+    async function bootstrap() {
+      try {
+        const status = await callAdminApi("status");
+        if (!active) return;
+        setConfigured(Boolean(status.configured));
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUserId(session?.user.id ?? null);
-      setUserEmail(session?.user.email ?? "");
-      setAuthReady(true);
-    });
+        const storedToken = window.localStorage.getItem(ADMIN_SESSION_KEY);
+        if (!storedToken) return;
 
+        const validation = await callAdminApi("validate", { token: storedToken });
+        if (!active) return;
+
+        if (validation.valid) {
+          setSessionToken(storedToken);
+          setAuthenticated(true);
+          await loadCards(storedToken);
+        } else {
+          window.localStorage.removeItem(ADMIN_SESSION_KEY);
+        }
+      } catch (error) {
+        if (active) setMessage(error instanceof Error ? error.message : "No pudimos cargar el acceso administrativo.");
+      } finally {
+        if (active) setAuthReady(true);
+      }
+    }
+
+    void bootstrap();
     return () => {
       active = false;
-      listener.subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, []);
 
-  useEffect(() => {
-    if (!userId) {
-      setProfile(null);
-      setCards([]);
-      return;
-    }
-
-    void loadAdminData(userId);
-  }, [userId]);
-
-  async function loadAdminData(currentUserId: string) {
-    setBusy(true);
-    setMessage("");
-
-    const { data: adminProfile, error: profileError } = await supabase
-      .from("admin_profiles")
-      .select("display_name,role,active")
-      .eq("user_id", currentUserId)
-      .maybeSingle();
-
-    if (profileError) {
-      setMessage("No pudimos validar tu perfil administrativo.");
-      setBusy(false);
-      return;
-    }
-
-    const typedProfile = adminProfile as AdminProfile | null;
-    setProfile(typedProfile);
-
-    if (!typedProfile?.active || !["owner", "admin"].includes(typedProfile.role)) {
-      setBusy(false);
-      return;
-    }
-
-    const { data: featureCards, error: cardsError } = await supabase
-      .from("home_feature_cards")
-      .select("id,event_code,slot,title,description,enabled,sort_order")
-      .eq("event_code", "SR26")
-      .order("sort_order", { ascending: true });
-
-    if (cardsError) {
-      setMessage("No pudimos cargar los bloques de la home.");
-      setBusy(false);
-      return;
-    }
-
-    setCards((featureCards ?? []) as HomeFeatureCard[]);
-    setBusy(false);
+  async function loadCards(token: string) {
+    const data = await callAdminApi("listCards", { token });
+    setCards((data.cards ?? []) as HomeFeatureCard[]);
   }
 
-  async function requestAccess(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setBusy(true);
-    setMessage("");
-    setOtp("");
-
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
-      options: {
-        shouldCreateUser: true,
-      },
-    });
-
-    if (error) {
-      setMessage("No pudimos enviar el código. Revisa el correo e intenta de nuevo.");
-    } else {
-      setAccessSent(true);
-      setMessage("Te enviamos un código de 6 dígitos por correo. Escríbelo aquí para entrar.");
-    }
-
-    setBusy(false);
+  function rememberSession(token: string) {
+    window.localStorage.setItem(ADMIN_SESSION_KEY, token);
+    setSessionToken(token);
+    setAuthenticated(true);
   }
 
-  async function verifyCode(event: FormEvent<HTMLFormElement>) {
+  async function setupPin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setBusy(true);
     setMessage("");
 
-    const { error } = await supabase.auth.verifyOtp({
-      email: email.trim(),
-      token: otp.trim(),
-      type: "email",
-    });
-
-    if (error) {
-      setMessage("Ese código no es válido o ya venció. Solicita uno nuevo e intenta otra vez.");
+    if (pin.length !== 6) {
+      setMessage("El PIN debe tener exactamente 6 dígitos.");
+      return;
+    }
+    if (pin !== confirmPin) {
+      setMessage("Los dos PIN no coinciden.");
+      return;
     }
 
-    setBusy(false);
+    setBusy(true);
+    try {
+      const data = await callAdminApi("setup", { pin });
+      if (!data.token) throw new Error("No pudimos crear la sesión administrativa.");
+      rememberSession(data.token);
+      setConfigured(true);
+      setPin("");
+      setConfirmPin("");
+      await loadCards(data.token);
+      setMessage("PIN configurado. Ya tienes acceso al panel.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No pudimos configurar el PIN.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function login(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMessage("");
+
+    if (pin.length !== 6) {
+      setMessage("Escribe tu PIN de 6 dígitos.");
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const data = await callAdminApi("login", { pin });
+      if (!data.token) throw new Error("No pudimos crear la sesión administrativa.");
+      rememberSession(data.token);
+      setPin("");
+      await loadCards(data.token);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No pudimos iniciar sesión.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   function updateCard(id: string | undefined, field: keyof HomeFeatureCard, value: string | number | boolean) {
@@ -150,42 +170,67 @@ export function AdminDashboard() {
   }
 
   async function saveCards() {
+    if (!sessionToken) return;
     setBusy(true);
     setMessage("");
 
-    for (const card of cards) {
-      if (!card.id) continue;
+    try {
+      await callAdminApi("saveCards", { token: sessionToken, cards });
+      setCards((current) => [...current].sort((a, b) => a.sort_order - b.sort_order));
+      setMessage("Cambios guardados. La home ya está usando esta configuración.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No se pudieron guardar los cambios.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
-      const { error } = await supabase
-        .from("home_feature_cards")
-        .update({
-          title: card.title.trim(),
-          description: card.description.trim(),
-          enabled: card.enabled,
-          sort_order: card.sort_order,
-        })
-        .eq("id", card.id);
+  async function changePin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!sessionToken) return;
+    setMessage("");
 
-      if (error) {
-        setMessage("No se pudieron guardar todos los cambios. Revisa tu acceso e intenta nuevamente.");
-        setBusy(false);
-        return;
-      }
+    if (newPin.length !== 6) {
+      setMessage("El nuevo PIN debe tener exactamente 6 dígitos.");
+      return;
+    }
+    if (newPin !== confirmNewPin) {
+      setMessage("Los dos PIN nuevos no coinciden.");
+      return;
     }
 
-    setCards((current) => [...current].sort((a, b) => a.sort_order - b.sort_order));
-    setMessage("Cambios guardados. La home ya está usando esta configuración.");
-    setBusy(false);
+    setBusy(true);
+    try {
+      const data = await callAdminApi("changePin", { token: sessionToken, newPin });
+      if (!data.token) throw new Error("El PIN cambió, pero no pudimos renovar la sesión.");
+      rememberSession(data.token);
+      setNewPin("");
+      setConfirmNewPin("");
+      setMessage("PIN actualizado. Las demás sesiones fueron cerradas.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No pudimos actualizar el PIN.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function signOut() {
-    await supabase.auth.signOut();
-    setProfile(null);
+    const token = sessionToken;
+    window.localStorage.removeItem(ADMIN_SESSION_KEY);
+    setSessionToken(null);
+    setAuthenticated(false);
     setCards([]);
     setMessage("");
-  }
+    setPin("");
 
-  const canEditHome = Boolean(profile?.active && ["owner", "admin"].includes(profile.role));
+    if (token) {
+      try {
+        await callAdminApi("logout", { token });
+      } catch {
+        // La sesión local ya quedó cerrada aunque falle la revocación remota.
+      }
+    }
+  }
 
   return (
     <main className="admin-page">
@@ -200,7 +245,7 @@ export function AdminDashboard() {
           <span>Marcas</span>
           <span>Rifas</span>
         </nav>
-        <small>{userEmail ? userEmail : "Admin · Social Run"}</small>
+        <small>{authenticated ? "Admin · Sesión con PIN" : "Admin · Social Run"}</small>
       </aside>
 
       <section className="admin-content">
@@ -209,47 +254,74 @@ export function AdminDashboard() {
 
         {!authReady ? (
           <div className="admin-panel-card"><p>Cargando acceso…</p></div>
-        ) : !userId ? (
+        ) : !authenticated && configured === false ? (
+          <div className="admin-panel-card admin-login-card">
+            <div>
+              <p className="section-label">PRIMER ACCESO</p>
+              <h2>Configura tu PIN</h2>
+              <p>Crea un PIN de 6 dígitos. Funcionará como la contraseña del panel y podrás cambiarlo después.</p>
+            </div>
+            <form onSubmit={setupPin} className="admin-pin-form">
+              <label>
+                Nuevo PIN
+                <input
+                  type="password"
+                  value={pin}
+                  onChange={(event) => setPin(normalizePin(event.target.value))}
+                  inputMode="numeric"
+                  autoComplete="new-password"
+                  placeholder="••••••"
+                  minLength={6}
+                  maxLength={6}
+                  pattern="[0-9]{6}"
+                  required
+                />
+              </label>
+              <label>
+                Repite el PIN
+                <input
+                  type="password"
+                  value={confirmPin}
+                  onChange={(event) => setConfirmPin(normalizePin(event.target.value))}
+                  inputMode="numeric"
+                  autoComplete="new-password"
+                  placeholder="••••••"
+                  minLength={6}
+                  maxLength={6}
+                  pattern="[0-9]{6}"
+                  required
+                />
+              </label>
+              <button className="button button-light" disabled={busy || pin.length !== 6 || confirmPin.length !== 6}>Guardar PIN y entrar</button>
+            </form>
+            {message && <p className="admin-feedback">{message}</p>}
+          </div>
+        ) : !authenticated ? (
           <div className="admin-panel-card admin-login-card">
             <div>
               <p className="section-label">ACCESO ADMIN</p>
-              <h2>Entra con un código</h2>
-              <p>Escribe tu correo y te enviaremos un código de 6 dígitos. No necesitas contraseña ni abrir enlaces.</p>
+              <h2>Introduce tu PIN</h2>
+              <p>Usa el PIN de 6 dígitos que configuraste para entrar al panel.</p>
             </div>
-            <form onSubmit={requestAccess} className="admin-login-form">
+            <form onSubmit={login} className="admin-pin-login-form">
               <label>
-                Correo
-                <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required placeholder="tu@correo.com" />
+                PIN
+                <input
+                  type="password"
+                  value={pin}
+                  onChange={(event) => setPin(normalizePin(event.target.value))}
+                  inputMode="numeric"
+                  autoComplete="current-password"
+                  placeholder="••••••"
+                  minLength={6}
+                  maxLength={6}
+                  pattern="[0-9]{6}"
+                  autoFocus
+                  required
+                />
               </label>
-              <button className="button" disabled={busy}>Enviar código</button>
+              <button className="button button-light" disabled={busy || pin.length !== 6}>Entrar</button>
             </form>
-            {accessSent && (
-              <form onSubmit={verifyCode} className="admin-login-form admin-otp-form">
-                <label>
-                  Código de 6 dígitos
-                  <input
-                    value={otp}
-                    onChange={(event) => setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))}
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    placeholder="000000"
-                    minLength={6}
-                    maxLength={6}
-                    pattern="[0-9]{6}"
-                    required
-                  />
-                </label>
-                <button className="button button-light" disabled={busy || otp.length !== 6}>Validar código</button>
-              </form>
-            )}
-            {message && <p className="admin-feedback">{message}</p>}
-          </div>
-        ) : !canEditHome ? (
-          <div className="admin-panel-card">
-            <p className="section-label">ACCESO PENDIENTE</p>
-            <h2>Tu cuenta todavía no tiene permisos de edición</h2>
-            <p>La sesión está creada correctamente. Falta activar este usuario como owner o admin del evento.</p>
-            <button className="text-link admin-signout" onClick={signOut}>Cerrar sesión</button>
             {message && <p className="admin-feedback">{message}</p>}
           </div>
         ) : (
@@ -303,6 +375,48 @@ export function AdminDashboard() {
               </div>
 
               {message && <p className="admin-feedback">{message}</p>}
+            </section>
+
+            <section className="admin-panel-card admin-security-settings">
+              <div className="admin-section-heading">
+                <div>
+                  <p className="section-label">SEGURIDAD</p>
+                  <h2>Cambiar PIN</h2>
+                </div>
+              </div>
+              <form onSubmit={changePin} className="admin-pin-form admin-change-pin-form">
+                <label>
+                  Nuevo PIN
+                  <input
+                    type="password"
+                    value={newPin}
+                    onChange={(event) => setNewPin(normalizePin(event.target.value))}
+                    inputMode="numeric"
+                    autoComplete="new-password"
+                    placeholder="••••••"
+                    minLength={6}
+                    maxLength={6}
+                    pattern="[0-9]{6}"
+                    required
+                  />
+                </label>
+                <label>
+                  Repite el nuevo PIN
+                  <input
+                    type="password"
+                    value={confirmNewPin}
+                    onChange={(event) => setConfirmNewPin(normalizePin(event.target.value))}
+                    inputMode="numeric"
+                    autoComplete="new-password"
+                    placeholder="••••••"
+                    minLength={6}
+                    maxLength={6}
+                    pattern="[0-9]{6}"
+                    required
+                  />
+                </label>
+                <button className="button" disabled={busy || newPin.length !== 6 || confirmNewPin.length !== 6}>Actualizar PIN</button>
+              </form>
             </section>
           </>
         )}
