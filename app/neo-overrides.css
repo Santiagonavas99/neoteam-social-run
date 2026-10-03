@@ -224,7 +224,9 @@ body {
 }
 
 .admin-login-form label,
-.admin-feature-editor label {
+.admin-feature-editor label,
+.admin-pin-form label,
+.admin-pin-login-form label {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -236,7 +238,9 @@ body {
 
 .admin-login-form input,
 .admin-feature-editor input,
-.admin-feature-editor textarea {
+.admin-feature-editor textarea,
+.admin-pin-form input,
+.admin-pin-login-form input {
   width: 100%;
   border: 1px solid var(--line);
   background: #fff;
@@ -248,9 +252,41 @@ body {
 
 .admin-login-form input:focus,
 .admin-feature-editor input:focus,
-.admin-feature-editor textarea:focus {
+.admin-feature-editor textarea:focus,
+.admin-pin-form input:focus,
+.admin-pin-login-form input:focus {
   border-color: var(--team-blue-dark);
   box-shadow: 0 0 0 1px var(--team-blue-dark);
+}
+
+.admin-pin-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: end;
+}
+
+.admin-pin-login-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: end;
+}
+
+.admin-pin-form input,
+.admin-pin-login-form input {
+  min-height: 48px;
+  font-size: 22px;
+  letter-spacing: .34em;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-security-settings {
+  margin-top: 24px;
+}
+
+.admin-change-pin-form {
+  margin-top: 28px;
 }
 
 .admin-otp-form {
@@ -358,6 +394,14 @@ body {
     grid-template-columns: 120px 1fr;
     align-items: end;
   }
+
+  .admin-pin-form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-pin-form .button {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 560px) {
@@ -407,13 +451,21 @@ body {
   .admin-feature-editor,
   .admin-feature-options,
   .admin-topline,
-  .admin-section-heading {
+  .admin-section-heading,
+  .admin-pin-form,
+  .admin-pin-login-form {
     grid-template-columns: 1fr;
     flex-direction: column;
   }
 
-  .admin-login-form {
+  .admin-login-form,
+  .admin-pin-form,
+  .admin-pin-login-form {
     display: grid;
+  }
+
+  .admin-pin-form .button {
+    grid-column: auto;
   }
 
   .admin-feature-editor {
