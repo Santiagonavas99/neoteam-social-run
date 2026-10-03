@@ -106,20 +106,20 @@ export function AdminDashboard() {
     event.preventDefault();
     setBusy(true);
     setMessage("");
+    setOtp("");
 
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
       options: {
         shouldCreateUser: true,
-        emailRedirectTo: `${window.location.origin}/admin`,
       },
     });
 
     if (error) {
-      setMessage("No pudimos enviar el acceso. Revisa el correo e intenta de nuevo.");
+      setMessage("No pudimos enviar el código. Revisa el correo e intenta de nuevo.");
     } else {
       setAccessSent(true);
-      setMessage("Te enviamos un acceso por correo. Puedes usar el enlace o escribir el código recibido.");
+      setMessage("Te enviamos un código de 6 dígitos por correo. Escríbelo aquí para entrar.");
     }
 
     setBusy(false);
@@ -137,7 +137,7 @@ export function AdminDashboard() {
     });
 
     if (error) {
-      setMessage("Ese código no es válido o ya venció.");
+      setMessage("Ese código no es válido o ya venció. Solicita uno nuevo e intenta otra vez.");
     }
 
     setBusy(false);
@@ -213,23 +213,33 @@ export function AdminDashboard() {
           <div className="admin-panel-card admin-login-card">
             <div>
               <p className="section-label">ACCESO ADMIN</p>
-              <h2>Entra con tu correo</h2>
-              <p>El contenido editable está protegido por Supabase Auth y permisos de administrador.</p>
+              <h2>Entra con un código</h2>
+              <p>Escribe tu correo y te enviaremos un código de 6 dígitos. No necesitas contraseña ni abrir enlaces.</p>
             </div>
             <form onSubmit={requestAccess} className="admin-login-form">
               <label>
                 Correo
                 <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required placeholder="tu@correo.com" />
               </label>
-              <button className="button" disabled={busy}>Enviar acceso</button>
+              <button className="button" disabled={busy}>Enviar código</button>
             </form>
             {accessSent && (
               <form onSubmit={verifyCode} className="admin-login-form admin-otp-form">
                 <label>
-                  Código
-                  <input value={otp} onChange={(event) => setOtp(event.target.value)} inputMode="numeric" autoComplete="one-time-code" placeholder="Código del correo" />
+                  Código de 6 dígitos
+                  <input
+                    value={otp}
+                    onChange={(event) => setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))}
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    placeholder="000000"
+                    minLength={6}
+                    maxLength={6}
+                    pattern="[0-9]{6}"
+                    required
+                  />
                 </label>
-                <button className="button button-light" disabled={busy || !otp.trim()}>Validar código</button>
+                <button className="button button-light" disabled={busy || otp.length !== 6}>Validar código</button>
               </form>
             )}
             {message && <p className="admin-feedback">{message}</p>}
