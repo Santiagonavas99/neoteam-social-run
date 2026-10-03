@@ -2,15 +2,13 @@ import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { SiteHeader } from "@/components/site-header";
 import { agenda, eventConfig } from "@/lib/event";
+import { getHomeFeatureCards } from "@/lib/home-features";
 
-const features = [
-  ["01", "Social Run", "Una salida pensada para compartir kilómetros, no para perseguir cronómetro."],
-  ["02", "Crews invitados", "Grupos de running invitados para juntar comunidades en una misma mañana."],
-  ["03", "Marcas", "Aliados con experiencias, producto y activaciones para los asistentes."],
-  ["04", "Rifas", "Inscripciones a carreras y premios entre quienes hagan parte del encuentro."],
-];
+export const dynamic = "force-dynamic";
 
-export default function Home() {
+export default async function Home() {
+  const features = await getHomeFeatureCards();
+
   return (
     <main>
       <section className="hero">
@@ -53,12 +51,12 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="feature-grid shell">
-        {features.map(([number, title, copy]) => (
-          <article className="feature-card" key={number}>
-            <span>{number}</span>
-            <h3>{title}</h3>
-            <p>{copy}</p>
+      <section className="feature-grid shell" aria-label="Características del Social Run">
+        {features.map((feature) => (
+          <article className="feature-card" key={feature.slot}>
+            <span>{String(feature.sort_order).padStart(2, "0")}</span>
+            <h3>{feature.title}</h3>
+            <p>{feature.description}</p>
           </article>
         ))}
       </section>
