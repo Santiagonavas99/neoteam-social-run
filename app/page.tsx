@@ -2,12 +2,12 @@ import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { SiteHeader } from "@/components/site-header";
 import { agenda, eventConfig } from "@/lib/event";
-import { getHomeFeatureCards } from "@/lib/home-features";
+import { getHomeCommunity, getHomeFeatureCards } from "@/lib/home-features";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const features = await getHomeFeatureCards();
+  const [features, community] = await Promise.all([getHomeFeatureCards(), getHomeCommunity()]);
 
   return (
     <main>
@@ -83,17 +83,21 @@ export default async function Home() {
         <div className="community-heading">
           <p className="section-label">COMUNIDAD</p>
           <h2>CORREMOS<br />ACOMPAÑADOS.</h2>
-          <p>La landing queda preparada para mostrar logos reales cuando tengamos confirmados los crews y las marcas.</p>
+          <p>Las comunidades y marcas que acompañan este encuentro.</p>
         </div>
         <div className="logo-panels">
           <div className="logo-panel">
             <span>RUNNING CREWS</span>
-            <strong>NEOTEAM</strong>
-            <small>+ grupos invitados</small>
+            <div className="community-logo-grid">
+              {community.groups.length ? community.groups.map(group => <div className="community-logo" key={group.id}>{group.logo_url ? <img src={group.logo_url} alt={group.name} /> : <strong>{group.name}</strong>}</div>) : <strong>NEOTEAM</strong>}
+            </div>
+            <small>comunidades que se suman</small>
           </div>
           <div className="logo-panel inverted">
             <span>MARCAS INVITADAS</span>
-            <strong>PARTNERS</strong>
+            <div className="community-logo-grid">
+              {community.brands.length ? community.brands.map(brand => <div className="community-logo" key={brand.id}>{brand.logo_url ? <img src={brand.logo_url} alt={brand.name} /> : <strong>{brand.name}</strong>}</div>) : <strong>PARTNERS</strong>}
+            </div>
             <small>activaciones · producto · experiencias</small>
           </div>
         </div>
