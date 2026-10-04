@@ -34,9 +34,16 @@ El formulario usa la función RPC `register_social_run_participant`, que únicam
 
 ### Setup inicial del panel
 
-Antes de configurar el primer PIN, crea un secreto de alta entropía y guárdalo en **Supabase → Edge Functions → Secrets** con el nombre `ADMIN_SETUP_SECRET`. Por ejemplo, puedes generarlo localmente con `openssl rand -base64 32`. No lo agregues al repositorio, a Vercel ni a una variable `NEXT_PUBLIC_*`.
+El panel necesita dos variables públicas de Supabase en cada entorno de Vercel donde se use:
 
-La persona responsable introduce ese secreto una sola vez en `/admin` junto con el PIN inicial. El backend limita los intentos de setup y rechaza la operación si el secreto no está configurado. Cuando el PIN se configure correctamente, el secreto deja de ser necesario para el acceso normal; puedes eliminarlo desde Supabase.
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+
+En Vercel, agrega ambas a **Settings → Environment Variables** para `Preview` (y para `Production` si vas a usar el panel allí). Para una preview ligada a una rama concreta, selecciona esa rama. Estos valores identifican el proyecto Supabase y su clave publishable; **no configures el PIN como variable de Vercel**.
+
+Para proteger el primer acceso, crea una clave privada de setup y guárdala solo en **Supabase → Edge Functions → Secrets**, con el nombre `ADMIN_SETUP_SECRET`. Puedes generarla localmente con `openssl rand -hex 32`. No la agregues al repositorio ni a una variable `NEXT_PUBLIC_*`.
+
+Primer acceso: abre `/admin`, introduce `ADMIN_SETUP_SECRET` y escribe el nuevo PIN de 6 dígitos dos veces. El backend guarda el PIN cifrado en Supabase. En adelante, inicia sesión con el PIN; no vuelvas a escribir la clave de setup. El backend limita los intentos y rechaza el setup si el secreto no está configurado. Puedes eliminar `ADMIN_SETUP_SECRET` desde Supabase después de completar el primer acceso.
 
 Las Edge Functions usan `Deno.env.get("ADMIN_SETUP_SECRET")`; Supabase aplica los cambios de secretos sin volver a desplegar la función.
 
