@@ -1,5 +1,14 @@
 import type { Metadata } from "next";
+import { Host_Grotesk } from "next/font/google";
 import "./globals.css";
+import "./neo-overrides.css";
+
+const hostGrotesk = Host_Grotesk({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-host-grotesk",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Social Run · NeoTeam",
@@ -8,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es">
+    <html lang="es" className={hostGrotesk.variable}>
       <body>{children}</body>
     </html>
   );

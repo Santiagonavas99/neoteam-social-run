@@ -2,15 +2,13 @@ import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { SiteHeader } from "@/components/site-header";
 import { agenda, eventConfig } from "@/lib/event";
+import { getHomeCommunity, getHomeFeatureCards } from "@/lib/home-features";
 
-const features = [
-  ["01", "Social Run", "Una salida pensada para compartir kilómetros, no para perseguir cronómetro."],
-  ["02", "Crews invitados", "Grupos de running invitados para juntar comunidades en una misma mañana."],
-  ["03", "Marcas", "Aliados con experiencias, producto y activaciones para los asistentes."],
-  ["04", "Rifas", "Inscripciones a carreras y premios entre quienes hagan parte del encuentro."],
-];
+export const dynamic = "force-dynamic";
 
-export default function Home() {
+export default async function Home() {
+  const [features, community] = await Promise.all([getHomeFeatureCards(), getHomeCommunity()]);
+
   return (
     <main>
       <section className="hero">
@@ -53,15 +51,17 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="feature-grid shell">
-        {features.map(([number, title, copy]) => (
-          <article className="feature-card" key={number}>
-            <span>{number}</span>
-            <h3>{title}</h3>
-            <p>{copy}</p>
+      <section className="feature-grid shell" aria-label="Características del Social Run">
+        {features.map((feature) => (
+          <article className="feature-card" key={feature.slot}>
+            <span>{String(feature.sort_order).padStart(2, "0")}</span>
+            <h3>{feature.title}</h3>
+            <p>{feature.description}</p>
           </article>
         ))}
       </section>
+
+      <div className="carousel-hint shell" aria-hidden="true"><span>Desliza para descubrir el plan</span><span>→</span></div>
 
       <section className="agenda-section" id="agenda">
         <div className="shell agenda-grid">
@@ -85,17 +85,21 @@ export default function Home() {
         <div className="community-heading">
           <p className="section-label">COMUNIDAD</p>
           <h2>CORREMOS<br />ACOMPAÑADOS.</h2>
-          <p>La landing queda preparada para mostrar logos reales cuando tengamos confirmados los crews y las marcas.</p>
+          <p>Las comunidades y marcas que acompañan este encuentro.</p>
         </div>
         <div className="logo-panels">
           <div className="logo-panel">
             <span>RUNNING CREWS</span>
-            <strong>NEOTEAM</strong>
-            <small>+ grupos invitados</small>
+            <div className="community-logo-grid">
+              {community.groups.length ? community.groups.map(group => <div className="community-logo" key={group.id}>{group.logo_url ? <img src={group.logo_url} alt={group.name} /> : <strong>{group.name}</strong>}</div>) : <strong>NEOTEAM</strong>}
+            </div>
+            <small>comunidades que se suman</small>
           </div>
           <div className="logo-panel inverted">
             <span>MARCAS INVITADAS</span>
-            <strong>PARTNERS</strong>
+            <div className="community-logo-grid">
+              {community.brands.length ? community.brands.map(brand => <div className="community-logo" key={brand.id}>{brand.logo_url ? <img src={brand.logo_url} alt={brand.name} /> : <strong>{brand.name}</strong>}</div>) : <strong>PARTNERS</strong>}
+            </div>
             <small>activaciones · producto · experiencias</small>
           </div>
         </div>
@@ -119,3 +123,4 @@ export default function Home() {
     </main>
   );
 }
+

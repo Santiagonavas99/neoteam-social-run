@@ -7,12 +7,13 @@ export function SiteHeader() {
         <span className="brand-mark">N</span>
         <span>NEOTEAM</span>
       </Link>
-      <nav>
+      <nav aria-label="Navegación principal">
         <a href="/#evento">Evento</a>
         <a href="/#agenda">Agenda</a>
         <a href="/#invitados">Invitados</a>
-        <Link className="button button-small" href="/registro">Quiero participar</Link>
+        <Link className="button button-small" href="/registro">Registrarme</Link>
       </nav>
     </header>
   );
 }
+
