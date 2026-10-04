@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { SiteHeader } from "@/components/site-header";
+import { HorizontalCarousel } from "@/components/horizontal-carousel";
+import { CommunityCarousel } from "@/components/community-carousel";
 import { agenda, eventConfig } from "@/lib/event";
 import { getHomeCommunity, getHomeFeatureCards } from "@/lib/home-features";
 
@@ -8,6 +10,9 @@ export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const [features, community] = await Promise.all([getHomeFeatureCards(), getHomeCommunity()]);
+  const organizers = community.brands.filter(brand => brand.type === "organizer");
+  const sponsors = community.brands.filter(brand => brand.type === "sponsor");
+  const partners = community.brands.filter(brand => brand.type === "main_partner" || brand.type === "invited");
 
   return (
     <main>
@@ -51,7 +56,8 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="feature-grid shell" aria-label="Características del Social Run">
+      {features.length > 0 && <section className="feature-section shell">
+        <HorizontalCarousel ariaLabel="Características del Social Run" className="feature-carousel">
         {features.map((feature) => (
           <article className="feature-card" key={feature.slot}>
             <span>{String(feature.sort_order).padStart(2, "0")}</span>
@@ -59,16 +65,15 @@ export default async function Home() {
             <p>{feature.description}</p>
           </article>
         ))}
-      </section>
-
-      <div className="carousel-hint shell" aria-hidden="true"><span>Desliza para descubrir el plan</span><span>→</span></div>
+        </HorizontalCarousel>
+      </section>}
 
       <section className="agenda-section" id="agenda">
         <div className="shell agenda-grid">
           <div className="agenda-title">
             <p className="section-label light">18 OCT · 2026</p>
             <h2>UNA MAÑANA<br />PARA CORRER<br />Y QUEDARSE.</h2>
-            <p>Horarios iniciales de trabajo. Los dejamos centralizados para poder actualizarlos luego desde configuración.</p>
+            <p>Una mañana para correr, conectar y celebrar juntos.</p>
           </div>
           <div className="agenda-list">
             {agenda.map(([time, name]) => (
@@ -81,29 +86,19 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="community shell" id="invitados">
+      {(community.groups.length > 0 || organizers.length + sponsors.length + partners.length > 0) && <section className="community shell" id="invitados">
         <div className="community-heading">
           <p className="section-label">COMUNIDAD</p>
           <h2>CORREMOS<br />ACOMPAÑADOS.</h2>
           <p>Las comunidades y marcas que acompañan este encuentro.</p>
         </div>
         <div className="logo-panels">
-          <div className="logo-panel">
-            <span>RUNNING CREWS</span>
-            <div className="community-logo-grid">
-              {community.groups.length ? community.groups.map(group => <div className="community-logo" key={group.id}>{group.logo_url ? <img src={group.logo_url} alt={group.name} /> : <strong>{group.name}</strong>}</div>) : <strong>NEOTEAM</strong>}
-            </div>
-            <small>comunidades que se suman</small>
-          </div>
-          <div className="logo-panel inverted">
-            <span>MARCAS INVITADAS</span>
-            <div className="community-logo-grid">
-              {community.brands.length ? community.brands.map(brand => <div className="community-logo" key={brand.id}>{brand.logo_url ? <img src={brand.logo_url} alt={brand.name} /> : <strong>{brand.name}</strong>}</div>) : <strong>PARTNERS</strong>}
-            </div>
-            <small>activaciones · producto · experiencias</small>
-          </div>
+          <CommunityCarousel items={community.groups} title="RUNNING CREWS" description="comunidades que se suman" />
+          <CommunityCarousel items={organizers} title="ORGANIZACIÓN" description="quienes hacen posible este encuentro" />
+          <CommunityCarousel items={sponsors} title="MARCAS" description="marcas que nos acompañan" />
+          <CommunityCarousel items={partners} title="PARTNERS / MARCAS INVITADAS" description="activaciones · producto · experiencias" />
         </div>
-      </section>
+      </section>}
 
       <section className="raffle shell">
         <div className="raffle-card">
@@ -123,4 +118,3 @@ export default async function Home() {
     </main>
   );
 }
-
