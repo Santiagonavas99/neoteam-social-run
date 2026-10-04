@@ -10,6 +10,7 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
 
 const SESSION_DAYS = 30;
 const PBKDF2_ITERATIONS = 180_000;
+const ADMIN_SETUP_SECRET = Deno.env.get("ADMIN_SETUP_SECRET")?.trim() ?? "";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -87,6 +88,21 @@ function validPin(pin: unknown): pin is string {
   return typeof pin === "string" && /^\d{6}$/.test(pin);
 }
 
+function secretsMatch(candidate: unknown, expected: string) {
+  if (typeof candidate !== "string" || candidate.length > 1024) return false;
+  const left = new TextEncoder().encode(candidate.trim());
+  const right = new TextEncoder().encode(expected);
+  if (left.length !== right.length) return false;
+  let diff = 0;
+  for (let i = 0; i < left.length; i++) diff |= left[i] ^ right[i];
+  return diff === 0;
+}
+
+async function verifySetupSecret(candidate: unknown) {
+  if (typeof candidate !== "string" || ADMIN_SETUP_SECRET.length < 12 || candidate.length > 1024) return false;
+  return secretsMatch(await sha256(candidate.trim()), await sha256(ADMIN_SETUP_SECRET));
+}
+
 function getClientIp(req: Request) {
   const forwarded = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
   return forwarded || req.headers.get("cf-connecting-ip") || "unknown";
@@ -151,13 +167,16 @@ Deno.serve(async (req: Request) => {
         .eq("id", 1)
         .maybeSingle();
       if (error) throw error;
-      return json({ configured: Boolean(data) });
+      return json({
+        configured: Boolean(data),
+        setupRequiresSecret: !data,
+        setupSecretReady: Boolean(data) || ADMIN_SETUP_SECRET.length >= 12,
+      });
     }
 
     if (action === "setup") {
       const pin = body?.pin;
       if (!validPin(pin)) return json({ error: "El PIN debe tener exactamente 6 dígitos." }, 400);
-
       const { data: existing, error: existingError } = await supabase
         .from("admin_pin_settings")
         .select("id")
@@ -165,6 +184,16 @@ Deno.serve(async (req: Request) => {
         .maybeSingle();
       if (existingError) throw existingError;
       if (existing) return json({ error: "El PIN ya fue configurado." }, 409);
+
+      if (ADMIN_SETUP_SECRET.length < 12) {
+        return json({ error: "Falta configurar la clave privada de setup en Supabase." }, 503);
+      }
+      if (!(await checkRateLimit(ip))) {
+        return json({ error: "Demasiados intentos. Espera unos minutos antes de volver a intentar." }, 429);
+      }
+      const setupAuthorized = await verifySetupSecret(body?.setupSecret);
+      await recordAttempt(ip, setupAuthorized);
+      if (!setupAuthorized) return json({ error: "La clave privada de setup no es correcta." }, 401);
 
       const pinHash = await hashPin(pin);
       const { error } = await supabase.from("admin_pin_settings").insert({ id: 1, pin_hash: pinHash });
@@ -248,16 +277,39 @@ Deno.serve(async (req: Request) => {
     if (action === "changePin") {
       const session = await requireSession(body?.token);
       if (!session) return json({ error: "Sesión no válida." }, 401);
+      const currentPin = body?.currentPin;
       const newPin = body?.newPin;
+      if (!validPin(currentPin)) return json({ error: "Escribe tu PIN actual de 6 dígitos." }, 400);
       if (!validPin(newPin)) return json({ error: "El nuevo PIN debe tener exactamente 6 dígitos." }, 400);
+      if (!(await checkRateLimit(ip))) {
+        return json({ error: "Demasiados intentos. Espera unos minutos antes de volver a intentar." }, 429);
+      }
+      const { data: currentSettings, error: currentSettingsError } = await supabase
+        .from("admin_pin_settings")
+        .select("pin_hash")
+        .eq("id", 1)
+        .maybeSingle();
+      if (currentSettingsError) throw currentSettingsError;
+      const currentPinIsValid = Boolean(currentSettings && await verifyPin(currentPin, currentSettings.pin_hash));
+      await recordAttempt(ip, currentPinIsValid);
+      if (!currentPinIsValid) {
+        return json({ error: "El PIN actual no es correcto." }, 401);
+      }
       const pinHash = await hashPin(newPin);
+      const freshSession = await createSession();
       const { error } = await supabase
         .from("admin_pin_settings")
         .update({ pin_hash: pinHash, updated_at: new Date().toISOString() })
         .eq("id", 1);
-      if (error) throw error;
-      await supabase.from("admin_pin_sessions").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-      const freshSession = await createSession();
+      if (error) {
+        await supabase.from("admin_pin_sessions").delete().eq("token_hash", await sha256(freshSession.token));
+        throw error;
+      }
+      const { error: revokeError } = await supabase
+        .from("admin_pin_sessions")
+        .delete()
+        .neq("token_hash", await sha256(freshSession.token));
+      if (revokeError) throw revokeError;
       return json({ ok: true, ...freshSession });
     }
 
