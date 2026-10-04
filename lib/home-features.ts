@@ -56,9 +56,7 @@ export async function getHomeFeatureCards(): Promise<HomeFeatureCard[]> {
       .order("sort_order", { ascending: true });
 
     if (error) throw error;
-    if (!data?.length) return defaultHomeFeatureCards;
-
-    return data as HomeFeatureCard[];
+    return (data ?? []) as HomeFeatureCard[];
   } catch (error) {
     console.error("Home feature cards fallback", error);
     return defaultHomeFeatureCards;
