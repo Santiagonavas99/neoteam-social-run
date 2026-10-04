@@ -274,6 +274,121 @@ Deno.serve(async (req: Request) => {
       return json({ ok: true });
     }
 
+    // All event-management actions are gated by the PIN session. Keep table and
+    // column names server controlled; the browser never receives the service key.
+    if (["adminData", "uploadAdminImage"].includes(action)) {
+      const session = await requireSession(body?.token);
+      if (!session) return json({ error: "Sesión no válida." }, 401);
+
+      if (action === "uploadAdminImage") {
+        const mime = body?.mime;
+        const allowedMime = ["image/png", "image/jpeg", "image/webp"];
+        if (!allowedMime.includes(mime) || typeof body?.content !== "string" || body.content.length > 5_600_000) {
+          return json({ error: "El archivo debe ser PNG, JPG o WEBP y pesar menos de 4 MB." }, 400);
+        }
+        const bytes = Uint8Array.from(atob(body.content), (char) => char.charCodeAt(0));
+        if (bytes.length > 4 * 1024 * 1024) return json({ error: "La imagen supera el límite de 4 MB." }, 400);
+        const extension = ({ "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp" } as Record<string,string>)[mime];
+        const path = `${crypto.randomUUID()}.${extension}`;
+        const { error } = await supabase.storage.from("admin-media").upload(path, bytes, { contentType: mime, upsert: false });
+        if (error) throw error;
+        const { data } = supabase.storage.from("admin-media").getPublicUrl(path);
+        return json({ ok: true, url: data.publicUrl });
+      }
+
+      const resource = body?.resource;
+      const operation = body?.operation;
+      const configs: Record<string, { table: string; fields: string; writable: string[] }> = {
+        brands: { table: "brands", fields: "id,name,slug,logo_url,website,instagram,type,active,sort_order,show_on_home", writable: ["name","slug","logo_url","website","instagram","type","active","sort_order","show_on_home"] },
+        groups: { table: "running_groups", fields: "id,name,slug,logo_url,instagram,invited,active,sort_order,show_on_home", writable: ["name","slug","logo_url","instagram","invited","active","sort_order","show_on_home"] },
+        participants: { table: "registrations", fields: "id,registration_number,registration_code,first_name,last_name,document_type,document_number,email,phone,running_group_id,other_running_group,shirt_size,status,checked_in_at,created_at", writable: ["status","checked_in_at"] },
+        raffles: { table: "raffles", fields: "id,event_id,name,description,prize,sponsor_brand_id,winner_count,requires_checkin,draw_at,status,created_at", writable: ["name","description","prize","sponsor_brand_id","winner_count","requires_checkin","draw_at","status"] },
+      };
+      if (resource === "metrics" && operation === "list") {
+        const event = await supabase.from("events").select("id,code,name,event_date,status,registration_open,checkin_open").eq("code", "SR26").single();
+        if (event.error) throw event.error;
+        const [registered, checked, groups, brands, raffles] = await Promise.all([
+          supabase.from("registrations").select("id", { count: "exact", head: true }).eq("event_id", event.data.id).neq("status", "cancelled"),
+          supabase.from("registrations").select("id", { count: "exact", head: true }).eq("event_id", event.data.id).eq("status", "checked_in"),
+          supabase.from("registrations").select("running_group_id").eq("event_id", event.data.id).not("running_group_id", "is", null),
+          supabase.from("brands").select("id", { count: "exact", head: true }).eq("active", true),
+          supabase.from("raffles").select("id", { count: "exact", head: true }).eq("event_id", event.data.id),
+        ]);
+        for (const result of [registered, checked, groups, brands, raffles]) if (result.error) throw result.error;
+        return json({ event: event.data, metrics: { registered: registered.count ?? 0, checkedIn: checked.count ?? 0, groups: new Set((groups.data ?? []).map((row: any) => row.running_group_id)).size, brands: brands.count ?? 0, raffles: raffles.count ?? 0 } });
+      }
+      const config = configs[resource];
+      if (!config) return json({ error: "Sección administrativa no válida." }, 400);
+      if (operation === "list") {
+        let query = supabase.from(config.table).select(config.fields);
+        if (resource === "participants" || resource === "raffles") {
+          const { data: event, error } = await supabase.from("events").select("id").eq("code", "SR26").single();
+          if (error) throw error;
+          query = query.eq("event_id", event.id);
+        }
+        if (resource === "participants") query = query.order("created_at", { ascending: false });
+        else if (resource === "brands" || resource === "groups") query = query.order("sort_order", { ascending: true }).order("name", { ascending: true });
+        else query = query.order("created_at", { ascending: false });
+        const { data, error } = await query;
+        if (error) throw error;
+        return json({ rows: data ?? [] });
+      }
+      if (operation === "save") {
+        const values = body?.values;
+        if (!values || typeof values !== "object" || Array.isArray(values)) return json({ error: "Datos incompletos." }, 400);
+        const safeValues: Record<string, unknown> = {};
+        for (const key of config.writable) if (key in values) safeValues[key] = values[key];
+        if (resource === "participants") {
+          if (!["checked_in", "registered", "no_show", "cancelled"].includes(String(safeValues.status))) return json({ error: "Estado de participante inválido." }, 400);
+          safeValues.checked_in_at = safeValues.status === "checked_in" ? new Date().toISOString() : null;
+        } else {
+          if (typeof safeValues.name !== "string" || !safeValues.name.trim()) return json({ error: "El nombre es obligatorio." }, 400);
+          safeValues.name = safeValues.name.trim().slice(0, 120);
+          if (resource === "brands" || resource === "groups") safeValues.slug = String(safeValues.slug || safeValues.name).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 100);
+        }
+        if (values.id) {
+          const { error } = await supabase.from(config.table).update(safeValues).eq("id", values.id);
+          if (error) throw error;
+        } else {
+          if (resource === "participants") return json({ error: "Los participantes se crean desde el formulario de registro." }, 400);
+          if (resource === "raffles") {
+            const { data: event, error } = await supabase.from("events").select("id").eq("code", "SR26").single();
+            if (error) throw error;
+            safeValues.event_id = event.id;
+          }
+          const { error } = await supabase.from(config.table).insert(safeValues);
+          if (error) throw error;
+        }
+        return json({ ok: true });
+      }
+      if (operation === "delete") {
+        if (!body?.id || !["brands", "groups", "raffles"].includes(resource)) return json({ error: "No se puede eliminar este registro." }, 400);
+        const { error } = await supabase.from(config.table).delete().eq("id", body.id);
+        if (error) throw error;
+        return json({ ok: true });
+      }
+      if (operation === "draw" && resource === "raffles") {
+        const { data: raffle, error: raffleError } = await supabase.from("raffles").select("id,event_id,winner_count,requires_checkin,status").eq("id", body?.id).single();
+        if (raffleError) throw raffleError;
+        if (raffle.status !== "open") return json({ error: "Abre la rifa antes de sortear." }, 409);
+        let entries = supabase.from("registrations").select("id").eq("event_id", raffle.event_id).neq("status", "cancelled");
+        if (raffle.requires_checkin) entries = entries.eq("status", "checked_in");
+        const { data: eligible, error: eligibleError } = await entries;
+        if (eligibleError) throw eligibleError;
+        const shuffled = (eligible ?? []).sort(() => Math.random() - 0.5).slice(0, raffle.winner_count);
+        if (!shuffled.length) return json({ error: "No hay participantes elegibles para esta rifa." }, 409);
+        const now = new Date().toISOString();
+        const { error: clearError } = await supabase.from("raffle_entries").delete().eq("raffle_id", raffle.id);
+        if (clearError) throw clearError;
+        const { error: insertError } = await supabase.from("raffle_entries").insert(shuffled.map((winner: any) => ({ raffle_id: raffle.id, registration_id: winner.id, is_winner: true, drawn_at: now })));
+        if (insertError) throw insertError;
+        const { error: updateError } = await supabase.from("raffles").update({ status: "drawn", draw_at: now }).eq("id", raffle.id);
+        if (updateError) throw updateError;
+        return json({ ok: true, winners: shuffled.length });
+      }
+      return json({ error: "Operación administrativa no válida." }, 400);
+    }
+
     if (action === "changePin") {
       const session = await requireSession(body?.token);
       if (!session) return json({ error: "Sesión no válida." }, 401);
