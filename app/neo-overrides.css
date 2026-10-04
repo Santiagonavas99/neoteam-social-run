@@ -370,7 +370,37 @@ body {
   background: #eef3f2;
 }
 
+.admin-module-tabs { display:flex; gap:8px; overflow:auto; padding:4px 0 18px; margin:8px 0 18px; border-bottom:1px solid #e4e5df; }
+.admin-module-tabs button { border:1px solid #d9dbd4; border-radius:999px; padding:10px 16px; background:#fff; color:#222; white-space:nowrap; cursor:pointer; }
+.admin-module-tabs button.active { background:#050505; border-color:#050505; color:#fff; }
+.admin-list-toolbar { display:flex; gap:12px; align-items:center; margin:12px 0 18px; }
+.admin-list-toolbar input { flex:1; }
+.admin-record-list { display:grid; gap:12px; }
+.admin-record { display:grid; grid-template-columns:minmax(180px,.8fr) minmax(0,1.5fr); gap:20px; align-items:start; padding:18px; border:1px solid #e5e5df; border-radius:16px; background:#fff; }
+.admin-record-main { display:grid; gap:8px; }
+.admin-record-main strong { font-size:17px; }
+.admin-record-main small { color:#686b66; line-height:1.45; overflow-wrap:anywhere; }
+.admin-record-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.admin-record-form label,.admin-inline-field { display:grid; gap:6px; font-size:12px; }
+.admin-record-form input,.admin-record-form select,.admin-inline-field select,.admin-list-toolbar input { min-width:0; border:1px solid #d6d8d1; border-radius:9px; padding:10px 12px; background:#fff; color:#111; }
+.admin-record-form input[type=file] { padding:7px; font-size:12px; }
+.admin-record-form .admin-toggle { display:flex; align-items:center; align-self:end; gap:8px; }
+.admin-row-actions { grid-column:1/-1; display:flex; align-items:center; gap:16px; }
+.admin-logo-preview { width:72px; height:72px; object-fit:contain; border:1px solid #e5e5df; border-radius:10px; padding:6px; background:#fafaf8; }
+.admin-live-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.admin-live-metrics article { display:grid; gap:14px; padding:20px; border-radius:14px; background:#f4f5f0; }
+.admin-live-metrics article span { color:#575b55; font-size:12px; text-transform:uppercase; letter-spacing:.06em; }
+.admin-live-metrics article strong { font-size:38px; }
+.admin-live-metrics p,.admin-empty { grid-column:1/-1; color:#686b66; padding:20px 4px; }
+.community-logo-grid { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin:20px 0; }
+.community-logo { display:flex; min-width:88px; min-height:64px; align-items:center; justify-content:center; padding:10px; border-radius:10px; background:rgba(255,255,255,.9); color:#050505; }
+.community-logo img { display:block; max-width:140px; width:auto; max-height:58px; object-fit:contain; }
+.logo-panel.inverted .community-logo { background:#fff; }
+
 @media (max-width: 850px) {
+  .admin-record { grid-template-columns:1fr; }
+  .admin-record-form,.admin-live-metrics { grid-template-columns:1fr; }
+  .admin-list-toolbar { align-items:stretch; flex-direction:column; }
   .registration-page {
     background: #fff;
   }
