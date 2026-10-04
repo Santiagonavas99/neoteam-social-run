@@ -15,6 +15,7 @@ export function AdminManagement({ token, callApi, onMessage }: {
 }) {
   const [section, setSection] = useState<string>("participants");
   const [rows, setRows] = useState<Row[]>([]);
+  const [brandOptions, setBrandOptions] = useState<Row[]>([]);
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
@@ -26,6 +27,10 @@ export function AdminManagement({ token, callApi, onMessage }: {
         const result = await callApi("adminData", { token, resource: "metrics", operation: "list" });
         setMetrics(result.metrics);
       } else {
+        if (current === "raffles") {
+          const brands = await callApi("adminData", { token, resource: "brands", operation: "list" });
+          setBrandOptions(brands.rows ?? []);
+        }
         const result = await callApi("adminData", { token, resource: current, operation: "list" });
         setRows(result.rows ?? []);
       }
@@ -97,8 +102,9 @@ export function AdminManagement({ token, callApi, onMessage }: {
         {filteredRows.map((row, index) => <article className="admin-record" key={row.id}>
           {section === "participants" ? <>
             <div className="admin-record-main"><strong>{row.first_name} {row.last_name}</strong><small>{row.registration_code || `Registro #${row.registration_number}`} · {row.email} · {row.phone}</small><small>{row.document_type} {row.document_number} · Talla {row.shirt_size || "—"}</small></div>
+            <div className="admin-record-main"><small>Grupo: {row.running_groups?.name || row.other_running_group || "Independiente"}</small></div>
             <label className="admin-inline-field">Asistencia<select value={row.status} onChange={e => void save({ id: row.id, status: e.target.value })}><option value="registered">Inscrito</option><option value="checked_in">Check-in</option><option value="no_show">No asistió</option><option value="cancelled">Cancelado</option></select></label>
-          </> : section === "raffles" ? <RaffleEditor row={row} save={save} remove={remove} callApi={callApi} token={token} refresh={() => load()} /> : <>
+          </> : section === "raffles" ? <RaffleEditor row={row} brands={brandOptions} save={save} remove={remove} callApi={callApi} token={token} refresh={() => load()} /> : <>
             <div className="admin-record-main"><strong>{row.name || "Nuevo registro"}</strong>{row.logo_url && <img className="admin-logo-preview" src={row.logo_url} alt={`Logo ${row.name}`} />}<small>{cards ? (section === "brands" ? row.type : row.invited ? "Invitado" : "Grupo") : ""}</small></div>
             <div className="admin-record-form">
               <label>Nombre<input value={row.name} onChange={e => setRows(items => items.map((x,i) => i === index ? {...x,name:e.target.value} : x))} /></label>
@@ -117,7 +123,7 @@ export function AdminManagement({ token, callApi, onMessage }: {
   </section>;
 }
 
-function RaffleEditor({ row, save, remove, callApi, token, refresh }: any) {
+function RaffleEditor({ row, brands, save, remove, callApi, token, refresh }: any) {
   const [values, setValues] = useState(row);
   async function draw() {
     try { await callApi("adminData", { token, resource: "raffles", operation: "draw", id: row.id }); await refresh(); }
@@ -127,6 +133,7 @@ function RaffleEditor({ row, save, remove, callApi, token, refresh }: any) {
   return <div className="admin-record-form"><strong>{row.name || "Nueva rifa"}</strong>{field("name","Nombre de la rifa")}{field("prize","Premio")}{field("description","Descripción")}
     <label>Ganadores<input type="number" min="1" value={values.winner_count ?? 1} onChange={e => setValues({...values,winner_count:Number(e.target.value)})} /></label>
     <label>Estado<select value={values.status ?? "draft"} onChange={e => setValues({...values,status:e.target.value})}><option value="draft">Borrador</option><option value="open">Abierta</option><option value="drawn">Sorteada</option><option value="cancelled">Cancelada</option></select></label>
+    <label>Marca patrocinadora<select value={values.sponsor_brand_id ?? ""} onChange={e => setValues({...values,sponsor_brand_id:e.target.value || null})}><option value="">Sin patrocinador</option>{brands.filter((brand: Row) => brand.active).map((brand: Row) => <option key={brand.id} value={brand.id}>{brand.name}</option>)}</select></label>
     <label className="admin-toggle"><input type="checkbox" checked={Boolean(values.requires_checkin)} onChange={e => setValues({...values,requires_checkin:e.target.checked})} /> Requiere check-in</label>
     <div className="admin-row-actions"><button className="button" onClick={() => void save(values,"raffles")}>Guardar rifa</button>{row.id && !String(row.id).startsWith("new-") && values.status === "open" && <button className="button" onClick={() => void draw()}>Sortear ganadores</button>}<button className="text-link" onClick={() => void remove(row)}>Eliminar</button></div>
   </div>;
