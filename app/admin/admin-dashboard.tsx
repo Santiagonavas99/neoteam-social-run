@@ -15,6 +15,7 @@ const ADMIN_SESSION_KEY = "neoteam_admin_pin_session";
 type AdminApiResponse = {
   ok?: boolean;
   configured?: boolean;
+  setupSecretReady?: boolean;
   valid?: boolean;
   token?: string;
   expiresAt?: string;
@@ -54,12 +55,15 @@ function normalizePin(value: string) {
 export function AdminDashboard() {
   const [authReady, setAuthReady] = useState(false);
   const [configured, setConfigured] = useState<boolean | null>(null);
+  const [setupSecretReady, setSetupSecretReady] = useState<boolean | null>(null);
   const [authenticated, setAuthenticated] = useState(false);
   const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [setupSecret, setSetupSecret] = useState("");
   const [pin, setPin] = useState("");
   const [confirmPin, setConfirmPin] = useState("");
   const [newPin, setNewPin] = useState("");
   const [confirmNewPin, setConfirmNewPin] = useState("");
+  const [currentPin, setCurrentPin] = useState("");
   const [cards, setCards] = useState<HomeFeatureCard[]>([]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -72,6 +76,7 @@ export function AdminDashboard() {
         const status = await callAdminApi("status");
         if (!active) return;
         setConfigured(Boolean(status.configured));
+        setSetupSecretReady(status.setupSecretReady ?? null);
 
         const storedToken = window.localStorage.getItem(ADMIN_SESSION_KEY);
         if (!storedToken) return;
@@ -125,12 +130,13 @@ export function AdminDashboard() {
 
     setBusy(true);
     try {
-      const data = await callAdminApi("setup", { pin });
+      const data = await callAdminApi("setup", { pin, setupSecret });
       if (!data.token) throw new Error("No pudimos crear la sesión administrativa.");
       rememberSession(data.token);
       setConfigured(true);
       setPin("");
       setConfirmPin("");
+      setSetupSecret("");
       await loadCards(data.token);
       setMessage("PIN configurado. Ya tienes acceso al panel.");
     } catch (error) {
@@ -201,11 +207,16 @@ export function AdminDashboard() {
 
     setBusy(true);
     try {
-      const data = await callAdminApi("changePin", { token: sessionToken, newPin });
+      if (currentPin.length !== 6) {
+        setMessage("Escribe tu PIN actual de 6 dígitos.");
+        return;
+      }
+      const data = await callAdminApi("changePin", { token: sessionToken, currentPin, newPin });
       if (!data.token) throw new Error("El PIN cambió, pero no pudimos renovar la sesión.");
       rememberSession(data.token);
       setNewPin("");
       setConfirmNewPin("");
+      setCurrentPin("");
       setMessage("PIN actualizado. Las demás sesiones fueron cerradas.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No pudimos actualizar el PIN.");
@@ -259,9 +270,22 @@ export function AdminDashboard() {
             <div>
               <p className="section-label">PRIMER ACCESO</p>
               <h2>Configura tu PIN</h2>
-              <p>Crea un PIN de 6 dígitos. Funcionará como la contraseña del panel y podrás cambiarlo después.</p>
+              <p>Crea un PIN de 6 dígitos. Por seguridad, el setup inicial también requiere una clave privada configurada por el responsable del proyecto en Supabase.</p>
+              {setupSecretReady === false && (
+                <p className="admin-feedback">El setup está bloqueado hasta que el responsable configure <code>ADMIN_SETUP_SECRET</code> en los secretos de Supabase.</p>
+              )}
             </div>
             <form onSubmit={setupPin} className="admin-pin-form">
+              <label>
+                Clave privada de setup
+                <input
+                  type="password"
+                  value={setupSecret}
+                  onChange={(event) => setSetupSecret(event.target.value)}
+                  autoComplete="off"
+                  required
+                />
+              </label>
               <label>
                 Nuevo PIN
                 <input
@@ -292,7 +316,7 @@ export function AdminDashboard() {
                   required
                 />
               </label>
-              <button className="button button-light" disabled={busy || pin.length !== 6 || confirmPin.length !== 6}>Guardar PIN y entrar</button>
+              <button className="button button-light" disabled={busy || setupSecretReady === false || !setupSecret || pin.length !== 6 || confirmPin.length !== 6}>Guardar PIN y entrar</button>
             </form>
             {message && <p className="admin-feedback">{message}</p>}
           </div>
@@ -386,6 +410,21 @@ export function AdminDashboard() {
               </div>
               <form onSubmit={changePin} className="admin-pin-form admin-change-pin-form">
                 <label>
+                  PIN actual
+                  <input
+                    type="password"
+                    value={currentPin}
+                    onChange={(event) => setCurrentPin(normalizePin(event.target.value))}
+                    inputMode="numeric"
+                    autoComplete="current-password"
+                    placeholder="••••••"
+                    minLength={6}
+                    maxLength={6}
+                    pattern="[0-9]{6}"
+                    required
+                  />
+                </label>
+                <label>
                   Nuevo PIN
                   <input
                     type="password"
@@ -415,7 +454,7 @@ export function AdminDashboard() {
                     required
                   />
                 </label>
-                <button className="button" disabled={busy || newPin.length !== 6 || confirmNewPin.length !== 6}>Actualizar PIN</button>
+                <button className="button" disabled={busy || currentPin.length !== 6 || newPin.length !== 6 || confirmNewPin.length !== 6}>Actualizar PIN</button>
               </form>
             </section>
           </>
