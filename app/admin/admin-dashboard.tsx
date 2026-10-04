@@ -242,13 +242,8 @@ export function AdminDashboard() {
       <aside className="admin-sidebar">
         <div className="brand"><span className="brand-mark">N</span><span>NEOTEAM</span></div>
         <nav>
-          <strong>Overview</strong>
-          <span>Contenido home</span>
-          <span>Participantes</span>
-          <span>Check-in</span>
-          <span>Grupos</span>
-          <span>Marcas</span>
-          <span>Rifas</span>
+          <strong>Panel</strong>
+          <span>Usa las pestañas de gestión para configurar el evento.</span>
         </nav>
         <small>{authenticated ? "Admin · Sesión con PIN" : "Admin · Social Run"}</small>
       </aside>
