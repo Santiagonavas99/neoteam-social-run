@@ -1,14 +1,8 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import type { HomeFeatureCard } from "@/lib/home-features";
-
-const metrics = [
-  ["REGISTRADOS", "—", "Métricas en la siguiente iteración"],
-  ["CHECK-IN", "—", "Asistentes confirmados"],
-  ["CREWS", "—", "Grupos representados"],
-  ["RIFAS", "—", "Premios configurados"],
-];
+import { AdminManagement } from "./admin-management";
 
 const ADMIN_SESSION_KEY = "neoteam_admin_pin_session";
 
@@ -65,6 +59,8 @@ export function AdminDashboard() {
   const [cards, setCards] = useState<HomeFeatureCard[]>([]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const stableCallAdminApi = useCallback(callAdminApi, []);
+  const reportMessage = useCallback((value: string) => setMessage(value), []);
 
   useEffect(() => {
     let active = true;
@@ -353,12 +349,6 @@ export function AdminDashboard() {
               <button className="text-link" onClick={signOut}>Cerrar sesión</button>
             </div>
 
-            <div className="metric-grid">
-              {metrics.map(([label, value, detail]) => (
-                <article key={label}><span>{label}</span><strong>{value}</strong><small>{detail}</small></article>
-              ))}
-            </div>
-
             <section className="admin-panel-card admin-home-settings">
               <div className="admin-section-heading">
                 <div>
@@ -455,6 +445,8 @@ export function AdminDashboard() {
                 <button className="button" disabled={busy || currentPin.length !== 6 || newPin.length !== 6 || confirmNewPin.length !== 6}>Actualizar PIN</button>
               </form>
             </section>
+
+            <AdminManagement token={sessionToken ?? ""} callApi={stableCallAdminApi} onMessage={reportMessage} />
           </>
         )}
       </section>
