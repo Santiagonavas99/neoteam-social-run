@@ -61,6 +61,8 @@ export default async function Home() {
         ))}
       </section>
 
+      <div className="carousel-hint shell" aria-hidden="true"><span>Desliza para descubrir el plan</span><span>→</span></div>
+
       <section className="agenda-section" id="agenda">
         <div className="shell agenda-grid">
           <div className="agenda-title">
@@ -121,3 +123,4 @@ export default async function Home() {
     </main>
   );
 }
+
