@@ -375,7 +375,14 @@ Deno.serve(async (req: Request) => {
         if (raffle.requires_checkin) entries = entries.eq("status", "checked_in");
         const { data: eligible, error: eligibleError } = await entries;
         if (eligibleError) throw eligibleError;
-        const shuffled = (eligible ?? []).sort(() => Math.random() - 0.5).slice(0, raffle.winner_count);
+        const shuffled = [...(eligible ?? [])];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const random = new Uint32Array(1);
+          crypto.getRandomValues(random);
+          const j = random[0] % (i + 1);
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        shuffled.length = Math.min(shuffled.length, raffle.winner_count);
         if (!shuffled.length) return json({ error: "No hay participantes elegibles para esta rifa." }, 409);
         const now = new Date().toISOString();
         const { error: clearError } = await supabase.from("raffle_entries").delete().eq("raffle_id", raffle.id);
