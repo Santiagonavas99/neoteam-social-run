@@ -64,3 +64,21 @@ export async function getHomeFeatureCards(): Promise<HomeFeatureCard[]> {
     return defaultHomeFeatureCards;
   }
 }
+
+export type CommunityLogo = { id: string; name: string; logo_url: string | null; type?: string; instagram?: string | null; website?: string | null };
+
+export async function getHomeCommunity() {
+  try {
+    const supabase = createServerSupabaseClient();
+    const [groups, brands] = await Promise.all([
+      supabase.from("running_groups").select("id,name,logo_url,instagram").eq("active", true).eq("show_on_home", true).order("sort_order", { ascending: true }),
+      supabase.from("brands").select("id,name,logo_url,type,instagram,website").eq("active", true).eq("show_on_home", true).order("sort_order", { ascending: true }),
+    ]);
+    if (groups.error) throw groups.error;
+    if (brands.error) throw brands.error;
+    return { groups: (groups.data ?? []) as CommunityLogo[], brands: (brands.data ?? []) as CommunityLogo[] };
+  } catch (error) {
+    console.error("Home community fallback", error);
+    return { groups: [] as CommunityLogo[], brands: [] as CommunityLogo[] };
+  }
+}
