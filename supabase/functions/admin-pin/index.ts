@@ -288,6 +288,10 @@ Deno.serve(async (req: Request) => {
         }
         const bytes = Uint8Array.from(atob(body.content), (char) => char.charCodeAt(0));
         if (bytes.length > 4 * 1024 * 1024) return json({ error: "La imagen supera el límite de 4 MB." }, 400);
+        const isPng = mime === "image/png" && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47;
+        const isJpeg = mime === "image/jpeg" && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+        const isWebp = mime === "image/webp" && new TextDecoder().decode(bytes.slice(0, 4)) === "RIFF" && new TextDecoder().decode(bytes.slice(8, 12)) === "WEBP";
+        if (!isPng && !isJpeg && !isWebp) return json({ error: "El contenido del archivo no coincide con el formato de imagen." }, 400);
         const extension = ({ "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp" } as Record<string,string>)[mime];
         const path = `${crypto.randomUUID()}.${extension}`;
         const { error } = await supabase.storage.from("admin-media").upload(path, bytes, { contentType: mime, upsert: false });
@@ -301,7 +305,7 @@ Deno.serve(async (req: Request) => {
       const configs: Record<string, { table: string; fields: string; writable: string[] }> = {
         brands: { table: "brands", fields: "id,name,slug,logo_url,website,instagram,type,active,sort_order,show_on_home", writable: ["name","slug","logo_url","website","instagram","type","active","sort_order","show_on_home"] },
         groups: { table: "running_groups", fields: "id,name,slug,logo_url,instagram,invited,active,sort_order,show_on_home", writable: ["name","slug","logo_url","instagram","invited","active","sort_order","show_on_home"] },
-        participants: { table: "registrations", fields: "id,registration_number,registration_code,first_name,last_name,document_type,document_number,email,phone,running_group_id,other_running_group,shirt_size,status,checked_in_at,created_at", writable: ["status","checked_in_at"] },
+        participants: { table: "registrations", fields: "id,registration_number,registration_code,first_name,last_name,document_type,document_number,email,phone,running_group_id,other_running_group,shirt_size,status,checked_in_at,created_at,running_groups(name)", writable: ["status","checked_in_at"] },
         raffles: { table: "raffles", fields: "id,event_id,name,description,prize,sponsor_brand_id,winner_count,requires_checkin,draw_at,status,created_at", writable: ["name","description","prize","sponsor_brand_id","winner_count","requires_checkin","draw_at","status"] },
       };
       if (resource === "metrics" && operation === "list") {
