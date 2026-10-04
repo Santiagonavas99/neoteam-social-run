@@ -27,18 +27,16 @@ async function callAdminApi(action: string, payload: Record<string, unknown> = {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-  if (!supabaseUrl) throw new Error("Supabase no está configurado.");
+  if (!supabaseUrl || !publishableKey) {
+    throw new Error("Faltan NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY en las variables de Vercel para esta preview.");
+  }
 
   const response = await fetch(`${supabaseUrl}/functions/v1/admin-pin`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(publishableKey
-        ? {
-            apikey: publishableKey,
-            Authorization: `Bearer ${publishableKey}`,
-          }
-        : {}),
+      apikey: publishableKey,
+      Authorization: `Bearer ${publishableKey}`,
     },
     body: JSON.stringify({ action, ...payload }),
   });
