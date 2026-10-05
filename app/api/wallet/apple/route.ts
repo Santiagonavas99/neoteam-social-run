@@ -78,7 +78,8 @@ export async function GET(request: Request) {
     );
 
     const buffer = pass.getAsBuffer();
-    return new Response(buffer, {
+    const body = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+    return new Response(body, {
       headers: {
         "Content-Type": "application/vnd.apple.pkpass",
         "Content-Disposition": `attachment; filename="neoteam-${participant.code}.pkpass"`,
