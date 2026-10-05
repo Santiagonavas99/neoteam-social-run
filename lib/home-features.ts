@@ -63,6 +63,33 @@ export async function getHomeFeatureCards(): Promise<HomeFeatureCard[]> {
   }
 }
 
+export type HomeLogoCarouselItem = {
+  id: string;
+  name: string;
+  logo_url: string;
+  link_url: string | null;
+  sort_order: number;
+};
+
+export async function getHomeLogoCarouselItems(): Promise<HomeLogoCarouselItem[]> {
+  try {
+    const supabase = createServerSupabaseClient();
+    const { data, error } = await supabase
+      .from("home_logo_carousel_items")
+      .select("id,name,logo_url,link_url,sort_order")
+      .eq("event_code", "SR26")
+      .eq("active", true)
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: true });
+
+    if (error) throw error;
+    return (data ?? []) as HomeLogoCarouselItem[];
+  } catch (error) {
+    console.error("Home logo carousel fallback", error);
+    return [];
+  }
+}
+
 export type CommunityLogo = { id: string; name: string; logo_url: string | null; type?: string; instagram?: string | null; website?: string | null };
 
 export async function getHomeCommunity() {
