@@ -39,10 +39,12 @@ function hasConfig() {
 
 Deno.serve(async (req: Request) => {
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+
+  const body = await req.json().catch(() => ({}));
+  if (body?.action === "status") return json({ configured: hasConfig() });
   if (!hasConfig()) return json({ error: "Apple Wallet todavía no está configurado." }, 503);
 
   try {
-    const body = await req.json().catch(() => ({}));
     const token = typeof body?.token === "string" ? body.token.trim() : "";
     if (!/^[0-9a-f-]{36}$/i.test(token)) return json({ error: "Pase no válido." }, 400);
 
