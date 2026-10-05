@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Host_Grotesk } from "next/font/google";
 import "./globals.css";
 import "./neo-overrides.css";
+import "./logo-marquee.css";
 
 const hostGrotesk = Host_Grotesk({
   subsets: ["latin"],
