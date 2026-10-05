@@ -102,6 +102,26 @@
 .home-editor-options {display:flex;flex-direction:column;gap:16px;}
 .security-card {max-width:480px;}
 .security-card .pin-input {text-align:left;}
+.dynamic-type-mark {width:48px;height:48px;flex:0 0 48px;display:grid;place-items:center;border-radius:10px;background:var(--neo-accent-dark);color:white;font-size:22px;font-weight:700;}
+.dynamic-record .record-title p {max-width:520px;}
+.dynamic-scan-panel {display:grid;grid-template-columns:minmax(0,1fr) minmax(420px,.9fr);gap:28px;align-items:end;padding:24px;margin:0 0 24px;background:#eaf2ee;border:1px solid #aac1b8;border-left:4px solid var(--neo-accent-dark);border-radius:10px;}
+.dynamic-scan-panel h2 {font-size:22px;letter-spacing:-.035em;margin:6px 0 8px;}
+.dynamic-scan-panel p {margin-bottom:0;}
+.dynamic-scan-controls {display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;}
+.dynamic-editor .form-grid {max-width:860px;}
+.status-completed {background:#dfece8;color:#234c3c;}
+.status-closed {background:#edf1ef;color:#52615a;}
+@media (max-width:900px) {
+  .dynamic-scan-panel {grid-template-columns:1fr;align-items:start;}
+  .dynamic-scan-controls {grid-template-columns:1fr 1fr;}
+  .dynamic-scan-controls input {grid-column:1/-1;}
+}
+@media (max-width:560px) {
+  .dynamic-type-mark {width:40px;height:40px;flex-basis:40px;}
+  .dynamic-scan-panel {padding:20px;}
+  .dynamic-scan-controls {grid-template-columns:1fr;}
+  .dynamic-scan-controls input {grid-column:auto;}
+}
 @media (max-width:1200px) {
   .admin-content {padding-inline:24px;}
   .admin-page {grid-template-columns:220px minmax(0,1fr);}
