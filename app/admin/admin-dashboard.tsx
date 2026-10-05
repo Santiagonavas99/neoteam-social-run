@@ -4,6 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react";
 import type { HomeFeatureCard } from "@/lib/home-features";
 import { AdminManagement } from "./admin-management";
 import { LogoCarouselAdmin } from "./logo-carousel-admin";
+import { DynamicsManagement } from "./dynamics-management";
 import { Feedback } from "./admin-ui";
 import type { AdminResponse, AdminSection } from "./admin-types";
 import Link from "next/link";
@@ -243,7 +244,7 @@ export function AdminDashboard() {
     { id: "participants", label: "Participantes", description: "Encuentra a cada corredor y gestiona su asistencia." },
     { id: "groups", label: "Grupos", description: "Las comunidades que corren con nosotros." },
     { id: "brands", label: "Marcas", description: "Los aliados que hacen parte del encuentro." },
-    { id: "raffles", label: "Rifas", description: "Prepara los premios y gestiona cada sorteo." },
+    { id: "dynamics", label: "Dinámicas", description: "Sorteos, QR, checkpoints, retos, misiones, votaciones, instant win y puntos." },
     { id: "security", label: "Seguridad", description: "Administra el acceso al panel del evento." },
   ];
   function navigate(next: AdminSection) { setSection(next); setMessage(""); }
@@ -297,7 +298,7 @@ export function AdminDashboard() {
           <div className="home-editor-fields"><label>Título<input value={card.title} onChange={e => updateCard(card.id,"title",e.target.value)} /></label><label>Descripción<textarea rows={2} value={card.description} onChange={e => updateCard(card.id,"description",e.target.value)} /></label></div>
           <div className="home-editor-options"><label>Orden<input type="number" min="0" value={card.sort_order} onChange={e => updateCard(card.id,"sort_order",Number(e.target.value))} /></label><label className="check-label"><input type="checkbox" checked={card.enabled} onChange={e => updateCard(card.id,"enabled",e.target.checked)} />Visible</label></div>
         </article>)}</div>
-      </section> : section === "security" ? <section className="admin-surface security-card">
+      </section> : section === "dynamics" ? <DynamicsManagement token={sessionToken ?? ""} callApi={stableCallAdminApi} /> : section === "security" ? <section className="admin-surface security-card">
         <h2>Cambiar PIN</h2><p className="muted">Al actualizarlo, se cerrarán las demás sesiones. Esta sesión seguirá activa.</p>
         <form onSubmit={changePin} className="stack-form">
           <PinField label="PIN actual" value={currentPin} onChange={setCurrentPin} current />
