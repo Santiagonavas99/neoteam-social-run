@@ -597,11 +597,11 @@ Deno.serve(async (req: Request) => {
             .eq("id", dynamic.id);
           if (updateError) throw updateError;
 
-          return {
+          return json({
             ok: true,
             winners: shuffled.length,
             winnerDetails: shuffled.map(dynamicParticipantPayload),
-          };
+          });
         }
 
         return json({ error: "Operación de dinámica no válida." }, 400);
