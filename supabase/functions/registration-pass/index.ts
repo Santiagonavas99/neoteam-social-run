@@ -39,18 +39,28 @@ Deno.serve(async (req: Request) => {
       const code = text(body?.code, 40).toUpperCase();
       const documentNumber = text(body?.documentNumber, 40);
       const email = text(body?.email, 180).toLowerCase();
-      if (!code || !documentNumber || !email) return json({ error: "Datos incompletos." }, 400);
+      if (!documentNumber || !email) return json({ error: "Datos incompletos." }, 400);
 
-      const { data, error } = await supabase
+      const { data: event, error: eventError } = await supabase
+        .from("events")
+        .select("id")
+        .eq("code", "SR26")
+        .single();
+      if (eventError) throw eventError;
+
+      let query = supabase
         .from("registrations")
         .select("registration_code,checkin_token,first_name,last_name,email,document_number,status")
-        .eq("registration_code", code)
-        .eq("document_number", documentNumber)
-        .maybeSingle();
+        .eq("event_id", event.id)
+        .eq("document_number", documentNumber);
+      if (code) query = query.eq("registration_code", code);
+
+      const { data, error } = await query.maybeSingle();
       if (error) throw error;
       if (!data || String(data.email).trim().toLowerCase() !== email) {
         return json({ error: "No pudimos validar el registro." }, 404);
       }
+      if (data.status === "cancelled") return json({ error: "Este registro fue cancelado." }, 410);
 
       return json({
         ok: true,
