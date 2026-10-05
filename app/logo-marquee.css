@@ -1,0 +1,87 @@
+.brand-marquee-section {
+  overflow: hidden;
+  width: 100%;
+  margin: 0 0 72px;
+  padding: 24px 0;
+  border-top: 1px solid var(--neo-border);
+  border-bottom: 1px solid var(--neo-border);
+  background: var(--neo-white);
+}
+
+.brand-marquee {
+  overflow: hidden;
+  width: 100%;
+}
+
+.brand-marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: neoteam-logo-marquee 28s linear infinite;
+}
+
+.brand-marquee-group {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: clamp(48px, 6vw, 96px);
+  padding-right: clamp(48px, 6vw, 96px);
+}
+
+.brand-marquee-item {
+  width: clamp(150px, 14vw, 210px);
+  height: 76px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+}
+
+.brand-marquee-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.brand-marquee:hover .brand-marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes neoteam-logo-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (max-width: 600px) {
+  .brand-marquee-section {
+    margin-bottom: 48px;
+    padding: 18px 0;
+  }
+
+  .brand-marquee-group {
+    gap: 36px;
+    padding-right: 36px;
+  }
+
+  .brand-marquee-item {
+    width: 136px;
+    height: 60px;
+    padding: 6px 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-marquee {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .brand-marquee::-webkit-scrollbar {
+    display: none;
+  }
+
+  .brand-marquee-track {
+    animation: none;
+  }
+}
