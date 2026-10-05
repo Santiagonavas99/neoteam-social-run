@@ -34,6 +34,8 @@ export type RegistrationState = {
   ok: boolean;
   message: string;
   code?: string;
+  checkinToken?: string;
+  participantName?: string;
   errors?: Record<string, string[] | undefined>;
 };
 
@@ -54,12 +56,13 @@ export async function registerParticipant(
 
   try {
     const supabase = createServerSupabaseClient();
+    const normalizedEmail = parsed.data.email.toLowerCase();
     const { data, error } = await supabase.rpc("register_social_run_participant", {
       p_first_name: parsed.data.firstName,
       p_last_name: parsed.data.lastName,
       p_document_type: parsed.data.documentType,
       p_document_number: parsed.data.documentNumber,
-      p_email: parsed.data.email.toLowerCase(),
+      p_email: normalizedEmail,
       p_phone: parsed.data.phone,
       p_birth_date: parsed.data.birthDate,
       p_running_group_slug: parsed.data.runningGroup,
@@ -79,10 +82,24 @@ export async function registerParticipant(
       throw error;
     }
 
+    const code = data as string;
+    const { data: passData, error: passError } = await supabase.functions.invoke("registration-pass", {
+      body: {
+        action: "claim",
+        code,
+        documentNumber: parsed.data.documentNumber,
+        email: normalizedEmail,
+      },
+    });
+
+    if (passError) console.error("Registration pass token error", passError);
+
     return {
       ok: true,
       message: "¡Registro completado!",
-      code: data as string,
+      code,
+      checkinToken: typeof passData?.checkinToken === "string" ? passData.checkinToken : undefined,
+      participantName: `${parsed.data.firstName} ${parsed.data.lastName}`,
     };
   } catch (error) {
     const isMissingConfig = error instanceof Error && error.message.includes("no está configurado");
