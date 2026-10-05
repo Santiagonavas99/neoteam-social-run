@@ -1,6 +1,6 @@
 import type { HomeFeatureCard } from "@/lib/home-features";
 
-export type AdminSection = "metrics" | "home" | "participants" | "groups" | "brands" | "raffles" | "security";
+export type AdminSection = "metrics" | "home" | "logos" | "participants" | "groups" | "brands" | "raffles" | "security";
 export type Resource = "participants" | "groups" | "brands" | "raffles";
 export type AdminRow = {
   id: string; name?: string; slug?: string; logo_url?: string | null; instagram?: string | null;
