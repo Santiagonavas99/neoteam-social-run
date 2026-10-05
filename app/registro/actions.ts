@@ -3,6 +3,11 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { z } from "zod";
 
+const phoneSchema = z
+  .string()
+  .trim()
+  .regex(/^\d{10}$/, "El número debe tener exactamente 10 dígitos.");
+
 const registrationSchema = z
   .object({
     firstName: z.string().trim().min(2, "Escribe tu nombre.").max(80),
@@ -10,12 +15,12 @@ const registrationSchema = z
     documentType: z.enum(["CC", "CE", "TI", "PA", "PPT", "OTRO"]),
     documentNumber: z.string().trim().min(5, "Revisa el número de documento.").max(30),
     email: z.email("Escribe un correo válido.").max(160),
-    phone: z.string().trim().min(7, "Escribe un celular válido.").max(30),
+    phone: phoneSchema,
     birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Selecciona tu fecha de nacimiento."),
     runningGroup: z.enum(["neoteam", "independiente", "otro"]),
     otherRunningGroup: z.string().trim().max(120).optional(),
     emergencyName: z.string().trim().min(2, "Escribe el contacto de emergencia.").max(120),
-    emergencyPhone: z.string().trim().min(7, "Escribe el celular de emergencia.").max(30),
+    emergencyPhone: phoneSchema,
     termsAccepted: z.literal("on", { error: "Debes aceptar los términos." }),
     privacyAccepted: z.literal("on", { error: "Debes aceptar el tratamiento de datos." }),
     marketingAccepted: z.string().optional(),
@@ -30,6 +35,23 @@ const registrationSchema = z
     }
   });
 
+export type RegistrationValues = {
+  firstName: string;
+  lastName: string;
+  documentType: string;
+  documentNumber: string;
+  email: string;
+  phone: string;
+  birthDate: string;
+  runningGroup: string;
+  otherRunningGroup: string;
+  emergencyName: string;
+  emergencyPhone: string;
+  termsAccepted: boolean;
+  privacyAccepted: boolean;
+  marketingAccepted: boolean;
+};
+
 export type RegistrationState = {
   ok: boolean;
   message: string;
@@ -37,12 +59,34 @@ export type RegistrationState = {
   checkinToken?: string;
   participantName?: string;
   errors?: Record<string, string[] | undefined>;
+  values?: RegistrationValues;
 };
+
+function submittedValues(formData: FormData): RegistrationValues {
+  const value = (name: string) => String(formData.get(name) ?? "");
+  return {
+    firstName: value("firstName"),
+    lastName: value("lastName"),
+    documentType: value("documentType") || "CC",
+    documentNumber: value("documentNumber"),
+    email: value("email"),
+    phone: value("phone"),
+    birthDate: value("birthDate"),
+    runningGroup: value("runningGroup") || "neoteam",
+    otherRunningGroup: value("otherRunningGroup"),
+    emergencyName: value("emergencyName"),
+    emergencyPhone: value("emergencyPhone"),
+    termsAccepted: formData.get("termsAccepted") === "on",
+    privacyAccepted: formData.get("privacyAccepted") === "on",
+    marketingAccepted: formData.get("marketingAccepted") === "on",
+  };
+}
 
 export async function registerParticipant(
   _previousState: RegistrationState,
   formData: FormData,
 ): Promise<RegistrationState> {
+  const values = submittedValues(formData);
   const raw = Object.fromEntries(formData.entries());
   const parsed = registrationSchema.safeParse(raw);
 
@@ -51,6 +95,7 @@ export async function registerParticipant(
       ok: false,
       message: "Hay algunos datos por revisar.",
       errors: parsed.error.flatten().fieldErrors,
+      values,
     };
   }
 
@@ -77,7 +122,11 @@ export async function registerParticipant(
 
     if (error) {
       if (error.message.includes("Ya existe una inscripción")) {
-        return { ok: false, message: "Ya existe una inscripción con ese documento o correo." };
+        return {
+          ok: false,
+          message: "Ya existe una inscripción con ese documento o correo.",
+          values,
+        };
       }
       throw error;
     }
@@ -109,6 +158,7 @@ export async function registerParticipant(
       message: isMissingConfig
         ? "La interfaz ya está lista. Falta conectar el proyecto de Supabase para guardar registros reales."
         : "No pudimos guardar el registro. Intenta nuevamente.",
+      values,
     };
   }
 }
