@@ -10,24 +10,22 @@ import Link from "next/link";
 const ADMIN_SESSION_KEY = "neoteam_admin_pin_session";
 
 async function callAdminApi(action: string, payload: Record<string, unknown> = {}) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-
-  if (!supabaseUrl || !publishableKey) {
-    throw new Error("Faltan NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY en las variables de Vercel para esta preview.");
-  }
-
-  const response = await fetch(`${supabaseUrl}/functions/v1/admin-pin`, {
+  const connectionError = "No pudimos conectar con el panel administrativo. Inténtalo de nuevo.";
+  const json = JSON.stringify({ action, ...payload });
+  const compressed = action === "uploadAdminImage";
+  const body = compressed
+    ? await new Response(new Blob([json]).stream().pipeThrough(new CompressionStream("gzip"))).blob()
+    : json;
+  const response = await fetch("/api/admin", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      apikey: publishableKey,
-      Authorization: `Bearer ${publishableKey}`,
+      ...(compressed ? { "Content-Encoding": "gzip" } : {}),
     },
-    body: JSON.stringify({ action, ...payload }),
-  });
+    body,
+  }).catch(() => { throw new Error(connectionError); });
 
-  const data = (await response.json().catch(() => ({}))) as AdminResponse;
+  const data = (await response.json().catch(() => { throw new Error(connectionError); })) as AdminResponse;
   if (!response.ok) throw new Error(data.error || "No pudimos completar la operación.");
   return data;
 }
@@ -315,4 +313,3 @@ export function AdminDashboard() {
 function PinField({label,value,onChange,current=false,autoFocus=false}: {label:string;value:string;onChange:(value:string)=>void;current?:boolean;autoFocus?:boolean}) {
   return <label>{label}<input className="pin-input" type="password" value={value} onChange={e => onChange(normalizePin(e.target.value))} inputMode="numeric" autoComplete={current ? "current-password" : "new-password"} placeholder="••••••" minLength={6} maxLength={6} pattern="[0-9]{6}" required autoFocus={autoFocus} /></label>;
 }
-
