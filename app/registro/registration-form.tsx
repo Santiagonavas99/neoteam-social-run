@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { registerParticipant, type RegistrationState } from "./actions";
+import { CheckinPass } from "./checkin-pass";
 
 const initialState: RegistrationState = { ok: false, message: "" };
 
@@ -16,13 +17,13 @@ export function RegistrationForm() {
 
   if (state.ok) {
     return (
-      <div className="success-card">
+      <div className="success-card success-card-pass">
         <span className="success-check">✓</span>
         <p className="section-label">REGISTRO CONFIRMADO</p>
         <h2>ESTÁS DENTRO.</h2>
         <p>Nos vemos el 18 de octubre en el Social Run del aniversario NeoTeam.</p>
-        <strong>{state.code}</strong>
-        <small>Guarda este código. Lo usaremos más adelante para check-in y rifas.</small>
+        {state.code && <CheckinPass code={state.code} checkinToken={state.checkinToken} participantName={state.participantName} />}
+        <small className="pass-help">Guarda esta pantalla. El QR será tu acceso rápido para el check-in y el código queda como respaldo.</small>
       </div>
     );
   }
