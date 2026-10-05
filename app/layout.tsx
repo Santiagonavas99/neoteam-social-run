@@ -4,6 +4,7 @@ import "./globals.css";
 import "./neo-overrides.css";
 import "./logo-marquee.css";
 import "./home-v2.css";
+import "./checkin-wallet.css";
 
 const hostGrotesk = Host_Grotesk({
   subsets: ["latin"],
