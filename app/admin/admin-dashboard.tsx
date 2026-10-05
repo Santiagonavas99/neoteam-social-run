@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import type { HomeFeatureCard } from "@/lib/home-features";
 import { AdminManagement } from "./admin-management";
+import { LogoCarouselAdmin } from "./logo-carousel-admin";
 import { Feedback } from "./admin-ui";
 import type { AdminResponse, AdminSection } from "./admin-types";
 import Link from "next/link";
@@ -238,7 +239,7 @@ export function AdminDashboard() {
 
   const navigation: { id: AdminSection; label: string; description: string }[] = [
     { id: "metrics", label: "Overview", description: "El pulso del Social Run, en un vistazo." },
-    { id: "home", label: "Contenido Home", description: "Los cuatro bloques que cuentan el plan. Edita, ordena y publica." },
+    { id: "logos", label: "Carrusel logos", description: "Sube, ordena y publica los logos de la cinta horizontal de la Home." },
     { id: "participants", label: "Participantes", description: "Encuentra a cada corredor y gestiona su asistencia." },
     { id: "groups", label: "Grupos", description: "Las comunidades que corren con nosotros." },
     { id: "brands", label: "Marcas", description: "Los aliados que hacen parte del encuentro." },
@@ -247,7 +248,7 @@ export function AdminDashboard() {
   ];
   function navigate(next: AdminSection) { setSection(next); setMessage(""); }
   const feedback = message ? { kind: messageKind, text: message } : null;
-  const current = navigation.find(item => item.id === section)!;
+  const current = navigation.find(item => item.id === section) ?? navigation[0];
 
   if (!authReady || !authenticated) return (
     <main className="admin-auth">
@@ -288,7 +289,7 @@ export function AdminDashboard() {
     <div className="admin-content">
       <div className="admin-topbar"><span>NEOTEAM / PANEL DEL EVENTO</span><Link href="/" target="_blank" className="text-link">Ver página ↗</Link></div>
       <header className="admin-section-header"><div><p className="section-label">SOCIAL RUN · 18 OCT</p><h1>{current.label}</h1><p className="muted">{current.description}</p></div></header>
-      {section === "home" ? <section className="admin-surface">
+      {section === "logos" ? <LogoCarouselAdmin token={sessionToken ?? ""} callApi={stableCallAdminApi} /> : section === "home" ? <section className="admin-surface">
         <div className="section-toolbar"><div><h2>Bloques del carrusel</h2><p className="muted">Los cambios se publican al guardar.</p></div><button className="button" onClick={saveCards} disabled={busy || !cards.length}>{busy ? "Guardando…" : "Guardar cambios"}</button></div>
         <Feedback value={feedback} />
         <div className="home-editor-list">{cards.map((card,index) => <article className="home-editor" key={card.id ?? card.slot}>
