@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { SiteHeader } from "@/components/site-header";
-import { HorizontalCarousel } from "@/components/horizontal-carousel";
 import { CommunityCarousel } from "@/components/community-carousel";
+import { LogoMarquee } from "@/components/logo-marquee";
 import { agenda, eventConfig } from "@/lib/event";
-import { getHomeCommunity, getHomeFeatureCards } from "@/lib/home-features";
+import { getHomeCommunity, getHomeLogoCarouselItems } from "@/lib/home-features";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [features, community] = await Promise.all([getHomeFeatureCards(), getHomeCommunity()]);
+  const [logoItems, community] = await Promise.all([getHomeLogoCarouselItems(), getHomeCommunity()]);
   const organizers = community.brands.filter(brand => brand.type === "organizer");
   const sponsors = community.brands.filter(brand => brand.type === "sponsor");
   const partners = community.brands.filter(brand => brand.type === "main_partner" || brand.type === "invited");
@@ -56,17 +56,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {features.length > 0 && <section className="feature-section shell">
-        <HorizontalCarousel ariaLabel="Características del Social Run" className="feature-carousel">
-        {features.map((feature) => (
-          <article className="feature-card" key={feature.slot}>
-            <span>{String(feature.sort_order).padStart(2, "0")}</span>
-            <h3>{feature.title}</h3>
-            <p>{feature.description}</p>
-          </article>
-        ))}
-        </HorizontalCarousel>
-      </section>}
+      <LogoMarquee items={logoItems} />
 
       <section className="agenda-section" id="agenda">
         <div className="shell agenda-grid">
