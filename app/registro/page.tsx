@@ -7,7 +7,10 @@ export default function RegistrationPage() {
     <main className="registration-page">
       <header className="registration-header shell">
         <Link href="/" className="brand"><span className="brand-mark">N</span><span>NEOTEAM</span></Link>
-        <Link href="/" className="text-link">← Volver al evento</Link>
+        <div className="registration-header-actions">
+          <Link href="/pase" className="text-link">Ya estoy inscrito · Mi pase</Link>
+          <Link href="/" className="text-link">← Volver al evento</Link>
+        </div>
       </header>
       <div className="registration-layout shell">
         <aside className="registration-copy">
