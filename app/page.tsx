@@ -50,8 +50,8 @@ export default async function Home() {
           <p>{eventConfig.description}</p>
           <div className="facts">
             <div><strong>18 OCT</strong><span>Fecha</span></div>
-            <div><strong>06:00</strong><span>Encuentro</span></div>
-            <div><strong>SOCIAL</strong><span>Formato</span></div>
+            <div><strong>07:30</strong><span>Encuentro</span></div>
+            <div><strong>5K</strong><span>Ruta</span></div>
           </div>
         </div>
       </section>
@@ -66,10 +66,20 @@ export default async function Home() {
             <p>Una mañana para correr, conectar y celebrar juntos.</p>
           </div>
           <div className="agenda-list">
-            {agenda.map(([time, name]) => (
-              <div className="agenda-row" key={`${time}-${name}`}>
-                <strong>{time}</strong>
-                <span>{name}</span>
+            {agenda.map(({ time, meridiem, title, details }) => (
+              <div className="agenda-row" key={`${time}-${title}`}>
+                <strong>
+                  {time}
+                  <small style={{ display: "block", marginTop: 5, fontSize: 10, letterSpacing: ".04em", color: "#abb7b1" }}>
+                    {meridiem}
+                  </small>
+                </strong>
+                <div>
+                  <span>{title}</span>
+                  <ul style={{ margin: "10px 0 0", paddingLeft: 18, color: "#abb7b1", fontSize: 13, lineHeight: 1.55 }}>
+                    {details.map((detail) => <li key={detail}>{detail}</li>)}
+                  </ul>
+                </div>
               </div>
             ))}
           </div>
