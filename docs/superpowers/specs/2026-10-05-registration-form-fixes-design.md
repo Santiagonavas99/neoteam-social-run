@@ -1,6 +1,6 @@
 # Registration form fixes — spec
 
-Date: 2026-10-05 · Branch: `fix/registration-form` (from `main` at 0.3.0) · Status: **awaiting OK**
+Date: 2026-10-05 · Branch: `fix/registration-form` (from `main` at 0.3.0) · Status: **approved 2026-10-05**
 
 Source: Santiago's commits `7867a32` and `11201f5` on `feat/qr-wallet-checkin`. They are ported here, not merged, because that branch predates `features/`.
 
