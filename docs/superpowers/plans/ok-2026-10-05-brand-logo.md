@@ -33,10 +33,23 @@ Spec: [`2026-10-05-brand-logo-design.md`](../specs/2026-10-05-brand-logo-design.
   - nothing wraps at 390 px;
   - the link is at least 44 px tall.
 
-### 4. `chore(release): 0.3.0`
+### 4. `feat: link preview for WhatsApp and social` (spec addendum, decisions 6–9; awaiting OK)
+
+- **`app/opengraph-image.png`:** a Playwright screenshot of `design/brand/share-image.html` at 1200×630.
+- **`app/layout.tsx`:** add `openGraph`, `twitter` and the share description to `metadata`.
+- **`app/registro/page.tsx`:** add `export const metadata` with its own title and description.
+- **`app/admin/page.tsx`:** add `export const metadata = { robots: { index: false, follow: false } }`.
+- **Checks:**
+  - after `pnpm build && pnpm start`, `curl -s localhost:3100/ | grep -o '<meta[^>]*og:[^>]*>'` lists `og:title`, `og:description`, `og:image` (with width and height), `og:locale` and `twitter:card`;
+  - `/registro` shows its own `og:title`;
+  - `/admin` has `noindex`;
+  - the image is under 300 KB;
+  - after deploy (Iván), check the preview in the Facebook Sharing Debugger and with a real WhatsApp share.
+
+### 5. `chore(release): 0.3.0`
 
 - `CHANGELOG.md`:
-  - under `[Unreleased]`, add an `Added` entry for the logo and favicon;
+  - under `[Unreleased]`, add `Added` entries for the logo and favicon and for the link preview;
   - rename that section to `## [0.3.0] - 2026-10-05`;
   - add an empty `[Unreleased]` above it.
 - `package.json` `version`: `0.3.0`.

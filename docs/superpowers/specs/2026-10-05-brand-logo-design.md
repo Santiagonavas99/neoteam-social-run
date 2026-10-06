@@ -50,6 +50,37 @@ The favicon is also 704×442, not square, so browsers squash it or letterbox it.
 
 The logo's cyan (`#02F2F8`) is not the site accent green (`--neo-accent` `#6fa39c`), even though `DESIGN.md` calls that green "NeoTeam logo green". This plan uses the cyan only inside the logo and leaves the accent alone. Retuning the accent to match the logo is a separate decision.
 
+## Addendum: link preview on WhatsApp
+
+Status: **awaiting OK**. Iván asked for this on 2026-10-05. Branch `feat/link-preview` (the logo and favicon merged in PR #10).
+
+### Problem
+
+The layout's metadata only sets `title` and `description`. With no `og:image`, `og:title`, `og:description` or `og:url`, WhatsApp shows a bare link, or one with no image, when someone shares the site. WhatsApp is the main channel for the invitation.
+
+### Decisions
+
+6. **Static share image `app/opengraph-image.png`**, 1200×630 (Next.js file convention).
+   - Next writes `og:image`, `og:image:width`, `og:image:height` and `og:image:type` for `/` and every child route.
+   - Draft: `design/brand/2026-10-05-share-image-draft.png`, rendered from `design/brand/share-image.html` with Playwright in the real font.
+   - Content: the logo, "ANIVERSARIO NEOTEAM · INSCRIPCIÓN GRATUITA", "SOCIAL RUN", and pills for the date, the time and "5K social · Parque del Ingenio".
+   - It is about 45 KB. WhatsApp drops previews whose image is over about 300 KB.
+   - **Rejected:** a generated `opengraph-image.tsx` (`next/og`). Satori needs the Host Grotesk TTF in the repo or fetched at build time, plus code, for an image whose text does not change before 18 Oct.
+7. **Metadata in `app/layout.tsx`:**
+   - `openGraph`: `type: 'website'`, `locale: 'es_CO'`, `siteName: 'NeoTeam'`, plus title and description;
+   - `twitter.card: 'summary_large_image'`;
+   - `metadataBase` is not set: on Vercel, Next fills it from `VERCEL_PROJECT_PRODUCTION_URL` (and `VERCEL_BRANCH_URL` on previews), so the image URL is absolute with no domain hardcoded. Locally it falls back to `localhost`, which is enough to check the tags.
+   - Share copy:
+     - title "Social Run · NeoTeam";
+     - description "Corremos para celebrar el aniversario de NeoTeam. 5K social el 18 de octubre, 7:30 a. m. Inscripción gratuita.", built from `eventConfig`.
+8. **`/registro` has its own title and description:**
+   - title "Reserva tu lugar · Social Run NeoTeam";
+   - description "Inscríbete gratis al Social Run de NeoTeam, 18 de octubre de 2026. Toma menos de dos minutos.";
+   - it keeps the same image.
+9. **`/admin` is `noindex`:** `robots: { index: false, follow: false }`, set with metadata in `app/admin/page.tsx`, which is a server component.
+
+**Caveat:** WhatsApp caches a link's preview. A link already shared before the deploy can keep its old preview for a few days, while a new share or a URL with `?v=2` shows the new one.
+
 ## Mobile
 
 - **At 390 px:**
@@ -61,5 +92,5 @@ The logo's cyan (`#02F2F8`) is not the site accent green (`--neo-accent` `#6fa39
 ## Out of scope
 
 - Changing the accent color.
-- Open Graph or social share images.
+- A sitemap and `robots.txt`.
 - A web app manifest.
