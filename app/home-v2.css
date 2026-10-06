@@ -1,7 +1,7 @@
 .home-v2 {
   background: var(--neo-bg);
   color: var(--neo-text);
-  overflow: hidden;
+  overflow: clip;
 }
 .home-v2 .shell {
   width: min(1280px, calc(100% - 72px));

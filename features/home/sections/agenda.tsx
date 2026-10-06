@@ -5,7 +5,7 @@ export function Agenda() {
   return (
     <section className="bg-neo-bg py-12 md:py-24" id="agenda">
       <div className="shell grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
-        <header className="lg:sticky lg:top-10 lg:self-start">
+        <header className="reveal lg:sticky lg:top-10 lg:self-start">
           <span className="v2-index">02 / AGENDA</span>
           <h2 className="m-0 mt-3 text-[clamp(40px,11vw,76px)] font-extrabold leading-[0.92] tracking-[-0.06em]">
             UNA MAÑANA
@@ -24,7 +24,7 @@ export function Agenda() {
             return (
               <li
                 key={`${item.time}-${item.title}`}
-                className="grid grid-cols-[56px_16px_minmax(0,1fr)] gap-x-2 py-3 md:grid-cols-[72px_16px_minmax(0,1fr)] md:gap-x-4"
+                className="reveal grid grid-cols-[56px_16px_minmax(0,1fr)] gap-x-2 py-3 md:grid-cols-[72px_16px_minmax(0,1fr)] md:gap-x-4"
               >
                 <p className="m-0 text-right text-lg font-extrabold leading-tight tracking-[-0.03em] tabular-nums md:text-2xl">
                   {item.time}

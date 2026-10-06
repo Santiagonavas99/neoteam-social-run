@@ -4,7 +4,7 @@ export function Story() {
   return (
     <section className="v2-story shell" id="evento">
       <span className="v2-index">01 / EL PLAN</span>
-      <div className="v2-story-copy">
+      <div className="v2-story-copy reveal">
         <p className="section-label">UN PUNTO DE ENCUENTRO</p>
         <h2>
           NO VENIMOS A <em>COMPETIR.</em>
@@ -12,7 +12,7 @@ export function Story() {
           VENIMOS A CORRER JUNTOS.
         </h2>
       </div>
-      <div className="v2-story-aside">
+      <div className="v2-story-aside reveal">
         <p>{eventConfig.description}</p>
         <div className="v2-fact-list">
           <div className="v2-fact">

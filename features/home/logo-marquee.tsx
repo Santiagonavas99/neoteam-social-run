@@ -71,7 +71,7 @@ export function LogoMarquee({ items }: { items: HomeLogoCarouselItem[] }) {
 
   return (
     <section aria-labelledby="brand-strip-title" className="bg-neo-bg py-8 md:py-12">
-      <div className="shell mb-4 flex items-baseline justify-between gap-3">
+      <div className="shell reveal mb-4 flex items-baseline justify-between gap-3">
         <h2
           id="brand-strip-title"
           className="m-0 text-xs font-bold uppercase tracking-[0.14em] text-neo-accent-text"
@@ -82,7 +82,7 @@ export function LogoMarquee({ items }: { items: HomeLogoCarouselItem[] }) {
           <p className="m-0 text-[13px] text-neo-text-secondary">Toca un logo para visitarla</p>
         )}
       </div>
-      <div className="group overflow-hidden py-2 [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)] motion-reduce:overflow-x-auto">
+      <div className="group reveal overflow-hidden py-2 [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)] motion-reduce:overflow-x-auto">
         <div
           className="flex w-max animate-marquee group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-reduce:animate-none"
           style={{ animationDuration: `${repeatedItems.length * 5}s` }}

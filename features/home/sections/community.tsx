@@ -18,7 +18,7 @@ export function Community({
   return (
     <section className="v2-community" id="invitados">
       <div className="shell">
-        <header className="v2-community-head">
+        <header className="v2-community-head reveal">
           <span className="v2-index">03 / COMUNIDAD</span>
           <h2>
             CORREMOS
@@ -31,7 +31,7 @@ export function Community({
           </p>
         </header>
 
-        <div className="logo-panels">
+        <div className="logo-panels reveal">
           <CommunityCarousel
             items={community.groups}
             title="RUNNING CREWS"

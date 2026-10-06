@@ -4,7 +4,7 @@ import Link from 'next/link'
 export function Raffle() {
   return (
     <section className="v2-raffle" aria-labelledby="raffle-title">
-      <div className="v2-raffle-copy">
+      <div className="v2-raffle-copy reveal">
         <div>
           <p className="section-label">04 / RIFAS</p>
           <h2 id="raffle-title">
@@ -20,7 +20,7 @@ export function Raffle() {
           celebrando a la comunidad.
         </p>
       </div>
-      <div className="v2-raffle-side">
+      <div className="v2-raffle-side reveal">
         <span className="inline-flex items-center gap-2">
           <Gift aria-hidden className="size-4 shrink-0" />
           DESPUÉS DE LA RUTA

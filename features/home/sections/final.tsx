@@ -6,7 +6,7 @@ export function Final() {
     <section className="v2-final">
       <div className="shell v2-final-grid">
         <span className="v2-index">05 / NOS VEMOS</span>
-        <div className="v2-final-main">
+        <div className="v2-final-main reveal">
           <p>DOMINGO · SOCIAL RUN · ANIVERSARIO NEOTEAM</p>
           <h2>18.10.26</h2>
           <Link href="/registro" className="button">
