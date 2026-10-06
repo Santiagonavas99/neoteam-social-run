@@ -12,15 +12,11 @@ const SESSION_DAYS = 30
 const PBKDF2_ITERATIONS = 180_000
 const ADMIN_SETUP_SECRET = Deno.env.get('ADMIN_SETUP_SECRET')?.trim() ?? ''
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Content-Type': 'application/json',
-}
+const ADMIN_PROXY_SECRET = Deno.env.get('ADMIN_PROXY_SECRET')?.trim() ?? ''
+const responseHeaders = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
 
 function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), { status, headers: corsHeaders })
+  return new Response(JSON.stringify(body), { status, headers: responseHeaders })
 }
 
 function base64(bytes: Uint8Array) {
@@ -133,9 +129,15 @@ async function verifySetupSecret(candidate: unknown) {
   return secretsMatch(await sha256(candidate.trim()), await sha256(ADMIN_SETUP_SECRET))
 }
 
+// Only the Next proxy holds ADMIN_PROXY_SECRET, so its client IP header is trusted.
+async function fromProxy(req: Request) {
+  if (ADMIN_PROXY_SECRET.length < 32) return false
+  const candidate = req.headers.get('x-admin-proxy-secret') ?? ''
+  return secretsMatch(await sha256(candidate.trim()), await sha256(ADMIN_PROXY_SECRET))
+}
+
 function getClientIp(req: Request) {
-  const forwarded = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-  return forwarded || req.headers.get('cf-connecting-ip') || 'unknown'
+  return req.headers.get('x-admin-client-ip')?.trim() || 'unknown'
 }
 
 async function createSession() {
@@ -166,23 +168,28 @@ async function requireSession(token: unknown) {
   return data
 }
 
-async function checkRateLimit(ip: string) {
-  const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString()
-  const { count } = await supabase
-    .from('admin_pin_attempts')
-    .select('id', { count: 'exact', head: true })
-    .eq('ip', ip)
-    .eq('success', false)
-    .gte('created_at', tenMinutesAgo)
-  return (count ?? 0) < 8
+async function reserveAttempt(ip: string): Promise<number | Response> {
+  const { data, error } = await supabase.rpc('admin_pin_reserve_attempt', { p_ip: ip })
+  if (error) {
+    console.error('admin_pin_reserve_attempt failed', { code: error.code })
+    return json({ error: 'No pudimos verificar el acceso. Inténtalo de nuevo.' }, 503)
+  }
+  if (data === null) {
+    return json(
+      { error: 'Demasiados intentos. Espera unos minutos antes de volver a intentar.' },
+      429,
+    )
+  }
+  return data
 }
 
-async function recordAttempt(ip: string, success: boolean) {
-  await supabase.from('admin_pin_attempts').insert({ ip, success })
+async function markAttemptSuccess(attemptId: number) {
+  const { error } = await supabase.rpc('admin_pin_mark_success', { p_attempt_id: attemptId })
+  if (error) console.error('admin_pin_mark_success failed', { code: error.code })
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
+  if (!(await fromProxy(req))) return json({ error: 'No autorizado.' }, 401)
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
 
   try {
@@ -218,14 +225,10 @@ Deno.serve(async (req: Request) => {
       if (ADMIN_SETUP_SECRET.length < 12) {
         return json({ error: 'Falta configurar la clave privada de setup en Supabase.' }, 503)
       }
-      if (!(await checkRateLimit(ip))) {
-        return json(
-          { error: 'Demasiados intentos. Espera unos minutos antes de volver a intentar.' },
-          429,
-        )
-      }
+      const attempt = await reserveAttempt(ip)
+      if (attempt instanceof Response) return attempt
       const setupAuthorized = await verifySetupSecret(body?.setupSecret)
-      await recordAttempt(ip, setupAuthorized)
+      if (setupAuthorized) await markAttemptSuccess(attempt)
       if (!setupAuthorized) return json({ error: 'La clave privada de setup no es correcta.' }, 401)
 
       const pinHash = await hashPin(pin)
@@ -245,12 +248,8 @@ Deno.serve(async (req: Request) => {
     if (action === 'login') {
       const pin = body?.pin
       if (!validPin(pin)) return json({ error: 'Escribe un PIN de 6 dígitos.' }, 400)
-      if (!(await checkRateLimit(ip))) {
-        return json(
-          { error: 'Demasiados intentos. Espera unos minutos antes de volver a intentar.' },
-          429,
-        )
-      }
+      const attempt = await reserveAttempt(ip)
+      if (attempt instanceof Response) return attempt
 
       const { data, error } = await supabase
         .from('admin_pin_settings')
@@ -261,7 +260,7 @@ Deno.serve(async (req: Request) => {
       if (!data) return json({ error: 'El PIN todavía no ha sido configurado.' }, 409)
 
       const ok = await verifyPin(pin, data.pin_hash)
-      await recordAttempt(ip, ok)
+      if (ok) await markAttemptSuccess(attempt)
       if (!ok) return json({ error: 'PIN incorrecto.' }, 401)
 
       const session = await createSession()
@@ -798,7 +797,7 @@ Deno.serve(async (req: Request) => {
           },
         })
       }
-      const config = configs[resource]
+      const config = Object.hasOwn(configs, resource) ? configs[resource] : undefined
       if (!config) return json({ error: 'Sección administrativa no válida.' }, 400)
       if (operation === 'list') {
         let query = supabase.from(config.table).select(config.fields)
@@ -944,16 +943,14 @@ Deno.serve(async (req: Request) => {
           .delete()
           .eq('raffle_id', raffle.id)
         if (clearError) throw clearError
-        const { error: insertError } = await supabase
-          .from('raffle_entries')
-          .insert(
-            shuffled.map((winner: any) => ({
-              raffle_id: raffle.id,
-              registration_id: winner.id,
-              is_winner: true,
-              drawn_at: now,
-            })),
-          )
+        const { error: insertError } = await supabase.from('raffle_entries').insert(
+          shuffled.map((winner: any) => ({
+            raffle_id: raffle.id,
+            registration_id: winner.id,
+            is_winner: true,
+            drawn_at: now,
+          })),
+        )
         if (insertError) throw insertError
         const { error: updateError } = await supabase
           .from('raffles')
@@ -973,12 +970,8 @@ Deno.serve(async (req: Request) => {
       if (!validPin(currentPin)) return json({ error: 'Escribe tu PIN actual de 6 dígitos.' }, 400)
       if (!validPin(newPin))
         return json({ error: 'El nuevo PIN debe tener exactamente 6 dígitos.' }, 400)
-      if (!(await checkRateLimit(ip))) {
-        return json(
-          { error: 'Demasiados intentos. Espera unos minutos antes de volver a intentar.' },
-          429,
-        )
-      }
+      const attempt = await reserveAttempt(ip)
+      if (attempt instanceof Response) return attempt
       const { data: currentSettings, error: currentSettingsError } = await supabase
         .from('admin_pin_settings')
         .select('pin_hash')
@@ -988,7 +981,7 @@ Deno.serve(async (req: Request) => {
       const currentPinIsValid = Boolean(
         currentSettings && (await verifyPin(currentPin, currentSettings.pin_hash)),
       )
-      await recordAttempt(ip, currentPinIsValid)
+      if (currentPinIsValid) await markAttemptSuccess(attempt)
       if (!currentPinIsValid) {
         return json({ error: 'El PIN actual no es correcto.' }, 401)
       }
