@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-05
+
+### Added
+
+- **Add your pass to Google Wallet** from the registration confirmation and Mi pase (Android).
+
 ## [0.6.0] - 2026-10-05
 
 ### Added

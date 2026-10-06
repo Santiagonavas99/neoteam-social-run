@@ -1,0 +1,137 @@
+import { createSign } from 'node:crypto'
+import { agenda, eventConfig } from '../event/event.ts'
+import type { PassData } from './pass'
+import { QR_PREFIX } from './qr.ts'
+
+export type GoogleWalletConfig = {
+  issuerId: string
+  serviceAccountEmail: string
+  privateKey: string
+  classSuffix: string
+}
+
+type Env = Record<string, string | undefined>
+type Fetch = typeof fetch
+
+const TOKEN_URL = 'https://oauth2.googleapis.com/token'
+const OBJECT_URL = 'https://walletobjects.googleapis.com/walletobjects/v1/eventTicketObject'
+const SCOPE = 'https://www.googleapis.com/auth/wallet_object.issuer'
+
+export function googleWalletConfig(env: Env): GoogleWalletConfig | null {
+  const issuerId = env.GOOGLE_WALLET_ISSUER_ID?.trim()
+  const serviceAccountEmail = env.GOOGLE_WALLET_SERVICE_ACCOUNT_EMAIL?.trim()
+  const keyBase64 = env.GOOGLE_WALLET_PRIVATE_KEY_BASE64?.trim()
+  if (!issuerId || !serviceAccountEmail || !keyBase64) return null
+  return {
+    issuerId,
+    serviceAccountEmail,
+    privateKey: Buffer.from(keyBase64, 'base64').toString('utf8'),
+    classSuffix: env.GOOGLE_WALLET_CLASS_SUFFIX?.trim() || 'neoteam_social_run_2026',
+  }
+}
+
+const base64url = (value: string) => Buffer.from(value).toString('base64url')
+
+export function signJwt(payload: Record<string, unknown>, privateKey: string) {
+  const input = `${base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }))}.${base64url(JSON.stringify(payload))}`
+  const signature = createSign('RSA-SHA256').update(input).sign(privateKey).toString('base64url')
+  return `${input}.${signature}`
+}
+
+const arrival = agenda[0]
+const meetingTime = `${eventConfig.dateShort} · ${arrival.time} ${arrival.meridiem}`
+
+export function walletObject(pass: PassData, config: GoogleWalletConfig) {
+  const classId = `${config.issuerId}.${config.classSuffix}`
+  return {
+    id: `${classId}_${pass.checkinToken.replaceAll('-', '')}`,
+    classId,
+    state: 'ACTIVE',
+    ticketHolderName: pass.name,
+    ticketNumber: pass.code,
+    reservationInfo: { confirmationCode: pass.code },
+    barcode: {
+      type: 'QR_CODE',
+      value: `${QR_PREFIX}${pass.checkinToken}`,
+      alternateText: pass.code,
+    },
+    hexBackgroundColor: '#050505',
+    textModulesData: [
+      { id: 'route', header: 'RECORRIDO', body: eventConfig.route },
+      { id: 'time', header: 'ENCUENTRO', body: meetingTime },
+    ],
+  }
+}
+
+export function saveJwt(object: { id: string; classId: string }, config: GoogleWalletConfig) {
+  return signJwt(
+    {
+      iss: config.serviceAccountEmail,
+      aud: 'google',
+      typ: 'savetowallet',
+      iat: Math.floor(Date.now() / 1000),
+      origins: [],
+      payload: { eventTicketObjects: [{ id: object.id, classId: object.classId }] },
+    },
+    config.privateKey,
+  )
+}
+
+const fail = (stage: string, status: number) => new Error(`google-wallet ${stage} ${status}`)
+
+let cachedToken: { value: string; expiresAt: number } | null = null
+
+async function accessToken(config: GoogleWalletConfig, fetcher: Fetch) {
+  const now = Date.now()
+  if (cachedToken && cachedToken.expiresAt > now) return cachedToken.value
+  const iat = Math.floor(now / 1000)
+  const assertion = signJwt(
+    { iss: config.serviceAccountEmail, scope: SCOPE, aud: TOKEN_URL, iat, exp: iat + 3600 },
+    config.privateKey,
+  )
+  const response = await fetcher(TOKEN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion,
+    }),
+    cache: 'no-store',
+  })
+  const body: unknown = await response.json().catch(() => null)
+  const token =
+    typeof body === 'object' && body !== null && 'access_token' in body ? body.access_token : null
+  const expiresIn =
+    typeof body === 'object' && body !== null && 'expires_in' in body ? Number(body.expires_in) : 0
+  if (!response.ok || typeof token !== 'string') throw fail('oauth', response.status)
+  cachedToken = { value: token, expiresAt: now + (Math.max(expiresIn, 120) - 60) * 1000 }
+  return token
+}
+
+async function ensureObject(token: string, object: { id: string }, fetcher: Fetch) {
+  const headers = { Authorization: `Bearer ${token}` }
+  const existing = await fetcher(`${OBJECT_URL}/${encodeURIComponent(object.id)}`, {
+    headers,
+    cache: 'no-store',
+  })
+  if (existing.ok) return
+  if (existing.status !== 404) throw fail('object-get', existing.status)
+  const created = await fetcher(OBJECT_URL, {
+    method: 'POST',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify(object),
+    cache: 'no-store',
+  })
+  if (!created.ok && created.status !== 409) throw fail('object-insert', created.status)
+}
+
+// Creating the object over REST first is the flow Santiago validated with this issuer.
+export async function googleSaveUrl(
+  pass: PassData,
+  config: GoogleWalletConfig,
+  fetcher: Fetch = fetch,
+) {
+  const object = walletObject(pass, config)
+  await ensureObject(await accessToken(config, fetcher), object, fetcher)
+  return `https://pay.google.com/gp/v/save/${saveJwt(object, config)}`
+}

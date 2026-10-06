@@ -39,6 +39,7 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 | `ScanLine` | Register a runner in a dynamic |
 | `UserCheck` | Check-in |
 | `QrCode` | The runner's check-in pass ("Mi pase") |
+| `Wallet` | Add the pass to Google Wallet |
 | `Eye` / `EyeOff` | Visible / hidden |
 | `CalendarDays` / `Clock` / `MapPin` / `Route` / `Gift` | Date / time / place / route / prizes |
 | `UserCheck`, `LayoutDashboard`, `GalleryHorizontal`, `Users`, `Flag`, `Tag`, `Zap`, `ShieldCheck` | Admin sections: check-in, overview, logo strip, participants, groups, brands, dynamics, security |
