@@ -13,18 +13,28 @@ One commit per task. Steps marked **(Iván)** touch secrets or production and ar
 - [ ] Read `admin-pin/index.ts:626-693` (dynamics draw) and write its exact rules below Task 3: eligibility, winner count, replace vs append, final status.
 - Commit: `chore(supabase): pull remote schema` (if pulled).
 
+## Task 1b — Local Supabase Postgres for SQL tests
+
+- [ ] `docker-compose.yml` (repo root): one service `db`, image `supabase/postgres:17.11.0.004` (Supabase roles and extensions; confirm the major version matches `select version()` on the remote in Task 1), port `54322:5432` (no clash with `~/infra` on 5432), own volume `neoteam_db`, local-only password.
+- [ ] `scripts/test-db.sh` + `pnpm test:db`: wait for the db, apply `supabase/migrations/*.sql` that do not depend on remote-only tables, then run `supabase/tests/*.sql` with `psql` inside the container (`ON_ERROR_STOP=1`). Fresh schema each run (`drop schema … cascade` of the test objects).
+- [ ] `AGENTS.md`/`CLAUDE.md`: `docker compose up -d db`, `pnpm test:db`, `docker compose down`.
+- Check: `docker compose up -d db && pnpm test:db` exits 0 with the existing migrations.
+- Commit: `chore(db): local Supabase Postgres for SQL tests`
+
+Order: Tasks 1b, 2, 4 and the PIN part of Task 5 do not depend on the remote schema and go first. Task 3 and the draw part of Task 5 wait for Task 1.
+
 ## Task 2 — Attempt reservation SQL
 
 - [ ] `supabase/migrations/20261006090000_admin_pin_atomic_attempts.sql`: `admin_pin_reserve_attempt(p_ip text) returns bigint` and `admin_pin_mark_success(p_attempt_id bigint) returns void`, as in spec §2 (advisory xact lock, 8 per IP per 10 min, 50 global per 60 min, `security definer`, `set search_path = ''`, revoke from `public, anon, authenticated`, grant to `service_role`).
 - [ ] `supabase/tests/admin_pin_attempts.sql` (plain SQL script with `do $$ … assert … $$`): the 9th failure from one IP returns null; the 51st global failure returns null; mark_success excludes the row from the counts.
-- Check: **(Iván)** run migration + script on the remote inside `begin; … rollback;` (nothing persists). No local Docker or Postgres.
+- Check: `pnpm test:db` (local, Task 1b); then **(Iván)** the same script on the remote inside `begin; … rollback;`.
 - Commit: `fix(db): atomic admin PIN attempt reservation`
 
 ## Task 3 — Atomic draws SQL
 
 - [ ] `supabase/migrations/20261006091000_atomic_draws.sql`: `draw_raffle`, `draw_dynamic`, `record_dynamic_participation`, as in spec §4, using the types from Task 1. Same grants as Task 2.
 - [ ] `supabase/tests/atomic_draws.sql`: drawing a non-open raffle raises; drawing twice gives one set of winners; the instant win never exceeds `winner_count` (loop with `p_roll = 0`).
-- Check: as in Task 2 (remote, `begin; … rollback;`).
+- Check: as in Task 2.
 - Commit: `fix(db): transactional raffle and dynamic draws`
 
 ## Task 4 — Proxy sends the secret and client IP

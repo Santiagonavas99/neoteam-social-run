@@ -65,7 +65,13 @@ pnpm typecheck   # next typegen + tsc
 pnpm test        # node --test on **/*.test.ts
 pnpm build
 pnpm ci:check    # all of the above
+
+docker compose up -d db   # local Supabase Postgres on :54322 (SQL tests only)
+pnpm test:db              # each supabase/tests/*.sql in a throwaway database
+docker compose down
 ```
+
+SQL tests pull in the migrations they need with `\ir ../migrations/<file>.sql`; tables that exist only in the remote schema must be created by the test itself.
 
 A task is done when `pnpm ci:check` passes. Say so with the output; if something fails, report it, do not hide it.
 

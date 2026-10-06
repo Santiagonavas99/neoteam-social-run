@@ -21,6 +21,7 @@ pnpm test                     # node --test on **/*.test.ts (strip-types, no fra
 node --experimental-strip-types --test path/to/file.test.ts   # single test file
 pnpm build
 pnpm ci:check                 # lint + typecheck + test + build
+pnpm test:db                  # SQL tests in the compose `db` service (supabase/postgres, :54322)
 ```
 
 `next-env.d.ts` and `.next/` are generated (gitignored); `typecheck` runs `next typegen` first so it works on a clean clone. If `build` panics inside Turbopack, delete `.next/` and retry.

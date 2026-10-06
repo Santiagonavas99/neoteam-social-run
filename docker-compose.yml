@@ -1,0 +1,21 @@
+name: neoteam-social-run
+
+# Local-only Postgres with Supabase's roles and extensions, for SQL tests.
+# Match the major version to the remote project (`select version()`).
+services:
+  db:
+    image: supabase/postgres:17.11.0.004
+    container_name: neoteam-db
+    ports: ['54322:5432']
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - neoteam_db:/var/lib/postgresql/data
+      - ./supabase:/work/supabase:ro
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      interval: 2s
+      retries: 30
+
+volumes:
+  neoteam_db:
