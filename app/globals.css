@@ -208,7 +208,7 @@ fieldset {
 }
 .button:hover:not(:disabled) {
   background: var(--neo-accent-dark);
-  border-color: var(--neo-accent-text);
+  border-color: var(--neo-accent-dark);
   color: white;
 }
 .button-small {
