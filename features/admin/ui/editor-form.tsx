@@ -31,17 +31,20 @@ export function EditorForm({
 }) {
   const locked = busy || uploading
   return (
-    <form className="record-editor" onSubmit={onSubmit}>
-      <div className="editor-heading">
-        <h3>{title}</h3>
-        <span className="muted">{hint}</span>
+    <form
+      className="mb-5 rounded-card border border-neo-border bg-neo-surface p-5 md:p-7 [article>&]:m-0 [article>&]:rounded-t-none [article>&]:border-x-0 [article>&]:border-b-0 [article>&]:bg-neo-bg"
+      onSubmit={onSubmit}
+    >
+      <div className="mb-6">
+        <h3 className="m-0 mb-2 text-lg font-bold tracking-[-0.03em]">{title}</h3>
+        <span className="text-xs text-neo-text-secondary">{hint}</span>
       </div>
       <fieldset disabled={locked}>
         <legend className="sr-only">{legend}</legend>
-        <div className="form-grid two">{children}</div>
+        <div className="grid max-w-[760px] grid-cols-1 gap-5 md:grid-cols-2">{children}</div>
       </fieldset>
       <Feedback value={feedback} />
-      <div className="editor-actions">
+      <div className="mt-6 flex flex-wrap items-center gap-2 md:gap-3 [&>.button]:flex-1 md:[&>.button]:flex-none">
         <button type="submit" className="button" disabled={locked}>
           <Check aria-hidden className="size-4 shrink-0" />
           {busy ? 'Guardando…' : uploading ? 'Subiendo imagen…' : submitLabel}
@@ -57,7 +60,7 @@ export function EditorForm({
         {onDelete && (
           <button
             type="button"
-            className="text-link danger-text"
+            className="text-link danger-text basis-full md:ml-auto md:basis-auto"
             onClick={onDelete}
             disabled={locked}
           >

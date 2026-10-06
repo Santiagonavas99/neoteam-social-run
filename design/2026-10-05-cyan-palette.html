@@ -1,0 +1,348 @@
+<title>Paleta cian NeoTeam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@400;500;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: a working sheet. Page chrome uses the proposed tokens; each mockup pins its own theme with .t-light / .t-dark. */
+:root {
+  --bg: #f2f8f8; --surface: #ffffff; --text: #050505; --secondary: #5c6565;
+  --border: rgba(5, 5, 5, 0.12); --border-strong: #737d7c;
+  --accent: #03f8f6; --accent-hover: #13e7e5; --accent-text: #077271; --accent-strong: #065958; --accent-soft: #defffd;
+  --danger: #a32929; --danger-bg: #fcf0ef; --warning: #8a5601; --warning-bg: #fef2d9; --muted-bg: #e9f0f0;
+  --black: #050505; --white: #ffffff; --on-dark-secondary: #c2cdcd; --on-dark-border: #27302f; --on-dark-hover: #192121;
+  --font: "Host Grotesk", Arial, sans-serif; --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #080f0e; --surface: #111a1a; --text: #ecf4f3; --secondary: #a3adad;
+  --border: rgba(255, 255, 255, 0.12); --border-strong: #6a7473;
+  --accent-text: #24fdfa; --accent-strong: #077271; --accent-soft: #002d2d;
+  --danger: #f08a8a; --danger-bg: #2a1515; --warning: #edbb64; --warning-bg: #32230e; --muted-bg: #202828; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #080f0e; --surface: #111a1a; --text: #ecf4f3; --secondary: #a3adad;
+  --border: rgba(255, 255, 255, 0.12); --border-strong: #6a7473;
+  --accent-text: #24fdfa; --accent-strong: #077271; --accent-soft: #002d2d;
+  --danger: #f08a8a; --danger-bg: #2a1515; --warning: #edbb64; --warning-bg: #32230e; --muted-bg: #202828; color-scheme: dark }
+.t-light {
+  --bg: #f2f8f8; --surface: #ffffff; --text: #050505; --secondary: #5c6565;
+  --border: rgba(5, 5, 5, 0.12); --border-strong: #737d7c;
+  --accent-text: #077271; --accent-strong: #065958; --accent-soft: #defffd;
+  --danger: #a32929; --danger-bg: #fcf0ef; --warning: #8a5601; --warning-bg: #fef2d9; --muted-bg: #e9f0f0; color-scheme: light }
+.t-dark {
+  --bg: #080f0e; --surface: #111a1a; --text: #ecf4f3; --secondary: #a3adad;
+  --border: rgba(255, 255, 255, 0.12); --border-strong: #6a7473;
+  --accent-text: #24fdfa; --accent-strong: #077271; --accent-soft: #002d2d;
+  --danger: #f08a8a; --danger-bg: #2a1515; --warning: #edbb64; --warning-bg: #32230e; --muted-bg: #202828; color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--text); font: 15px/1.5 var(--font) }
+.page { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 32px 80px; display: grid; gap: 56px }
+h1, h2, h3 { margin: 0; text-wrap: balance; letter-spacing: -0.03em }
+h1 { font-size: clamp(30px, 6vw, 48px); font-weight: 800; line-height: 1 }
+h2 { font-size: 26px; font-weight: 800 }
+h3 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em }
+p { margin: 0; max-width: 68ch }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-text) }
+.lead { color: var(--secondary); font-size: 17px }
+section { display: grid; gap: 20px }
+.head { display: grid; gap: 8px }
+.mono { font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums }
+
+/* Theme switch for the sheet itself */
+.switch { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); width: fit-content }
+.switch button { font: 700 13px var(--font); min-height: 40px; padding: 0 14px; border: 0; border-radius: 7px; background: transparent; color: var(--secondary); cursor: pointer }
+.switch button[aria-pressed="true"] { background: var(--text); color: var(--bg) }
+.switch button:focus-visible, a:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px }
+
+/* Ramps */
+.ramp { display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); border-radius: 12px; overflow: hidden; border: 1px solid var(--border) }
+.ramp div { min-height: 88px; padding: 8px 6px; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; font-size: 11px }
+.ramp b { font-weight: 700 }
+.ramp .brand { box-shadow: inset 0 0 0 3px var(--black) }
+@media (max-width: 720px) { .ramp { grid-template-columns: repeat(4, minmax(0, 1fr)) } .ramp div { min-height: 64px } }
+
+/* Token table */
+.scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface) }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14px }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: middle }
+th { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--secondary); font-weight: 700 }
+tr:last-child td { border-bottom: 0 }
+.chip { display: inline-flex; align-items: center; gap: 8px }
+.sw { width: 22px; height: 22px; border-radius: 6px; border: 1px solid rgba(127, 127, 127, 0.35); flex: none }
+.pass { color: var(--accent-text); font-weight: 700 }
+.was { color: var(--secondary); text-decoration: line-through }
+
+/* Mockups */
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; align-items: start }
+.phone { width: 100%; max-width: 390px; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; background: var(--bg); color: var(--text); font-size: 14px; display: flex; flex-direction: column; min-height: 640px; position: relative }
+.cap { font-size: 12px; font-weight: 700; color: var(--secondary); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px }
+.topbar { background: var(--black); color: var(--white); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between }
+.logo { font-weight: 800; letter-spacing: -0.02em; font-size: 17px; line-height: 1 }
+.logo small { display: block; font-size: 8px; letter-spacing: 0.4em; color: var(--accent); font-weight: 700; margin-top: 3px }
+.topbar .who { color: var(--on-dark-secondary); font-size: 12px }
+.body { padding: 16px; display: grid; gap: 14px; align-content: start; flex: 1 }
+.title { display: grid; gap: 2px }
+.title h3 { font-size: 24px; font-weight: 800; letter-spacing: -0.04em }
+.title p { color: var(--secondary); font-size: 13px }
+.row { display: flex; gap: 8px; align-items: center }
+.input { flex: 1; min-height: 44px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); display: flex; align-items: center; padding: 0 12px; color: var(--secondary); gap: 8px; min-width: 0 }
+.iconbtn { width: 44px; height: 44px; border: 1px solid var(--border-strong); border-radius: 8px; display: grid; place-items: center; background: var(--surface); color: var(--text); flex: none }
+svg.i { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none }
+.chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px }
+.chips span { white-space: nowrap; font-size: 12px; font-weight: 700; min-height: 32px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: 99px; border: 1px solid var(--border); color: var(--secondary); background: var(--surface) }
+.chips span.on { background: var(--text); color: var(--bg); border-color: var(--text) }
+.list { display: grid; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden }
+.item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 12px 14px; border-bottom: 1px solid var(--border); align-items: center; min-height: 64px }
+.item:last-child { border-bottom: 0 }
+.item b { font-weight: 700; font-size: 15px }
+.item small { color: var(--secondary); font-size: 12px; grid-column: 1 }
+.item .code { font-family: var(--mono); font-size: 12px; color: var(--secondary) }
+.badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 99px; grid-row: 1 / span 2; grid-column: 2; white-space: nowrap }
+.b-ok { background: var(--accent-soft); color: var(--accent-text) }
+.b-reg { background: var(--muted-bg); color: var(--secondary) }
+.b-no { background: var(--warning-bg); color: var(--warning) }
+.b-x { background: var(--danger-bg); color: var(--danger) }
+.badge svg.i { width: 13px; height: 13px }
+.tabbar { position: sticky; bottom: 0; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--surface); border-top: 1px solid var(--border) }
+.tabbar span { display: grid; justify-items: center; gap: 2px; padding: 8px 0 10px; font-size: 11px; font-weight: 700; color: var(--secondary); min-height: 56px }
+.tabbar span.on { color: var(--accent-text); box-shadow: inset 0 3px 0 var(--accent) }
+.result { border-radius: 12px; padding: 16px; display: grid; gap: 6px; background: var(--accent-soft); color: var(--text); border: 1px solid var(--border) }
+.result .h { display: flex; gap: 8px; align-items: center; font-weight: 800; font-size: 18px; color: var(--accent-text) }
+.result .h svg.i { width: 22px; height: 22px }
+.result p { color: var(--secondary); font-size: 13px }
+.btn { min-height: 48px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; font-size: 13px; padding: 0 16px; border: 1px solid transparent }
+.btn-primary { background: var(--text); color: var(--bg) }
+.btn-accent { background: var(--accent); color: var(--black) }
+.btn-ghost { background: var(--surface); color: var(--text); border-color: var(--border-strong) }
+.btn-danger-text { color: var(--danger); padding: 0; min-height: 44px; justify-content: flex-start }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 12px; overflow: hidden }
+.stats div { background: var(--surface); padding: 12px 14px; display: grid; gap: 2px }
+.stats b { font-size: 28px; font-weight: 800; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; line-height: 1.1 }
+.stats small { color: var(--secondary); font-size: 12px }
+.stats .main { grid-column: 1 / -1; background: var(--black); color: var(--white) }
+.stats .main small { color: var(--on-dark-secondary) }
+.stats .main b { color: var(--accent); font-size: 40px }
+.meter { height: 6px; border-radius: 99px; background: var(--on-dark-border); overflow: hidden; margin-top: 6px }
+.meter i { display: block; height: 100%; width: 34%; background: var(--accent) }
+.sheetnote { font-size: 12px; color: var(--secondary) }
+
+/* Desktop shell */
+.desk { border: 1px solid var(--border); border-radius: 16px; overflow: hidden; display: grid; grid-template-columns: 220px minmax(0, 1fr); min-height: 420px; background: var(--bg); color: var(--text) }
+.side { background: var(--black); color: var(--white); padding: 20px 12px; display: grid; gap: 18px; align-content: start }
+.grp { display: grid; gap: 2px }
+.grp em { font-style: normal; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--on-dark-secondary); padding: 0 10px 6px }
+.grp span { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 10px; border-radius: 8px; color: var(--on-dark-secondary); font-size: 14px }
+.grp span.on { background: var(--on-dark-hover); color: var(--white); box-shadow: inset 3px 0 0 var(--accent) }
+.pane { padding: 24px; display: grid; gap: 16px; align-content: start }
+@media (max-width: 760px) { .desk { grid-template-columns: 1fr } .side { display: none } }
+
+.findings { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)) }
+.finding { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: grid; gap: 6px; align-content: start }
+.finding p { color: var(--secondary); font-size: 14px }
+.finding .eyebrow { font-size: 11px }
+</style>
+
+<main class="page">
+  <header class="head">
+    <span class="eyebrow">Social Run · 18 oct · propuesta de diseño</span>
+    <h1>Paleta cian y maquetado del panel</h1>
+    <p class="lead">Una sola tinta, el cian de la marca (#03F8F6), genera todos los tonos: los grises, los textos y los rellenos. Así desaparecen los grises verdosos y el modo oscuro funciona con los mismos nombres de token.</p>
+    <div class="switch" role="group" aria-label="Tema de esta página">
+      <button type="button" data-set="system" aria-pressed="true">Sistema</button>
+      <button type="button" data-set="light" aria-pressed="false">Claro</button>
+      <button type="button" data-set="dark" aria-pressed="false">Oscuro</button>
+    </div>
+  </header>
+
+  <section>
+    <div class="head">
+      <span class="eyebrow">1 · Escalas</span>
+      <h2>Cian y neutros, mismo matiz</h2>
+      <p class="lead">Calculadas en OKLCH con el matiz del cian de marca (193,7°). El recuadro negro marca el cian de marca. Los neutros llevan una pizca del mismo cian, en lugar del verde de hoy.</p>
+    </div>
+    <div class="ramp" aria-label="Escala cian">
+      <div style="background:#defffd;color:#050505"><b>50</b><span class="mono">defffd</span></div>
+      <div style="background:#b3fffd;color:#050505"><b>100</b><span class="mono">b3fffd</span></div>
+      <div class="brand" style="background:#03f8f6;color:#050505"><b>marca</b><span class="mono">03f8f6</span></div>
+      <div style="background:#13e7e5;color:#050505"><b>300</b><span class="mono">13e7e5</span></div>
+      <div style="background:#0fd1d0;color:#050505"><b>400</b><span class="mono">0fd1d0</span></div>
+      <div style="background:#0fb5b3;color:#050505"><b>500</b><span class="mono">0fb5b3</span></div>
+      <div style="background:#078c8b;color:#ffffff"><b>600</b><span class="mono">078c8b</span></div>
+      <div style="background:#077271;color:#ffffff"><b>700</b><span class="mono">077271</span></div>
+      <div style="background:#065958;color:#ffffff"><b>800</b><span class="mono">065958</span></div>
+      <div style="background:#004141;color:#ffffff"><b>900</b><span class="mono">004141</span></div>
+      <div style="background:#002d2d;color:#ffffff"><b>950</b><span class="mono">002d2d</span></div>
+    </div>
+    <div class="ramp" aria-label="Escala neutra">
+      <div style="background:#f2f8f8;color:#050505"><b>50</b><span class="mono">f2f8f8</span></div>
+      <div style="background:#e9f0f0;color:#050505"><b>100</b><span class="mono">e9f0f0</span></div>
+      <div style="background:#d9e4e3;color:#050505"><b>200</b><span class="mono">d9e4e3</span></div>
+      <div style="background:#c2cdcd;color:#050505"><b>300</b><span class="mono">c2cdcd</span></div>
+      <div style="background:#a3adad;color:#050505"><b>400</b><span class="mono">a3adad</span></div>
+      <div style="background:#737d7c;color:#ffffff"><b>500</b><span class="mono">737d7c</span></div>
+      <div style="background:#5c6565;color:#ffffff"><b>600</b><span class="mono">5c6565</span></div>
+      <div style="background:#27302f;color:#ffffff"><b>700</b><span class="mono">27302f</span></div>
+      <div style="background:#192121;color:#ffffff"><b>800</b><span class="mono">192121</span></div>
+      <div style="background:#111a1a;color:#ffffff"><b>900</b><span class="mono">111a1a</span></div>
+      <div style="background:#080f0e;color:#ffffff"><b>950</b><span class="mono">080f0e</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <span class="eyebrow">2 · Tokens</span>
+      <h2>Qué cambia, con su contraste medido</h2>
+      <p class="lead">Mismo nombre de token en los dos temas. Mínimo WCAG: 4,5:1 para texto y 3:1 para bordes de controles.</p>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Token</th><th>Hoy</th><th>Claro</th><th>Oscuro</th><th>Contraste claro / oscuro</th></tr></thead>
+        <tbody>
+          <tr><td>--neo-bg</td><td class="mono was">f4f6f5</td><td><span class="chip"><i class="sw" style="background:#f2f8f8"></i><span class="mono">f2f8f8</span></span></td><td><span class="chip"><i class="sw" style="background:#080f0e"></i><span class="mono">080f0e</span></span></td><td>fondo</td></tr>
+          <tr><td>--neo-surface</td><td class="mono">fff</td><td><span class="chip"><i class="sw" style="background:#fff"></i><span class="mono">ffffff</span></span></td><td><span class="chip"><i class="sw" style="background:#111a1a"></i><span class="mono">111a1a</span></span></td><td>tarjetas</td></tr>
+          <tr><td>--neo-text</td><td class="mono">050505</td><td><span class="chip"><i class="sw" style="background:#050505"></i><span class="mono">050505</span></span></td><td><span class="chip"><i class="sw" style="background:#ecf4f3"></i><span class="mono">ecf4f3</span></span></td><td class="pass">20,4 · 15,9</td></tr>
+          <tr><td>--neo-text-secondary</td><td class="mono was">68716f</td><td><span class="chip"><i class="sw" style="background:#5c6565"></i><span class="mono">5c6565</span></span></td><td><span class="chip"><i class="sw" style="background:#a3adad"></i><span class="mono">a3adad</span></span></td><td class="pass">6,0 · 7,7</td></tr>
+          <tr><td>--neo-accent-text</td><td class="mono was">007a78</td><td><span class="chip"><i class="sw" style="background:#077271"></i><span class="mono">077271</span></span></td><td><span class="chip"><i class="sw" style="background:#24fdfa"></i><span class="mono">24fdfa</span></span></td><td class="pass">5,8 · 13,9</td></tr>
+          <tr><td>--neo-accent-strong <small>(antes accent-dark)</small></td><td class="mono was">007a78</td><td><span class="chip"><i class="sw" style="background:#065958"></i><span class="mono">065958</span></span></td><td><span class="chip"><i class="sw" style="background:#077271"></i><span class="mono">077271</span></span></td><td class="pass">blanco encima 8,2 · 5,8</td></tr>
+          <tr><td>--neo-accent</td><td class="mono">03f8f6</td><td><span class="chip"><i class="sw" style="background:#03f8f6"></i><span class="mono">03f8f6</span></span></td><td><span class="chip"><i class="sw" style="background:#03f8f6"></i><span class="mono">03f8f6</span></span></td><td class="pass">negro encima 15,3</td></tr>
+          <tr><td>--neo-accent-soft</td><td class="mono was">e7fbfb</td><td><span class="chip"><i class="sw" style="background:#defffd"></i><span class="mono">defffd</span></span></td><td><span class="chip"><i class="sw" style="background:#002d2d"></i><span class="mono">002d2d</span></span></td><td class="pass">texto cian 5,4 · 11,7</td></tr>
+          <tr><td>--neo-border-strong <small>(nuevo)</small></td><td class="mono was">b8c1be · 1,8</td><td><span class="chip"><i class="sw" style="background:#737d7c"></i><span class="mono">737d7c</span></span></td><td><span class="chip"><i class="sw" style="background:#6a7473"></i><span class="mono">6a7473</span></span></td><td class="pass">4,2 · 3,7</td></tr>
+          <tr><td>--neo-muted-bg <small>(nuevo)</small></td><td class="mono was">edf1ef</td><td><span class="chip"><i class="sw" style="background:#e9f0f0"></i><span class="mono">e9f0f0</span></span></td><td><span class="chip"><i class="sw" style="background:#202828"></i><span class="mono">202828</span></span></td><td class="pass">secundario encima 5,2 · 6,6</td></tr>
+          <tr><td>--neo-warning / -bg <small>(nuevo)</small></td><td class="mono was">6b5627 / f4edde</td><td><span class="chip"><i class="sw" style="background:#8a5601"></i><i class="sw" style="background:#fef2d9"></i></span></td><td><span class="chip"><i class="sw" style="background:#edbb64"></i><i class="sw" style="background:#32230e"></i></span></td><td class="pass">5,5 · 8,6</td></tr>
+          <tr><td>--neo-danger / -bg</td><td class="mono">a32929 / fcf0ef</td><td><span class="chip"><i class="sw" style="background:#a32929"></i><i class="sw" style="background:#fcf0ef"></i></span></td><td><span class="chip"><i class="sw" style="background:#f08a8a"></i><i class="sw" style="background:#2a1515"></i></span></td><td class="pass">6,5 · 7,2</td></tr>
+          <tr><td>--neo-on-dark-secondary <small>(nuevo)</small></td><td class="mono was">9 grises distintos</td><td colspan="2"><span class="chip"><i class="sw" style="background:#c2cdcd"></i><span class="mono">c2cdcd</span> sobre negro, igual en ambos</span></td><td class="pass">12,5</td></tr>
+          <tr><td>--neo-on-dark-border / -hover <small>(nuevo)</small></td><td class="mono was">6 grises distintos</td><td colspan="2"><span class="chip"><i class="sw" style="background:#27302f"></i><i class="sw" style="background:#192121"></i><span class="mono">27302f · 192121</span></span></td><td>divisores</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sheetnote">--neo-success-bg desaparece: el éxito usa --neo-accent-soft con texto --neo-accent-text, porque en NeoTeam el cian ya significa «listo».</p>
+  </section>
+
+  <section>
+    <div class="head">
+      <span class="eyebrow">3 · Lo que encontré en el panel actual (390 px)</span>
+      <h2>Secciones y maquetado</h2>
+    </div>
+    <div class="findings">
+      <div class="finding"><span class="eyebrow">Navegación</span><h3>Ocho pestañas en una fila que se corta</h3><p>En el celular, «Grupos», «Marcas», «Dinámicas» y «Seguridad» quedan fuera de la pantalla. El día del evento el staff necesita Check-in, Participantes y Dinámicas, y dos de esas tres están ocultas.</p></div>
+      <div class="finding"><span class="eyebrow">Encabezado</span><h3>230 px antes del contenido</h3><p>Ruta de navegación, «Ver página», etiqueta, título gigante y descripción ocupan la cuarta parte de la pantalla en cada sección.</p></div>
+      <div class="finding"><span class="eyebrow">Participantes</span><h3>380 px por corredor y «Eliminar» en rojo lleno</h3><p>Con 128 inscritos son unos 48.000 px de scroll. La acción destructiva pesa más que el check-in.</p></div>
+      <div class="finding"><span class="eyebrow">Overview</span><h3>La navegación aparece dos veces</h3><p>«Gestiona el encuentro» repite el menú. Las cinco métricas pesan igual, aunque el día del evento lo que importa es cuántos han hecho check-in.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <span class="eyebrow">4 · Propuesta en el celular</span>
+      <h2>Barra inferior con lo del día del evento</h2>
+      <p class="lead">Check-in, Participantes y Dinámicas quedan al alcance del pulgar; el resto va en «Más». Corredores en filas de 64 px; el detalle y «Eliminar» se abren al tocar la fila. Mismo diseño en claro y oscuro.</p>
+    </div>
+    <div class="pair">
+      <div>
+        <div class="cap">Participantes · claro</div>
+        <div class="phone t-light" data-mock="participants"></div>
+      </div>
+      <div>
+        <div class="cap">Participantes · oscuro</div>
+        <div class="phone t-dark" data-mock="participants"></div>
+      </div>
+      <div>
+        <div class="cap">Check-in · oscuro</div>
+        <div class="phone t-dark" data-mock="checkin"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <span class="eyebrow">5 · Propuesta en escritorio (1440 px)</span>
+      <h2>Menú lateral agrupado por momento</h2>
+      <p class="lead">«Día del evento» arriba, «Contenido del sitio» después y «Cuenta» al final. El Overview pone primero la asistencia.</p>
+    </div>
+    <div class="desk t-light">
+      <aside class="side">
+        <div class="logo">NEO TEAM<small>RUN &amp; HIKE</small></div>
+        <div class="grp"><em>Día del evento</em><span class="on">Overview</span><span>Check-in</span><span>Participantes</span><span>Dinámicas</span></div>
+        <div class="grp"><em>Contenido del sitio</em><span>Carrusel de logos</span><span>Grupos</span><span>Marcas</span></div>
+        <div class="grp"><em>Cuenta</em><span>Seguridad</span><span>Tema · Sistema</span></div>
+      </aside>
+      <div class="pane">
+        <div class="title"><span class="eyebrow">Social Run · 18 oct</span><h3>Overview</h3></div>
+        <div class="stats" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+          <div class="main" style="grid-column:span 2"><small>Check-in</small><b>43 / 128</b><div class="meter"><i></i></div></div>
+          <div><small>Dinámicas activas</small><b>2</b></div>
+          <div><small>Grupos</small><b>9</b></div>
+        </div>
+        <div class="list">
+          <div class="item"><b>Ruleta del aliado</b><span class="badge b-ok">Activa</span><small>30 participaciones · 2 ganadores</small></div>
+          <div class="item"><b>Stand Hidratación</b><span class="badge b-ok">Activa</span><small>12 participaciones</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="head">
+      <span class="eyebrow">6 · Estados</span>
+      <h2>Insignias: color e ícono, nunca solo color</h2>
+    </div>
+    <div class="pair">
+      <div class="list t-light" style="padding:14px;display:flex;flex-wrap:wrap;gap:8px;background:var(--surface)">
+        <span class="badge b-reg" data-i="circle">Inscrito</span><span class="badge b-ok" data-i="check">Check-in</span><span class="badge b-no" data-i="slash">No asistió</span><span class="badge b-x" data-i="x">Cancelado</span>
+      </div>
+      <div class="list t-dark" style="padding:14px;display:flex;flex-wrap:wrap;gap:8px;background:var(--surface)">
+        <span class="badge b-reg" data-i="circle">Inscrito</span><span class="badge b-ok" data-i="check">Check-in</span><span class="badge b-no" data-i="slash">No asistió</span><span class="badge b-x" data-i="x">Cancelado</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const icon = {
+  check: '<path d="M21.8 10A10 10 0 1 1 17 3.3"/><path d="m9 11 3 3L22 4"/>',
+  circle: '<circle cx="12" cy="12" r="10"/>',
+  slash: '<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>',
+  x: '<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/>',
+  search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  refresh: '<path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M8 16H3v5"/>',
+  usercheck: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
+  zap: '<path d="M4 14a1 1 0 0 1-.8-1.6l9.9-10.2a.5.5 0 0 1 .9.5l-1.9 6A1 1 0 0 0 13 10h7a1 1 0 0 1 .8 1.6l-9.9 10.2a.5.5 0 0 1-.9-.5l1.9-6A1 1 0 0 0 11 14z"/>',
+  more: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
+  scan: '<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/>',
+}
+const svg = (name) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${icon[name]}</svg>`
+document.querySelectorAll('[data-i]').forEach((el) => el.insertAdjacentHTML('afterbegin', svg(el.dataset.i)))
+
+const runners = [
+  ['Ana Prueba', 'SR26-00001', 'NeoTeam', 'b-ok', 'check', 'Check-in'],
+  ['Luis Demo', 'SR26-00002', 'Crew Test', 'b-reg', 'circle', 'Inscrito'],
+  ['Sara Ejemplo', 'SR26-00003', 'Independiente', 'b-x', 'x', 'Cancelado'],
+  ['Mateo Ruiz', 'SR26-00004', 'Run Cali', 'b-no', 'slash', 'No asistió'],
+  ['Valentina Gómez', 'SR26-00005', 'NeoTeam', 'b-ok', 'check', 'Check-in'],
+]
+const top = '<div class="topbar"><div class="logo">NEO TEAM<small>RUN &amp; HIKE</small></div><span class="who">Social Run · 18 oct</span></div>'
+const tabs = (on) => `<nav class="tabbar">${[['usercheck', 'Check-in'], ['users', 'Participantes'], ['zap', 'Dinámicas'], ['more', 'Más']]
+  .map(([i, l]) => `<span class="${l === on ? 'on' : ''}">${svg(i)}${l}</span>`).join('')}</nav>`
+const mocks = {
+  participants: () => `${top}<div class="body">
+    <div class="title"><h3>Participantes</h3><p>43 de 128 con check-in</p></div>
+    <div class="row"><div class="input">${svg('search')}Nombre, código o documento</div><span class="iconbtn" aria-label="Actualizar">${svg('refresh')}</span></div>
+    <div class="chips"><span class="on">Todos 128</span><span>Inscritos 82</span><span>Check-in 43</span><span>No asistió 1</span><span>Cancelados 2</span></div>
+    <div class="list">${runners.map(([n, c, g, b, i, l]) => `<div class="item"><b>${n}</b><span class="badge ${b}">${svg(i)}${l}</span><small><span class="code">${c}</span> · ${g}</small></div>`).join('')}</div>
+  </div>${tabs('Participantes')}`,
+  checkin: () => `${top}<div class="body">
+    <div class="title"><h3>Check-in</h3><p>Apunta la cámara al QR del corredor.</p></div>
+    <div style="aspect-ratio:1;max-width:100%;border-radius:12px;background:#000;display:grid;place-items:center;color:var(--accent)"><svg class="i" viewBox="0 0 24 24" style="width:96px;height:96px;stroke-width:1">${icon.scan}</svg></div>
+    <div class="result"><div class="h">${svg('check')}Check-in registrado</div><b style="font-size:16px">Ana Prueba</b><p><span class="mono">SR26-00001</span> · NeoTeam</p></div>
+    <span class="btn btn-ghost">Escribir código a mano</span>
+  </div>${tabs('Check-in')}`,
+}
+document.querySelectorAll('[data-mock]').forEach((el) => { el.innerHTML = mocks[el.dataset.mock]() })
+
+const root = document.documentElement
+document.querySelectorAll('.switch button').forEach((btn) => btn.addEventListener('click', () => {
+  const mode = btn.dataset.set
+  if (mode === 'system') root.removeAttribute('data-theme')
+  else root.setAttribute('data-theme', mode)
+  document.querySelectorAll('.switch button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)))
+}))
+</script>

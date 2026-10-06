@@ -64,22 +64,23 @@ export function ParticipantsView({ token }: { token: string }) {
       (!status || row.status === status),
   )
 
+  const counts = rows.reduce<Record<string, number>>((acc, row) => {
+    const key = row.status ?? 'registered'
+    acc[key] = (acc[key] ?? 0) + 1
+    return acc
+  }, {})
+  const chips = [
+    ['', `Todos ${rows.length}`],
+    ...Object.entries(participantStates).map(([id, label]) => [id, `${label} ${counts[id] ?? 0}`]),
+  ]
+
   return (
-    <section className="management-view" aria-busy={loading}>
+    <section aria-busy={loading}>
       <ListToolbar
         searchLabel="Buscar participantes"
         placeholder="Nombre, código, contacto…"
         query={query}
         onQuery={setQuery}
-        filters={
-          <label>
-            <span className="sr-only">Filtrar por estado</span>
-            <select value={status} onChange={(e) => setStatus(e.target.value)}>
-              <option value="">Todos los estados</option>
-              <LabelOptions labels={participantStates} />
-            </select>
-          </label>
-        }
         loading={loading}
         refreshDisabled={loading || !!busy}
         onRefresh={() => {
@@ -87,6 +88,28 @@ export function ParticipantsView({ token }: { token: string }) {
           void records.reload()
         }}
       />
+      {!loading && rows.length > 0 && (
+        <fieldset>
+          <legend className="sr-only">Filtrar por estado</legend>
+          <div className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:px-0">
+            {chips.map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={status === id}
+                onClick={() => setStatus(id ?? '')}
+                className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 ${
+                  status === id
+                    ? 'border-neo-text bg-neo-text text-neo-bg'
+                    : 'border-neo-border bg-neo-surface text-neo-text-secondary'
+                }`}
+              >
+                <span className="whitespace-nowrap text-xs font-bold">{label}</span>
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      )}
       <Feedback value={feedback} />
       {confirmation && (
         <ConfirmPanel
@@ -118,55 +141,44 @@ export function ParticipantsView({ token }: { token: string }) {
         )
       ) : (
         <>
-          <p className="result-count">
+          <p className="m-0 mb-2 text-xs text-neo-text-secondary">
             {visible.length} de {rows.length} participantes
           </p>
-          <div className="participants-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>Participante</th>
-                  <th>Código</th>
-                  <th>Contacto</th>
-                  <th>Grupo</th>
-                  <th>Talla</th>
-                  <th>Estado</th>
-                  <th>Asistencia</th>
-                </tr>
-              </thead>
-              <tbody>
-                {visible.map((row) => (
-                  <tr key={row.id}>
-                    <td data-label="Participante">
-                      <strong>
-                        {row.first_name} {row.last_name}
-                      </strong>
-                      <small>
-                        {row.document_type} {row.document_number}
-                      </small>
-                    </td>
-                    <td data-label="Código" className="mono-value">
-                      {row.registration_code || `#${row.registration_number}`}
-                    </td>
-                    <td data-label="Contacto">
-                      <span>{row.email}</span>
-                      <small>{row.phone}</small>
-                    </td>
-                    <td data-label="Grupo">
-                      {row.running_groups?.name || row.other_running_group || 'Independiente'}
-                    </td>
-                    <td data-label="Talla">{row.shirt_size || '—'}</td>
-                    <td data-label="Estado">
-                      <StatusBadge
-                        status={row.status ?? 'registered'}
-                        label={
-                          participantStates[row.status ?? 'registered'] ?? row.status ?? 'Inscrito'
-                        }
-                      />
-                    </td>
-                    <td data-label="Asistencia">
-                      <div className="attendance-actions">
-                        {row.status === 'registered' && (
+          <ul className="m-0 list-none overflow-hidden rounded-card border border-neo-border bg-neo-surface p-0">
+            {visible.map((row) => {
+              const state = row.status ?? 'registered'
+              const name = fullName(row)
+              return (
+                <li key={row.id} className="border-b border-neo-border last:border-b-0">
+                  <details className="group">
+                    <summary className="grid min-h-16 cursor-pointer list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-0.5 px-4 py-3 [&::-webkit-details-marker]:hidden">
+                      <span className="truncate text-[15px] font-bold text-neo-text">{name}</span>
+                      <span className="row-span-2">
+                        <StatusBadge status={state} label={participantStates[state] ?? state} />
+                      </span>
+                      <span className="truncate text-xs text-neo-text-secondary">
+                        <span className="font-mono">
+                          {row.registration_code || `#${row.registration_number}`}
+                        </span>
+                        {' · '}
+                        {row.running_groups?.name || row.other_running_group || 'Independiente'}
+                      </span>
+                    </summary>
+                    <div className="grid gap-4 border-t border-neo-border bg-neo-bg px-4 py-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+                      <dl className="m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 text-sm">
+                        <dt className="text-neo-text-secondary">Documento</dt>
+                        <dd className="m-0 text-neo-text">
+                          {row.document_type} {row.document_number}
+                        </dd>
+                        <dt className="text-neo-text-secondary">Correo</dt>
+                        <dd className="m-0 break-all text-neo-text">{row.email}</dd>
+                        <dt className="text-neo-text-secondary">Celular</dt>
+                        <dd className="m-0 text-neo-text">{row.phone}</dd>
+                        <dt className="text-neo-text-secondary">Talla</dt>
+                        <dd className="m-0 text-neo-text">{row.shirt_size || '—'}</dd>
+                      </dl>
+                      <div className="flex flex-wrap items-center gap-3">
+                        {state === 'registered' && (
                           <button
                             type="button"
                             className="button button-small"
@@ -178,16 +190,17 @@ export function ParticipantsView({ token }: { token: string }) {
                           </button>
                         )}
                         <select
-                          aria-label={`Estado de ${row.first_name} ${row.last_name}`}
-                          value={row.status}
+                          aria-label={`Estado de ${name}`}
+                          value={state}
                           onChange={(e) => void changeAttendance(row, e.target.value)}
                           disabled={!!busy}
+                          className="min-h-11 w-auto!"
                         >
                           <LabelOptions labels={participantStates} />
                         </select>
                         <button
                           type="button"
-                          className="button button-small button-danger"
+                          className="text-link danger-text"
                           onClick={() => records.setConfirmation({ row, action: 'delete' })}
                           disabled={!!busy}
                         >
@@ -195,12 +208,12 @@ export function ParticipantsView({ token }: { token: string }) {
                           Eliminar
                         </button>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
+                  </details>
+                </li>
+              )
+            })}
+          </ul>
         </>
       )}
     </section>

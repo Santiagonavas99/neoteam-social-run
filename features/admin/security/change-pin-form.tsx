@@ -47,12 +47,12 @@ export function ChangePinForm({
   }
 
   return (
-    <section className="admin-surface security-card">
-      <h2 className="flex items-center gap-2">
+    <section className="max-w-[480px] rounded-card border border-neo-border bg-neo-surface p-5 md:p-7">
+      <h2 className="m-0 mb-2 flex items-center gap-2 text-[21px] font-bold tracking-[-0.035em]">
         <KeyRound aria-hidden className="size-5 shrink-0" />
         Cambiar PIN
       </h2>
-      <p className="muted">
+      <p className="m-0 mb-5 text-sm text-neo-text-secondary">
         Al actualizarlo, se cerrarán las demás sesiones. Esta sesión seguirá activa.
       </p>
       <form onSubmit={changePin} className="stack-form">

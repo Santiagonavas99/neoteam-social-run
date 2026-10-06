@@ -14,7 +14,7 @@ export type ScanOutcome = {
 }
 
 const tones: Record<ScanOutcome['tone'], { icon: LucideIcon; className: string }> = {
-  success: { icon: CircleCheck, className: 'bg-neo-success-bg text-neo-accent-dark' },
+  success: { icon: CircleCheck, className: 'bg-neo-success-bg text-neo-accent-text' },
   neutral: { icon: Clock, className: 'bg-neo-surface text-neo-text' },
   danger: { icon: CircleAlert, className: 'bg-neo-danger-bg text-neo-danger' },
 }
@@ -113,7 +113,7 @@ export function ScanStation({
         <button
           type="submit"
           disabled={busy}
-          className="inline-flex min-h-12 shrink-0 items-center rounded-control border border-neo-black bg-neo-black px-5 text-neo-white hover:border-neo-accent-dark hover:bg-neo-accent-dark"
+          className="inline-flex min-h-12 shrink-0 items-center rounded-control border border-neo-text bg-neo-text px-5 text-neo-surface hover:border-neo-accent-dark hover:bg-neo-accent-dark"
         >
           <span className="text-[13px] font-bold">Registrar</span>
         </button>

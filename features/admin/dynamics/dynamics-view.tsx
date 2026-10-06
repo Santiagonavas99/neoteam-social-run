@@ -78,7 +78,7 @@ export function DynamicsView({ token }: { token: string }) {
   )
 
   return (
-    <section className="management-view" aria-busy={loading}>
+    <section aria-busy={loading}>
       <ListToolbar
         searchLabel="Buscar dinámicas"
         placeholder="Buscar dinámica…"
@@ -172,7 +172,7 @@ export function DynamicsView({ token }: { token: string }) {
           />
         )
       ) : (
-        <div className="record-list">
+        <div className="grid gap-3">
           {visible.map((row) => (
             <RecordCard
               key={row.id}

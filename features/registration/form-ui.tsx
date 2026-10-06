@@ -5,7 +5,7 @@ import type { ComponentProps, ReactNode } from 'react'
 // these blocks add layout and wire label, error and aria attributes together.
 
 export const cardClass =
-  'min-w-0 rounded-card border border-neo-border bg-neo-white px-5 py-6 sm:p-8 lg:p-10'
+  'min-w-0 rounded-card border border-neo-border bg-neo-surface px-5 py-6 sm:p-8 lg:p-10'
 
 export const linkClass =
   'inline-flex min-h-11 items-center gap-2 text-[13px] font-bold hover:underline hover:underline-offset-4'
@@ -100,7 +100,7 @@ export function CheckboxField({
 export function FormSection({ step, title, hint }: { step: string; title: string; hint: string }) {
   return (
     <div className="mt-8 mb-6 flex items-center gap-4 border-b border-neo-border pb-5 first-of-type:mt-0">
-      <span aria-hidden className="text-2xl font-medium tracking-[-0.06em] text-neo-accent">
+      <span aria-hidden className="text-2xl font-medium tracking-[-0.06em] text-neo-accent-text">
         {step}
       </span>
       <h2 className="m-0 flex flex-col gap-1">
@@ -151,7 +151,7 @@ export function SubmitButton({
 
 export function Eyebrow({ children }: { children: ReactNode }) {
   return (
-    <p className="m-0 text-xs font-bold uppercase leading-normal tracking-[0.14em] text-neo-accent-dark">
+    <p className="m-0 text-xs font-bold uppercase leading-normal tracking-[0.14em] text-neo-accent-text">
       {children}
     </p>
   )

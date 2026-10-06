@@ -38,7 +38,7 @@ export function RegistrationShell({
       </header>
       <div className="mx-auto grid w-full max-w-170 items-start gap-6 px-5 pt-6 pb-20 md:max-w-[1336px] md:grid-cols-[0.75fr_1.25fr] md:gap-8 md:px-12 md:pt-12 lg:gap-16">
         <aside className="md:sticky md:top-8 md:py-8">
-          <p className="m-0 text-xs font-bold uppercase tracking-[0.14em] text-neo-accent-dark">
+          <p className="m-0 text-xs font-bold uppercase tracking-[0.14em] text-neo-accent-text">
             Social Run · {eventConfig.dateShort}
           </p>
           <h1 className="my-4 text-[40px] uppercase sm:text-5xl leading-[0.94] font-bold tracking-[-0.06em] md:my-6 md:text-[clamp(50px,5.5vw,80px)]">
@@ -52,7 +52,7 @@ export function RegistrationShell({
                 key={label}
                 className="grid grid-cols-[88px_1fr] items-baseline gap-3 border-t border-neo-border py-2.5 md:flex md:flex-col md:gap-2 md:py-4"
               >
-                <dt className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.13em] text-neo-accent-dark">
+                <dt className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.13em] text-neo-accent-text">
                   <Icon aria-hidden className="size-3.5 shrink-0" />
                   {label}
                 </dt>

@@ -21,8 +21,12 @@ export function ConfirmPanel({
   const draw = kind === 'draw'
   const ref = useReveal<HTMLElement>()
   return (
-    <section ref={ref} className="confirmation-panel scroll-mt-4" aria-label="Confirmar acción">
-      <h2 className="flex items-center gap-2">
+    <section
+      ref={ref}
+      className="my-4 scroll-mt-4 rounded-control border border-l-4 border-neo-accent border-l-neo-accent-dark bg-neo-accent-soft p-5 md:my-6 md:p-6"
+      aria-label="Confirmar acción"
+    >
+      <h2 className="m-0 mb-3 flex items-center gap-2 text-xl font-bold tracking-[-0.03em]">
         {draw ? (
           <Dices aria-hidden className="size-5 shrink-0" />
         ) : (
@@ -30,8 +34,8 @@ export function ConfirmPanel({
         )}
         {title}
       </h2>
-      <p>{text}</p>
-      <div className="toolbar-actions">
+      <p className="m-0 mb-4 max-w-[650px] text-sm text-neo-accent-text">{text}</p>
+      <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
           className="button button-secondary"

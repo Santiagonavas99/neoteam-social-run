@@ -21,7 +21,7 @@ export function DrawResult({
       <div className="flex items-start justify-between gap-3">
         <h2
           id="draw-result-title"
-          className="m-0 flex items-center gap-2 text-base font-bold text-neo-accent-dark"
+          className="m-0 flex items-center gap-2 text-base font-bold text-neo-accent-text"
         >
           <Trophy aria-hidden className="size-5 shrink-0" />
           Ganadores · {name}
@@ -30,7 +30,7 @@ export function DrawResult({
           type="button"
           onClick={onClose}
           aria-label="Cerrar resultado"
-          className="inline-flex size-11 shrink-0 items-center justify-center rounded-control text-neo-text hover:bg-neo-white"
+          className="inline-flex size-11 shrink-0 items-center justify-center rounded-control text-neo-text hover:bg-neo-surface"
         >
           <X aria-hidden className="size-5" />
         </button>
@@ -38,7 +38,7 @@ export function DrawResult({
       <ol className="m-0 mt-3 flex list-none flex-col gap-3 p-0">
         {winners.map((winner, index) => (
           <li key={winner.id} className="flex items-baseline gap-3">
-            <span aria-hidden className="w-6 shrink-0 text-sm font-bold text-neo-accent-dark">
+            <span aria-hidden className="w-6 shrink-0 text-sm font-bold text-neo-accent-text">
               {index + 1}.
             </span>
             <div className="min-w-0">

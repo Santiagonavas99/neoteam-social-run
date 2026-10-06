@@ -51,7 +51,7 @@ export function CommunityView({
   const visible = rows.filter((row) => matchesQuery([row.name], query))
 
   return (
-    <section className="management-view" aria-busy={loading}>
+    <section aria-busy={loading}>
       <ListToolbar
         searchLabel="Buscar registros"
         placeholder="Buscar por nombre…"
@@ -108,7 +108,7 @@ export function CommunityView({
           />
         )
       ) : (
-        <div className="record-list">
+        <div className="grid gap-3">
           {visible.map((row) => (
             <RecordCard
               key={row.id}
