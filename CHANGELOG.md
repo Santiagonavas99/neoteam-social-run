@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-05
+
+### Changed
+
+- **New cyan accent color** across the site and the admin panel, with a darker cyan for text so it stays readable.
+
 ## [0.5.0] - 2026-10-05
 
 ### Added
