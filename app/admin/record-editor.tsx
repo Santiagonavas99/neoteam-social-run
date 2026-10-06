@@ -261,7 +261,7 @@ export function RecordEditor({
       </fieldset>
       <Feedback value={feedback} />
       <div className="editor-actions">
-        <button className="button" disabled={busy || uploading}>
+        <button type="submit" className="button" disabled={busy || uploading}>
           {busy ? 'Guardando…' : uploading ? 'Subiendo imagen…' : 'Guardar cambios'}
         </button>
         <button

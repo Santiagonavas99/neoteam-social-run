@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 @AGENTS.md
 
-**Mandatory workflow (see AGENTS.md):** read `DESIGN.md`, `design/` and the `frontend-design` skill → write spec → write plan → wait for Iván's explicit OK → implement. Never implement in the same turn the plan is written.
+**Mandatory workflow (see AGENTS.md):** read `DESIGN.md`, `design/` and the `frontend-design` skill → write spec → write plan → wait for Iván's explicit OK → implement. **Mobile first** (390 px) in every spec, plan and check. Never implement in the same turn the plan is written.
 
 ## Project
 
@@ -21,6 +21,7 @@ pnpm test                     # node --test on **/*.test.ts (strip-types, no fra
 node --experimental-strip-types --test path/to/file.test.ts   # single test file
 pnpm build
 pnpm ci:check                 # lint + typecheck + test + build
+pnpm test:db                  # SQL tests in the compose `db` service (supabase/postgres, :54322)
 ```
 
 `next-env.d.ts` and `.next/` are generated (gitignored); `typecheck` runs `next typegen` first so it works on a clean clone. If `build` panics inside Turbopack, delete `.next/` and retry.

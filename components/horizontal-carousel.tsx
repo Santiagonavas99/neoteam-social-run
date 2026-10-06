@@ -25,16 +25,26 @@ export function HorizontalCarousel({
         previous.start === start && previous.end === end ? previous : { start, end },
       )
     }
-    const observer = new ResizeObserver(measure)
-    observer.observe(element)
-    Array.from(element.children).forEach((child) => observer.observe(child))
+    const resizes = new ResizeObserver(measure)
+    const observeSlides = () => {
+      resizes.observe(element)
+      for (const child of element.children) resizes.observe(child)
+    }
+    // Slides arrive after mount when the home data loads; re-observe and re-measure.
+    const slides = new MutationObserver(() => {
+      observeSlides()
+      measure()
+    })
+    observeSlides()
+    slides.observe(element, { childList: true })
     element.addEventListener('scroll', measure, { passive: true })
     measure()
     return () => {
-      observer.disconnect()
+      resizes.disconnect()
+      slides.disconnect()
       element.removeEventListener('scroll', measure)
     }
-  }, [children])
+  }, [])
 
   function move(direction: number) {
     const element = track.current
@@ -50,9 +60,8 @@ export function HorizontalCarousel({
   }
 
   return (
-    <div
+    <section
       className={`horizontal-carousel ${className}`}
-      role="region"
       aria-label={ariaLabel}
       aria-roledescription="carrusel"
     >
@@ -76,10 +85,13 @@ export function HorizontalCarousel({
           →
         </button>
       </div>
+      {/* biome-ignore lint/a11y/useSemanticElements: a scroll track, not a form fieldset */}
       <div
         id={id}
         ref={track}
         className="carousel-track"
+        role="group"
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be keyboard reachable
         tabIndex={0}
         aria-label={`${ariaLabel}: desplaza para ver más`}
         onKeyDown={(event) => {
@@ -92,6 +104,6 @@ export function HorizontalCarousel({
       >
         {children}
       </div>
-    </div>
+    </section>
   )
 }

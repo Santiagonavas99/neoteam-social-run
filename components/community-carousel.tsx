@@ -24,6 +24,14 @@ function logoLink(item: CommunityLogo) {
   return /^[\w.]+$/.test(handle) ? `https://www.instagram.com/${handle}/` : undefined
 }
 
+function logoContent(item: CommunityLogo) {
+  return item.logo_url ? (
+    <Image unoptimized src={item.logo_url} width={180} height={80} alt={item.name} />
+  ) : (
+    <strong>{item.name}</strong>
+  )
+}
+
 export function CommunityCarousel({
   items,
   title,
@@ -40,11 +48,7 @@ export function CommunityCarousel({
       <HorizontalCarousel ariaLabel={title} className="logo-carousel">
         {items.map((item) => {
           const href = logoLink(item)
-          const content = item.logo_url ? (
-            <Image unoptimized src={item.logo_url} width={180} height={80} alt={item.name} />
-          ) : (
-            <strong>{item.name}</strong>
-          )
+          const content = logoContent(item)
           return href ? (
             <a
               className="community-logo"

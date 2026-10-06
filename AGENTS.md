@@ -32,6 +32,15 @@ Trivial fixes (typo, one-line copy change) may skip the spec, never the OK.
 
 Code reviews are written to `docs/superpowers/audits/`, never only left in chat.
 
+## Mobile first
+
+Most participants register from a phone, and staff run check-in, scans and draws from phones on event day. Mobile is the primary target:
+
+- Design and build at **390 px first**, then scale up (1024, 1440). In CSS, base styles are mobile and `min-width` media queries (Tailwind `md:`/`lg:`) add desktop.
+- Touch targets ≥ 44×44 px, no hover-only interactions, inputs use the right `type`/`inputmode`/`autocomplete`.
+- Every spec has a *Mobile* section; every plan's checks include a pass at 390 px (real device or emulation) **before** desktop.
+- Performance on mid-range phones over 4G counts: no new client-side dependency without a mobile cost note.
+
 ## Code rules
 
 - All code, identifiers, file names and comments in **English**. User-facing copy stays in **Spanish**.
@@ -56,9 +65,22 @@ pnpm typecheck   # next typegen + tsc
 pnpm test        # node --test on **/*.test.ts
 pnpm build
 pnpm ci:check    # all of the above
+
+docker compose up -d db   # local Supabase Postgres on :54322 (SQL tests only)
+pnpm test:db              # each supabase/tests/*.sql in a throwaway database
+docker compose down
 ```
 
+SQL tests pull in the migrations they need with `\ir ../migrations/<file>.sql`; tables that exist only in the remote schema must be created by the test itself.
+
 A task is done when `pnpm ci:check` passes. Say so with the output; if something fails, report it, do not hide it.
+
+## Changelog
+
+- `CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and SemVer.
+- Every PR adds its user-visible changes under `## [Unreleased]`, in the right group (`Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`), written for the reader of a release note.
+- Never bump `package.json` `version`, create a version section or tag a release unless Iván asks.
+- Cutting a release (only when Iván asks): in one PR, set `package.json` `version` to `x.y.z` and rename `## [Unreleased]` to `## [x.y.z] - YYYY-MM-DD`, adding an empty `## [Unreleased]` above it. When the PR merges into `main`, `.github/workflows/release.yml` tags `vx.y.z` and publishes a GitHub release with that section as notes. With no matching section, the workflow does nothing.
 
 ## Git
 

@@ -2,26 +2,39 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
-const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+function requireEnv(name: string) {
+  const value = Deno.env.get(name)
+  if (!value) throw new Error(`Missing required environment variable ${name}`)
+  return value
+}
+
+const SUPABASE_URL = requireEnv('SUPABASE_URL')
+const SERVICE_ROLE_KEY = requireEnv('SUPABASE_SERVICE_ROLE_KEY')
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false },
 })
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Content-Type': 'application/json',
-}
+const ADMIN_PROXY_SECRET = Deno.env.get('ADMIN_PROXY_SECRET')?.trim() ?? ''
+const responseHeaders = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
 
 function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), { status, headers: corsHeaders })
+  return new Response(JSON.stringify(body), { status, headers: responseHeaders })
 }
 
 async function sha256(value: string) {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+// Only the Next proxy holds ADMIN_PROXY_SECRET. Digests have equal length, so the
+// comparison below runs in constant time.
+async function fromProxy(req: Request) {
+  if (ADMIN_PROXY_SECRET.length < 32) return false
+  const candidate = await sha256((req.headers.get('x-admin-proxy-secret') ?? '').trim())
+  const expected = await sha256(ADMIN_PROXY_SECRET)
+  let diff = 0
+  for (let i = 0; i < expected.length; i++) diff |= candidate.charCodeAt(i) ^ expected.charCodeAt(i)
+  return diff === 0
 }
 
 async function requireSession(token: unknown) {
@@ -51,7 +64,7 @@ function cleanUrl(value: unknown, required = false) {
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
+  if (!(await fromProxy(req))) return json({ error: 'No autorizado.' }, 401)
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
 
   try {

@@ -34,6 +34,10 @@ Already done on the branch (commits `b571514`, `daaeb11`, `92787f3`, `4f7d2a3`):
 5. **Design reference.** `DESIGN.md` documents the current system as it is (tokens, type: Host Grotesk, CSS layer order, reduced motion, admin vs public surfaces) and lists standing rules (use tokens, never raw hex in new CSS; new home styles go to `home-v2.css`). `design/README.md` explains what goes in `design/`. The studies themselves are added when Iván provides them.
 6. **Code review** is saved as `docs/superpowers/audits/2026-10-05-code-review.md`. Its security and correctness findings get **their own spec and plan**; this plan only fixes what lint requires.
 
+## Mobile
+
+`DESIGN.md` records mobile-first as a standing rule (390 px base, `min-width` queries, 44 px touch targets). The lint fixes in admin (button types, autofocus) are checked at 390 px first. The CI does not test viewports; that is a manual check in each plan.
+
 ## Out of scope
 
 Visual changes, CSP, Supabase schema/migrations, `supabase db pull`, Deno type-checking of edge functions (no `deno` in CI yet), the audit's behavioural fixes, the README rewrite.

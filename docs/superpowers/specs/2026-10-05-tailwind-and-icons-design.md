@@ -29,6 +29,10 @@ Rejected:
 - Heroicons / react-icons: they break consistency with the Lucide used in the other projects; react-icons bundles several sets.
 - CSS Modules: they solve scoping but not consistency with the other projects.
 
+## Mobile
+
+Tailwind is used mobile-first: unprefixed utilities are the 390 px design, `md:`/`lg:` add desktop. When legacy CSS is desktop-first (`max-width` queries), the migration inverts it. Icons stay ≥ 16 px and icon-only buttons have ≥ 44 px hit areas. Admin is migrated with the phone as the main device: staff use it during check-in and draws.
+
 ## Out of scope
 
 Visual redesign, dark mode, shadcn/ui components, the Phase B migration (it gets its own plan after the event).

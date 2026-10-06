@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import type { FeedbackValue } from './admin-types'
 
 export function Feedback({ value }: { value: FeedbackValue }) {
@@ -18,7 +19,7 @@ export function Logo({ url, name }: { url?: string | null; name: string }) {
   return (
     <span className="record-logo">
       {url ? (
-        <img src={url} alt={`Logo de ${name}`} />
+        <Image unoptimized src={url} width={64} height={64} alt={`Logo de ${name}`} />
       ) : (
         <span aria-hidden="true">{name.slice(0, 2).toUpperCase() || 'N'}</span>
       )}

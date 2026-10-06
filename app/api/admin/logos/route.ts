@@ -1,3 +1,5 @@
+import { adminUpstreamHeaders, parseAdminBody } from '@/lib/admin-proxy'
+
 export const runtime = 'nodejs'
 
 const connectionError = 'No pudimos conectar con el carrusel de logos. Inténtalo de nuevo.'
@@ -15,31 +17,18 @@ export async function POST(request: Request) {
     })
     return Response.json({ error: connectionError }, { status: 503, headers })
   }
+  const upstreamHeaders = adminUpstreamHeaders(request, key)
+  if (!upstreamHeaders) {
+    console.error('Logo admin proxy: missing ADMIN_PROXY_SECRET', { hasProxySecret: false })
+    return Response.json({ error: connectionError }, { status: 503, headers })
+  }
 
-  let body: Record<string, unknown>
-  try {
-    const parsed = await request.json()
-    if (
-      !parsed ||
-      typeof parsed !== 'object' ||
-      Array.isArray(parsed) ||
-      typeof parsed.action !== 'string'
-    )
-      throw new Error('Invalid body')
-    body = parsed
-  } catch {
+  const body = await parseAdminBody(request)
+  if (!body) {
     return Response.json({ error: 'No pudimos procesar la solicitud.' }, { status: 400, headers })
   }
 
   try {
-    const upstreamHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
-      apikey: key,
-    }
-    if (process.env.VERCEL === '1') {
-      const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-      if (ip) upstreamHeaders['x-forwarded-for'] = ip
-    }
     const response = await fetch(`${url.replace(/\/$/, '')}/functions/v1/admin-logos`, {
       method: 'POST',
       headers: upstreamHeaders,
@@ -48,6 +37,10 @@ export async function POST(request: Request) {
       signal: AbortSignal.timeout(30_000),
       redirect: 'error',
     })
+    if (response.status >= 500) {
+      console.error('Logo admin proxy: upstream failure', { status: response.status })
+      return Response.json({ error: connectionError }, { status: 502, headers })
+    }
     const data = await response.json().catch(() => ({ error: connectionError }))
     return Response.json(data, { status: response.status, headers })
   } catch {

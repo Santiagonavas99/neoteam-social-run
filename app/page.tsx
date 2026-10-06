@@ -21,7 +21,7 @@ export default async function Home() {
       <section className="v2-hero">
         <SiteHeader />
 
-        <div className="v2-hero-meta shell" aria-label="Datos principales del evento">
+        <div className="v2-hero-meta shell">
           <span className="v2-meta-pill accent">18 OCT · 2026</span>
           <span className="v2-meta-pill">07:30 A. M.</span>
           <span className="v2-meta-pill">5K SOCIAL</span>

@@ -138,13 +138,14 @@ export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: 
         </div>
         <div className="toolbar-actions">
           <button
+            type="button"
             className="button button-secondary"
             onClick={() => void load()}
             disabled={loading || busy || !!editor}
           >
             {loading ? 'Cargando…' : '↻ Actualizar'}
           </button>
-          <button className="button" onClick={addLogo} disabled={busy || !!editor}>
+          <button type="button" className="button" onClick={addLogo} disabled={busy || !!editor}>
             + Añadir logo
           </button>
         </div>
@@ -181,7 +182,7 @@ export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: 
             cinta continua en la Home.
           </p>
           {!editor && (
-            <button className="button" onClick={addLogo}>
+            <button type="button" className="button" onClick={addLogo}>
               + Añadir primer logo
             </button>
           )}
@@ -205,6 +206,7 @@ export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: 
                 </div>
                 <div className="record-actions">
                   <button
+                    type="button"
                     className="button button-secondary"
                     onClick={() => {
                       setConfirmingId(null)
@@ -215,6 +217,7 @@ export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: 
                     Editar
                   </button>
                   <button
+                    type="button"
                     className={
                       confirmingId === row.id ? 'button button-danger' : 'text-link danger-text'
                     }
@@ -385,7 +388,7 @@ function LogoEditor({
       </fieldset>
       <Feedback value={feedback} />
       <div className="editor-actions">
-        <button className="button" disabled={busy || uploading}>
+        <button type="submit" className="button" disabled={busy || uploading}>
           {busy ? 'Guardando…' : uploading ? 'Subiendo imagen…' : 'Guardar logo'}
         </button>
         <button

@@ -63,19 +63,28 @@ La publishable key puede estar en el frontend; el acceso real a datos sigue cont
 
 ## Desarrollo
 
-```bash
-npm install
-npm run dev
-```
-
-Para validar producción:
+Requisitos: Node 22 (`.nvmrc`) y pnpm (versión fijada en `packageManager`).
 
 ```bash
-npm run typecheck
-npm run build
+pnpm install
+pnpm dev
 ```
 
-> En el entorno donde se generó este starter el acceso a npm estaba bloqueado, por lo que el build final debe validarse en Vercel o en una máquina con acceso al registro npm.
+Validación completa (lo mismo que corre el CI):
+
+```bash
+pnpm ci:check   # lint + typecheck + tests + build
+```
+
+Pruebas SQL contra un Postgres local de Supabase (Docker, puerto 54322):
+
+```bash
+docker compose up -d db
+pnpm test:db
+docker compose down
+```
+
+Flujo de trabajo, reglas para agentes y releases: ver `AGENTS.md` y `CHANGELOG.md`.
 
 ## Base de datos
 

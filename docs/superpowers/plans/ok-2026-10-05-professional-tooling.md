@@ -1,6 +1,6 @@
 # Professional tooling — plan
 
-Spec: `docs/superpowers/specs/2026-10-05-professional-tooling-design.md`. Branch: `chore/professionalize-tooling`. Status: **awaiting OK**.
+Spec: `docs/superpowers/specs/2026-10-05-professional-tooling-design.md`. Branch: `chore/professionalize-tooling`. Status: **approved 2026-10-05, done** on `chore/lint-tests-ci` (Tasks 2–9: `0141a8e` … `7e85fb1`). CI also runs the SQL tests (added beyond the plan).
 
 One commit per task. Each task ends with the check named in it; the last one ends with `pnpm ci:check` green.
 
@@ -36,7 +36,7 @@ One commit per task. Each task ends with the check named in it; the last one end
 - [ ] `components/community-carousel.tsx:44,46`: move the logo/name JSX into a `logoContent(item)` helper outside `map`.
 - [ ] `components/logo-marquee.tsx`: build `image` through a `logoImage(item, hidden)` helper; keep `` key={`${item.id}-${index}`} `` with `// biome-ignore lint/suspicious/noArrayIndexKey: items repeat on purpose to fill the marquee`.
 - [ ] `biome.json`: override `app/admin/**` → `a11y/noAutofocus: off`.
-- Check: `pnpm exec biome lint app components` → 0 errors. `pnpm build` and a manual look at `/` (carousels, arrow keys on the track) and `/admin` (login focus).
+- Check: `pnpm exec biome lint app components` → 0 errors. `pnpm build`; manual pass **at 390 px first** (carousel swipe, login focus not opening the keyboard unexpectedly on admin forms), then desktop (arrow keys on the track).
 - Commit: `fix: carousel semantics, list keys and admin autofocus rule`
 
 ## Task 5 — No `any` in the admin edge function
@@ -70,7 +70,7 @@ One commit per task. Each task ends with the check named in it; the last one end
 
 ## Task 9 — Design reference
 
-- [ ] `DESIGN.md`: current tokens (`--neo-*`, `--space-*`, `--radius-*`), Host Grotesk scale, CSS layer order, reduced-motion rule, public vs admin surfaces, standing rules (tokens over raw hex; new home styles in `home-v2.css`; every interactive element keyboard-reachable with visible focus).
+- [ ] `DESIGN.md`: **mobile-first standing rule** (390 px base, `min-width` queries, 44 px touch targets, `inputmode`/`autocomplete` on forms); current tokens (`--neo-*`, `--space-*`, `--radius-*`), Host Grotesk scale, CSS layer order, reduced-motion rule, public vs admin surfaces, standing rules (tokens over raw hex; new home styles in `home-v2.css`; every interactive element keyboard-reachable with visible focus).
 - [ ] `design/README.md`: what goes in `design/` (studies, mockups, references), naming `YYYY-MM-DD-<topic>.<ext>`.
 - Check: every token named in `DESIGN.md` exists in `app/*.css` (`grep`).
 - Commit: `docs: add DESIGN.md and design studies folder`
