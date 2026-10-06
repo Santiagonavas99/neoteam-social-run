@@ -14,7 +14,7 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 1. **Mobile first.** Design and build at 390 px, then scale up with `min-width` queries (Tailwind `md:`/`lg:`). Touch targets ≥ 44×44 px; no hover-only interactions; form inputs set `type`, `inputmode` and `autocomplete`.
 2. **Tokens only.** New CSS uses the `--neo-*`, `--space-*` and `--radius-*` tokens below; never a raw hex, px spacing or radius outside them. A missing token is added here first.
 3. **Keyboard and focus.** Every interactive element is reachable by keyboard and shows a visible `:focus-visible` style. A scrollable region is focusable (`tabIndex={0}`).
-4. **Motion respects `prefers-reduced-motion`.** Animations (the logo marquee, smooth scrolling) stop or become instant.
+4. **Motion respects `prefers-reduced-motion`.** Animations (the logo marquee, scroll reveals, smooth scrolling) stop or become instant. Scroll reveals use the `reveal` utility (`app/tailwind.css`): CSS scroll-driven animation, no JavaScript, only inside `@supports (animation-timeline: view())`, so unsupported browsers show the element at rest. Never on the first screen. An ancestor with `overflow: hidden` becomes the scroll container and freezes the reveal; clip with `overflow: clip` instead.
 5. **Text ≥ 12 px** on any new UI (16 px for inputs, which avoids iOS zoom on focus).
 6. **Icons** come from `lucide-react` only: no Unicode glyphs (`← → ↗ ✓`), no inline SVG. One icon, one meaning, everywhere (table below). Decorative icons get `aria-hidden`; icon-only buttons have an `aria-label` and a 44 px target. Sizes: `size-4` inline with text, `size-5` in navigation and metric cards, `size-8` in empty states. Icons replace numbering that encodes nothing (admin nav, metrics, empty states); real sequences keep their numbers (form steps, agenda, home section index). Status never relies on color alone. Spinners use `motion-safe:animate-spin`.
 7. **Copy** is Spanish, sentence case, and says what happens ("Guardar cambios", not "Enviar"). Errors say what failed and how to fix it.
@@ -76,7 +76,7 @@ Every shade is derived in OKLCH from the brand cyan `#03f8f6` (hue 193.7°); neu
 | `--neo-on-dark-border` / `-hover` | `#27302f` / `#192121` | same | Dividers and hover on black |
 | `--neo-brand-cyan` | `#007a78` | `#02f2f8` | Logo accent only |
 
-The dark values apply under `[data-theme="dark"]`: the admin theme switch sets it; the public pages get it in Phase B.
+The dark values apply under `[data-theme="dark"]` on `<html>`, set before paint by `lib/theme.ts` (`app/layout.tsx`) for the whole site. The choice is one key, `neoteam_theme`; the switches are the header menu on the home (`components/theme-menu.tsx`) and the admin's segmented switch, both through `components/use-theme-choice.ts`. The hero, header and community band stay black in both themes on purpose.
 
 ### Spacing (4 px base)
 
@@ -105,7 +105,7 @@ Tailwind 4 (`app/tailwind.css`, loaded first in `app/layout.tsx`) runs **without
 
 ## CSS architecture
 
-- **Admin (`/admin`)**: Tailwind only, mobile first. No admin rules remain in the global stylesheets. The theme root is `app/admin/layout.tsx` (`#admin-theme`, with a pre-paint script from `lib/theme.ts`); the switch ("Claro · Oscuro · Sistema") lives in the sidebar's "Cuenta" group and in the phone "Más" sheet.
+- **Admin (`/admin`)**: Tailwind only, mobile first. No admin rules remain in the global stylesheets. The theme switch ("Claro · Oscuro · Sistema") lives in the sidebar's "Cuenta" group and in the phone "Más" sheet.
 - **Public (`/`, `/registro`, `/pase`)**: legacy global CSS loaded by `app/layout.tsx` in this order, later files overriding earlier ones: `globals.css` (tokens, base, public components) → `home-v2.css`. Registration, the pass card, the theme menu and the logo strip are already Tailwind. The rest moves in Phase B, after 18 Oct.
 - Admin navigation is grouped by moment in `features/admin/sections.ts` (`group`, `primary`): phones get a bottom tab bar with the primary sections plus "Más"; from `md` a black sidebar shows the three groups.
 
@@ -114,8 +114,8 @@ Tailwind 4 (`app/tailwind.css`, loaded first in `app/layout.tsx`) runs **without
 Measured on the public legacy CSS (the admin is clear of all of it); each item is fixed when its component moves to Tailwind:
 
 - **Desktop-first**: 8 different `max-width` breakpoints (560, 600, 760, 800, 1024, 1100, 1200 px). Target: mobile base plus `md` (768) / `lg` (1024).
-- **31 raw hex colors** left in `home-v2.css` (public home, Phase B). `globals.css` has none outside the token blocks.
-- **Absolute surfaces on the public site**: hero, header and agenda paint with `--neo-white`/`--neo-black`; they move to `--neo-surface`/`--neo-text` when the public pages get the theme in Phase B.
+- **Raw colors**: none left in any stylesheet outside the token blocks (2026-10-06).
+- **Legacy home CSS**: hero, story, community, raffle and final sections still live in `home-v2.css`; the agenda, logo strip, footer links and theme menu are Tailwind. The rest moves in Phase B.
 - **14 font sizes**, including 9–11 px labels, which are hard to read on phones.
 - **Only 3 `:focus-visible` rules**: most controls rely on the browser default focus ring.
 - **14 specificity inversions** caused by the override layering. Biome's `noDescendingSpecificity` is switched off for `home-v2.css` only (`biome.json`); remove that override when the file is deleted.
