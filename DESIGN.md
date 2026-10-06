@@ -40,6 +40,8 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 | `UserCheck` | Check-in |
 | `QrCode` | The runner's check-in pass ("Mi pase") |
 | `Wallet` | Add the pass to Google Wallet |
+| `Ellipsis` | "Más": the phone sheet with the remaining admin sections |
+| `Sun` / `Moon` / `Monitor` | Theme: light / dark / system |
 | `Eye` / `EyeOff` | Visible / hidden |
 | `CalendarDays` / `Clock` / `MapPin` / `Route` / `Gift` | Date / time / place / route / prizes |
 | `UserCheck`, `LayoutDashboard`, `GalleryHorizontal`, `Users`, `Flag`, `Tag`, `Zap`, `ShieldCheck` | Admin sections: check-in, overview, logo strip, participants, groups, brands, dynamics, security |
@@ -103,22 +105,17 @@ Tailwind 4 (`app/tailwind.css`, loaded first in `app/layout.tsx`) runs **without
 
 ## CSS architecture
 
-Global stylesheets loaded in this order by `app/layout.tsx`; later files override earlier ones:
-
-1. `globals.css`: tokens, base, public and admin components
-2. `neo-overrides.css`: brand overrides and admin panel
-3. `logo-marquee.css`: home logo strip
-4. `home-v2.css`: editorial home v2
-
-The Tailwind plan (`docs/superpowers/plans/2026-10-05-tailwind-and-icons.md`) replaces this layering component by component.
+- **Admin (`/admin`)**: Tailwind only, mobile first. No admin rules remain in the global stylesheets. The theme root is `app/admin/layout.tsx` (`#admin-theme`, with a pre-paint script from `lib/theme.ts`); the switch ("Claro · Oscuro · Sistema") lives in the sidebar's "Cuenta" group and in the phone "Más" sheet.
+- **Public (`/`, `/registro`, `/pase`)**: legacy global CSS loaded by `app/layout.tsx` in this order, later files overriding earlier ones: `globals.css` (tokens, base, public components) → `logo-marquee.css` → `home-v2.css`. Registration and the pass card are already Tailwind. The rest moves in Phase B, after 18 Oct.
+- Admin navigation is grouped by moment in `features/admin/sections.ts` (`group`, `primary`): phones get a bottom tab bar with the primary sections plus "Más"; from `md` a black sidebar shows the three groups.
 
 ## Known debt (2026-10-05)
 
-Measured on the legacy CSS; each item is fixed when its component moves to Tailwind:
+Measured on the public legacy CSS (the admin is clear of all of it); each item is fixed when its component moves to Tailwind:
 
 - **Desktop-first**: 8 different `max-width` breakpoints (560, 600, 760, 800, 1024, 1100, 1200 px). Target: mobile base plus `md` (768) / `lg` (1024).
-- **31 raw hex colors** left in `home-v2.css` (public home, Phase B). `globals.css` and `neo-overrides.css` have none outside the token blocks.
-- **Absolute white surfaces**: 31 legacy rules paint admin and public surfaces with `--neo-white`/`--neo-black`, which do not follow the theme; they move to `--neo-surface`/`--neo-text` as each component goes to Tailwind.
+- **31 raw hex colors** left in `home-v2.css` (public home, Phase B). `globals.css` has none outside the token blocks.
+- **Absolute surfaces on the public site**: hero, header and agenda paint with `--neo-white`/`--neo-black`; they move to `--neo-surface`/`--neo-text` when the public pages get the theme in Phase B.
 - **14 font sizes**, including 9–11 px labels, which are hard to read on phones.
 - **Only 3 `:focus-visible` rules**: most controls rely on the browser default focus ring.
-- **14 specificity inversions** caused by the override layering. Biome's `noDescendingSpecificity` is switched off for `home-v2.css` and `neo-overrides.css` only (`biome.json`); remove that override when those files are deleted.
+- **14 specificity inversions** caused by the override layering. Biome's `noDescendingSpecificity` is switched off for `home-v2.css` only (`biome.json`); remove that override when the file is deleted.
