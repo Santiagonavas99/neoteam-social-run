@@ -96,7 +96,19 @@ function validUuid(value: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
 }
 
-function dynamicParticipantPayload(row: any) {
+type ParticipantRow = {
+  id: string
+  registration_code: string
+  first_name: string
+  last_name: string
+  status: string
+  other_running_group: string | null
+  running_groups: { name: string } | null
+}
+type IdRow = { id: string }
+type ParticipationRow = { dynamic_id: string; status: string }
+
+function dynamicParticipantPayload(row: ParticipantRow) {
   return {
     id: row.id,
     code: row.registration_code,
@@ -383,8 +395,8 @@ Deno.serve(async (req: Request) => {
             .order('created_at', { ascending: false })
           if (error) throw error
 
-          const ids = (rows ?? []).map((row: any) => row.id)
-          let participations: any[] = []
+          const ids = (rows ?? []).map((row: IdRow) => row.id)
+          let participations: ParticipationRow[] = []
           if (ids.length) {
             const result = await supabase
               .from('dynamic_participations')
@@ -403,7 +415,7 @@ Deno.serve(async (req: Request) => {
           }
 
           return json({
-            dynamicRows: (rows ?? []).map((row: any) => ({
+            dynamicRows: (rows ?? []).map((row: IdRow & Record<string, unknown>) => ({
               ...row,
               participations_count: counts.get(row.id)?.total ?? 0,
               winners_count: counts.get(row.id)?.winners ?? 0,
@@ -633,7 +645,11 @@ Deno.serve(async (req: Request) => {
               .eq('dynamic_id', dynamic.eligibility_dynamic_id)
               .in('status', ['completed', 'winner'])
             if (qualifyingError) throw qualifyingError
-            eligibleIds = [...new Set((qualifying ?? []).map((row: any) => row.registration_id))]
+            eligibleIds = [
+              ...new Set(
+                (qualifying ?? []).map((row: { registration_id: string }) => row.registration_id),
+              ),
+            ]
             if (!eligibleIds.length)
               return json(
                 { error: 'Nadie ha completado todavía la dinámica requerida para este sorteo.' },
@@ -672,7 +688,7 @@ Deno.serve(async (req: Request) => {
           if (clearError) throw clearError
 
           const { error: winnersError } = await supabase.from('dynamic_participations').upsert(
-            shuffled.map((winner: any) => ({
+            shuffled.map((winner: ParticipantRow) => ({
               dynamic_id: dynamic.id,
               registration_id: winner.id,
               status: 'winner',
@@ -791,7 +807,9 @@ Deno.serve(async (req: Request) => {
           metrics: {
             registered: registered.count ?? 0,
             checkedIn: checked.count ?? 0,
-            groups: new Set((groups.data ?? []).map((row: any) => row.running_group_id)).size,
+            groups: new Set(
+              (groups.data ?? []).map((row: { running_group_id: string }) => row.running_group_id),
+            ).size,
             brands: brands.count ?? 0,
             dynamics: dynamics.count ?? 0,
           },
@@ -944,7 +962,7 @@ Deno.serve(async (req: Request) => {
           .eq('raffle_id', raffle.id)
         if (clearError) throw clearError
         const { error: insertError } = await supabase.from('raffle_entries').insert(
-          shuffled.map((winner: any) => ({
+          shuffled.map((winner: IdRow) => ({
             raffle_id: raffle.id,
             registration_id: winner.id,
             is_winner: true,
