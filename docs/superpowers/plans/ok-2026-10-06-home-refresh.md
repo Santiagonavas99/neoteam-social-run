@@ -1,6 +1,6 @@
 # Home refresh — plan
 
-Spec: [`2026-10-06-home-refresh-design.md`](../specs/2026-10-06-home-refresh-design.md) · Branch: `feat/home-refresh` (from `main` after PR #23) · Status: **awaiting OK** · Freeze: 15 Oct.
+Spec: [`2026-10-06-home-refresh-design.md`](../specs/2026-10-06-home-refresh-design.md) · Branch: `feat/home-refresh` (from `main` after PR #23) · Status: **approved** (Iván, 2026-10-06) · Freeze: 15 Oct.
 
 ## Tasks
 

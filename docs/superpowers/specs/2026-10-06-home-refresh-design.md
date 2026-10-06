@@ -1,6 +1,6 @@
 # Home refresh: theme, logo strip, agenda, motion — spec
 
-Date: 2026-10-06 · Branch: `feat/home-refresh` (from `main`, which has the cyan palette and `lib/theme.ts` since PR #23) · Status: **awaiting OK**
+Date: 2026-10-06 · Branch: `feat/home-refresh` (from `main`, which has the cyan palette and `lib/theme.ts` since PR #23) · Status: **approved** (Iván, 2026-10-06)
 
 Design study: [`design/2026-10-06-home-refresh.html`](../../../design/2026-10-06-home-refresh.html), published as a private artifact for Iván.
 
