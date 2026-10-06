@@ -1,14 +1,17 @@
 # Tailwind CSS and icon system — plan (Phase A)
 
-Spec: `docs/superpowers/specs/2026-10-05-tailwind-and-icons-design.md`. Branch: `feat/tailwind-and-icons`, cut from `main` after `chore/professionalize-tooling` merges. Status: **awaiting OK**.
+Spec: `docs/superpowers/specs/2026-10-05-tailwind-and-icons-design.md`. Branch: `feat/tailwind-and-icons`, cut from `main`. Status: **approved 2026-10-05; changed the same day, awaiting OK: Task 3 rewritten (icon review of every screen), dark tokens added to Task 2, new Task 4b (theme)**.
 
 One commit per task. Every task ends with `pnpm ci:check` green. Phase B (public pages, legacy CSS removal, preflight) gets its own plan after 18 Oct.
+
+**Order agreed with Iván (2026-10-05):** this branch ships Tasks 0–3 (setup, tokens, icons) so the new screens of `feat/qr-checkin` and `feat/dynamics-admin` are built with Tailwind and Lucide from the start. Tasks 4, 4b and 5 (moving the existing admin to Tailwind, then the theme) run on a follow-up branch `refactor/admin-tailwind` after those two, from this same plan.
 
 ---
 
 ## Task 0 — Baseline screenshots
 
-- [ ] Screenshots of `/`, `/registro` and every admin section (`metrics`, `logos`, `participants`, `groups`, `brands`, `raffles`, `security`) at **390 px** and 1440 px, saved under `design/baseline/2026-10-05/`.
+- [ ] Public pages: headless Chrome against the production site (no local server), `/` and `/registro` at **390×844** first, then 1440×900, saved under `design/baseline/2026-10-05/` as `<route>-<width>.png`.
+- [ ] **(Iván)** Admin sections (`metrics`, `logos`, `participants`, `groups`, `brands`, `raffles`, `security`) and the login screen: screenshots from his phone (390 px) and laptop, because the panel needs the PIN. Test records only, no real participant data (`design/README.md`).
 - No commit of code; commit the screenshots: `docs(design): baseline screenshots before Tailwind`
 
 ## Task 1 — Install Tailwind 4 without preflight
@@ -36,17 +39,78 @@ One commit per task. Every task ends with `pnpm ci:check` green. Phase B (public
   - `--radius-card: var(--radius-card)`, `--radius-control: var(--radius-control)`
   - `--font-sans: var(--font-host-grotesk), system-ui, sans-serif`
 - [ ] `DESIGN.md` (from the tooling plan): add a "Tailwind" section with the token ↔ utility table.
+- [ ] Dark values for every color token under `[data-theme="dark"]` in `app/globals.css` (palette in spec decision 8), plus `@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));` in `app/tailwind.css`. Inert in this branch: nothing sets `data-theme` yet.
+- [ ] Contrast check of each dark text/background pair (WCAG AA ≥ 4.5:1 for text, ≥ 3:1 for large text and UI borders), results recorded in `DESIGN.md`.
 - Check: a throwaway `bg-neo-accent rounded-card` element renders with the legacy values (then removed); `pnpm build`.
 - Commit: `feat(styles): expose design tokens as Tailwind theme`
 
-## Task 3 — Lucide icons everywhere
+## Task 3 — Icon system: review of every screen
 
-- [ ] `pnpm add lucide-react@^1.52.0`
-- [ ] Replace the 19 glyphs (`grep -rn '[←→↗✓↓]' app components`): `→` `ArrowRight`, `←` `ArrowLeft`, `↗` `ArrowUpRight`, `✓` `Check`, `↓` `ArrowDown`. Each icon `aria-hidden` and `className="size-4 shrink-0"` (or the size the glyph had), inline with text via `inline-flex items-center gap-1` on the parent.
-- [ ] Icon-only buttons (carousel prev/next) keep their `aria-label`.
-- [ ] `DESIGN.md` standing rule: icons come from `lucide-react` only; no Unicode glyphs, no inline SVG.
-- Check: `grep -rn '[←→↗✓↓]' app components` → no matches in JSX; screenshots vs baseline (arrows now aligned; nothing else moved).
-- Commit: `feat(ui): lucide-react icon system`
+- [ ] `pnpm add lucide-react@^1.52.0` (client cost: only imported icons ship, ~0.3–0.6 KB gzip each; about 30 distinct icons).
+- [ ] Apply the inventory below. Each icon: `aria-hidden`, `className="size-4 shrink-0"` unless the table says otherwise, parent gets `inline-flex items-center gap-2` when it is not already flex. Text stays; icons sit before the text for state/object, after it for direction (`ArrowRight`, `ArrowUpRight`, `ChevronRight`).
+- [ ] `DESIGN.md`: replace standing rule 6 with the icon rules and the vocabulary table (icon → meaning) from spec decision 4.
+
+### Public
+
+| Where | Today | Icon |
+|-------|-------|------|
+| `app/page.tsx` hero CTA "Quiero participar" | `↗` | `ArrowRight` (internal link) |
+| `app/page.tsx` "Ver agenda" | `↓` | `ArrowDown` |
+| `app/page.tsx` meta pills "18 OCT · 2026" / "07:30 A. M." / "5K SOCIAL" | text | `CalendarDays` / `Clock` / `Route` before the text |
+| `app/page.tsx` route card "Parque del Ingenio…" | text | `MapPin` before the place |
+| `app/page.tsx` raffle block "DESPUÉS DE LA RUTA" | text | `Gift` before the label |
+| `app/page.tsx` raffle "Registrarme", final "Quiero estar ahí" | `↗` | `ArrowRight` |
+| `components/horizontal-carousel.tsx` prev / next | `←` `→` | `ChevronLeft` / `ChevronRight` (`size-5`, `aria-label` kept, 44 px target) |
+| `app/registro/page.tsx` "Volver al evento" | `←` | `ArrowLeft` |
+| `app/registro/page.tsx` facts FECHA / PUNTO / FORMATO | text | `CalendarDays` / `MapPin` / `Users` |
+| `app/registro/registration-form.tsx` submit "Confirmar mi registro" | `↗` | `ArrowRight`; while pending, `LoaderCircle` (`motion-safe:animate-spin`) replaces it |
+| `registration-form.tsx` field errors | text | `CircleAlert` (`size-3.5`) before the message |
+| `registration-form.tsx` form message (error) | text | `CircleAlert` |
+| `registration-form.tsx` success mark | `✓` | `CircleCheck` (`size-8`) |
+
+No icons on: the site header nav, the footer, the hero title, the big numbers (`v2-fact`), the agenda cards (their `01–07` is a real timeline), the form section numbers (`01–03`, real steps), the logo carousels.
+
+### Admin
+
+| Where | Today | Icon |
+|-------|-------|------|
+| Login "Entrar" / setup "Guardar PIN y entrar" | `→` / — | `LogIn` |
+| Login / setup "Volver al evento" | `←` | `ArrowLeft` |
+| Loading "Comprobando acceso…", "Cargando…" states | text / `loading-line` | `LoaderCircle` (`motion-safe:animate-spin`) |
+| Sidebar nav numbers `01…07` | numbers | section icons, `size-5`: Overview `LayoutDashboard`, Carrusel logos `GalleryHorizontal`, Participantes `Users`, Grupos `Flag`, Marcas `Tag`, Rifas `Gift`, Seguridad `ShieldCheck` |
+| Sidebar "Cerrar sesión" | `↗` | `LogOut` |
+| Topbar "Ver página" (`target="_blank"`) | `↗` | `ArrowUpRight` (only true new-tab link) |
+| `Feedback` (`admin-ui.tsx`) success / error | text | `CircleCheck` / `CircleAlert` |
+| `StatusBadge` participant: Inscrito / Check-in / No asistió / Cancelado | color | `Circle` / `CircleCheck` / `CircleSlash` / `CircleX` (`size-3.5`) |
+| `StatusBadge` raffle: Borrador / Abierta / Sorteada / Cancelada | color | `CircleDashed` / `CircleDot` / `Trophy` / `CircleX` |
+| `StatusBadge` active·inactive, visible·oculto | color | `Eye` / `EyeOff` |
+| Toolbar "Actualizar" (management, logos) | `↻` | `RefreshCw`, spinning while loading (`motion-safe`) |
+| Toolbar "Añadir marca / grupo / Crear rifa / Añadir logo" | `+` | `Plus` |
+| Search field | — | `Search` inside the field (left, `pointer-events-none`) |
+| Empty state `00` | number | the section's nav icon (`size-8`); with filters active, `SearchX` |
+| "Limpiar filtros" | — | `X` |
+| Metric cards index `01…05` | numbers | Inscritos `Users`, Check-in `UserCheck`, Grupos `Flag`, Marcas `Tag`, Rifas `Gift` (`size-5`) |
+| Quick access items | `↗` | the section icon before, `ChevronRight` after (internal navigation) |
+| Participants "Check-in" | `✓` | `UserCheck` |
+| Participants / logos "Eliminar", "Sí, eliminar", "Confirmar eliminar", editor "Eliminar" | text | `Trash2` |
+| Confirmation panel title, delete / draw | text | `TriangleAlert` / `Dices` |
+| Raffle "Sortear", "Confirmar y sortear" | `→` / — | `Dices` |
+| Record and logo "Editar" | text | `Pencil` |
+| Editor "Guardar cambios" / "Guardar logo" | text | `Check` |
+| Upload field "Añadir imagen" / "Cambiar imagen" | text | `ImagePlus` / `ImageUp` |
+| Logo row link (`link_url`) | text | `Link` (`size-3.5`) |
+| Security "Cambiar PIN" heading, "Actualizar PIN" button | text | `KeyRound` |
+
+No icons on: "Cancelar" buttons (text is enough next to an iconed primary action), table headers, form labels, the `N` brand mark.
+
+### Checks
+
+- `grep -rnE '[←→↗↘↓✓↻]' app components` → no matches in JSX; no `+ ` prefixes left in button text.
+- Every icon-only control has an `aria-label`; every other icon has `aria-hidden` (`grep -c aria-hidden` per file vs icon imports).
+- **390 px first**: home, registro (form, an error, success) and every admin section; icons aligned with their text, no wrapping inside buttons, carousel and nav targets ≥ 44 px. Then 1440 px. Compared with the Task 0 baseline: icons are the only change.
+- macOS "Reduce motion" on: spinners do not spin.
+- `pnpm ci:check` green; `pnpm build` client bundle size for `/` and `/admin` noted in the PR (before/after).
+- Commits (two, for review): `feat(ui): lucide icon system on public pages`, `feat(admin): lucide icons across the panel`.
 
 ## Task 4 — Admin panel to Tailwind (one commit per file)
 
@@ -59,6 +123,17 @@ Mobile first: unprefixed utilities = 390 px, `md:`/`lg:` for desktop; `max-width
 - [ ] 4e `app/admin/admin-dashboard.tsx` (shell, sidebar, login, security)
 - Check per commit: screenshots at **390 px first**, then 1440, vs baseline; tables/lists usable on a phone (no horizontal page scroll, 44 px targets); keyboard pass (tab order, visible focus); `pnpm ci:check`.
 - Commits: `refactor(admin): <file> to Tailwind`
+
+## Task 4b — Light / dark / system theme (admin and new screens)
+
+On `refactor/admin-tailwind`, after Task 4e, when the whole admin is on tokens.
+
+- [ ] `lib/theme.ts`: `type ThemeChoice = 'light' | 'dark' | 'system'`, `resolveTheme(choice, prefersDark)`, the storage key `neoteam-theme`; plus `lib/theme.test.ts` (resolution and invalid stored values fall back to `system`).
+- [ ] `app/admin/layout.tsx`: wraps the admin in `<div id="neo-theme-root" data-theme="light">`, followed by an inline script (before paint) that reads the stored choice, resolves `system` with `matchMedia` and sets `data-theme` and `style.colorScheme`. The `/admin/checkin` and dynamics screens live under `/admin` and inherit it.
+- [ ] `app/admin/theme-switch.tsx` (client): a radio group "Claro · Oscuro · Sistema" with `Sun` / `Moon` / `Monitor` icons and visible labels, each option ≥ 44 px; stores the choice and, in `system`, listens to `matchMedia` changes.
+- [ ] Placed in the admin sidebar under the navigation (top bar on phones).
+- Check: **390 px first**, every admin section in light and dark; reload in dark shows no light flash; switching the phone to dark with "Sistema" selected updates the open panel; keyboard (arrow keys move inside the radio group, visible focus); `pnpm ci:check`.
+- Commit: `feat(admin): light, dark and system theme`
 
 ## Task 5 — Close Phase A
 
