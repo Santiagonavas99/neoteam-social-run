@@ -1,4 +1,4 @@
-import type { HomeFeatureCard } from '@/lib/home-features'
+import type { HomeFeatureCard } from '@/features/home/data'
 
 export type AdminSection =
   | 'metrics'

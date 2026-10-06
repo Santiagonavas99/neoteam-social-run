@@ -3,7 +3,7 @@
 import { ArrowLeft, ArrowUpRight, KeyRound, LoaderCircle, LogIn, LogOut } from 'lucide-react'
 import Link from 'next/link'
 import { type FormEvent, useCallback, useEffect, useState } from 'react'
-import type { HomeFeatureCard } from '@/lib/home-features'
+import type { HomeFeatureCard } from '@/features/home/data'
 import { AdminManagement } from './admin-management'
 import type { AdminResponse, AdminSection } from './admin-types'
 import { Feedback, sectionIcons } from './admin-ui'

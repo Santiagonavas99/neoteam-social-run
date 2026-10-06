@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import type { HomeLogoCarouselItem } from '@/lib/home-features'
+import type { HomeLogoCarouselItem } from '@/features/home/data'
 
 function externalUrl(value?: string | null) {
   if (!value?.trim()) return undefined

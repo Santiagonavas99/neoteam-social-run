@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { registrationSchema } from './registration-schema.ts'
+import { registrationSchema } from './schema.ts'
 
 const valid = {
   firstName: 'Ana',

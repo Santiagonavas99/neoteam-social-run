@@ -1,12 +1,12 @@
 import { ArrowDown, ArrowRight, CalendarDays, Clock, Gift, MapPin, Route } from 'lucide-react'
 import Link from 'next/link'
-import { CommunityCarousel } from '@/components/community-carousel'
-import { EventCountdown } from '@/components/event-countdown'
 import { Footer } from '@/components/footer'
-import { LogoMarquee } from '@/components/logo-marquee'
 import { SiteHeader } from '@/components/site-header'
-import { agenda, eventConfig } from '@/lib/event'
-import { getHomeCommunity, getHomeLogoCarouselItems } from '@/lib/home-features'
+import { agenda, eventConfig } from '@/features/event/event'
+import { EventCountdown } from '@/features/event/event-countdown'
+import { CommunityCarousel } from '@/features/home/community-carousel'
+import { getHomeCommunity, getHomeLogoCarouselItems } from '@/features/home/data'
+import { LogoMarquee } from '@/features/home/logo-marquee'
 
 export const dynamic = 'force-dynamic'
 
