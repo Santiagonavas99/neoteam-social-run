@@ -18,7 +18,7 @@ export function Community({
   return (
     <section className="v2-community" id="invitados">
       <div className="shell">
-        <header className="v2-community-head">
+        <header className="v2-community-head reveal">
           <span className="v2-index">03 / COMUNIDAD</span>
           <h2>
             CORREMOS
@@ -31,26 +31,26 @@ export function Community({
           </p>
         </header>
 
-        <div className="logo-panels">
+        <div className="logo-panels reveal">
           <CommunityCarousel
             items={community.groups}
             title="RUNNING CREWS"
-            description="comunidades que se suman"
+            description="Comunidades que se suman"
           />
           <CommunityCarousel
             items={organizers}
             title="ORGANIZACIÓN"
-            description="quienes hacen posible este encuentro"
+            description="Quienes hacen posible este encuentro"
           />
           <CommunityCarousel
             items={sponsors}
             title="MARCAS"
-            description="marcas que nos acompañan"
+            description="Marcas que nos acompañan"
           />
           <CommunityCarousel
             items={partners}
             title="PARTNERS / MARCAS INVITADAS"
-            description="activaciones · producto · experiencias"
+            description="Activaciones · producto · experiencias"
           />
         </div>
       </div>

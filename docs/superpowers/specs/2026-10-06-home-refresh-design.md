@@ -1,6 +1,6 @@
 # Home refresh: theme, logo strip, agenda, motion — spec
 
-Date: 2026-10-06 · Branch: `feat/home-refresh` (from `main`, which has the cyan palette and `lib/theme.ts` since PR #23) · Status: **awaiting OK**
+Date: 2026-10-06 · Branch: `feat/home-refresh` (from `main`, which has the cyan palette and `lib/theme.ts` since PR #23) · Status: **approved** (Iván, 2026-10-06)
 
 Design study: [`design/2026-10-06-home-refresh.html`](../../../design/2026-10-06-home-refresh.html), published as a private artifact for Iván.
 
@@ -35,7 +35,7 @@ Measured at 390 / 1440 px (screenshots in the study):
 3. **Logo strip:**
    - **Tiles:** white, 148×88 on phones and 200×112 from `md`, with a 14 px radius and a hairline border. They stay white in dark mode, because most logos are dark marks.
    - **Color and motion:**
-     - logos are grayscale at 85% opacity and turn full color on hover or focus;
+     - logos keep their own colors at all times (Iván, 2026-10-06), and the tile lifts slightly on hover;
      - the strip pauses on hover;
      - its edges fade out with `mask-image`.
    - **Label:** "Marcas aliadas", in place of an unlabeled band.

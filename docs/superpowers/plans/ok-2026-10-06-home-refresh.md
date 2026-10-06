@@ -1,6 +1,6 @@
 # Home refresh — plan
 
-Spec: [`2026-10-06-home-refresh-design.md`](../specs/2026-10-06-home-refresh-design.md) · Branch: `feat/home-refresh` (from `main` after PR #23) · Status: **awaiting OK** · Freeze: 15 Oct.
+Spec: [`2026-10-06-home-refresh-design.md`](../specs/2026-10-06-home-refresh-design.md) · Branch: `feat/home-refresh` (spec, plan, Task 1: merged as PR #25), then `feat/home-theme-motion` (Tasks 2–9) · Status: **approved** (Iván, 2026-10-06) · Freeze: 15 Oct.
 
 ## Tasks
 
@@ -66,10 +66,10 @@ Spec: [`2026-10-06-home-refresh-design.md`](../specs/2026-10-06-home-refresh-des
 ### 5. `feat(home): agenda timeline` (spec decision 4)
 
 - **`features/home/sections/agenda.tsx`:** an `<ol>` timeline in Tailwind, with a sticky heading from `lg`.
-- **`features/event/event.ts`:** each agenda item gains a `summary` (one line) and `highlight?: true`.
+- **`features/event/event.ts`:** two agenda items gain `highlight: true`. No `summary` field: the existing details render as one paragraph instead.
 - The agenda rules are deleted from `home-v2.css`.
 - **Checks:**
-  - the section is at most 1,000 px tall at 390;
+  - the section is at most 1,000 px tall at 390 (result: 1,129 px, down from 2,516; going lower would mean cutting event copy);
   - at 1440 there is no empty column;
   - the highlighted items show the cyan dot.
 
@@ -96,17 +96,14 @@ Spec: [`2026-10-06-home-refresh-design.md`](../specs/2026-10-06-home-refresh-des
   - the `reveal` utility and its rules;
   - Known debt updated.
 
-### 9. `chore(release): 0.8.0`
+### 9. `chore(release): 0.9.0`
 
-The admin branch merged without its release commit, so v0.8.0 was never tagged (Iván, 2026-10-06: one tag for both).
-- `package.json` goes to 0.8.0.
-- One `## [0.8.0]` section holds both:
-  - the admin release notes (palette, navigation, participants, overview, theme, six-box PIN), taken from `e39fae1`;
-  - this branch's notes:
-    - **Added:** the theme on the home and the scroll motion;
-    - **Changed:** the logo strip, the agenda and the footer;
-    - **Fixed:** the community section.
-- The remote `feat/home-refresh` still points at `e39fae1`, so the first push uses `--force-with-lease`, and only when Iván asks.
+PR #25 merged the spec, the plan and Task 1 into `main` together with the admin's 0.8.0 release commit, so v0.8.0 is out. Tasks 2–9 continue on `feat/home-theme-motion`.
+- `package.json` goes to 0.9.0.
+- The CHANGELOG gains the dated section:
+  - **Added:** the theme on the home and the scroll motion;
+  - **Changed:** the logo strip, the agenda and the footer;
+  - **Fixed:** the community section, released by PR #25 but not in its notes.
 
 ## Done when
 
