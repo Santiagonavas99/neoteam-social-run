@@ -259,7 +259,7 @@ export function AdminManagement({
       </div>
       <Feedback value={feedback} />
       {section === 'participants' && participantSummary && !loading && (
-        <div className="participant-overview" aria-label="Resumen de participantes">
+        <section className="participant-overview" aria-label="Resumen de participantes">
           <div className="participant-overview-total">
             <strong>{participantSummary.total}</strong>
             <span>participantes</span>
@@ -282,7 +282,7 @@ export function AdminManagement({
               <strong>{participantSummary.cancelled}</strong> Cancelados
             </span>
           </div>
-        </div>
+        </section>
       )}
       {confirmation && (
         <section className="confirmation-panel" aria-label="Confirmar acción">
@@ -433,9 +433,9 @@ export function AdminManagement({
             <table>
               <thead>
                 <tr>
-                  <th>Participante</th>
-                  <th>Registro</th>
-                  <th>Estado</th>
+                  <th scope="col">Participante</th>
+                  <th scope="col">Registro</th>
+                  <th scope="col">Estado</th>
                 </tr>
               </thead>
               <tbody>
@@ -456,7 +456,9 @@ export function AdminManagement({
                             <small>
                               {row.document_type} {row.document_number}
                             </small>
-                            <small className="participant-phone">{row.phone || 'Sin teléfono'}</small>
+                            <small className="participant-phone">
+                              {row.phone || 'Sin teléfono'}
+                            </small>
                             <span className="participant-email">{row.email}</span>
                           </span>
                         </div>
@@ -515,7 +517,11 @@ export function AdminManagement({
                             </svg>
                           </button>
                         </div>
-                        {busy === row.id && <small className="participant-saving">Guardando…</small>}
+                        {busy === row.id && (
+                          <small className="participant-saving" aria-live="polite">
+                            Guardando…
+                          </small>
+                        )}
                       </td>
                     </tr>
                   )

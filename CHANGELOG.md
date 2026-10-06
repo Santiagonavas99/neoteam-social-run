@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`DESIGN.md`** with tokens, mobile-first standing rules and the measured design debt, plus `design/` for studies and baseline screenshots.
 - Tests for the registration form rules and the admin proxy body parsing (including oversized gzip bodies).
 
+### Changed
+
+- The participant roster uses denser rows, clearer grouped metadata and an aligned state control on desktop and mobile without horizontal scrolling.
+
 ### Fixed
 
 - Every admin button declares its type, so actions never submit a form by accident.
