@@ -1042,13 +1042,16 @@
   font-weight: 700;
 }
 .participants-table {
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
   border-color: #d8dfdc;
   border-radius: 14px;
   box-shadow: 0 10px 32px rgba(22, 35, 31, 0.05);
 }
 .participants-table table {
-  min-width: 1180px;
+  width: 100%;
+  min-width: 1080px;
 }
 .participants-table th {
   padding: 17px 16px;
@@ -1072,25 +1075,29 @@
   background: #fbfcfc;
 }
 .participants-table th:nth-child(1) {
-  width: 19%;
+  width: 21%;
 }
 .participants-table th:nth-child(2) {
-  width: 11%;
+  width: 10%;
 }
 .participants-table th:nth-child(3) {
   width: 19%;
 }
 .participants-table th:nth-child(4) {
-  width: 11%;
+  width: 10%;
 }
 .participants-table th:nth-child(5) {
   width: 5%;
 }
 .participants-table th:nth-child(6) {
-  width: 10%;
+  width: 11%;
 }
 .participants-table th:nth-child(7) {
-  width: 25%;
+  width: 24%;
+}
+.participants-table th:last-child,
+.participants-table td:last-child {
+  min-width: 245px;
 }
 .participant-identity {
   display: flex;
@@ -1176,10 +1183,12 @@
   font-size: 10px;
 }
 .participant-actions {
-  display: grid;
-  grid-template-columns: auto minmax(112px, 1fr) auto;
+  display: flex;
   align-items: center;
-  gap: 7px;
+  justify-content: flex-start;
+  gap: 6px;
+  min-width: 0;
+  flex-wrap: nowrap;
 }
 .participant-actions .button,
 .participant-actions select {
@@ -1187,8 +1196,8 @@
   height: 40px;
 }
 .participant-checkin {
-  grid-column: 1;
-  padding-inline: 13px;
+  flex: 0 0 auto;
+  padding-inline: 11px;
   white-space: nowrap;
   background: #101715;
   border-color: #101715;
@@ -1198,16 +1207,17 @@
   border-color: var(--neo-accent-dark);
 }
 .participant-status-select {
-  grid-column: 2;
-  min-width: 0;
-  padding: 8px 30px 8px 10px;
+  flex: 1 1 104px;
+  min-width: 96px;
+  max-width: 126px;
+  padding: 8px 28px 8px 9px;
   border-color: #ccd5d1;
   background-color: #fff;
   font-size: 11px;
 }
 .participant-delete {
-  grid-column: 3;
-  padding-inline: 11px;
+  flex: 0 0 auto;
+  padding-inline: 9px;
   border-color: #e6c1bd;
   background: #fff8f7;
   color: #9d2b28;
