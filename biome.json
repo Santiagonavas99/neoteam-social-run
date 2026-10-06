@@ -64,7 +64,7 @@
       }
     },
     {
-      "includes": ["app/home-v2.css", "app/neo-overrides.css"],
+      "includes": ["app/home-v2.css"],
       "linter": {
         "rules": {
           "style": {

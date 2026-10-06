@@ -78,7 +78,7 @@ export function DynamicsView({ token }: { token: string }) {
   )
 
   return (
-    <section className="management-view" aria-busy={loading}>
+    <section aria-busy={loading}>
       <ListToolbar
         searchLabel="Buscar dinámicas"
         placeholder="Buscar dinámica…"

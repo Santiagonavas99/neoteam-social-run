@@ -106,16 +106,16 @@ export function LogosView({ token }: { token: string }) {
   )
 
   return (
-    <section className="management-view" aria-busy={loading}>
-      <div className="section-toolbar">
+    <section aria-busy={loading}>
+      <div className="mb-5 flex flex-col gap-3 md:mb-6 md:flex-row md:items-start md:justify-between">
         <div>
-          <h2>Logos de la cinta</h2>
-          <p className="muted">
+          <h2 className="m-0 mb-1 text-[21px] font-bold tracking-[-0.035em]">Logos de la cinta</h2>
+          <p className="m-0 max-w-[60ch] text-sm text-neo-text-secondary">
             Sube cada logo una sola vez. La web duplica la lista automáticamente para crear el
             movimiento infinito.
           </p>
         </div>
-        <div className="toolbar-actions">
+        <div className="flex items-center gap-2 md:shrink-0 [&>.button]:flex-1 md:[&>.button]:flex-none">
           <RefreshButton
             loading={loading}
             disabled={loading || busy || !!editor}

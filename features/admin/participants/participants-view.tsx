@@ -75,7 +75,7 @@ export function ParticipantsView({ token }: { token: string }) {
   ]
 
   return (
-    <section className="management-view" aria-busy={loading}>
+    <section aria-busy={loading}>
       <ListToolbar
         searchLabel="Buscar participantes"
         placeholder="Nombre, código, contacto…"

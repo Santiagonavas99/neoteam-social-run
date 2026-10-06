@@ -45,7 +45,7 @@ Both API routes are thin wrappers around `proxyToEdgeFunction` in `lib/admin-pro
 
 **Home page** (`app/page.tsx`, `force-dynamic`) renders one component per section (`features/home/sections/`) and reads logo carousel items and community data via `features/home/data.ts` using the server Supabase client; each loader falls back to hardcoded defaults on error so the landing never breaks. Static event copy, agenda and start/end times live in `features/event/event.ts`.
 
-**Styling**: plain global CSS layered in `app/layout.tsx` — `globals.css` → `neo-overrides.css` → `logo-marquee.css` → `home-v2.css` (later files override earlier ones), plus Tailwind 4 utilities (`app/tailwind.css`, no preflight; legacy unlayered CSS wins conflicts). New UI uses Tailwind on the `--neo-*` tokens; see `DESIGN.md`.
+**Styling**: plain global CSS layered in `app/layout.tsx` — `globals.css` → `logo-marquee.css` → `home-v2.css` (later files override earlier ones), plus Tailwind 4 utilities (`app/tailwind.css`, no preflight; legacy unlayered CSS wins conflicts). The admin is Tailwind only; new UI uses Tailwind on the `--neo-*` tokens; see `DESIGN.md`.
 
 ## Supabase
 

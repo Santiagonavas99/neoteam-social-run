@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, LoaderCircle, LogIn } from 'lucide-react'
+import { ArrowLeft, LogIn } from 'lucide-react'
 import Link from 'next/link'
 import { type FormEvent, useState } from 'react'
 import { BrandLink } from '@/components/brand-link'
@@ -8,6 +8,7 @@ import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
 import type { FeedbackValue } from '../types'
 import { Feedback } from '../ui/admin-ui'
+import { LoadingState } from '../ui/loading-state'
 import { isPin } from './pin'
 import { PinField } from './pin-field'
 import type { AdminSession } from './use-admin-session'
@@ -71,19 +72,21 @@ export function AuthScreen({ session }: { session: AdminSession }) {
     )
 
   return (
-    <main className="admin-auth">
+    <main className="flex min-h-svh flex-col items-center justify-center gap-6 border-t-[6px] border-neo-accent-dark bg-neo-bg px-5 py-7 md:gap-8 md:py-10">
       <BrandLink />
-      <section className="auth-card" aria-labelledby="login-title">
+      <section
+        className="w-full max-w-[460px] rounded-card border border-neo-border bg-neo-surface px-6 py-7 md:p-10"
+        aria-labelledby="login-title"
+      >
         <p className="section-label">SOCIAL RUN · ADMIN</p>
-        <h1 id="login-title">Panel del evento</h1>
+        <h1 id="login-title" className="m-0 mb-4 text-[30px] tracking-[-0.05em] md:text-[34px]">
+          Panel del evento
+        </h1>
         {!session.ready ? (
-          <p className="loading-state flex items-center gap-2" role="status">
-            <LoaderCircle aria-hidden className="size-4 shrink-0 motion-safe:animate-spin" />
-            Comprobando acceso…
-          </p>
+          <LoadingState>Comprobando acceso…</LoadingState>
         ) : session.configured === false ? (
           <>
-            <p className="muted">
+            <p className="m-0 text-sm text-neo-text-secondary">
               Primer acceso. Usa tu clave de configuración y elige el PIN con el que entrarás al
               panel.
             </p>
@@ -128,7 +131,9 @@ export function AuthScreen({ session }: { session: AdminSession }) {
           </>
         ) : (
           <>
-            <p className="muted">Introduce tu PIN de 6 dígitos para continuar.</p>
+            <p className="m-0 text-sm text-neo-text-secondary">
+              Introduce tu PIN de 6 dígitos para continuar.
+            </p>
             <form onSubmit={login} className="stack-form">
               <PinField label="PIN de acceso" value={pin} onChange={setPin} current autoFocus />
               <Feedback value={feedback} />

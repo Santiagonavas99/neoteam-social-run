@@ -51,7 +51,7 @@ export function CommunityView({
   const visible = rows.filter((row) => matchesQuery([row.name], query))
 
   return (
-    <section className="management-view" aria-busy={loading}>
+    <section aria-busy={loading}>
       <ListToolbar
         searchLabel="Buscar registros"
         placeholder="Buscar por nombre…"

@@ -1,4 +1,4 @@
-/* NeoTeam — shared tokens, public site and registration. Admin lives in neo-overrides.css. */
+/* NeoTeam — shared tokens and the legacy public site. The admin is Tailwind only. */
 :root {
   /* Every shade is OKLCH from the brand cyan (hue 193.7). Contrasts: DESIGN.md. */
   --neo-black: #050505;
@@ -272,6 +272,9 @@ fieldset {
 .text-link:hover {
   text-decoration: underline;
   text-underline-offset: 5px;
+}
+.danger-text {
+  color: var(--neo-danger);
 }
 .kicker,
 .section-label {
