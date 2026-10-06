@@ -1,5 +1,18 @@
 'use client'
 
+import {
+  Check,
+  Eye,
+  EyeOff,
+  ImagePlus,
+  ImageUp,
+  Link as LinkIcon,
+  LoaderCircle,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Trash2,
+} from 'lucide-react'
 import { type ChangeEvent, type FormEvent, useCallback, useEffect, useRef, useState } from 'react'
 import type { AdminApi, FeedbackValue } from './admin-types'
 import { Feedback, Logo, StatusBadge } from './admin-ui'
@@ -143,10 +156,15 @@ export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: 
             onClick={() => void load()}
             disabled={loading || busy || !!editor}
           >
-            {loading ? 'Cargando…' : '↻ Actualizar'}
+            <RefreshCw
+              aria-hidden
+              className={`size-4 shrink-0 ${loading ? 'motion-safe:animate-spin' : ''}`}
+            />
+            {loading ? 'Cargando…' : 'Actualizar'}
           </button>
           <button type="button" className="button" onClick={addLogo} disabled={busy || !!editor}>
-            + Añadir logo
+            <Plus aria-hidden className="size-4 shrink-0" />
+            Añadir logo
           </button>
         </div>
       </div>
@@ -167,14 +185,14 @@ export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: 
       )}
 
       {loading ? (
-        <div className="loading-state" role="status">
-          <span className="loading-line" />
+        <div className="loading-state flex items-center gap-2" role="status">
+          <LoaderCircle aria-hidden className="size-4 shrink-0 motion-safe:animate-spin" />
           Cargando logos…
         </div>
       ) : !rows.length ? (
         <div className="empty-state">
           <span className="empty-number" aria-hidden="true">
-            00
+            <ImagePlus aria-hidden className="mx-auto block size-8" />
           </span>
           <h2>Añade los logos del carrusel</h2>
           <p>
@@ -183,7 +201,8 @@ export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: 
           </p>
           {!editor && (
             <button type="button" className="button" onClick={addLogo}>
-              + Añadir primer logo
+              <Plus aria-hidden className="size-4 shrink-0" />
+              Añadir primer logo
             </button>
           )}
         </div>
@@ -201,8 +220,12 @@ export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: 
                   <StatusBadge
                     status={row.active ? 'open' : 'cancelled'}
                     label={row.active ? 'Visible' : 'Oculto'}
+                    icon={row.active ? Eye : EyeOff}
                   />
-                  <small>{row.link_url || 'Sin enlace'}</small>
+                  <small className="inline-flex items-center gap-1">
+                    {row.link_url && <LinkIcon aria-hidden className="size-3.5 shrink-0" />}
+                    {row.link_url || 'Sin enlace'}
+                  </small>
                 </div>
                 <div className="record-actions">
                   <button
@@ -214,6 +237,7 @@ export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: 
                     }}
                     disabled={busy || (!!editor && editor.id !== row.id)}
                   >
+                    <Pencil aria-hidden className="size-4 shrink-0" />
                     Editar
                   </button>
                   <button
@@ -224,6 +248,7 @@ export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: 
                     onClick={() => void remove(row)}
                     disabled={busy || (!!editor && editor.id !== row.id)}
                   >
+                    <Trash2 aria-hidden className="size-4 shrink-0" />
                     {confirmingId === row.id ? 'Confirmar eliminar' : 'Eliminar'}
                   </button>
                 </div>
@@ -360,7 +385,12 @@ function LogoEditor({
           <label className="upload-field span-full">
             <Logo url={values.logo_url} name={values.name || 'Logo'} />
             <span>
-              <strong>
+              <strong className="inline-flex items-center gap-2">
+                {values.logo_url ? (
+                  <ImageUp aria-hidden className="size-4 shrink-0" />
+                ) : (
+                  <ImagePlus aria-hidden className="size-4 shrink-0" />
+                )}
                 {uploading
                   ? 'Subiendo imagen…'
                   : values.logo_url
@@ -389,6 +419,7 @@ function LogoEditor({
       <Feedback value={feedback} />
       <div className="editor-actions">
         <button type="submit" className="button" disabled={busy || uploading}>
+          <Check aria-hidden className="size-4 shrink-0" />
           {busy ? 'Guardando…' : uploading ? 'Subiendo imagen…' : 'Guardar logo'}
         </button>
         <button

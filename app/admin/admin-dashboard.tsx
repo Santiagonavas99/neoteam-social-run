@@ -1,11 +1,12 @@
 'use client'
 
+import { ArrowLeft, ArrowUpRight, KeyRound, LoaderCircle, LogIn, LogOut } from 'lucide-react'
 import Link from 'next/link'
 import { type FormEvent, useCallback, useEffect, useState } from 'react'
 import type { HomeFeatureCard } from '@/lib/home-features'
 import { AdminManagement } from './admin-management'
 import type { AdminResponse, AdminSection } from './admin-types'
-import { Feedback } from './admin-ui'
+import { Feedback, sectionIcons } from './admin-ui'
 import { LogoCarouselAdmin } from './logo-carousel-admin'
 
 const ADMIN_SESSION_KEY = 'neoteam_admin_pin_session'
@@ -287,7 +288,8 @@ export function AdminDashboard() {
           <p className="section-label">SOCIAL RUN · ADMIN</p>
           <h1 id="login-title">Panel del evento</h1>
           {!authReady ? (
-            <p className="loading-state" role="status">
+            <p className="loading-state flex items-center gap-2" role="status">
+              <LoaderCircle aria-hidden className="size-4 shrink-0 motion-safe:animate-spin" />
               Comprobando acceso…
             </p>
           ) : configured === false ? (
@@ -330,6 +332,7 @@ export function AdminDashboard() {
                     confirmPin.length !== 6
                   }
                 >
+                  <LogIn aria-hidden className="size-4 shrink-0" />
                   {busy ? 'Configurando…' : 'Guardar PIN y entrar'}
                 </button>
               </form>
@@ -345,14 +348,16 @@ export function AdminDashboard() {
                   className="button full-width"
                   disabled={busy || pin.length !== 6}
                 >
-                  {busy ? 'Entrando…' : 'Entrar →'}
+                  <LogIn aria-hidden className="size-4 shrink-0" />
+                  {busy ? 'Entrando…' : 'Entrar'}
                 </button>
               </form>
             </>
           )}
         </section>
         <Link href="/" className="text-link">
-          ← Volver al evento
+          <ArrowLeft aria-hidden className="size-4 shrink-0" />
+          Volver al evento
         </Link>
       </main>
     )
@@ -365,27 +370,32 @@ export function AdminDashboard() {
         </Link>
         <span className="sidebar-caption">SOCIAL RUN / 2026</span>
         <nav aria-label="Panel del evento">
-          {navigation.map((item, index) => (
-            <button
-              type="button"
-              key={item.id}
-              aria-current={section === item.id ? 'page' : undefined}
-              onClick={() => navigate(item.id)}
-            >
-              <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-              {item.label}
-            </button>
-          ))}
+          {navigation.map((item) => {
+            const Icon = sectionIcons[item.id]
+            return (
+              <button
+                type="button"
+                key={item.id}
+                aria-current={section === item.id ? 'page' : undefined}
+                onClick={() => navigate(item.id)}
+              >
+                <Icon aria-hidden className="size-5 shrink-0" />
+                {item.label}
+              </button>
+            )
+          })}
         </nav>
-        <button type="button" className="sidebar-signout" onClick={signOut}>
-          Cerrar sesión ↗
+        <button type="button" className="sidebar-signout flex items-center gap-2" onClick={signOut}>
+          <LogOut aria-hidden className="size-4 shrink-0" />
+          Cerrar sesión
         </button>
       </aside>
       <div className="admin-content">
         <div className="admin-topbar">
           <span>NEOTEAM / PANEL DEL EVENTO</span>
           <Link href="/" target="_blank" className="text-link">
-            Ver página ↗
+            Ver página
+            <ArrowUpRight aria-hidden className="size-4 shrink-0" />
           </Link>
         </div>
         <header className="admin-section-header">
@@ -460,7 +470,10 @@ export function AdminDashboard() {
           </section>
         ) : section === 'security' ? (
           <section className="admin-surface security-card">
-            <h2>Cambiar PIN</h2>
+            <h2 className="flex items-center gap-2">
+              <KeyRound aria-hidden className="size-5 shrink-0" />
+              Cambiar PIN
+            </h2>
             <p className="muted">
               Al actualizarlo, se cerrarán las demás sesiones. Esta sesión seguirá activa.
             </p>
@@ -483,6 +496,7 @@ export function AdminDashboard() {
                   confirmNewPin.length !== 6
                 }
               >
+                <KeyRound aria-hidden className="size-4 shrink-0" />
                 {busy ? 'Actualizando…' : 'Actualizar PIN'}
               </button>
             </form>

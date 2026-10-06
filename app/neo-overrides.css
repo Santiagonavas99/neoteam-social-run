@@ -78,11 +78,6 @@
   text-align: left;
   font-size: 13px;
 }
-.admin-sidebar nav button > span {
-  font-size: 10px;
-  color: #89a399;
-  font-variant-numeric: tabular-nums;
-}
 .admin-sidebar nav button:hover {
   background: #15201b;
   color: white;
@@ -269,10 +264,6 @@
   color: var(--neo-text-secondary);
   font-size: 12px;
 }
-.quick-access button > span:last-child {
-  font-size: 24px;
-  color: var(--neo-accent-dark);
-}
 .loading-state {
   padding: 32px 24px;
   color: var(--neo-text-secondary);
@@ -280,14 +271,6 @@
   border: 1px solid var(--neo-border);
   border-radius: 8px;
   background: var(--neo-surface);
-}
-.loading-line {
-  display: block;
-  max-width: 240px;
-  height: 10px;
-  background: #e2ebe7;
-  margin-bottom: 16px;
-  border-radius: 3px;
 }
 .empty-state {
   padding: 56px 24px;
@@ -404,13 +387,6 @@
   background: #edf1ef;
   color: #52615a;
   white-space: nowrap;
-}
-.status-badge::before {
-  content: "";
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: currentColor;
 }
 .status-checked_in,
 .status-open,
@@ -751,9 +727,6 @@
     border-left: 0;
     border-bottom: 3px solid transparent;
     padding: 12px 16px;
-  }
-  .admin-sidebar nav button > span {
-    display: none;
   }
   .admin-sidebar nav button[aria-current="page"] {
     border-bottom-color: var(--neo-accent);
