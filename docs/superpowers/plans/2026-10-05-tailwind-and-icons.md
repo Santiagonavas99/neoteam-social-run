@@ -1,10 +1,10 @@
 # Tailwind CSS and icon system — plan (Phase A)
 
-Spec: `docs/superpowers/specs/2026-10-05-tailwind-and-icons-design.md`. Branch: `feat/tailwind-and-icons`, cut from `main`. Status: **approved 2026-10-05; changed the same day, awaiting OK: Task 3 rewritten (icon review of every screen), dark tokens added to Task 2, new Task 4b (theme)**.
+Spec: `docs/superpowers/specs/2026-10-05-tailwind-and-icons-design.md`. Branch: `feat/tailwind-and-icons`, cut from `main`. Status: **approved 2026-10-05; changed the same day, awaiting OK: Task 3 rewritten (icon review of every screen), dark tokens added to Task 2, new Task 4b (theme), new Task 3b (countdown)**.
 
 One commit per task. Every task ends with `pnpm ci:check` green. Phase B (public pages, legacy CSS removal, preflight) gets its own plan after 18 Oct.
 
-**Order agreed with Iván (2026-10-05):** this branch ships Tasks 0–3 (setup, tokens, icons) so the new screens of `feat/qr-checkin` and `feat/dynamics-admin` are built with Tailwind and Lucide from the start. Tasks 4, 4b and 5 (moving the existing admin to Tailwind, then the theme) run on a follow-up branch `refactor/admin-tailwind` after those two, from this same plan.
+**Order agreed with Iván (2026-10-05):** this branch ships Tasks 0–3b (setup, tokens, icons, countdown) so the new screens of `feat/qr-checkin` and `feat/dynamics-admin` are built with Tailwind and Lucide from the start. Tasks 4, 4b and 5 (moving the existing admin to Tailwind, then the theme) run on a follow-up branch `refactor/admin-tailwind` after those two, from this same plan.
 
 ---
 
@@ -111,6 +111,17 @@ No icons on: "Cancelar" buttons (text is enough next to an iconed primary action
 - macOS "Reduce motion" on: spinners do not spin.
 - `pnpm ci:check` green; `pnpm build` client bundle size for `/` and `/admin` noted in the PR (before/after).
 - Commits (two, for review): `feat(ui): lucide icon system on public pages`, `feat(admin): lucide icons across the panel`.
+
+## Task 3b — Event countdown on the home
+
+Spec: `docs/superpowers/specs/2026-10-05-event-countdown-design.md`. Needs Tasks 1–2.
+
+- [ ] `lib/event.ts`: `startsAt: '2026-10-18T07:30:00-05:00'`, `endsAt: '2026-10-18T11:00:00-05:00'`.
+- [ ] `lib/countdown.ts` + `lib/countdown.test.ts`: `countdown(nowMs, startMs, endMs)`; tests: 1 s before start, exactly at start (`live`), 1 s before end, exactly at end (`ended`), a value with days, hours, minutes and seconds all non-zero.
+- [ ] `components/event-countdown.tsx` (client): server values as initial state, 1 s interval, cleared on unmount; digits `aria-hidden` + `tabular-nums` + `suppressHydrationWarning`; visually hidden sentence; `live` state with `motion-safe:animate-pulse` dot; `ended` → `null`.
+- [ ] `app/page.tsx`: render it in `.v2-hero-side` between the headline and `.v2-hero-actions`.
+- Check: **390×844 first** (headless Chrome on the preview): clock and CTA visible without scrolling, one line, no overflow at 360 px; then 1440. Reduced motion: no pulse. Fake clock in the test covers the three states; a manual check of `live` by temporarily passing a past `startsAt` in dev (not committed). `pnpm ci:check`.
+- Commit: `feat(home): countdown to the event`
 
 ## Task 4 — Admin panel to Tailwind (one commit per file)
 
