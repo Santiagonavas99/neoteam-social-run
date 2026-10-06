@@ -1261,7 +1261,9 @@ fieldset {
   *,
   *::before,
   *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over every component animation */
     transition: none !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must win over every component animation */
     animation: none !important;
   }
 }

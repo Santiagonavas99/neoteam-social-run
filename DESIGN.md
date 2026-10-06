@@ -69,5 +69,5 @@ Measured on the legacy CSS; each item is fixed when its component moves to Tailw
 - **92 raw hex colors** outside the tokens (`globals.css` 33, `neo-overrides.css` 29, `home-v2.css` 30).
 - **14 font sizes**, including 9–11 px labels, which are hard to read on phones.
 - **Only 3 `:focus-visible` rules**: most controls rely on the browser default focus ring.
-- **14 specificity inversions** (Biome `noDescendingSpecificity`) caused by the override layering.
+- **14 specificity inversions** caused by the override layering. Biome's `noDescendingSpecificity` is switched off for `home-v2.css` and `neo-overrides.css` only (`biome.json`); remove that override when those files are deleted.
 - **Glyph icons** (`← → ↗ ✓ ↓`) instead of an icon library.
