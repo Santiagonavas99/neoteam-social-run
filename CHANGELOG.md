@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-06
+
+### Added
+
+- **Staff accounts with roles.** Each person signs in with their own username and PIN. Admins see the whole panel; check-in staff see only the scanner and their own PIN.
+- **Equipo screen** for admins to add staff, change their role, turn off their access or give them a new PIN. Each of these changes signs that person out.
+- **Light, dark and system theme on the public site,** from the button next to "Registrarme".
+- **Sections fade in as you scroll** on the home page, unless the device asks for reduced motion.
+- **"Creado por Landak Studio"** credit in the footer.
+
+### Changed
+
+- **Signing in to the panel now asks for a username.** The current PIN becomes the `admin` user, and everyone signs in once more after the update.
+- **Changing your PIN signs out only your other sessions,** not the whole team.
+- **Logo strip:** bigger white tiles, logos in their own colours, and it pauses when touched or hovered.
+- **The agenda is a timeline** and takes less than half the height on phones.
+- **Community section:** groups and brands sit side by side when there are few.
+- **Footer** gains links to Registro, Mi pase and Agenda.
+
+### Fixed
+
+- **The home's community section** (running groups and brands) shows again.
+- **Spelling and capitalization fixes** across the home page.
+
 ## [0.8.0] - 2026-10-06
 
 ### Added
