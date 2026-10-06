@@ -150,7 +150,7 @@ a.brand-marquee-item:hover {
   }
 
   .brand-marquee-meta {
-    width: min(100% - 32px, 1280px);
+    width: min(1280px, calc(100% - 32px));
     gap: 12px;
     margin-bottom: 14px;
   }
