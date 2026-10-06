@@ -444,7 +444,7 @@
   font-weight: 600;
   font-size: 22px;
   letter-spacing: -0.06em;
-  color: var(--neo-accent-dark);
+  color: var(--neo-accent-text);
 }
 .record-title {
   flex: 1;
@@ -553,7 +553,7 @@
 .confirmation-panel {
   border: 1px solid var(--neo-accent);
   border-left: 4px solid var(--neo-accent-dark);
-  background: #eaf2ee;
+  background: var(--neo-accent-soft);
   padding: 24px;
   margin: 16px 0 24px;
   border-radius: 8px;
@@ -566,7 +566,7 @@
 .confirmation-panel p {
   font-size: 14px;
   max-width: 650px;
-  color: var(--neo-accent-dark);
+  color: var(--neo-accent-text);
 }
 .security-card {
   max-width: 480px;
