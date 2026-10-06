@@ -44,7 +44,7 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 | `Sun` / `Moon` / `Monitor` | Theme: light / dark / system |
 | `Eye` / `EyeOff` | Visible / hidden |
 | `CalendarDays` / `Clock` / `MapPin` / `Route` / `Gift` | Date / time / place / route / prizes |
-| `UserCheck`, `LayoutDashboard`, `GalleryHorizontal`, `Users`, `Flag`, `Tag`, `Zap`, `ShieldCheck` | Admin sections: check-in, overview, logo strip, participants, groups, brands, dynamics, security |
+| `UserCheck`, `LayoutDashboard`, `GalleryHorizontal`, `Users`, `Flag`, `Tag`, `Zap`, `UserCog`, `ShieldCheck` | Admin sections: check-in, overview, logo strip, participants, groups, brands, dynamics, team, security |
 | `Circle`, `CircleCheck`, `CircleSlash`, `CircleX`, `CircleDashed`, `CircleDot`, `CircleStop`, `Trophy` | Status: registered, checked in, no show, cancelled, draft, open, closed, drawn or completed |
 
 ## Tokens (`app/globals.css :root`)

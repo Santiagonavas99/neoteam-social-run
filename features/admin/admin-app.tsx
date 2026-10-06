@@ -12,6 +12,7 @@ import { ParticipantsView } from './participants/participants-view'
 import { type AdminSection, sectionsFor } from './sections'
 import { ChangePinForm } from './security/change-pin-form'
 import { AdminShell } from './shell/admin-shell'
+import { TeamView } from './team/team-view'
 
 export function AdminApp() {
   const session = useAdminSession()
@@ -33,6 +34,8 @@ export function AdminApp() {
         <CheckinView token={token} />
       ) : section === 'logos' ? (
         <LogosView token={token} />
+      ) : section === 'team' ? (
+        <TeamView token={token} />
       ) : section === 'security' ? (
         <ChangePinForm token={token} onToken={session.remember} />
       ) : section === 'participants' ? (

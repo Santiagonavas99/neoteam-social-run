@@ -901,6 +901,73 @@ Deno.serve(async (req: Request) => {
       })
     }
 
+    if (action === 'users') {
+      const operation = body?.operation
+      if (operation === 'list') {
+        const { data, error } = await supabase
+          .from('admin_users')
+          .select('id,name,username,role,active')
+          .order('created_at', { ascending: true })
+        if (error) throw error
+        return json({ rows: data ?? [] })
+      }
+
+      if (operation === 'save') {
+        const values = body?.values ?? {}
+        const id = typeof values.id === 'string' ? values.id : null
+        const name = cleanName(values.name)
+        const role = values.role === 'admin' || values.role === 'checkin' ? values.role : null
+        const active = values.active !== false
+        const pin = values.pin ? values.pin : null
+        if (!name) return json({ error: 'Escribe un nombre de 2 a 80 caracteres.' }, 400)
+        if (!role) return json({ error: 'Elige un rol.' }, 400)
+        if (pin !== null && !validPin(pin))
+          return json({ error: 'El PIN debe tener exactamente 6 dígitos.' }, 400)
+
+        if (!id) {
+          const username = cleanUsername(values.username)
+          if (!username)
+            return json(
+              { error: 'El usuario usa de 3 a 32 letras minúsculas, números, punto o guion.' },
+              400,
+            )
+          if (!pin) return json({ error: 'Asigna un PIN de 6 dígitos.' }, 400)
+          const { error } = await supabase
+            .from('admin_users')
+            .insert({ name, username, role, active, pin_hash: await hashPin(pin) })
+          if (error) {
+            if ((error as { code?: string }).code === '23505')
+              return json({ error: 'Ese usuario ya existe.' }, 409)
+            throw error
+          }
+          return json({ ok: true })
+        }
+
+        if (id === session.userId && (role !== 'admin' || !active))
+          return json({ error: 'No puedes quitarte tu propio acceso de administrador.' }, 400)
+        if (id === session.userId && pin)
+          return json({ error: 'Cambia tu propio PIN en Seguridad.' }, 400)
+
+        const { data: before, error: beforeError } = await supabase
+          .from('admin_users')
+          .select('role,active')
+          .eq('id', id)
+          .maybeSingle()
+        if (beforeError) throw beforeError
+        if (!before) return json({ error: 'Ese usuario ya no existe.' }, 404)
+
+        const changes = { name, role, active, updated_at: new Date().toISOString() }
+        if (pin) changes.pin_hash = await hashPin(pin)
+        const { error } = await supabase.from('admin_users').update(changes).eq('id', id)
+        if (error) throw error
+        // Access changed: the person signs in again under the new rules.
+        if (pin || before.role !== role || before.active !== active) await revokeSessions(id)
+        return json({ ok: true })
+      }
+
+      return json({ error: 'Operación no válida.' }, 400)
+    }
+
     if (action === 'changePin') {
       const currentPin = body?.currentPin
       const newPin = body?.newPin

@@ -13,38 +13,9 @@ import { isPin } from './pin'
 import { PinField } from './pin-field'
 import type { AdminSession } from './use-admin-session'
 import { isUsername, normalizeUsername } from './username'
+import { UsernameField } from './username-field'
 
 const USERNAME_RULE = 'El usuario usa de 3 a 32 letras minúsculas, números, punto o guion.'
-
-export function UsernameField({
-  label,
-  value,
-  onChange,
-  autoFocus = false,
-}: {
-  label: string
-  value: string
-  onChange: (value: string) => void
-  autoFocus?: boolean
-}) {
-  return (
-    <label>
-      {label}
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        autoComplete="username"
-        autoCapitalize="none"
-        autoCorrect="off"
-        spellCheck={false}
-        maxLength={32}
-        required
-        autoFocus={autoFocus}
-      />
-    </label>
-  )
-}
 
 export function AuthScreen({ session }: { session: AdminSession }) {
   const [setupSecret, setSetupSecret] = useState('')

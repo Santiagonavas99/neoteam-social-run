@@ -6,6 +6,7 @@ import {
   ShieldCheck,
   Tag,
   UserCheck,
+  UserCog,
   Users,
   Zap,
 } from 'lucide-react'
@@ -19,6 +20,7 @@ export type AdminSection =
   | 'groups'
   | 'brands'
   | 'dynamics'
+  | 'team'
   | 'security'
 
 export type AdminSectionGroup = 'event' | 'content' | 'account'
@@ -93,6 +95,13 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     description: 'Los aliados que hacen parte del encuentro.',
     icon: Tag,
     group: 'content',
+  },
+  {
+    id: 'team',
+    label: 'Equipo',
+    description: 'Quién entra al panel y qué puede hacer.',
+    icon: UserCog,
+    group: 'account',
   },
   {
     id: 'security',
