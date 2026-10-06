@@ -1,5 +1,9 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
+// Supabase errors are plain objects, so logging them whole prints "{}".
+const errorText = (error: unknown) =>
+  typeof error === 'object' && error !== null && 'message' in error ? String(error.message) : error
+
 export type HomeLogoCarouselItem = {
   id: string
   name: string
@@ -22,7 +26,7 @@ export async function getHomeLogoCarouselItems(): Promise<HomeLogoCarouselItem[]
     if (error) throw error
     return (data ?? []) as HomeLogoCarouselItem[]
   } catch (error) {
-    console.error('Home logo carousel fallback', error)
+    console.error('Home logo carousel fallback', errorText(error))
     return []
   }
 }
@@ -60,7 +64,7 @@ export async function getHomeCommunity() {
       brands: (brands.data ?? []) as CommunityLogo[],
     }
   } catch (error) {
-    console.error('Home community fallback', error)
+    console.error('Home community fallback', errorText(error))
     return { groups: [] as CommunityLogo[], brands: [] as CommunityLogo[] }
   }
 }
