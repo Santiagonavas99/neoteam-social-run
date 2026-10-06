@@ -1,3 +1,4 @@
+import { Wallet } from 'lucide-react'
 import type { Pass } from './pass'
 
 export function PassCard({ pass }: { pass: Pass }) {
@@ -15,6 +16,16 @@ export function PassCard({ pass }: { pass: Pass }) {
       <p className="m-0 rounded-control border border-dashed border-neo-accent bg-neo-bg px-4 py-2 text-2xl font-bold tracking-wide text-neo-text">
         {pass.code}
       </p>
+      {pass.googleWalletUrl ? (
+        <a
+          href={pass.googleWalletUrl}
+          className="mt-2 inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-control border border-neo-black bg-neo-black px-5 py-3 transition-colors hover:border-neo-accent-dark hover:bg-neo-accent-dark md:max-w-80"
+        >
+          {/* Global `a { color: inherit }` beats utilities on the link itself. */}
+          <Wallet aria-hidden className="size-4 shrink-0 text-neo-white" />
+          <span className="text-[13px] font-bold text-neo-white">Añadir a Google Wallet</span>
+        </a>
+      ) : null}
       <p className="m-0 text-sm leading-normal text-neo-text-secondary">
         Toma una captura de pantalla: es tu entrada para el check-in.
       </p>
