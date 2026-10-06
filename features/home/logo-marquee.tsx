@@ -25,6 +25,7 @@ export function LogoMarquee({ items }: { items: HomeLogoCarouselItem[] }) {
 
   const repeatCount = Math.max(1, Math.ceil(8 / visibleItems.length))
   const repeatedItems = Array.from({ length: repeatCount }, () => visibleItems).flat()
+  const countLabel = String(visibleItems.length).padStart(2, '0')
 
   function group(hidden = false) {
     return (
@@ -59,10 +60,20 @@ export function LogoMarquee({ items }: { items: HomeLogoCarouselItem[] }) {
 
   return (
     <section className="brand-marquee-section" aria-label="Marcas y aliados del Social Run">
-      <div className="brand-marquee">
-        <div className="brand-marquee-track">
-          {group(false)}
-          {group(true)}
+      <div className="brand-marquee-meta shell">
+        <span className="brand-marquee-label">Aliados / Social Run 2026</span>
+        <span className="brand-marquee-rule" aria-hidden="true" />
+        <span className="brand-marquee-count" aria-label={`${visibleItems.length} aliados`}>
+          {countLabel}
+        </span>
+      </div>
+
+      <div className="brand-marquee-window">
+        <div className="brand-marquee">
+          <div className="brand-marquee-track">
+            {group(false)}
+            {group(true)}
+          </div>
         </div>
       </div>
     </section>
