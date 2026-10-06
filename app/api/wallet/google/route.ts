@@ -68,77 +68,6 @@ async function getGoogleAccessToken(
   return body.access_token;
 }
 
-async function diagnoseGoogleWalletAccess(
-  accessToken: string,
-  issuerId: string,
-  classId: string,
-) {
-  const headers = { Authorization: `Bearer ${accessToken}` };
-
-  const [issuerListResponse, issuerGetResponse, classGetResponse] =
-    await Promise.all([
-      fetch("https://walletobjects.googleapis.com/walletobjects/v1/issuer", {
-        headers,
-        cache: "no-store",
-      }),
-      fetch(
-        `https://walletobjects.googleapis.com/walletobjects/v1/issuer/${encodeURIComponent(
-          issuerId,
-        )}`,
-        { headers, cache: "no-store" },
-      ),
-      fetch(
-        `https://walletobjects.googleapis.com/walletobjects/v1/eventTicketClass/${encodeURIComponent(
-          classId,
-        )}`,
-        { headers, cache: "no-store" },
-      ),
-    ]);
-
-  const issuerListBody = (await issuerListResponse
-    .json()
-    .catch(() => ({}))) as {
-    resources?: Array<{ issuerId?: string; name?: string }>;
-    error?: unknown;
-  };
-
-  const issuerGetBody = await issuerGetResponse
-    .json()
-    .catch(() => ({} as Record<string, unknown>));
-  const classGetBody = await classGetResponse
-    .json()
-    .catch(() => ({} as Record<string, unknown>));
-
-  return {
-    targetIssuerId: issuerId,
-    targetClassId: classId,
-    issuerListStatus: issuerListResponse.status,
-    visibleIssuers:
-      issuerListBody.resources?.map((issuer) => ({
-        issuerId: issuer.issuerId ?? null,
-        name: issuer.name ?? null,
-      })) ?? [],
-    issuerGetStatus: issuerGetResponse.status,
-    issuerGet:
-      issuerGetResponse.ok
-        ? {
-            issuerId:
-              (issuerGetBody as { issuerId?: string }).issuerId ?? null,
-            name: (issuerGetBody as { name?: string }).name ?? null,
-          }
-        : issuerGetBody,
-    classGetStatus: classGetResponse.status,
-    classGet:
-      classGetResponse.ok
-        ? {
-            id: (classGetBody as { id?: string }).id ?? null,
-            reviewStatus:
-              (classGetBody as { reviewStatus?: string }).reviewStatus ?? null,
-          }
-        : classGetBody,
-  };
-}
-
 async function ensureGoogleWalletObject(
   accessToken: string,
   eventObject: Record<string, unknown>,
@@ -218,36 +147,6 @@ export async function GET(request: Request) {
     "neoteam_social_run_2026";
   const classId = `${issuerId}.${classSuffix}`;
   const privateKey = Buffer.from(privateKeyBase64, "base64").toString("utf8");
-
-  if (requestUrl.searchParams.get("diagnose") === "1") {
-    try {
-      const accessToken = await getGoogleAccessToken(
-        serviceAccountEmail,
-        privateKey,
-      );
-      const diagnostics = await diagnoseGoogleWalletAccess(
-        accessToken,
-        issuerId,
-        classId,
-      );
-      return Response.json(
-        {
-          ok: true,
-          serviceAccountEmail,
-          diagnostics,
-        },
-        {
-          headers: { "Cache-Control": "no-store" },
-        },
-      );
-    } catch (error) {
-      const googleError = safeGoogleError(error);
-      return Response.json(
-        { ok: false, google: googleError },
-        { status: googleError.status >= 400 ? googleError.status : 500 },
-      );
-    }
-  }
 
   const token = requestUrl.searchParams.get("token")?.trim() ?? "";
   if (!token) {
