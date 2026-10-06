@@ -482,6 +482,17 @@ Deno.serve(async (req: Request) => {
           return json({ ok: true })
         }
 
+        if (operation === 'deleteDrafts') {
+          const { data, error } = await supabase
+            .from('dynamics')
+            .delete()
+            .eq('event_id', event.id)
+            .eq('status', 'draft')
+            .select('id')
+          if (error) throw error
+          return json({ ok: true, deleted: data?.length ?? 0 })
+        }
+
         if (operation === 'complete') {
           if (typeof body?.id !== 'string' || !body.id)
             return json({ error: 'Dinámica no válida.' }, 400)
