@@ -181,7 +181,7 @@
 .v2-index {
   font-size: 12px;
   letter-spacing: 0.12em;
-  color: var(--neo-accent-dark);
+  color: var(--neo-accent-text);
   font-weight: 700;
   padding-top: 10px;
 }
@@ -197,7 +197,7 @@
 }
 .v2-story-copy h2 em {
   font-style: normal;
-  color: var(--neo-accent-dark);
+  color: var(--neo-accent-text);
 }
 .v2-story-aside {
   align-self: end;
@@ -468,7 +468,7 @@
   font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--neo-accent-dark);
+  color: var(--neo-accent-text);
   font-weight: 700;
 }
 .v2-final-main h2 {
