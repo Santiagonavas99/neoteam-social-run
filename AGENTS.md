@@ -23,6 +23,10 @@ Trivial fixes (typo, one-line copy change) may skip the spec, never the OK.
 
 | Path | Content |
 |------|---------|
+| `app/` | Routes only: pages, layouts, API `route.ts`, global CSS |
+| `features/<context>/` | Domain code by bounded context (`event`, `registration`, `home`, `admin/<screen>`); pure logic in `.ts` with tests, views in `.tsx`. Imports `components/`, `lib/`, `features/event/`, never another feature or `app/` |
+| `components/` | UI shared by several features |
+| `lib/` | Infrastructure: Supabase clients, admin proxy |
 | `DESIGN.md` | Design system: tokens, typography, components, standing rules |
 | `design/` | Design studies: mockups, HTML explorations, references, screenshots |
 | `docs/superpowers/specs/` | Specs (`…-design.md`) |

@@ -1,6 +1,6 @@
 import Image from 'next/image'
-import type { CommunityLogo } from '@/lib/home-features'
-import { HorizontalCarousel } from './horizontal-carousel'
+import { HorizontalCarousel } from '@/components/horizontal-carousel'
+import type { CommunityLogo } from '@/features/home/data'
 
 function externalUrl(value?: string | null) {
   if (!value?.trim()) return undefined

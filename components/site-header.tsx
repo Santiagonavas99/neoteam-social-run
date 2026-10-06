@@ -1,12 +1,10 @@
 import Link from 'next/link'
+import { BrandLink } from './brand-link'
 
 export function SiteHeader() {
   return (
     <header className="site-header">
-      <Link href="/" className="brand" aria-label="Social Run NeoTeam">
-        <span className="brand-mark">N</span>
-        <span>NEOTEAM</span>
-      </Link>
+      <BrandLink label="Social Run NeoTeam" />
       <nav aria-label="Navegación principal">
         <a href="/#evento">Evento</a>
         <a href="/#agenda">Agenda</a>

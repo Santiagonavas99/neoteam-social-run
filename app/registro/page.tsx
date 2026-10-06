@@ -1,7 +1,7 @@
 import { ArrowLeft, CalendarDays, MapPin, Users } from 'lucide-react'
 import Link from 'next/link'
-import { eventConfig } from '@/lib/event'
-import { RegistrationForm } from './registration-form'
+import { eventConfig } from '@/features/event/event'
+import { RegistrationForm } from '@/features/registration/registration-form'
 
 export default function RegistrationPage() {
   return (

@@ -568,28 +568,6 @@
   max-width: 650px;
   color: var(--neo-accent-dark);
 }
-.home-editor {
-  display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) 112px;
-  gap: 24px;
-  padding: 24px 0;
-  border-top: 1px solid var(--neo-border);
-}
-.editor-number {
-  font-size: 27px;
-  letter-spacing: -0.06em;
-  color: var(--neo-accent-dark);
-  padding-top: 23px;
-}
-.home-editor-fields {
-  display: grid;
-  gap: 16px;
-}
-.home-editor-options {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
 .security-card {
   max-width: 480px;
 }
@@ -884,19 +862,6 @@
   }
   .admin-surface > .section-toolbar {
     align-items: start;
-  }
-  .home-editor {
-    grid-template-columns: 28px minmax(0, 1fr);
-    gap: 12px;
-  }
-  .home-editor-options {
-    grid-column: 2;
-    display: grid;
-    grid-template-columns: 90px 1fr;
-    align-items: end;
-  }
-  .editor-number {
-    font-size: 23px;
   }
   .confirmation-panel {
     padding: 20px;

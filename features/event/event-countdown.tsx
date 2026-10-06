@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { countdown } from '@/lib/countdown'
+import { countdown } from './countdown'
 
 const units = [
   ['days', 'Días'],

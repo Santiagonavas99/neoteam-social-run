@@ -28,22 +28,24 @@ pnpm test:db                  # SQL tests in the compose `db` service (supabase/
 
 ## Architecture
 
+**Layout (DDD-lite, by bounded context):** `app/` holds routes only (pages, layouts, `route.ts`, CSS). Domain code lives in `features/<context>/`: `event` (shared kernel: date, agenda, countdown), `registration`, `home`, `admin` (one folder per admin screen plus `ui/` building blocks, `api.ts` client, `sections.ts` navigation config, `types.ts` entities). `components/` is UI shared across features; `lib/` is infrastructure (Supabase clients, admin proxy). Features import from `components/`, `lib/` and `features/event/`, never from each other or from `app/`. Pure logic sits in its own `.ts` file with a `.test.ts` next to it.
+
 **The browser never talks to Supabase tables directly.** RLS is on for every table; access goes through three narrow paths:
 
-1. **Registration** — `app/registro/actions.ts` is a server action that validates with Zod, then calls the Postgres RPC `register_social_run_participant` (the only public write path; returns the `SR26-xxxxx` code). Duplicate detection relies on the RPC's Spanish error message `"Ya existe una inscripción"`.
-2. **Admin** — `app/admin/*` (client components) → `POST /api/admin` (Next route, Node runtime) → Supabase Edge Function `supabase/functions/admin-pin`. All admin operations are a single JSON body dispatched on an `action` field (`status`, `setup`, `login`, `validate`, `logout`, `changePin`, `listCards`, `saveCards`, `uploadAdminImage`, `dynamicData`, …). The edge function uses the service-role key; the Next proxy only ever forwards the publishable key.
-3. **Logo carousel admin** — same pattern: `app/admin/logo-carousel-admin.tsx` → `POST /api/admin/logos` → `supabase/functions/admin-logos`.
+1. **Registration** — `features/registration/actions.ts` is a server action that validates with Zod, then calls the Postgres RPC `register_social_run_participant` (the only public write path; returns the `SR26-xxxxx` code). Duplicate detection relies on the RPC's Spanish error message `"Ya existe una inscripción"`.
+2. **Admin** — `features/admin/*` (client components, mounted by `app/admin/page.tsx`) → `POST /api/admin` (Next route, Node runtime) → Supabase Edge Function `supabase/functions/admin-pin`. All admin operations are a single JSON body dispatched on an `action` field (`status`, `setup`, `login`, `validate`, `logout`, `changePin`, `listCards`, `saveCards`, `uploadAdminImage`, `dynamicData`, …). The edge function uses the service-role key; the Next proxy only ever forwards the publishable key.
+3. **Logo carousel admin** — same pattern: `features/admin/logos/` → `POST /api/admin/logos` → `supabase/functions/admin-logos`.
 
-Proxy details worth preserving when editing `app/api/admin/route.ts`:
-- Large requests (image uploads) are gzip-compressed client-side (`CompressionStream` in `admin-dashboard.tsx`) and gunzipped in the route to stay under Vercel's body limit; the edge function still receives plain JSON.
+Both API routes are thin wrappers around `proxyToEdgeFunction` in `lib/admin-proxy.ts`. Details worth preserving when editing it:
+- Large requests (image uploads) are gzip-compressed client-side (`CompressionStream` in `features/admin/api.ts`) and gunzipped in the route to stay under Vercel's body limit; the edge function still receives plain JSON.
 - `x-forwarded-for` is forwarded only when `VERCEL === "1"` (used for PIN rate limiting upstream).
 - Upstream 5xx/errors are replaced with a generic Spanish message; never leak upstream details.
 
 **Admin auth**: first access uses `ADMIN_SETUP_SECRET` (Supabase Edge Function secret only, never a Vercel/`NEXT_PUBLIC_*` var) to set a 6-digit PIN stored hashed in Supabase. Login returns a session token kept in `localStorage`; the edge function stores only its SHA-256 hash in `admin_pin_sessions`. Changing the PIN revokes other sessions.
 
-**Home page** (`app/page.tsx`, `force-dynamic`) reads feature cards, logo carousel items and community data via `lib/home-features.ts` using the server Supabase client; each loader falls back to hardcoded defaults on error so the landing never breaks. Static event copy/agenda lives in `lib/event.ts`.
+**Home page** (`app/page.tsx`, `force-dynamic`) renders one component per section (`features/home/sections/`) and reads logo carousel items and community data via `features/home/data.ts` using the server Supabase client; each loader falls back to hardcoded defaults on error so the landing never breaks. Static event copy, agenda and start/end times live in `features/event/event.ts`.
 
-**Styling**: plain global CSS layered in `app/layout.tsx` — `globals.css` → `neo-overrides.css` → `logo-marquee.css` → `home-v2.css` (later files override earlier ones). No Tailwind/CSS modules.
+**Styling**: plain global CSS layered in `app/layout.tsx` — `globals.css` → `neo-overrides.css` → `logo-marquee.css` → `home-v2.css` (later files override earlier ones), plus Tailwind 4 utilities (`app/tailwind.css`, no preflight; legacy unlayered CSS wins conflicts). New UI uses Tailwind on the `--neo-*` tokens; see `DESIGN.md`.
 
 ## Supabase
 

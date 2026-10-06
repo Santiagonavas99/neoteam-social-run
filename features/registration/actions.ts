@@ -1,7 +1,7 @@
 'use server'
 
-import { registrationSchema } from '@/lib/registration-schema'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { registrationSchema } from './schema'
 
 export type RegistrationState = {
   ok: boolean
