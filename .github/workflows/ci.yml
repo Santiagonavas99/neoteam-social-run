@@ -1,28 +1,46 @@
 name: CI
 
+# Validates pull requests into main that are ready for review (drafts skip).
+# main itself only receives merged, already validated pull requests. A new push
+# to the same pull request cancels the run still going for the previous one.
 on:
   pull_request:
-  push:
-    branches:
-      - main
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
-  validate:
+  app:
+    if: ${{ !github.event.pull_request.draft }}
+    name: Lint + Typecheck + Tests + Build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v5
+
+      - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version-file: .nvmrc
+          cache: pnpm
 
-      - name: Install dependencies
-        run: npm install
+      - run: pnpm install --frozen-lockfile
 
-      - name: Typecheck
-        run: npm run typecheck
+      - run: pnpm ci:check
 
-      - name: Build
-        run: npm run build
+  db:
+    if: ${{ !github.event.pull_request.draft }}
+    name: SQL tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Run supabase/tests against supabase/postgres
+        run: bash scripts/test-db.sh
+
+      - name: Stop database
+        if: always()
+        run: docker compose down -v

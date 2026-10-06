@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **CI on pull requests**: `pnpm ci:check` (lint, typecheck, tests, build) and the SQL tests run on every ready pull request into `main`.
+- Tests for the registration form rules and the admin proxy body parsing (including oversized gzip bodies).
+
+### Fixed
+
+- Every admin button declares its type, so actions never submit a form by accident.
+- The home carousels no longer re-subscribe their observers on every render.
+- Carousel and admin markup use correct semantics for assistive technologies.
+
 ## [0.1.0] - 2026-10-05
 
 ### Added
