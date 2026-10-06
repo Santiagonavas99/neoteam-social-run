@@ -23,11 +23,13 @@
   --space-24: 96px;
   --radius-control: 8px;
   --radius-card: 12px;
+  --neo-brand-cyan: #007a78;
 }
 
 /* Inert until a surface sets data-theme (admin theme switch, plan Task 4b).
    --neo-black and --neo-white stay absolute: the hero is black in both themes. */
 [data-theme="dark"] {
+  --neo-brand-cyan: #02f2f8;
   color-scheme: dark;
   --neo-text: #f2f5f4;
   --neo-accent-dark: #8fc0b8;
@@ -174,22 +176,11 @@ fieldset {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.05em;
-  white-space: nowrap;
+  min-height: 44px;
 }
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  background: var(--neo-accent);
-  color: var(--neo-black);
-  font-style: italic;
-  font-weight: 900;
-  border-radius: 4px;
+.site-header,
+.admin-sidebar {
+  --neo-brand-cyan: #02f2f8;
 }
 .button {
   min-height: 48px;
@@ -1051,14 +1042,6 @@ fieldset {
   .registration-header {
     height: 72px;
     gap: 12px;
-  }
-  .brand {
-    font-size: 16px;
-    gap: 8px;
-  }
-  .brand-mark {
-    width: 30px;
-    height: 30px;
   }
   .site-header .button {
     min-height: 44px;

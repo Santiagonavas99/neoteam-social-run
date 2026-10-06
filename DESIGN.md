@@ -18,7 +18,8 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 5. **Text ≥ 12 px** on any new UI (16 px for inputs, which avoids iOS zoom on focus).
 6. **Icons** come from `lucide-react` only: no Unicode glyphs (`← → ↗ ✓`), no inline SVG. One icon, one meaning, everywhere (table below). Decorative icons get `aria-hidden`; icon-only buttons have an `aria-label` and a 44 px target. Sizes: `size-4` inline with text, `size-5` in navigation and metric cards, `size-8` in empty states. Icons replace numbering that encodes nothing (admin nav, metrics, empty states); real sequences keep their numbers (form steps, agenda, home section index). Status never relies on color alone. Spinners use `motion-safe:animate-spin`.
 7. **Copy** is Spanish, sentence case, and says what happens ("Guardar cambios", not "Enviar"). Errors say what failed and how to fix it.
-8. **New home styles go in `app/home-v2.css`**; new admin styles go next to the component that uses them. No new global stylesheet.
+8. **Logo** is `NeoTeamLogo` (`components/neoteam-logo.tsx`), usually through `BrandLink`: letters in `currentColor`, accent in `--neo-brand-cyan`, so it reads on light and dark surfaces. Never an `<img>` of the white file in `design/brand/`. Favicon: `app/icon.svg`.
+9. **New home styles go in `app/home-v2.css`**; new admin styles go next to the component that uses them. No new global stylesheet.
 
 ### Icon vocabulary
 
@@ -50,7 +51,8 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 | `--neo-black` | `#050505` | Always-dark surfaces (hero), text on accent. Same in both themes |
 | `--neo-white` | `#fff` | Text on always-dark surfaces. Same in both themes |
 | `--neo-text` | `#050505` | Primary text on `--neo-bg` / `--neo-surface` (follows the theme) |
-| `--neo-accent` | `#6fa39c` | Brand accent (NeoTeam logo green) |
+| `--neo-accent` | `#6fa39c` | Site accent green (buttons, highlights) |
+| `--neo-brand-cyan` | `#007a78` light / `#02f2f8` dark | Logo accent only. Dark value on `.site-header`, `.admin-sidebar` and the dark theme |
 | `--neo-accent-dark` | `#263f3c` | Accent text and pressed states |
 | `--neo-bg` | `#f4f6f5` | Page background |
 | `--neo-surface` | `#fff` | Cards, panels |
