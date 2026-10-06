@@ -1,104 +1,103 @@
-# Apple and Google Wallet passes — spec
+# Google Wallet pass — spec
 
-Date: 2026-10-05 · Branch: `feat/wallet-passes` (from `main` after `feat/qr-checkin` is **in production**) · Status: **awaiting OK**
+Date: 2026-10-05 · Branch: `feat/wallet-google` (from `main` v0.6.0) · Status: **awaiting OK**
 
-Source: the Wallet commits on Santiago's `feat/qr-wallet-checkin`: `19fb16c` through `9f26e55`, then `aa2e59b` through `d61bac2`.
+Source: the Google Wallet commits on Santiago's `feat/qr-wallet-checkin` (`aa2e59b` through `74446cf`). Santiago tested that flow with a validated issuer and class.
+
+**Revised 2026-10-05 (Iván):** Google only. Apple Wallet and Santiago's iPhone web pass (PWA, service worker) are out of scope.
 
 ## Problem
 
-After spec 2, the pass is a QR on screen that the runner screenshots. A Wallet pass is better: it shows up on the lock screen near the event, and it does not get lost in the camera roll.
+Today the pass is a QR on screen that the runner screenshots. A Google Wallet pass is better on Android:
+- it does not get lost in the camera roll;
+- it shows up near the event date.
 
-Santiago's version is not ready to merge:
-- **It is unfinished.** The last four commits add diagnostics for a Google Wallet error that was still open: "use existing event class", "create object via REST", then two "diagnostics" commits.
-- **A public diagnostic mode.** `GET /api/wallet/google?diagnose=1` reports the issuer and class state from Google to anyone who asks. It goes away.
-- **Unsecured endpoints.**
-  - The Wallet routes call `registration-pass` and `apple-wallet-pass` with only the publishable key. Spec 2 puts `registration-pass` behind the proxy secret, and `apple-wallet-pass` needs the same.
-  - `/api/wallet/status` makes an Edge call on every success card, only to decide whether to show two buttons.
-- **External accounts nobody has confirmed yet:**
-  - **Apple:** an Apple Developer membership (USD 99 a year), a Pass Type ID, its certificate and key, and the WWDR certificate.
-  - **Google:** a Google Wallet issuer account approved for publishing, plus a service account.
-
-  Without them the buttons never appear, and all of this code is dead weight.
-
-## Go / no-go (Iván, before any code)
-
-This plan starts only if **by 12 Oct** both of these are true:
-1. **Apple** (if wanted): the membership is active and the Pass Type certificate is exported.
-2. **Google** (if wanted): the issuer account is approved for publishing (not demo mode), and the service account is added as a user of the issuer.
-
-Each provider is independent: one can ship without the other. If neither is ready by 12 Oct, this waits until after the event or is dropped. The QR screenshot from spec 2 covers the event.
+Santiago's branch works, but it cannot be merged as it is:
+- **It is built on the old structure** (`app/registro`, `lib/wallet`), from before the feature folders and plan 2.
+- **It leaks Google's errors.** The route returns Google's error text (up to 1000 characters) to the browser.
+- **It calls `registration-pass` with only the publishable key.** Since plan 2, that function requires the proxy secret, so his call fails on `main`.
+- **`/api/wallet/status`** costs an extra request per pass shown, only to decide whether to show a button.
 
 ## Decisions
 
-1. **One lookup by token, behind the proxy secret.**
-   - The `pass` action comes back to `registration-pass`: lookup by `checkin_token`, which returns the code, the name and the status.
-   - It is called only from Next through `callEdgeFunction` (spec 2).
-2. **Google Wallet: a "fat JWT", signed in a Next route.**
-   - `GET /api/wallet/google?token=…` looks up the pass and builds the `eventTicketObject` inline in the save JWT.
-   - It signs the JWT with RS256 using `node:crypto`, with no dependency, and redirects to `https://pay.google.com/gp/v/save/<jwt>`.
-   - Google creates the object when the runner saves it.
-   - The event class is created **once**, by hand in the Google Pay & Wallet Console, by Iván. Its ID goes into `GOOGLE_WALLET_CLASS_ID`.
-   - **Rejected:** Santiago's flow. It gets an OAuth access token, reads the object, creates it with REST, then signs a JWT that only references it: three calls to Google per tap, and it is where his errors came from. Inline objects are the documented path for "Add to Google Wallet" links.
-   - **Vercel env (server only, never `NEXT_PUBLIC_*`):**
-     - `GOOGLE_WALLET_ISSUER_ID`;
-     - `GOOGLE_WALLET_CLASS_ID`;
-     - `GOOGLE_WALLET_SERVICE_ACCOUNT_EMAIL`;
-     - `GOOGLE_WALLET_PRIVATE_KEY_BASE64`.
-3. **Apple Wallet: signed in the `apple-wallet-pass` Edge Function**, as Santiago did.
-   - It uses `npm:passkit-generator` inside Deno, so there is no new dependency in `package.json`.
-   - The certificates live only in Supabase secrets.
-   - **Added:**
-     - the proxy-secret check;
-     - the token lookup lives in `supabase/functions/_shared/pass-lookup.ts`, used by both `registration-pass` and `apple-wallet-pass`, so it is written once.
-   - `GET /api/wallet/apple?token=…` proxies the `.pkpass` with `Content-Type: application/vnd.apple.pkpass`.
-4. **The server decides which buttons to show; there is no status endpoint.**
-   - The success card and `/pase` get a `wallets` flag from the server action:
-     - `google` is true when its four env vars are set;
-     - `apple` is true when `APPLE_WALLET_ENABLED=1` is set in Vercel. Iván sets it after testing a pass.
-   - No extra request per page view.
-5. **Buttons:**
-   - the official "Add to Apple Wallet" and "Add to Google Wallet" badges, in Spanish ("Añadir a Apple Wallet", "Añadir a Google Wallet");
-   - placed under the QR;
-   - Apple's shown only on iOS and macOS Safari, Google's on the other devices (user-agent check on the server, both shown when unknown). Each brand requires its own badge artwork, kept in `public/wallet/`, the only exception to `DESIGN.md` rule 6 (no inline SVG): brand marks are not icons.
+1. **Keep Santiago's Google flow, because it is the one that was validated.** On each tap:
+   - get an OAuth token for the service account;
+   - read the `eventTicketObject`, and create it with REST if it does not exist (409 counts as success);
+   - sign a short save JWT that only references the object;
+   - redirect to `https://pay.google.com/gp/v/save/<jwt>`.
 
-   This needs approval to create a `public/` folder, which is a new top-level folder.
-6. **Pass content, in both providers:**
-   - "Social Run NeoTeam";
-   - the date, 18 Oct 2026, 7:30 a. m.;
-   - "Parque del Ingenio";
+   **Change from his version:** the OAuth token is cached in memory until a minute before it expires, so repeated taps skip one call.
+
+   **Rejected:** the "fat JWT" with the object inline (the old spec). It is one call fewer, but nobody has tested it with this issuer, and save links longer than about 1800 characters can fail in some browsers.
+
+2. **Lookup by token, behind the proxy secret.**
+   - The `pass` action comes back to `registration-pass`: it checks the UUID, then looks up by `checkin_token` within event `SR26`.
+   - Missing and cancelled both answer 404, so the endpoint gives no hint about which tokens exist.
+   - Next calls it through `callEdgeFunction`, like `claim`.
+
+3. **The server decides whether to show the button.** `Pass` gains `googleWalletUrl?: string`. It is set when:
+   - the three env vars are present;
+   - the user agent is not iPhone or iPad (Google Wallet does not work on iOS).
+
+   There is no status endpoint.
+
+4. **The button** sits under the QR:
+   - a 48 px link at full width at 390 px, with the `Wallet` icon and the label "Añadir a Google Wallet";
+   - the screenshot hint stays, for iPhone and as a fallback.
+
+   It is a plain button like Santiago's, not the official badge artwork, so there is no `public/` folder. If Google's publishing review asks for the official badge, we add it then.
+
+5. **Pass content,** from Santiago's tested object:
    - the runner's name;
    - the code;
    - the QR `NEOTEAM-SR26:<token>`;
-   - black background, logo, and accent `#02F2F8`.
+   - "5K · Parque del Ingenio y sus alrededores";
+   - "18 OCT 2026 · 7:30 a. m.";
+   - background `#050505`.
 
-   The relevant date (Apple `relevantDate`, Google `dateTime.start`) makes it appear on the lock screen the morning of the race.
+   The event name, logo and date live in the class, which Santiago already created in the console.
+
+6. **Vercel env, server only (never `NEXT_PUBLIC_*`):**
+   - `GOOGLE_WALLET_ISSUER_ID`;
+   - `GOOGLE_WALLET_SERVICE_ACCOUNT_EMAIL`;
+   - `GOOGLE_WALLET_PRIVATE_KEY_BASE64`;
+   - `GOOGLE_WALLET_CLASS_SUFFIX` (default `neoteam_social_run_2026`).
+
+   Santiago's `GOOGLE_WALLET_ORIGIN` is dropped: the JWT sends `origins: []`, so it is never used.
 
 **Dropped from Santiago's branch:**
-- the `diagnose` mode;
+- Apple Wallet and the `apple-wallet-pass` function;
+- the iPhone PWA (`manifest.ts`, `sw.js`);
 - `/api/wallet/status`;
-- the REST object creation;
-- `lib/wallet/pass-data.ts`, replaced by `callEdgeFunction`.
+- `lib/wallet/pass-data.ts`;
+- the Google error details in responses.
 
 ## Security
 
-- **The token in the Wallet URLs** is the same secret as the QR.
-  - It is sent over HTTPS only.
-  - The routes set `Cache-Control: no-store` and log no query string.
-  - Vercel request logs do show the URL. That is accepted, because the token only allows check-in by staff.
-- **Private keys** are Vercel server env (Google) and Supabase secrets (Apple). They are never in the repo, never `NEXT_PUBLIC_*`, never in chat.
-- **Errors** are generic Spanish messages. Google's or Apple's error details are logged on the server only.
+- **The token in the link** (`/api/wallet/google?token=…`) is the same secret as the QR, and that QR is already on the runner's screen.
+  - The route answers with `Cache-Control: no-store` and logs no query string.
+  - Vercel's request log does keep the URL. That is accepted, because the token only allows check-in by staff.
+- **The private key** is a Vercel server env var; it never goes in the repo, a `NEXT_PUBLIC_*` variable or chat.
+- **Errors:**
+  - the server logs the failing stage and HTTP status, never Google's response body;
+  - the runner sees a generic Spanish page: "No pudimos añadir el pase a Google Wallet. Usa la captura de tu QR o inténtalo más tarde."
+
+## Go / no-go (Iván, before deploying)
+
+1. **Is the issuer in publishing mode?** In demo mode, only accounts added as testers can save the pass.
+2. **The four env vars are set in Vercel** for Preview and Production.
+3. **On a real Android phone:**
+   - the pass gets added;
+   - its QR scans in the check-in section.
 
 ## Mobile
 
-- **Buttons:** both are 48 px tall, at full width at 390 px.
-- **Testing on real phones, before turning a provider on:**
-  - Apple: an iPhone with Safari opens the `.pkpass` and adds it;
-  - Google: an Android with Chrome opens the save page and adds it.
-- **Lock screen:** on the morning of 18 Oct, the pass appears there (Apple: `relevantDate` plus location; Google: the event date).
-- **Cost:** no client JavaScript; the buttons are plain links.
+- **Button:** 48 px tall, full width at 390 px.
+- **Cost:** no client JavaScript; the button is a plain link, and the extra work happens on the server only when it is tapped.
+- **iPhone:** the button does not appear, and the screenshot hint stays.
 
 ## Out of scope
 
-- Updating passes after issue (push updates, the Apple web service).
-- Passes for check-in status.
+- Apple Wallet and the iPhone web pass.
+- Updating a pass after it is saved (for example, to show check-in).
 - Email delivery.
