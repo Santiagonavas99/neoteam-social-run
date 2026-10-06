@@ -79,7 +79,8 @@ A task is done when `pnpm ci:check` passes. Say so with the output; if something
 
 - `CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and SemVer.
 - Every PR adds its user-visible changes under `## [Unreleased]`, in the right group (`Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`), written for the reader of a release note.
-- Never bump `package.json` `version`, create a version section or tag a release unless Iván asks. Releases and tags will be automated from `CHANGELOG.md` when 1.0.0 is cut.
+- Never bump `package.json` `version`, create a version section or tag a release unless Iván asks.
+- Cutting a release (only when Iván asks): in one PR, set `package.json` `version` to `x.y.z` and rename `## [Unreleased]` to `## [x.y.z] - YYYY-MM-DD`, adding an empty `## [Unreleased]` above it. When the PR merges into `main`, `.github/workflows/release.yml` tags `vx.y.z` and publishes a GitHub release with that section as notes. With no matching section, the workflow does nothing.
 
 ## Git
 
