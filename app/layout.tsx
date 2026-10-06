@@ -4,6 +4,7 @@ import './tailwind.css'
 import './globals.css'
 import './logo-marquee.css'
 import './home-v2.css'
+import { themeScript } from '@/lib/theme'
 
 const hostGrotesk = Host_Grotesk({
   subsets: ['latin'],
@@ -19,7 +20,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={hostGrotesk.variable} data-scroll-behavior="smooth">
+    <html
+      lang="es"
+      className={hostGrotesk.variable}
+      data-scroll-behavior="smooth"
+      data-theme="light"
+      suppressHydrationWarning
+    >
+      <head>
+        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: static script built from a constant, no user input */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>{children}</body>
     </html>
   )

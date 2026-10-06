@@ -1,49 +1,13 @@
 'use client'
 
 import { Monitor, Moon, Sun } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { parseThemeChoice, resolveTheme, THEME_KEY, type ThemeChoice } from '@/lib/theme'
+import type { ThemeChoice } from '@/lib/theme'
 
 const options = [
   { id: 'light', label: 'Claro', icon: Sun },
   { id: 'dark', label: 'Oscuro', icon: Moon },
   { id: 'system', label: 'Sistema', icon: Monitor },
 ] as const
-
-function readChoice(): ThemeChoice {
-  try {
-    return parseThemeChoice(localStorage.getItem(THEME_KEY))
-  } catch {
-    return 'system'
-  }
-}
-
-// One owner for the choice, so the sidebar and the phone sheet never disagree.
-export function useThemeChoice() {
-  const [choice, setChoice] = useState<ThemeChoice>('system')
-
-  useEffect(() => setChoice(readChoice()), [])
-
-  useEffect(() => {
-    const root = document.getElementById('admin-theme')
-    const media = matchMedia('(prefers-color-scheme: dark)')
-    const apply = () => root?.setAttribute('data-theme', resolveTheme(choice, media.matches))
-    apply()
-    if (choice !== 'system') return
-    media.addEventListener('change', apply)
-    return () => media.removeEventListener('change', apply)
-  }, [choice])
-
-  function select(next: ThemeChoice) {
-    setChoice(next)
-    try {
-      if (next === 'system') localStorage.removeItem(THEME_KEY)
-      else localStorage.setItem(THEME_KEY, next)
-    } catch {}
-  }
-
-  return [choice, select] as const
-}
 
 export function ThemeSwitch({
   tone,

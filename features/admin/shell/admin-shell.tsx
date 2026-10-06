@@ -4,6 +4,7 @@ import { ArrowUpRight, Ellipsis, LogOut, X } from 'lucide-react'
 import Link from 'next/link'
 import { type ReactNode, useRef } from 'react'
 import { BrandLink } from '@/components/brand-link'
+import { useThemeChoice } from '@/components/use-theme-choice'
 import {
   type AdminSection,
   type AdminSectionInfo,
@@ -11,7 +12,7 @@ import {
   sectionGroups,
   sectionInfo,
 } from '../sections'
-import { ThemeSwitch, useThemeChoice } from './theme-switch'
+import { ThemeSwitch } from './theme-switch'
 
 const primarySections = adminSections.filter((item) => item.primary)
 const moreSections = adminSections.filter((item) => !item.primary)
