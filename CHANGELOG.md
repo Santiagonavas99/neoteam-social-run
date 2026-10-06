@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **CI on pull requests**: `pnpm ci:check` (lint, typecheck, tests, build) and the SQL tests run on every ready pull request into `main`.
+- **`DESIGN.md`** with tokens, mobile-first standing rules and the measured design debt, plus `design/` for studies and baseline screenshots.
 - Tests for the registration form rules and the admin proxy body parsing (including oversized gzip bodies).
 
 ### Fixed
