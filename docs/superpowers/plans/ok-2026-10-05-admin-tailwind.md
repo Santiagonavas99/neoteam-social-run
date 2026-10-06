@@ -6,7 +6,7 @@
 
 Tasks 4, 4b and 5 of [`ok-2026-10-05-tailwind-and-icons.md`](ok-2026-10-05-tailwind-and-icons.md).
 
-**Branch:** `refactor/admin-tailwind` (rebased on `main` v0.7.0) · **Status:** awaiting OK.
+**Branch:** `refactor/admin-tailwind` (rebased on `main` v0.7.0) · **Status:** approved (Iván, 2026-10-05).
 
 ## Freeze and order
 
