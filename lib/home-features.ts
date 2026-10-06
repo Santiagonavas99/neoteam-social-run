@@ -1,109 +1,129 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export type HomeFeatureCard = {
-  id?: string;
-  event_code: string;
-  slot: string;
-  title: string;
-  description: string;
-  enabled: boolean;
-  sort_order: number;
-};
+  id?: string
+  event_code: string
+  slot: string
+  title: string
+  description: string
+  enabled: boolean
+  sort_order: number
+}
 
 export const defaultHomeFeatureCards: HomeFeatureCard[] = [
   {
-    event_code: "SR26",
-    slot: "social_run",
-    title: "Social Run",
-    description: "Una salida pensada para compartir kilómetros, no para perseguir cronómetro.",
+    event_code: 'SR26',
+    slot: 'social_run',
+    title: 'Social Run',
+    description: 'Una salida pensada para compartir kilómetros, no para perseguir cronómetro.',
     enabled: true,
     sort_order: 1,
   },
   {
-    event_code: "SR26",
-    slot: "crews",
-    title: "Crews invitados",
-    description: "Grupos de running invitados para juntar comunidades en una misma mañana.",
+    event_code: 'SR26',
+    slot: 'crews',
+    title: 'Crews invitados',
+    description: 'Grupos de running invitados para juntar comunidades en una misma mañana.',
     enabled: true,
     sort_order: 2,
   },
   {
-    event_code: "SR26",
-    slot: "brands",
-    title: "Marcas",
-    description: "Aliados con experiencias, producto y activaciones para los asistentes.",
+    event_code: 'SR26',
+    slot: 'brands',
+    title: 'Marcas',
+    description: 'Aliados con experiencias, producto y activaciones para los asistentes.',
     enabled: true,
     sort_order: 3,
   },
   {
-    event_code: "SR26",
-    slot: "raffles",
-    title: "Rifas",
-    description: "Inscripciones a carreras y premios entre quienes hagan parte del encuentro.",
+    event_code: 'SR26',
+    slot: 'raffles',
+    title: 'Rifas',
+    description: 'Inscripciones a carreras y premios entre quienes hagan parte del encuentro.',
     enabled: true,
     sort_order: 4,
   },
-];
+]
 
 export async function getHomeFeatureCards(): Promise<HomeFeatureCard[]> {
   try {
-    const supabase = createServerSupabaseClient();
+    const supabase = createServerSupabaseClient()
     const { data, error } = await supabase
-      .from("home_feature_cards")
-      .select("id,event_code,slot,title,description,enabled,sort_order")
-      .eq("event_code", "SR26")
-      .eq("enabled", true)
-      .order("sort_order", { ascending: true });
+      .from('home_feature_cards')
+      .select('id,event_code,slot,title,description,enabled,sort_order')
+      .eq('event_code', 'SR26')
+      .eq('enabled', true)
+      .order('sort_order', { ascending: true })
 
-    if (error) throw error;
-    return (data ?? []) as HomeFeatureCard[];
+    if (error) throw error
+    return (data ?? []) as HomeFeatureCard[]
   } catch (error) {
-    console.error("Home feature cards fallback", error);
-    return defaultHomeFeatureCards;
+    console.error('Home feature cards fallback', error)
+    return defaultHomeFeatureCards
   }
 }
 
 export type HomeLogoCarouselItem = {
-  id: string;
-  name: string;
-  logo_url: string;
-  link_url: string | null;
-  sort_order: number;
-};
+  id: string
+  name: string
+  logo_url: string
+  link_url: string | null
+  sort_order: number
+}
 
 export async function getHomeLogoCarouselItems(): Promise<HomeLogoCarouselItem[]> {
   try {
-    const supabase = createServerSupabaseClient();
+    const supabase = createServerSupabaseClient()
     const { data, error } = await supabase
-      .from("home_logo_carousel_items")
-      .select("id,name,logo_url,link_url,sort_order")
-      .eq("event_code", "SR26")
-      .eq("active", true)
-      .order("sort_order", { ascending: true })
-      .order("created_at", { ascending: true });
+      .from('home_logo_carousel_items')
+      .select('id,name,logo_url,link_url,sort_order')
+      .eq('event_code', 'SR26')
+      .eq('active', true)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true })
 
-    if (error) throw error;
-    return (data ?? []) as HomeLogoCarouselItem[];
+    if (error) throw error
+    return (data ?? []) as HomeLogoCarouselItem[]
   } catch (error) {
-    console.error("Home logo carousel fallback", error);
-    return [];
+    console.error('Home logo carousel fallback', error)
+    return []
   }
 }
 
-export type CommunityLogo = { id: string; name: string; logo_url: string | null; type?: string; instagram?: string | null; website?: string | null };
+export type CommunityLogo = {
+  id: string
+  name: string
+  logo_url: string | null
+  type?: string
+  instagram?: string | null
+  website?: string | null
+}
 
 export async function getHomeCommunity() {
   try {
-    const supabase = createServerSupabaseClient();
+    const supabase = createServerSupabaseClient()
     const [groups, brands] = await Promise.all([
-      supabase.from("running_groups").select("id,name,logo_url,instagram").eq("active", true).eq("show_on_home", true).order("sort_order", { ascending: true }),
-      supabase.from("brands").select("id,name,logo_url,type,instagram,website").eq("active", true).eq("show_on_home", true).order("sort_order", { ascending: true }),
-    ]);
-    if (groups.error) throw groups.error;
-    if (brands.error) throw brands.error;
-    return { groups: (groups.data ?? []) as CommunityLogo[], brands: (brands.data ?? []) as CommunityLogo[] };
+      supabase
+        .from('running_groups')
+        .select('id,name,logo_url,instagram')
+        .eq('active', true)
+        .eq('show_on_home', true)
+        .order('sort_order', { ascending: true }),
+      supabase
+        .from('brands')
+        .select('id,name,logo_url,type,instagram,website')
+        .eq('active', true)
+        .eq('show_on_home', true)
+        .order('sort_order', { ascending: true }),
+    ])
+    if (groups.error) throw groups.error
+    if (brands.error) throw brands.error
+    return {
+      groups: (groups.data ?? []) as CommunityLogo[],
+      brands: (brands.data ?? []) as CommunityLogo[],
+    }
   } catch (error) {
-    console.error("Home community fallback", error);
-    return { groups: [] as CommunityLogo[], brands: [] as CommunityLogo[] };
+    console.error('Home community fallback', error)
+    return { groups: [] as CommunityLogo[], brands: [] as CommunityLogo[] }
   }
 }
