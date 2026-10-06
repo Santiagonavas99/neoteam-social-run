@@ -56,7 +56,10 @@ export function AdminDashboard() {
   const [cards, setCards] = useState<HomeFeatureCard[]>([])
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
-  const stableCallAdminApi = useCallback(callAdminApi, [])
+  const loadCards = useCallback(async (token: string) => {
+    const data = await callAdminApi('listCards', { token })
+    setCards((data.cards ?? []) as HomeFeatureCard[])
+  }, [])
   const [section, setSection] = useState<AdminSection>('metrics')
   const [messageKind, setMessageKind] = useState<'success' | 'error'>('error')
 
@@ -97,12 +100,7 @@ export function AdminDashboard() {
     return () => {
       active = false
     }
-  }, [])
-
-  async function loadCards(token: string) {
-    const data = await callAdminApi('listCards', { token })
-    setCards((data.cards ?? []) as HomeFeatureCard[])
-  }
+  }, [loadCards])
 
   function rememberSession(token: string) {
     window.localStorage.setItem(ADMIN_SESSION_KEY, token)
@@ -398,7 +396,7 @@ export function AdminDashboard() {
           </div>
         </header>
         {section === 'logos' ? (
-          <LogoCarouselAdmin token={sessionToken ?? ''} callApi={stableCallAdminApi} />
+          <LogoCarouselAdmin token={sessionToken ?? ''} callApi={callAdminApi} />
         ) : section === 'home' ? (
           <section className="admin-surface">
             <div className="section-toolbar">
@@ -494,7 +492,7 @@ export function AdminDashboard() {
             key={section}
             section={section}
             token={sessionToken ?? ''}
-            callApi={stableCallAdminApi}
+            callApi={callAdminApi}
             navigate={navigate}
           />
         )}

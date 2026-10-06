@@ -13,6 +13,12 @@ import { brandTypes, participantStates, raffleStates } from './admin-types'
 import { Feedback, Logo, StatusBadge } from './admin-ui'
 import { RecordEditor } from './record-editor'
 
+function errorText(error: unknown) {
+  return error instanceof Error
+    ? error.message
+    : 'No pudimos completar la operación. Inténtalo de nuevo.'
+}
+
 export function AdminManagement({
   token,
   callApi,
@@ -38,11 +44,6 @@ export function AdminManagement({
     action: 'delete' | 'draw'
   } | null>(null)
   const requestId = useRef(0)
-  const errorText = (error: unknown) =>
-    error instanceof Error
-      ? error.message
-      : 'No pudimos completar la operación. Inténtalo de nuevo.'
-
   const load = useCallback(async () => {
     const id = ++requestId.current
     setLoading(true)
