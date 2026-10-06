@@ -102,7 +102,7 @@ button:active:not(:disabled),
   transform: translateY(1px);
 }
 :focus-visible {
-  outline: 3px solid var(--neo-accent);
+  outline: 3px solid var(--neo-accent-text);
   outline-offset: 4px;
 }
 img {
