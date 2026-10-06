@@ -35,22 +35,22 @@ export function Community({
           <CommunityCarousel
             items={community.groups}
             title="RUNNING CREWS"
-            description="comunidades que se suman"
+            description="Comunidades que se suman"
           />
           <CommunityCarousel
             items={organizers}
             title="ORGANIZACIÓN"
-            description="quienes hacen posible este encuentro"
+            description="Quienes hacen posible este encuentro"
           />
           <CommunityCarousel
             items={sponsors}
             title="MARCAS"
-            description="marcas que nos acompañan"
+            description="Marcas que nos acompañan"
           />
           <CommunityCarousel
             items={partners}
             title="PARTNERS / MARCAS INVITADAS"
-            description="activaciones · producto · experiencias"
+            description="Activaciones · producto · experiencias"
           />
         </div>
       </div>

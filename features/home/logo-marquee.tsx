@@ -79,7 +79,9 @@ export function LogoMarquee({ items }: { items: HomeLogoCarouselItem[] }) {
           Marcas aliadas
         </h2>
         {linked && (
-          <p className="m-0 text-[13px] text-neo-text-secondary">Toca un logo para visitarla</p>
+          <p className="m-0 text-[13px] text-neo-text-secondary">
+            Toca un logo para visitar la marca
+          </p>
         )}
       </div>
       <div className="group reveal overflow-hidden py-2 [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)] motion-reduce:overflow-x-auto">
