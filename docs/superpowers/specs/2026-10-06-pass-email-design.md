@@ -1,6 +1,6 @@
 # Pass by email and OTP to claim it — spec
 
-Date: 2026-10-06 · Branch: `feat/staff-and-email` · Status: **draft**, waiting for Iván's OK
+Date: 2026-10-06 · Branch: `feat/pass-email` · Status: **draft**, waiting for Iván's OK
 
 ## Problem
 
