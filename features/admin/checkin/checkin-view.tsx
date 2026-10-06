@@ -12,11 +12,11 @@ import { type FormEvent, useRef, useState } from 'react'
 import { formatTime } from '@/features/event/datetime'
 import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
-import type { CheckinParticipant, CheckinResult } from '../types'
+import type { CheckinResult, ScannedParticipant } from '../types'
 import { QrScanner } from '../ui/qr-scanner'
 
 type Outcome =
-  | { kind: CheckinResult; participant: CheckinParticipant }
+  | { kind: CheckinResult; participant: ScannedParticipant }
   | { kind: 'error'; message: string }
 
 const tone: Record<Outcome['kind'], { icon: LucideIcon; className: string }> = {
