@@ -208,6 +208,7 @@ export function AdminManagement({
         )}
         <div className="toolbar-actions">
           <button
+            type="button"
             className="button button-secondary"
             onClick={() => {
               setFeedback(null)
@@ -218,7 +219,12 @@ export function AdminManagement({
             {loading ? 'Cargando…' : '↻ Actualizar'}
           </button>
           {section !== 'metrics' && section !== 'participants' && (
-            <button className="button" onClick={addRecord} disabled={!!editor || !!busy}>
+            <button
+              type="button"
+              className="button"
+              onClick={addRecord}
+              disabled={!!editor || !!busy}
+            >
               + {newLabel}
             </button>
           )}
@@ -241,6 +247,7 @@ export function AdminManagement({
           </p>
           <div className="toolbar-actions">
             <button
+              type="button"
               className="button button-secondary"
               autoFocus
               onClick={() => setConfirmation(null)}
@@ -249,6 +256,7 @@ export function AdminManagement({
               Cancelar
             </button>
             <button
+              type="button"
               className={`button ${confirmation.action === 'delete' ? 'button-danger' : ''}`}
               onClick={() => void confirmAction()}
               disabled={!!busy}
@@ -313,7 +321,7 @@ export function AdminManagement({
                   ['raffles', 'Rifas', 'Premios y sorteos'],
                 ] as const
               ).map(([id, title, detail]) => (
-                <button key={id} onClick={() => navigate(id)}>
+                <button type="button" key={id} onClick={() => navigate(id)}>
                   <span>
                     <strong>{title}</strong>
                     <small>{detail}</small>
@@ -345,6 +353,7 @@ export function AdminManagement({
           </p>
           {query || status ? (
             <button
+              type="button"
               className="button button-secondary"
               onClick={() => {
                 setQuery('')
@@ -356,7 +365,7 @@ export function AdminManagement({
           ) : (
             section !== 'participants' &&
             !editor && (
-              <button className="button" onClick={addRecord}>
+              <button type="button" className="button" onClick={addRecord}>
                 {newLabel}
               </button>
             )
@@ -414,6 +423,7 @@ export function AdminManagement({
                       <div className="attendance-actions">
                         {row.status === 'registered' && (
                           <button
+                            type="button"
                             className="button button-small"
                             onClick={() => void changeAttendance(row, 'checked_in')}
                             disabled={!!busy}
@@ -434,6 +444,7 @@ export function AdminManagement({
                           ))}
                         </select>
                         <button
+                          type="button"
                           className="button button-small button-danger"
                           onClick={() => setConfirmation({ row, action: 'delete' })}
                           disabled={!!busy}
@@ -499,6 +510,7 @@ export function AdminManagement({
                 </div>
                 <div className="record-actions">
                   <button
+                    type="button"
                     className="button button-secondary"
                     aria-expanded={editor?.id === row.id}
                     onClick={() => {
@@ -511,6 +523,7 @@ export function AdminManagement({
                   </button>
                   {section === 'raffles' && row.status === 'open' && (
                     <button
+                      type="button"
                       className="button"
                       onClick={() => setConfirmation({ row, action: 'draw' })}
                       disabled={!!busy || !!editor}

@@ -322,6 +322,7 @@ export function AdminDashboard() {
                 <PinField label="3. Confirma tu PIN" value={confirmPin} onChange={setConfirmPin} />
                 <Feedback value={feedback} />
                 <button
+                  type="submit"
                   className="button full-width"
                   disabled={
                     busy ||
@@ -341,7 +342,11 @@ export function AdminDashboard() {
               <form onSubmit={login} className="stack-form">
                 <PinField label="PIN de acceso" value={pin} onChange={setPin} current autoFocus />
                 <Feedback value={feedback} />
-                <button className="button full-width" disabled={busy || pin.length !== 6}>
+                <button
+                  type="submit"
+                  className="button full-width"
+                  disabled={busy || pin.length !== 6}
+                >
                   {busy ? 'Entrando…' : 'Entrar →'}
                 </button>
               </form>
@@ -364,6 +369,7 @@ export function AdminDashboard() {
         <nav aria-label="Panel del evento">
           {navigation.map((item, index) => (
             <button
+              type="button"
               key={item.id}
               aria-current={section === item.id ? 'page' : undefined}
               onClick={() => navigate(item.id)}
@@ -373,7 +379,7 @@ export function AdminDashboard() {
             </button>
           ))}
         </nav>
-        <button className="sidebar-signout" onClick={signOut}>
+        <button type="button" className="sidebar-signout" onClick={signOut}>
           Cerrar sesión ↗
         </button>
       </aside>
@@ -400,7 +406,12 @@ export function AdminDashboard() {
                 <h2>Bloques del carrusel</h2>
                 <p className="muted">Los cambios se publican al guardar.</p>
               </div>
-              <button className="button" onClick={saveCards} disabled={busy || !cards.length}>
+              <button
+                type="button"
+                className="button"
+                onClick={saveCards}
+                disabled={busy || !cards.length}
+              >
                 {busy ? 'Guardando…' : 'Guardar cambios'}
               </button>
             </div>
@@ -465,6 +476,7 @@ export function AdminDashboard() {
               />
               <Feedback value={feedback} />
               <button
+                type="submit"
                 className="button"
                 disabled={
                   busy ||
