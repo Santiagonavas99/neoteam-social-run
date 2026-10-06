@@ -201,6 +201,17 @@ async function reserveAttempt(ip: string): Promise<number | Response> {
   return data
 }
 
+// The draw RPCs raise stable identifiers; map them to the panel's messages.
+function rpcErrorResponse(
+  error: { message?: string } | null,
+  known: Record<string, [message: string, status: number]>,
+) {
+  const key = error?.message ?? ''
+  if (!Object.hasOwn(known, key)) return null
+  const [message, status] = known[key]
+  return json({ error: message }, status)
+}
+
 async function markAttemptSuccess(attemptId: number) {
   const { error } = await supabase.rpc('admin_pin_mark_success', { p_attempt_id: attemptId })
   if (error) console.error('admin_pin_mark_success failed', { code: error.code })
@@ -579,42 +590,26 @@ Deno.serve(async (req: Request) => {
             })
           }
 
-          let participationStatus = 'completed'
+          let wonRoll = false
           if (dynamic.type === 'instant_win') {
-            const { count, error: countError } = await supabase
-              .from('dynamic_participations')
-              .select('id', { count: 'exact', head: true })
-              .eq('dynamic_id', dynamic.id)
-              .eq('status', 'winner')
-            if (countError) throw countError
-
             const rawProbability = Number(dynamic.config?.win_probability ?? 0.1)
             const probability = Number.isFinite(rawProbability)
               ? Math.max(0, Math.min(1, rawProbability))
               : 0.1
-            if ((count ?? 0) < dynamic.winner_count && randomUnit() < probability)
-              participationStatus = 'winner'
+            wonRoll = randomUnit() < probability
           }
 
-          const now = new Date().toISOString()
-          const { error: insertError } = await supabase.from('dynamic_participations').insert({
-            dynamic_id: dynamic.id,
-            registration_id: participant.id,
-            status: participationStatus,
-            points_awarded: dynamic.points,
-            source: 'staff_scan',
-            completed_at: now,
-            updated_at: now,
-          })
-          if (insertError) {
-            if ((insertError as { code?: string }).code === '23505') {
-              return json({
-                ok: true,
-                alreadyCompleted: true,
-                participant: dynamicParticipantPayload(participant),
-              })
-            }
-            throw insertError
+          const { data: participationStatus, error: recordError } = await supabase.rpc(
+            'record_dynamic_participation',
+            { p_dynamic_id: dynamic.id, p_registration_id: participant.id, p_won_roll: wonRoll },
+          )
+          if (recordError) throw recordError
+          if (participationStatus === null) {
+            return json({
+              ok: true,
+              alreadyCompleted: true,
+              participant: dynamicParticipantPayload(participant),
+            })
           }
 
           return json({
@@ -629,94 +624,38 @@ Deno.serve(async (req: Request) => {
         if (operation === 'draw') {
           if (typeof body?.id !== 'string' || !body.id)
             return json({ error: 'Dinámica no válida.' }, 400)
-          const { data: dynamic, error: dynamicError } = await supabase
-            .from('dynamics')
-            .select(
-              'id,event_id,type,status,winner_count,requires_checkin,points,eligibility_dynamic_id',
-            )
-            .eq('id', body.id)
-            .eq('event_id', event.id)
-            .single()
-          if (dynamicError) throw dynamicError
-          if (dynamic.type !== 'raffle')
-            return json({ error: 'Esta dinámica no es un sorteo.' }, 400)
-          if (dynamic.status !== 'open')
-            return json({ error: 'Activa el sorteo antes de ejecutarlo.' }, 409)
+          const { data: drawn, error: drawError } = await supabase.rpc('draw_dynamic', {
+            p_dynamic_id: body.id,
+            p_event_id: event.id,
+          })
+          const known = rpcErrorResponse(drawError, {
+            dynamic_not_found: ['Dinámica no válida.', 404],
+            dynamic_not_raffle: ['Esta dinámica no es un sorteo.', 400],
+            dynamic_not_open: ['Activa el sorteo antes de ejecutarlo.', 409],
+            no_qualifying_participants: [
+              'Nadie ha completado todavía la dinámica requerida para este sorteo.',
+              409,
+            ],
+            no_eligible_participants: ['No hay participantes elegibles para este sorteo.', 409],
+          })
+          if (known) return known
+          if (drawError) throw drawError
 
-          let eligibleIds: string[] | null = null
-          if (dynamic.eligibility_dynamic_id) {
-            const { data: qualifying, error: qualifyingError } = await supabase
-              .from('dynamic_participations')
-              .select('registration_id')
-              .eq('dynamic_id', dynamic.eligibility_dynamic_id)
-              .in('status', ['completed', 'winner'])
-            if (qualifyingError) throw qualifyingError
-            eligibleIds = [
-              ...new Set(
-                (qualifying ?? []).map((row: { registration_id: string }) => row.registration_id),
-              ),
-            ]
-            if (!eligibleIds.length)
-              return json(
-                { error: 'Nadie ha completado todavía la dinámica requerida para este sorteo.' },
-                409,
-              )
-          }
-
-          let eligibleQuery = supabase
+          const winnerIds = (drawn ?? []).map(
+            (row: { registration_id: string }) => row.registration_id,
+          )
+          const { data: winners, error: winnersError } = await supabase
             .from('registrations')
             .select(
               'id,registration_code,first_name,last_name,status,other_running_group,running_groups(name)',
             )
-            .eq('event_id', dynamic.event_id)
-            .in('status', dynamic.requires_checkin ? ['checked_in'] : ['registered', 'checked_in'])
-          if (eligibleIds) eligibleQuery = eligibleQuery.in('id', eligibleIds)
-
-          const { data: eligible, error: eligibleError } = await eligibleQuery
-          if (eligibleError) throw eligibleError
-          const shuffled = [...(eligible ?? [])]
-          for (let i = shuffled.length - 1; i > 0; i--) {
-            const random = new Uint32Array(1)
-            crypto.getRandomValues(random)
-            const j = random[0] % (i + 1)
-            ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-          }
-          shuffled.length = Math.min(shuffled.length, dynamic.winner_count)
-          if (!shuffled.length)
-            return json({ error: 'No hay participantes elegibles para este sorteo.' }, 409)
-
-          const now = new Date().toISOString()
-          const { error: clearError } = await supabase
-            .from('dynamic_participations')
-            .delete()
-            .eq('dynamic_id', dynamic.id)
-            .eq('status', 'winner')
-          if (clearError) throw clearError
-
-          const { error: winnersError } = await supabase.from('dynamic_participations').upsert(
-            shuffled.map((winner: ParticipantRow) => ({
-              dynamic_id: dynamic.id,
-              registration_id: winner.id,
-              status: 'winner',
-              points_awarded: dynamic.points,
-              source: 'raffle_draw',
-              completed_at: now,
-              updated_at: now,
-            })),
-            { onConflict: 'dynamic_id,registration_id' },
-          )
+            .in('id', winnerIds)
           if (winnersError) throw winnersError
-
-          const { error: updateError } = await supabase
-            .from('dynamics')
-            .update({ status: 'completed', draw_at: now, updated_at: now })
-            .eq('id', dynamic.id)
-          if (updateError) throw updateError
 
           return json({
             ok: true,
-            winners: shuffled.length,
-            winnerDetails: shuffled.map(dynamicParticipantPayload),
+            winners: winnerIds.length,
+            winnerDetails: (winners ?? []).map(dynamicParticipantPayload),
           })
         }
 
@@ -936,52 +875,25 @@ Deno.serve(async (req: Request) => {
         return json({ ok: true })
       }
       if (operation === 'draw' && resource === 'raffles') {
-        const { data: raffle, error: raffleError } = await supabase
-          .from('raffles')
-          .select('id,event_id,winner_count,requires_checkin,status')
-          .eq('id', body?.id)
-          .single()
-        if (raffleError) throw raffleError
-        if (raffle.status !== 'open') return json({ error: 'Abre la rifa antes de sortear.' }, 409)
-        let entries = supabase
-          .from('registrations')
+        if (typeof body?.id !== 'string' || !body.id) return json({ error: 'Rifa no válida.' }, 400)
+        const { data: event, error: eventError } = await supabase
+          .from('events')
           .select('id')
-          .eq('event_id', raffle.event_id)
-          .neq('status', 'cancelled')
-        if (raffle.requires_checkin) entries = entries.eq('status', 'checked_in')
-        const { data: eligible, error: eligibleError } = await entries
-        if (eligibleError) throw eligibleError
-        const shuffled = [...(eligible ?? [])]
-        for (let i = shuffled.length - 1; i > 0; i--) {
-          const random = new Uint32Array(1)
-          crypto.getRandomValues(random)
-          const j = random[0] % (i + 1)
-          ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-        }
-        shuffled.length = Math.min(shuffled.length, raffle.winner_count)
-        if (!shuffled.length)
-          return json({ error: 'No hay participantes elegibles para esta rifa.' }, 409)
-        const now = new Date().toISOString()
-        const { error: clearError } = await supabase
-          .from('raffle_entries')
-          .delete()
-          .eq('raffle_id', raffle.id)
-        if (clearError) throw clearError
-        const { error: insertError } = await supabase.from('raffle_entries').insert(
-          shuffled.map((winner: IdRow) => ({
-            raffle_id: raffle.id,
-            registration_id: winner.id,
-            is_winner: true,
-            drawn_at: now,
-          })),
-        )
-        if (insertError) throw insertError
-        const { error: updateError } = await supabase
-          .from('raffles')
-          .update({ status: 'drawn', draw_at: now })
-          .eq('id', raffle.id)
-        if (updateError) throw updateError
-        return json({ ok: true, winners: shuffled.length })
+          .eq('code', 'SR26')
+          .single()
+        if (eventError) throw eventError
+        const { data: winners, error: drawError } = await supabase.rpc('draw_raffle', {
+          p_raffle_id: body.id,
+          p_event_id: event.id,
+        })
+        const known = rpcErrorResponse(drawError, {
+          raffle_not_found: ['Rifa no válida.', 404],
+          raffle_not_open: ['Abre la rifa antes de sortear.', 409],
+          no_eligible_participants: ['No hay participantes elegibles para esta rifa.', 409],
+        })
+        if (known) return known
+        if (drawError) throw drawError
+        return json({ ok: true, winners })
       }
       return json({ error: 'Operación administrativa no válida.' }, 400)
     }
