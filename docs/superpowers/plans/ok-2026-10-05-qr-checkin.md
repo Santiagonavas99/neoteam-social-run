@@ -95,8 +95,9 @@ Spec: [`2026-10-05-qr-checkin-design.md`](../specs/2026-10-05-qr-checkin-design.
 
 ### 5. Deploy and clean up (Iván)
 
-- `supabase functions delete registration-pass admin-checkin apple-wallet-pass` (an error for one that does not exist is fine; spec 4 recreates the Wallet function).
-- `supabase functions deploy admin-pin registration-pass`
+- Always pass `--project-ref ohatsnkgaeccltqwhkbv`: without it the CLI asks for a project and can deploy to the wrong one.
+- `supabase functions deploy admin-pin registration-pass --project-ref ohatsnkgaeccltqwhkbv` (replaces the old `registration-pass`).
+- `supabase functions delete admin-checkin --project-ref ohatsnkgaeccltqwhkbv` and the same for `apple-wallet-pass`: `delete` takes one name per call; an error for one that does not exist is fine. Spec 4 recreates the Wallet function.
 - Close Santiago's `feat/qr-wallet-checkin` PR with a link to this one; spec 4 continues the Wallet part.
 
 ## Done when
