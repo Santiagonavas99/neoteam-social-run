@@ -434,12 +434,9 @@ export function AdminManagement({
               <thead>
                 <tr>
                   <th>Participante</th>
-                  <th>Código</th>
-                  <th>Contacto</th>
-                  <th>Grupo</th>
-                  <th>Talla</th>
+                  <th>Registro</th>
                   <th>Estado</th>
-                  <th>Asistencia</th>
+                  <th>Gestión</th>
                 </tr>
               </thead>
               <tbody>
@@ -457,24 +454,24 @@ export function AdminManagement({
                           <small>
                             {row.document_type} {row.document_number}
                           </small>
+                          <span className="participant-contact-details">
+                            <span>{row.email}</span>
+                            <span>{row.phone}</span>
+                          </span>
                         </span>
                       </div>
                     </td>
-                    <td data-label="Código" className="mono-value">
-                      <span className="registration-code-chip">
+                    <td data-label="Registro" className="participant-registration">
+                      <span className="registration-code-chip mono-value">
                         {row.registration_code || `#${row.registration_number}`}
                       </span>
-                    </td>
-                    <td data-label="Contacto" className="participant-contact">
-                      <span>{row.email}</span>
-                      <small>{row.phone}</small>
-                    </td>
-                    <td data-label="Grupo">
-                      <span className="group-pill">
-                        {row.running_groups?.name || row.other_running_group || 'Independiente'}
+                      <span className="participant-registration-meta">
+                        <span className="group-pill">
+                          {row.running_groups?.name || row.other_running_group || 'Independiente'}
+                        </span>
+                        <small>Talla {row.shirt_size || '—'}</small>
                       </span>
                     </td>
-                    <td data-label="Talla">{row.shirt_size || '—'}</td>
                     <td data-label="Estado">
                       <StatusBadge
                         status={row.status ?? 'registered'}
@@ -483,7 +480,7 @@ export function AdminManagement({
                         }
                       />
                     </td>
-                    <td data-label="Asistencia">
+                    <td data-label="Gestión">
                       <div className="attendance-actions participant-actions">
                         {row.status === 'registered' && (
                           <button
