@@ -15,7 +15,7 @@ export function RefreshButton({
         aria-hidden
         className={`size-4 shrink-0 ${loading ? 'motion-safe:animate-spin' : ''}`}
       />
-      {loading ? 'Cargando…' : 'Actualizar'}
+      <span className="sr-only md:not-sr-only">{loading ? 'Cargando…' : 'Actualizar'}</span>
     </button>
   )
 }
