@@ -2,8 +2,7 @@
 
 import { ArrowLeft, ArrowUpRight, KeyRound, LoaderCircle, LogIn, LogOut } from 'lucide-react'
 import Link from 'next/link'
-import { type FormEvent, useCallback, useEffect, useState } from 'react'
-import type { HomeFeatureCard } from '@/features/home/data'
+import { type FormEvent, useEffect, useState } from 'react'
 import { AdminManagement } from './admin-management'
 import type { AdminResponse, AdminSection } from './admin-types'
 import { Feedback, sectionIcons } from './admin-ui'
@@ -54,13 +53,8 @@ export function AdminDashboard() {
   const [newPin, setNewPin] = useState('')
   const [confirmNewPin, setConfirmNewPin] = useState('')
   const [currentPin, setCurrentPin] = useState('')
-  const [cards, setCards] = useState<HomeFeatureCard[]>([])
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
-  const loadCards = useCallback(async (token: string) => {
-    const data = await callAdminApi('listCards', { token })
-    setCards((data.cards ?? []) as HomeFeatureCard[])
-  }, [])
   const [section, setSection] = useState<AdminSection>('metrics')
   const [messageKind, setMessageKind] = useState<'success' | 'error'>('error')
 
@@ -83,7 +77,6 @@ export function AdminDashboard() {
         if (validation.valid) {
           setSessionToken(storedToken)
           setAuthenticated(true)
-          await loadCards(storedToken)
         } else {
           window.localStorage.removeItem(ADMIN_SESSION_KEY)
         }
@@ -101,7 +94,7 @@ export function AdminDashboard() {
     return () => {
       active = false
     }
-  }, [loadCards])
+  }, [])
 
   function rememberSession(token: string) {
     window.localStorage.setItem(ADMIN_SESSION_KEY, token)
@@ -132,7 +125,6 @@ export function AdminDashboard() {
       setPin('')
       setConfirmPin('')
       setSetupSecret('')
-      await loadCards(data.token)
       setMessageKind('success')
       setMessage('PIN configurado. Ya tienes acceso al panel.')
     } catch (error) {
@@ -158,37 +150,8 @@ export function AdminDashboard() {
       if (!data.token) throw new Error('No pudimos crear la sesión administrativa.')
       rememberSession(data.token)
       setPin('')
-      await loadCards(data.token)
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'No pudimos iniciar sesión.')
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  function updateCard(
-    id: string | undefined,
-    field: keyof HomeFeatureCard,
-    value: string | number | boolean,
-  ) {
-    setCards((current) =>
-      current.map((card) => (card.id === id ? { ...card, [field]: value } : card)),
-    )
-  }
-
-  async function saveCards() {
-    if (!sessionToken) return
-    setBusy(true)
-    setMessage('')
-    setMessageKind('error')
-
-    try {
-      await callAdminApi('saveCards', { token: sessionToken, cards })
-      setCards((current) => [...current].sort((a, b) => a.sort_order - b.sort_order))
-      setMessageKind('success')
-      setMessage('Cambios guardados. La home ya está usando esta configuración.')
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'No se pudieron guardar los cambios.')
     } finally {
       setBusy(false)
     }
@@ -235,7 +198,6 @@ export function AdminDashboard() {
     window.localStorage.removeItem(ADMIN_SESSION_KEY)
     setSessionToken(null)
     setAuthenticated(false)
-    setCards([])
     setMessage('')
     setMessageKind('error')
     setPin('')
@@ -407,67 +369,6 @@ export function AdminDashboard() {
         </header>
         {section === 'logos' ? (
           <LogoCarouselAdmin token={sessionToken ?? ''} callApi={callAdminApi} />
-        ) : section === 'home' ? (
-          <section className="admin-surface">
-            <div className="section-toolbar">
-              <div>
-                <h2>Bloques del carrusel</h2>
-                <p className="muted">Los cambios se publican al guardar.</p>
-              </div>
-              <button
-                type="button"
-                className="button"
-                onClick={saveCards}
-                disabled={busy || !cards.length}
-              >
-                {busy ? 'Guardando…' : 'Guardar cambios'}
-              </button>
-            </div>
-            <Feedback value={feedback} />
-            <div className="home-editor-list">
-              {cards.map((card, index) => (
-                <article className="home-editor" key={card.id ?? card.slot}>
-                  <span className="editor-number">{String(index + 1).padStart(2, '0')}</span>
-                  <div className="home-editor-fields">
-                    <label>
-                      Título
-                      <input
-                        value={card.title}
-                        onChange={(e) => updateCard(card.id, 'title', e.target.value)}
-                      />
-                    </label>
-                    <label>
-                      Descripción
-                      <textarea
-                        rows={2}
-                        value={card.description}
-                        onChange={(e) => updateCard(card.id, 'description', e.target.value)}
-                      />
-                    </label>
-                  </div>
-                  <div className="home-editor-options">
-                    <label>
-                      Orden
-                      <input
-                        type="number"
-                        min="0"
-                        value={card.sort_order}
-                        onChange={(e) => updateCard(card.id, 'sort_order', Number(e.target.value))}
-                      />
-                    </label>
-                    <label className="check-label">
-                      <input
-                        type="checkbox"
-                        checked={card.enabled}
-                        onChange={(e) => updateCard(card.id, 'enabled', e.target.checked)}
-                      />
-                      Visible
-                    </label>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
         ) : section === 'security' ? (
           <section className="admin-surface security-card">
             <h2 className="flex items-center gap-2">

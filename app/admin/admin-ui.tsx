@@ -9,7 +9,6 @@ import {
   Flag,
   GalleryHorizontal,
   Gift,
-  House,
   LayoutDashboard,
   type LucideIcon,
   ShieldCheck,
@@ -22,7 +21,6 @@ import type { AdminSection, FeedbackValue } from './admin-types'
 
 export const sectionIcons: Record<AdminSection, LucideIcon> = {
   metrics: LayoutDashboard,
-  home: House,
   logos: GalleryHorizontal,
   participants: Users,
   groups: Flag,

@@ -1,8 +1,5 @@
-import type { HomeFeatureCard } from '@/features/home/data'
-
 export type AdminSection =
   | 'metrics'
-  | 'home'
   | 'logos'
   | 'participants'
   | 'groups'
@@ -56,7 +53,6 @@ export type AdminResponse = {
   valid?: boolean
   token?: string
   expiresAt?: string
-  cards?: HomeFeatureCard[]
   rows?: AdminRow[]
   metrics?: Metrics
   url?: string
