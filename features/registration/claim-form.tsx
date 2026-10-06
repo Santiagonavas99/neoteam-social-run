@@ -1,10 +1,10 @@
 'use client'
 
-import { ArrowRight, CircleAlert, LoaderCircle } from 'lucide-react'
 import { useActionState } from 'react'
 import { type ClaimState, claimPassAction } from './claim-actions'
+import { cardClass, FormMessage, FormSection, SubmitButton, TextField } from './form-ui'
 import { PassCard } from './pass-card'
-import { FieldError } from './registration-form'
+import { SuccessCard } from './registration-form'
 
 const initialState: ClaimState = { message: '' }
 
@@ -13,59 +13,41 @@ export function ClaimForm() {
 
   if (state.pass) {
     return (
-      <div className="success-card">
-        <p className="section-label">TU PASE</p>
-        <h2>LISTO PARA CORRER.</h2>
+      <SuccessCard eyebrow="Tu pase" title="Listo para correr.">
         <PassCard pass={state.pass} />
-      </div>
+      </SuccessCard>
     )
   }
 
   return (
-    <form action={formAction} className="registration-form">
-      <div className="form-section-title">
-        <span>01</span>
-        <div>
-          <strong>Recupera tu pase</strong>
-          <small>Usa el mismo documento y correo con los que te inscribiste.</small>
-        </div>
-      </div>
-      <label>
-        Documento
-        <input
+    <form action={formAction} className={cardClass}>
+      <FormSection
+        step="01"
+        title="Recupera tu pase"
+        hint="Usa el mismo documento y correo con los que te inscribiste."
+      />
+      <div className="grid gap-5">
+        <TextField
           name="documentNumber"
+          label="Documento"
           defaultValue={state.values?.documentNumber}
           required
           inputMode="numeric"
           autoComplete="off"
+          errors={state.errors?.documentNumber}
         />
-        <FieldError errors={state.errors?.documentNumber} />
-      </label>
-      <label>
-        Correo
-        <input
+        <TextField
           name="email"
+          label="Correo"
           type="email"
           defaultValue={state.values?.email}
           required
           autoComplete="email"
+          errors={state.errors?.email}
         />
-        <FieldError errors={state.errors?.email} />
-      </label>
-      {state.message && (
-        <p className="form-message flex items-start gap-2">
-          <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
-          {state.message}
-        </p>
-      )}
-      <button className="button submit-button" type="submit" disabled={pending}>
-        {pending ? 'Buscando…' : 'Ver mi pase'}
-        {pending ? (
-          <LoaderCircle aria-hidden className="size-4 shrink-0 motion-safe:animate-spin" />
-        ) : (
-          <ArrowRight aria-hidden className="size-4 shrink-0" />
-        )}
-      </button>
+      </div>
+      {state.message && <FormMessage>{state.message}</FormMessage>}
+      <SubmitButton pending={pending} idle="Ver mi pase" busy="Buscando…" />
     </form>
   )
 }
