@@ -1,5 +1,6 @@
 import { Trophy, X } from 'lucide-react'
 import type { ScannedParticipant } from '../types'
+import { useReveal } from '../ui/use-reveal'
 
 export function DrawResult({
   name,
@@ -10,10 +11,12 @@ export function DrawResult({
   winners: ScannedParticipant[]
   onClose: () => void
 }) {
+  const ref = useReveal<HTMLElement>()
   return (
     <section
+      ref={ref}
       aria-labelledby="draw-result-title"
-      className="mb-4 rounded-card border border-neo-border bg-neo-success-bg p-4 md:p-6"
+      className="mb-4 scroll-mt-4 rounded-card border border-neo-border bg-neo-success-bg p-4 md:p-6"
     >
       <div className="flex items-start justify-between gap-3">
         <h2
