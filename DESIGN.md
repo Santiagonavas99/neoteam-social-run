@@ -51,9 +51,12 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 | `--neo-black` | `#050505` | Always-dark surfaces (hero), text on accent. Same in both themes |
 | `--neo-white` | `#fff` | Text on always-dark surfaces. Same in both themes |
 | `--neo-text` | `#050505` | Primary text on `--neo-bg` / `--neo-surface` (follows the theme) |
-| `--neo-accent` | `#6fa39c` | Site accent green (buttons, highlights) |
+| `--neo-accent` | `#03f8f6` | Primary NeoTeam cyan for buttons, borders and highlights |
 | `--neo-brand-cyan` | `#007a78` light / `#02f2f8` dark | Logo accent only. Dark value on `.site-header`, `.admin-sidebar` and the dark theme |
-| `--neo-accent-dark` | `#263f3c` | Accent text and pressed states |
+| `--neo-accent-dark` | `#007a78` | Deep cyan for filled states that need white text |
+| `--neo-accent-text` | `#007a78` | Accessible accent text on light surfaces |
+| `--neo-accent-hover` | `#02d9d7` | Softer cyan hover for bright accent controls |
+| `--neo-accent-soft` / `--neo-accent-border` | `#e7fbfb` / `#7fd8d6` | Soft cyan surfaces and supporting borders |
 | `--neo-bg` | `#f4f6f5` | Page background |
 | `--neo-surface` | `#fff` | Cards, panels |
 | `--neo-text-secondary` | `#68716f` | Secondary text, captions |
@@ -71,8 +74,9 @@ Values under `[data-theme="dark"]` in `app/globals.css`. Inert until a surface s
 | `--neo-bg` | `#0b0f0e` | — |
 | `--neo-surface` | `#141a19` | — |
 | `--neo-text-secondary` | `#9aa5a2` | 7.6:1 on bg, 7.0:1 on surface |
-| `--neo-accent` | `#6fa39c` (unchanged) | 6.2:1 on surface; black on accent 7.2:1 |
-| `--neo-accent-dark` | `#8fc0b8` | 8.7:1 on surface |
+| `--neo-accent` | `#03f8f6` (unchanged) | Bright brand accent; use dark text on filled controls |
+| `--neo-accent-dark` | `#006b6a` | Deep cyan fill; white text remains readable |
+| `--neo-accent-text` | `#67fffd` | High-contrast accent text on dark surfaces |
 | `--neo-danger` / `--neo-danger-bg` | `#f08a8a` / `#2a1515` | 7.2:1 |
 | `--neo-success-bg` | `#13261f` | text 14.5:1 |
 | `--neo-border` | `rgba(255, 255, 255, 0.12)` | Hairline only; like the light border it is below 3:1, so input outlines need a stronger border when they move to Tailwind |
