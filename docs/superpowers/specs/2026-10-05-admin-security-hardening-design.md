@@ -50,6 +50,6 @@ Registration abuse/captcha (M2), CSP (L5), retention cron (L6), SQLSTATE for dup
 
 ## Risks and unknowns
 
-- **There is only one Supabase project (production).** The SQL is verified first on a local stack (`supabase start`, Docker) if available. Otherwise it is applied to the remote project, where it is additive, and exercised on a test raffle and dynamic that are created and deleted afterwards.
+- **There is only one Supabase project (production) and no local Postgres/Docker in use** (Iván's local DB is MySQL). The SQL is verified on the remote inside `begin; … rollback;`, then applied (it is additive) and exercised on a test raffle and dynamic that are deleted afterwards.
 - **The column types of `raffles`, `raffle_entries`, `dynamics`, `dynamic_participations` and `registrations` exist only in the remote schema.** The plan's first task reads them (`supabase db pull` or `gen types`) before writing the SQL.
 - **Exactly what the dynamics draw does today is read from the code** (`admin-pin/index.ts:626-693`) and mirrored 1:1. Any difference found is raised to Iván before proceeding.

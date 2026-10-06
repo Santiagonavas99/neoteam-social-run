@@ -17,14 +17,14 @@ One commit per task. Steps marked **(Iván)** touch secrets or production and ar
 
 - [ ] `supabase/migrations/20261006090000_admin_pin_atomic_attempts.sql`: `admin_pin_reserve_attempt(p_ip text) returns bigint` and `admin_pin_mark_success(p_attempt_id bigint) returns void`, as in spec §2 (advisory xact lock, 8 per IP per 10 min, 50 global per 60 min, `security definer`, `set search_path = ''`, revoke from `public, anon, authenticated`, grant to `service_role`).
 - [ ] `supabase/tests/admin_pin_attempts.sql` (plain SQL script with `do $$ … assert … $$`): the 9th failure from one IP returns null; the 51st global failure returns null; mark_success excludes the row from the counts.
-- Check: run the script on `supabase start` (local) if Docker is available; otherwise **(Iván)** run it on the remote inside `begin; … rollback;`.
+- Check: **(Iván)** run migration + script on the remote inside `begin; … rollback;` (nothing persists). No local Docker or Postgres.
 - Commit: `fix(db): atomic admin PIN attempt reservation`
 
 ## Task 3 — Atomic draws SQL
 
 - [ ] `supabase/migrations/20261006091000_atomic_draws.sql`: `draw_raffle`, `draw_dynamic`, `record_dynamic_participation`, as in spec §4, using the types from Task 1. Same grants as Task 2.
 - [ ] `supabase/tests/atomic_draws.sql`: drawing a non-open raffle raises; drawing twice gives one set of winners; the instant win never exceeds `winner_count` (loop with `p_roll = 0`).
-- Check: as in Task 2.
+- Check: as in Task 2 (remote, `begin; … rollback;`).
 - Commit: `fix(db): transactional raffle and dynamic draws`
 
 ## Task 4 — Proxy sends the secret and client IP
