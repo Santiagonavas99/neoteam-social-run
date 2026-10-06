@@ -477,12 +477,20 @@ export function AdminManagement({
                           <label
                             className={`participant-state-control participant-state-${participantStatus}`}
                           >
-                            <span className="sr-only">
-                              Estado de {row.first_name} {row.last_name}
-                            </span>
                             <span className="participant-state-dot" aria-hidden="true" />
+                            <span className="participant-state-label">
+                              {participantStates[participantStatus] ?? participantStatus}
+                            </span>
+                            <svg
+                              className="participant-state-chevron"
+                              viewBox="0 0 20 20"
+                              aria-hidden="true"
+                            >
+                              <path d="m6 8 4 4 4-4" />
+                            </svg>
                             <select
-                              aria-label={`Estado de ${row.first_name} ${row.last_name}`}
+                              className="participant-state-native"
+                              aria-label={`Cambiar estado de ${row.first_name} ${row.last_name}`}
                               value={participantStatus}
                               onChange={(e) => void changeAttendance(row, e.target.value)}
                               disabled={!!busy}
@@ -493,13 +501,6 @@ export function AdminManagement({
                                 </option>
                               ))}
                             </select>
-                            <svg
-                              className="participant-state-chevron"
-                              viewBox="0 0 20 20"
-                              aria-hidden="true"
-                            >
-                              <path d="m6 8 4 4 4-4" />
-                            </svg>
                           </label>
                           <button
                             type="button"
