@@ -149,7 +149,7 @@ export function LogosView({ token }: { token: string }) {
           }
         />
       ) : (
-        <div className="record-list">
+        <div className="grid gap-3">
           {rows.map((row) => {
             const locked = busy || (!!editor && editor.id !== row.id)
             const confirming = confirmingId === row.id

@@ -60,7 +60,7 @@ export function DynamicForm({
           ))}
         </select>
       </label>
-      <label className="span-full">
+      <label className="col-span-full">
         Descripción
         <textarea
           rows={2}
@@ -136,7 +136,7 @@ export function DynamicForm({
         </label>
       )}
       {raffle && (
-        <label className="span-full">
+        <label className="col-span-full">
           Participan quienes completaron
           <select
             value={values.eligibility_dynamic_id ?? ''}
@@ -153,7 +153,7 @@ export function DynamicForm({
           </select>
         </label>
       )}
-      <label className="span-full">
+      <label className="col-span-full">
         Marca patrocinadora
         <select
           value={values.sponsor_brand_id ?? ''}
@@ -169,7 +169,7 @@ export function DynamicForm({
             ))}
         </select>
       </label>
-      <label className="check-label span-full">
+      <label className="check-label col-span-full">
         <input
           type="checkbox"
           checked={values.requires_checkin}

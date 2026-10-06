@@ -13,12 +13,10 @@ export function EmptyState({
   action?: ReactNode
 }) {
   return (
-    <div className="empty-state">
-      <span className="empty-number" aria-hidden="true">
-        <Icon aria-hidden className="mx-auto block size-8" />
-      </span>
-      <h2>{title}</h2>
-      <p>{text}</p>
+    <div className="rounded-card border border-dashed border-neo-border-strong bg-neo-surface px-6 py-14 text-center">
+      <Icon aria-hidden className="mx-auto block size-8 text-neo-accent-text" />
+      <h2 className="mt-5 mb-2 text-2xl font-bold tracking-[-0.04em]">{title}</h2>
+      <p className="mx-auto mb-6 max-w-[460px] text-sm text-neo-text-secondary">{text}</p>
       {action}
     </div>
   )

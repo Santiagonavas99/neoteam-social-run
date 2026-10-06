@@ -59,7 +59,7 @@ export function LogoForm({
         />
         <small>Los números menores aparecen primero.</small>
       </label>
-      <label className="span-full">
+      <label className="col-span-full">
         Enlace opcional
         <input
           type="url"

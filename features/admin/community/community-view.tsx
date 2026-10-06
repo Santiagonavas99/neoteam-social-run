@@ -108,7 +108,7 @@ export function CommunityView({
           />
         )
       ) : (
-        <div className="record-list">
+        <div className="grid gap-3">
           {visible.map((row) => (
             <RecordCard
               key={row.id}
