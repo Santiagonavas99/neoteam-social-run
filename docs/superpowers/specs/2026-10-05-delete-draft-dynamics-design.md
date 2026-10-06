@@ -1,6 +1,6 @@
 # Delete draft dynamics — spec
 
-Date: 2026-10-05 · Branch: `feat/delete-draft-dynamics` · Status: **awaiting OK**
+Date: 2026-10-05 · Branch: `feat/delete-draft-dynamics` · Status: **approved** (Iván, 2026-10-05)
 
 ## Problem
 

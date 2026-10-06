@@ -1,6 +1,6 @@
 # Delete draft dynamics — plan
 
-Spec: [`2026-10-05-delete-draft-dynamics-design.md`](../specs/2026-10-05-delete-draft-dynamics-design.md) · Branch: `feat/delete-draft-dynamics` · Needs: Iván's OK, then an `admin-pin` deploy.
+Spec: [`2026-10-05-delete-draft-dynamics-design.md`](../specs/2026-10-05-delete-draft-dynamics-design.md) · Branch: `feat/delete-draft-dynamics` · **Approved by Iván, 2026-10-05.** Needs an `admin-pin` deploy.
 
 ## Tasks
 
