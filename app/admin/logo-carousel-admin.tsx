@@ -14,34 +14,13 @@ import {
   Trash2,
 } from 'lucide-react'
 import { type ChangeEvent, type FormEvent, useCallback, useEffect, useRef, useState } from 'react'
-import type { AdminApi, FeedbackValue } from './admin-types'
-import { Feedback, Logo, StatusBadge } from './admin-ui'
-
-type LogoRow = {
-  id: string
-  name: string
-  logo_url: string
-  link_url?: string | null
-  active: boolean
-  sort_order: number
-}
-
-type LogoResponse = { ok?: boolean; rows?: LogoRow[]; error?: string }
-
-async function callLogoApi(action: string, payload: Record<string, unknown>) {
-  const response = await fetch('/api/admin/logos', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action, ...payload }),
-  })
-  const data = (await response.json().catch(() => ({}))) as LogoResponse
-  if (!response.ok) throw new Error(data.error || 'No pudimos gestionar el carrusel de logos.')
-  return data
-}
+import { callLogos } from '@/features/admin/api'
+import type { AdminApi, FeedbackValue, LogoItem } from '@/features/admin/types'
+import { Feedback, Logo, StatusBadge } from '@/features/admin/ui/admin-ui'
 
 export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: AdminApi }) {
-  const [rows, setRows] = useState<LogoRow[]>([])
-  const [editor, setEditor] = useState<LogoRow | null>(null)
+  const [rows, setRows] = useState<LogoItem[]>([])
+  const [editor, setEditor] = useState<LogoItem | null>(null)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -53,7 +32,7 @@ export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: 
     const id = ++requestId.current
     setLoading(true)
     try {
-      const data = await callLogoApi('list', { token })
+      const data = await callLogos<LogoItem>('list', { token })
       if (id !== requestId.current) return
       setRows(data.rows ?? [])
     } catch (error) {
@@ -87,7 +66,7 @@ export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: 
     })
   }
 
-  async function save(values: LogoRow) {
+  async function save(values: LogoItem) {
     setBusy(true)
     setFeedback(null)
     try {
@@ -99,7 +78,7 @@ export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: 
         sort_order: values.sort_order,
       }
       if (!values.id.startsWith('new-')) payload.id = values.id
-      await callLogoApi('save', { token, values: payload })
+      await callLogos<LogoItem>('save', { token, values: payload })
       setEditor(null)
       setFeedback({
         kind: 'success',
@@ -116,7 +95,7 @@ export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: 
     }
   }
 
-  async function remove(row: LogoRow) {
+  async function remove(row: LogoItem) {
     if (confirmingId !== row.id) {
       setConfirmingId(row.id)
       return
@@ -124,7 +103,7 @@ export function LogoCarouselAdmin({ token, callApi }: { token: string; callApi: 
     setBusy(true)
     setFeedback(null)
     try {
-      await callLogoApi('delete', { token, id: row.id })
+      await callLogos<LogoItem>('delete', { token, id: row.id })
       setConfirmingId(null)
       if (editor?.id === row.id) setEditor(null)
       setFeedback({ kind: 'success', text: `${row.name} eliminado del carrusel.` })
@@ -283,19 +262,19 @@ function LogoEditor({
   onSave,
   onCancel,
 }: {
-  row: LogoRow
+  row: LogoItem
   token: string
   callApi: AdminApi
   busy: boolean
   uploading: boolean
   setUploading: (value: boolean) => void
-  onSave: (row: LogoRow) => Promise<void>
+  onSave: (row: LogoItem) => Promise<void>
   onCancel: () => void
 }) {
   const [values, setValues] = useState({ ...row })
   const [feedback, setFeedback] = useState<FeedbackValue>(null)
 
-  function update<K extends keyof LogoRow>(key: K, value: LogoRow[K]) {
+  function update<K extends keyof LogoItem>(key: K, value: LogoItem[K]) {
     setValues((current) => ({ ...current, [key]: value }))
   }
 

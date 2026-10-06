@@ -3,39 +3,13 @@
 import { ArrowLeft, ArrowUpRight, KeyRound, LoaderCircle, LogIn, LogOut } from 'lucide-react'
 import Link from 'next/link'
 import { type FormEvent, useEffect, useState } from 'react'
+import { callAdmin } from '@/features/admin/api'
+import { type AdminSection, adminSections, sectionInfo } from '@/features/admin/sections'
+import { Feedback } from '@/features/admin/ui/admin-ui'
 import { AdminManagement } from './admin-management'
-import type { AdminResponse, AdminSection } from './admin-types'
-import { Feedback, sectionIcons } from './admin-ui'
 import { LogoCarouselAdmin } from './logo-carousel-admin'
 
 const ADMIN_SESSION_KEY = 'neoteam_admin_pin_session'
-
-async function callAdminApi(action: string, payload: Record<string, unknown> = {}) {
-  const connectionError = 'No pudimos conectar con el panel administrativo. Inténtalo de nuevo.'
-  const json = JSON.stringify({ action, ...payload })
-  const compressed = action === 'uploadAdminImage'
-  const body = compressed
-    ? await new Response(
-        new Blob([json]).stream().pipeThrough(new CompressionStream('gzip')),
-      ).blob()
-    : json
-  const response = await fetch('/api/admin', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(compressed ? { 'Content-Encoding': 'gzip' } : {}),
-    },
-    body,
-  }).catch(() => {
-    throw new Error(connectionError)
-  })
-
-  const data = (await response.json().catch(() => {
-    throw new Error(connectionError)
-  })) as AdminResponse
-  if (!response.ok) throw new Error(data.error || 'No pudimos completar la operación.')
-  return data
-}
 
 function normalizePin(value: string) {
   return value.replace(/\D/g, '').slice(0, 6)
@@ -63,7 +37,7 @@ export function AdminDashboard() {
 
     async function bootstrap() {
       try {
-        const status = await callAdminApi('status')
+        const status = await callAdmin('status')
         if (!active) return
         setConfigured(Boolean(status.configured))
         setSetupSecretReady(status.setupSecretReady ?? null)
@@ -71,7 +45,7 @@ export function AdminDashboard() {
         const storedToken = window.localStorage.getItem(ADMIN_SESSION_KEY)
         if (!storedToken) return
 
-        const validation = await callAdminApi('validate', { token: storedToken })
+        const validation = await callAdmin('validate', { token: storedToken })
         if (!active) return
 
         if (validation.valid) {
@@ -118,7 +92,7 @@ export function AdminDashboard() {
 
     setBusy(true)
     try {
-      const data = await callAdminApi('setup', { pin, setupSecret })
+      const data = await callAdmin('setup', { pin, setupSecret })
       if (!data.token) throw new Error('No pudimos crear la sesión administrativa.')
       rememberSession(data.token)
       setConfigured(true)
@@ -146,7 +120,7 @@ export function AdminDashboard() {
 
     setBusy(true)
     try {
-      const data = await callAdminApi('login', { pin })
+      const data = await callAdmin('login', { pin })
       if (!data.token) throw new Error('No pudimos crear la sesión administrativa.')
       rememberSession(data.token)
       setPin('')
@@ -178,7 +152,7 @@ export function AdminDashboard() {
         setMessage('Escribe tu PIN actual de 6 dígitos.')
         return
       }
-      const data = await callAdminApi('changePin', { token: sessionToken, currentPin, newPin })
+      const data = await callAdmin('changePin', { token: sessionToken, currentPin, newPin })
       if (!data.token) throw new Error('El PIN cambió, pero no pudimos renovar la sesión.')
       rememberSession(data.token)
       setNewPin('')
@@ -204,41 +178,19 @@ export function AdminDashboard() {
 
     if (token) {
       try {
-        await callAdminApi('logout', { token })
+        await callAdmin('logout', { token })
       } catch {
         // La sesión local ya quedó cerrada aunque falle la revocación remota.
       }
     }
   }
 
-  type NavigationItem = { id: AdminSection; label: string; description: string }
-  const navigation: [NavigationItem, ...NavigationItem[]] = [
-    { id: 'metrics', label: 'Overview', description: 'El pulso del Social Run, en un vistazo.' },
-    {
-      id: 'logos',
-      label: 'Carrusel logos',
-      description: 'Sube, ordena y publica los logos de la cinta horizontal de la Home.',
-    },
-    {
-      id: 'participants',
-      label: 'Participantes',
-      description: 'Encuentra a cada corredor y gestiona su asistencia.',
-    },
-    { id: 'groups', label: 'Grupos', description: 'Las comunidades que corren con nosotros.' },
-    { id: 'brands', label: 'Marcas', description: 'Los aliados que hacen parte del encuentro.' },
-    { id: 'raffles', label: 'Rifas', description: 'Prepara los premios y gestiona cada sorteo.' },
-    {
-      id: 'security',
-      label: 'Seguridad',
-      description: 'Administra el acceso al panel del evento.',
-    },
-  ]
   function navigate(next: AdminSection) {
     setSection(next)
     setMessage('')
   }
   const feedback = message ? { kind: messageKind, text: message } : null
-  const current = navigation.find((item) => item.id === section) ?? navigation[0]
+  const current = sectionInfo(section)
 
   if (!authReady || !authenticated)
     return (
@@ -332,8 +284,8 @@ export function AdminDashboard() {
         </Link>
         <span className="sidebar-caption">SOCIAL RUN / 2026</span>
         <nav aria-label="Panel del evento">
-          {navigation.map((item) => {
-            const Icon = sectionIcons[item.id]
+          {adminSections.map((item) => {
+            const Icon = item.icon
             return (
               <button
                 type="button"
@@ -368,7 +320,7 @@ export function AdminDashboard() {
           </div>
         </header>
         {section === 'logos' ? (
-          <LogoCarouselAdmin token={sessionToken ?? ''} callApi={callAdminApi} />
+          <LogoCarouselAdmin token={sessionToken ?? ''} callApi={callAdmin} />
         ) : section === 'security' ? (
           <section className="admin-surface security-card">
             <h2 className="flex items-center gap-2">
@@ -407,7 +359,7 @@ export function AdminDashboard() {
             key={section}
             section={section}
             token={sessionToken ?? ''}
-            callApi={callAdminApi}
+            callApi={callAdmin}
             navigate={navigate}
           />
         )}

@@ -21,16 +21,10 @@ import {
   X,
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type {
-  AdminApi,
-  AdminRow,
-  AdminSection,
-  FeedbackValue,
-  Metrics,
-  Resource,
-} from './admin-types'
-import { brandTypes, participantStates, raffleStates } from './admin-types'
-import { Feedback, Logo, StatusBadge, sectionIcons } from './admin-ui'
+import { brandTypes, participantStates, raffleStates } from '@/features/admin/labels'
+import { type AdminSection, adminSections, sectionInfo } from '@/features/admin/sections'
+import type { AdminApi, AdminRow, FeedbackValue, Metrics, Resource } from '@/features/admin/types'
+import { Feedback, Logo, StatusBadge } from '@/features/admin/ui/admin-ui'
 import { RecordEditor } from './record-editor'
 
 function errorText(error: unknown) {
@@ -189,7 +183,7 @@ export function AdminManagement({
       .toLocaleLowerCase()
     return text.includes(query.toLocaleLowerCase()) && (!status || row.status === status)
   })
-  const SectionIcon = sectionIcons[section]
+  const SectionIcon = sectionInfo(section).icon
   const newLabel =
     section === 'brands' ? 'Añadir marca' : section === 'groups' ? 'Añadir grupo' : 'Crear rifa'
 
@@ -353,15 +347,8 @@ export function AdminManagement({
             <p className="section-label">EN MARCHA</p>
             <h2>Gestiona el encuentro</h2>
             <div>
-              {(
-                [
-                  ['participants', 'Participantes', 'Lista y check-in'],
-                  ['groups', 'Grupos', 'Comunidades invitadas'],
-                  ['brands', 'Marcas', 'Aliados y logos'],
-                  ['raffles', 'Rifas', 'Premios y sorteos'],
-                ] as const
-              ).map(([id, title, detail]) => {
-                const Icon = sectionIcons[id]
+              {adminSections.map(({ id, label: title, quickAccess: detail, icon: Icon }) => {
+                if (!detail) return null
                 return (
                   <button type="button" key={id} onClick={() => navigate(id)}>
                     <span>

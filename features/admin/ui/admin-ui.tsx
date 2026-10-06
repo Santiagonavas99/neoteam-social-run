@@ -6,28 +6,11 @@ import {
   CircleDot,
   CircleSlash,
   CircleX,
-  Flag,
-  GalleryHorizontal,
-  Gift,
-  LayoutDashboard,
   type LucideIcon,
-  ShieldCheck,
-  Tag,
   Trophy,
-  Users,
 } from 'lucide-react'
 import Image from 'next/image'
-import type { AdminSection, FeedbackValue } from './admin-types'
-
-export const sectionIcons: Record<AdminSection, LucideIcon> = {
-  metrics: LayoutDashboard,
-  logos: GalleryHorizontal,
-  participants: Users,
-  groups: Flag,
-  brands: Tag,
-  raffles: Gift,
-  security: ShieldCheck,
-}
+import type { FeedbackValue } from '../types'
 
 const statusIcons: Record<string, LucideIcon> = {
   registered: Circle,

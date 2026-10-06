@@ -2,9 +2,9 @@
 
 import { Check, ImagePlus, ImageUp, Trash2 } from 'lucide-react'
 import { type ChangeEvent, type FormEvent, useState } from 'react'
-import type { AdminApi, AdminRow, FeedbackValue, Resource } from './admin-types'
-import { brandTypes, raffleStates } from './admin-types'
-import { Feedback, Logo } from './admin-ui'
+import { brandTypes, raffleStates } from '@/features/admin/labels'
+import type { AdminApi, AdminRow, FeedbackValue, Resource } from '@/features/admin/types'
+import { Feedback, Logo } from '@/features/admin/ui/admin-ui'
 
 export function RecordEditor({
   row,
