@@ -1,6 +1,6 @@
 # Home refresh — plan
 
-Spec: [`2026-10-06-home-refresh-design.md`](../specs/2026-10-06-home-refresh-design.md) · Branch: `feat/home-refresh` (from `refactor/admin-tailwind`; it is rebased onto `main` once that merges) · Status: **awaiting OK** · Freeze: 15 Oct.
+Spec: [`2026-10-06-home-refresh-design.md`](../specs/2026-10-06-home-refresh-design.md) · Branch: `feat/home-refresh` (from `main` after PR #23) · Status: **awaiting OK** · Freeze: 15 Oct.
 
 ## Tasks
 
@@ -96,13 +96,17 @@ Spec: [`2026-10-06-home-refresh-design.md`](../specs/2026-10-06-home-refresh-des
   - the `reveal` utility and its rules;
   - Known debt updated.
 
-### 9. `chore(release): 0.9.0`
+### 9. `chore(release): 0.8.0`
 
-- `package.json` goes to 0.9.0.
-- The CHANGELOG gains the dated section:
-  - **Added:** the theme on the home and the scroll motion;
-  - **Changed:** the logo strip, the agenda and the footer;
-  - **Fixed:** the community section.
+The admin branch merged without its release commit, so v0.8.0 was never tagged (Iván, 2026-10-06: one tag for both).
+- `package.json` goes to 0.8.0.
+- One `## [0.8.0]` section holds both:
+  - the admin release notes (palette, navigation, participants, overview, theme, six-box PIN), taken from `e39fae1`;
+  - this branch's notes:
+    - **Added:** the theme on the home and the scroll motion;
+    - **Changed:** the logo strip, the agenda and the footer;
+    - **Fixed:** the community section.
+- The remote `feat/home-refresh` still points at `e39fae1`, so the first push uses `--force-with-lease`, and only when Iván asks.
 
 ## Done when
 
