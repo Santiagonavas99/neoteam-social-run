@@ -68,6 +68,77 @@ async function getGoogleAccessToken(
   return body.access_token;
 }
 
+async function diagnoseGoogleWalletAccess(
+  accessToken: string,
+  issuerId: string,
+  classId: string,
+) {
+  const headers = { Authorization: `Bearer ${accessToken}` };
+
+  const [issuerListResponse, issuerGetResponse, classGetResponse] =
+    await Promise.all([
+      fetch("https://walletobjects.googleapis.com/walletobjects/v1/issuer", {
+        headers,
+        cache: "no-store",
+      }),
+      fetch(
+        `https://walletobjects.googleapis.com/walletobjects/v1/issuer/${encodeURIComponent(
+          issuerId,
+        )}`,
+        { headers, cache: "no-store" },
+      ),
+      fetch(
+        `https://walletobjects.googleapis.com/walletobjects/v1/eventTicketClass/${encodeURIComponent(
+          classId,
+        )}`,
+        { headers, cache: "no-store" },
+      ),
+    ]);
+
+  const issuerListBody = (await issuerListResponse
+    .json()
+    .catch(() => ({}))) as {
+    resources?: Array<{ issuerId?: string; name?: string }>;
+    error?: unknown;
+  };
+
+  const issuerGetBody = await issuerGetResponse
+    .json()
+    .catch(() => ({} as Record<string, unknown>));
+  const classGetBody = await classGetResponse
+    .json()
+    .catch(() => ({} as Record<string, unknown>));
+
+  return {
+    targetIssuerId: issuerId,
+    targetClassId: classId,
+    issuerListStatus: issuerListResponse.status,
+    visibleIssuers:
+      issuerListBody.resources?.map((issuer) => ({
+        issuerId: issuer.issuerId ?? null,
+        name: issuer.name ?? null,
+      })) ?? [],
+    issuerGetStatus: issuerGetResponse.status,
+    issuerGet:
+      issuerGetResponse.ok
+        ? {
+            issuerId:
+              (issuerGetBody as { issuerId?: string }).issuerId ?? null,
+            name: (issuerGetBody as { name?: string }).name ?? null,
+          }
+        : issuerGetBody,
+    classGetStatus: classGetResponse.status,
+    classGet:
+      classGetResponse.ok
+        ? {
+            id: (classGetBody as { id?: string }).id ?? null,
+            reviewStatus:
+              (classGetBody as { reviewStatus?: string }).reviewStatus ?? null,
+          }
+        : classGetBody,
+  };
+}
+
 async function ensureGoogleWalletObject(
   accessToken: string,
   eventObject: Record<string, unknown>,
@@ -195,6 +266,27 @@ export async function GET(request: Request) {
       serviceAccountEmail,
       privateKey,
     );
+
+    const diagnose =
+      new URL(request.url).searchParams.get("diagnose") === "1";
+    if (diagnose) {
+      const diagnostics = await diagnoseGoogleWalletAccess(
+        accessToken,
+        issuerId,
+        classId,
+      );
+      return Response.json(
+        {
+          ok: true,
+          serviceAccountEmail,
+          diagnostics,
+        },
+        {
+          headers: { "Cache-Control": "no-store" },
+        },
+      );
+    }
+
     await ensureGoogleWalletObject(accessToken, eventObject);
 
     // The object now exists. The save JWT only references it.
