@@ -18,22 +18,26 @@ The service account must be authorized for the Google Wallet issuer. For this pr
 
 Official guide: https://developers.google.com/wallet/tickets/events/web
 
-## Apple Wallet
+## iPhone · NeoTeam Pass PWA
 
-Apple Wallet passes are signed inside the Supabase Edge Function `apple-wallet-pass`. Do not place Apple certificates in browser-visible variables or commit them to the repository.
+Apple Wallet is intentionally not exposed in the UI because issuing a signed `.pkpass` requires an Apple Developer membership and Pass Type certificates.
 
-Configure these **Supabase Edge Function secrets**:
+On iPhone the site instead uses the NeoTeam Pass web app:
 
-- `APPLE_PASS_TYPE_ID`
-- `APPLE_TEAM_ID`
-- `APPLE_WWDR_CERT_BASE64`
-- `APPLE_PASS_CERT_BASE64`
-- `APPLE_PASS_KEY_BASE64`
-- `APPLE_PASS_KEY_PASSPHRASE` (only if the exported key has a passphrase)
+- `/pase` restores the participant pass from local device storage.
+- iOS shows **Guardar pase en mi iPhone** instead of the Google Wallet button.
+- The fullscreen pass includes the event data, registration code and the same secure QR used by check-in.
+- **Modo escaneo** switches to a high-contrast white presentation and uses the Screen Wake Lock API when supported.
+- `app/manifest.ts` makes the pass installable to the Home Screen as **NeoTeam Pass**.
+- `public/sw.js` caches the pass shell and same-origin static resources for resilience when connectivity is unstable.
+- The browser cannot programmatically increase iPhone screen brightness, so the UI must not claim that it can.
 
-You need an Apple Developer membership, a Pass Type ID, its Pass Type ID certificate/private key, and the Apple WWDR certificate chain. The function produces a signed `.pkpass` Event Ticket containing the NeoTeam QR.
+The previous Apple Wallet Edge Function remains scaffolded in the repository but is not surfaced to participants.
 
-Official guide: https://developer.apple.com/documentation/walletpasses/building-a-pass
+## Platform behavior
+
+- **Android / desktop:** Google Wallet when configured, with NeoTeam Pass as a fallback.
+- **iPhone / iPad:** NeoTeam Pass web app / Home Screen PWA.
 
 ## QR payload
 
