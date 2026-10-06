@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { AuthScreen } from './auth/auth-screen'
 import { useAdminSession } from './auth/use-admin-session'
+import { CheckinView } from './checkin/checkin-view'
 import { CommunityView } from './community/community-view'
 import { LogosView } from './logos/logos-view'
 import { OverviewView } from './overview/overview-view'
@@ -21,7 +22,9 @@ export function AdminApp() {
 
   return (
     <AdminShell section={section} onNavigate={setSection} onSignOut={() => void session.signOut()}>
-      {section === 'logos' ? (
+      {section === 'checkin' ? (
+        <CheckinView token={token} />
+      ) : section === 'logos' ? (
         <LogosView token={token} />
       ) : section === 'security' ? (
         <ChangePinForm token={token} onToken={session.remember} />

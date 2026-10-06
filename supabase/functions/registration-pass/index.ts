@@ -1,6 +1,7 @@
 // @ts-nocheck
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { fromProxy } from '../_shared/proxy.ts'
 
 function requireEnv(name: string) {
   const value = Deno.env.get(name)
@@ -12,7 +13,6 @@ const supabase = createClient(requireEnv('SUPABASE_URL'), requireEnv('SUPABASE_S
   auth: { persistSession: false, autoRefreshToken: false },
 })
 
-const ADMIN_PROXY_SECRET = Deno.env.get('ADMIN_PROXY_SECRET')?.trim() ?? ''
 const responseHeaders = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
 
 function json(body: unknown, status = 200) {
@@ -21,27 +21,6 @@ function json(body: unknown, status = 200) {
 
 function text(value: unknown, max: number) {
   return typeof value === 'string' ? value.trim().slice(0, max) : ''
-}
-
-async function sha256(value: string) {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))
-  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('')
-}
-
-function secretsMatch(candidate: string, expected: string) {
-  const left = new TextEncoder().encode(candidate)
-  const right = new TextEncoder().encode(expected)
-  if (left.length !== right.length) return false
-  let diff = 0
-  for (let i = 0; i < left.length; i++) diff |= left[i] ^ right[i]
-  return diff === 0
-}
-
-// Same gate as admin-pin: only the Next server holds the proxy secret.
-async function fromProxy(req: Request) {
-  if (ADMIN_PROXY_SECRET.length < 32) return false
-  const candidate = (req.headers.get('x-admin-proxy-secret') ?? '').slice(0, 1024).trim()
-  return secretsMatch(await sha256(candidate), await sha256(ADMIN_PROXY_SECRET))
 }
 
 type PassRow = {
