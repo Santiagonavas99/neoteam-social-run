@@ -1,6 +1,6 @@
 # Professional tooling — plan
 
-Spec: `docs/superpowers/specs/2026-10-05-professional-tooling-design.md`. Branch: `chore/professionalize-tooling`. Status: **awaiting OK**.
+Spec: `docs/superpowers/specs/2026-10-05-professional-tooling-design.md`. Branch: `chore/professionalize-tooling`. Status: **approved 2026-10-05, done** on `chore/lint-tests-ci` (Tasks 2–9: `0141a8e` … `7e85fb1`). CI also runs the SQL tests (added beyond the plan).
 
 One commit per task. Each task ends with the check named in it; the last one ends with `pnpm ci:check` green.
 
