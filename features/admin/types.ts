@@ -103,6 +103,7 @@ export type AdminResponse<Row = unknown> = {
   url?: string
   error?: string
   winners?: number
+  deleted?: number
   result?: CheckinResult
   participant?: ScannedParticipant
   dynamicRows?: DynamicRow[]
