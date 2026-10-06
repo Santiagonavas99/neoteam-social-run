@@ -1,6 +1,6 @@
 # Tailwind CSS and icon system — plan (Phase A)
 
-Spec: `docs/superpowers/specs/2026-10-05-tailwind-and-icons-design.md`. Branch: `feat/tailwind-and-icons`, cut from `main`. Status: **approved 2026-10-05 (changes approved the same day): Task 3 rewritten (icon review of every screen), dark tokens added to Task 2, new Task 4b (theme), new Task 3b (countdown)**.
+Spec: `docs/superpowers/specs/2026-10-05-tailwind-and-icons-design.md`. Branch: `feat/tailwind-and-icons`, cut from `main`. Status: **approved 2026-10-05 (changes approved the same day). Done on `feat/tailwind-and-icons`: 0 `b60a4a0` (public; admin baseline pending Iván), 1 `6fd8e74`, 2 `e63edf2`, 3 `3b5b1f2` + `3ed89b5`, 3b `3f2dc9b`. Pending on `refactor/admin-tailwind`: 4, 4b, 5. Original changes: Task 3 rewritten (icon review of every screen), dark tokens added to Task 2, new Task 4b (theme), new Task 3b (countdown)**.
 
 One commit per task. Every task ends with `pnpm ci:check` green. Phase B (public pages, legacy CSS removal, preflight) gets its own plan after 18 Oct.
 
