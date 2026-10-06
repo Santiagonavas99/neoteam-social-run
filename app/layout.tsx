@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Host_Grotesk } from 'next/font/google'
+import './tailwind.css'
 import './globals.css'
 import './neo-overrides.css'
 import './logo-marquee.css'
