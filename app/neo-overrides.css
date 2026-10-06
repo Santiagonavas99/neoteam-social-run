@@ -390,7 +390,8 @@
 }
 .status-checked_in,
 .status-open,
-.status-drawn {
+.status-drawn,
+.status-completed {
   background: #dfede7;
   color: #234c3c;
 }

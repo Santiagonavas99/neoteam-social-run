@@ -1,20 +1,14 @@
 # Dynamics admin panel — plan
 
-Spec: [`2026-10-05-dynamics-admin-design.md`](../specs/2026-10-05-dynamics-admin-design.md) · Branch: `feat/dynamics-admin` · Order: **3 of 5** (needs `qr-scanner.tsx` from plan 2) · Needs approval: replacing "Rifas" with "Dinámicas"; migrations only if Task 0 finds the tables missing.
+Spec: [`2026-10-05-dynamics-admin-design.md`](../specs/2026-10-05-dynamics-admin-design.md) · Branch: `feat/dynamics-admin` · Order: **3 of 5** (needs `qr-scanner.tsx` from plan 2) · **Approved by Iván, 2026-10-05**, including "Dinámicas" replacing "Rifas". Task 0 dropped: production is still in development and both migrations are idempotent.
 
 ## Tasks
-
-### 0. Verify the remote (Iván, read-only, no commit)
-
-- Run the three queries in the spec and paste the results into the PR.
 
 ### 1. `chore(db): record the dynamics migrations`
 
 - Add `supabase/migrations/20261005233028_dynamics_mvp.sql` and `20261005233800_index_dynamics_eligibility.sql`, copied from Santiago's branch.
-- Run them on the remote only if Task 0 says so. Re-run the raffle copy if `raffles_without_dynamic > 0`.
-- After any run, Task 0's queries show:
-  - both tables;
-  - 0 raffles without a dynamic.
+- Both are idempotent (`if not exists`, `where not exists`), so Iván can run them on the remote safely; they create nothing if the tables exist and copy only raffles not copied yet.
+- After the run, the spec's queries show both tables and 0 raffles without a dynamic.
 
 ### 2. `feat(admin): dynamics types and data hook`
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronRight, Flag, Gift, Tag, UserCheck, Users } from 'lucide-react'
+import { ChevronRight, Flag, Tag, UserCheck, Users, Zap } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
@@ -36,7 +36,7 @@ export function OverviewView({
     ['Check-in', metrics?.checkedIn, 'Asistencia confirmada', UserCheck],
     ['Grupos', metrics?.groups, 'Representados en registros', Flag],
     ['Marcas', metrics?.brands, 'Aliados activos', Tag],
-    ['Rifas', metrics?.raffles, 'Premios configurados', Gift],
+    ['Dinámicas', metrics?.dynamics, 'Stands, retos y sorteos', Zap],
   ] as const
 
   return (

@@ -691,31 +691,6 @@ fieldset {
   text-align: center;
   overflow-wrap: anywhere;
 }
-.raffle {
-  padding-bottom: 64px;
-}
-.raffle-card {
-  position: relative;
-  padding: 56px 64px;
-  color: var(--neo-white);
-  background: var(--neo-accent-dark);
-  border-left: 6px solid var(--neo-accent);
-}
-.raffle-card h2 {
-  font-size: clamp(40px, 5.5vw, 76px);
-  letter-spacing: -0.055em;
-  line-height: 0.98;
-  margin: 24px 0;
-  max-width: 780px;
-}
-.raffle-card p:not(.section-label) {
-  color: #d2dfda;
-  max-width: 520px;
-  font-size: 16px;
-}
-.raffle-card .button {
-  margin-top: 16px;
-}
 .final-cta {
   text-align: center;
   padding: 32px 0 96px;
@@ -983,19 +958,6 @@ fieldset {
   }
   .community-logo img {
     height: 48px;
-  }
-  .raffle {
-    padding-bottom: 32px;
-  }
-  .raffle-card {
-    padding: 32px 24px;
-    border-left-width: 4px;
-  }
-  .raffle-card h2 {
-    font-size: 38px;
-  }
-  .raffle-card p:not(.section-label) {
-    font-size: 14px;
   }
   .final-cta {
     padding: 24px 0 56px;

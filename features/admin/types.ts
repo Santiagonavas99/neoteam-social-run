@@ -1,4 +1,4 @@
-export type Resource = 'participants' | 'groups' | 'brands' | 'raffles'
+export type Resource = 'participants' | 'groups' | 'brands'
 
 export type Participant = {
   id: string
@@ -32,18 +32,6 @@ export type CommunityRecord = {
   sort_order: number
 }
 
-export type Raffle = {
-  id: string
-  name: string
-  prize: string
-  description?: string | null
-  winner_count: number
-  requires_checkin: boolean
-  status: string
-  sponsor_brand_id?: string | null
-  draw_at?: string | null
-}
-
 export type LogoItem = {
   id: string
   name: string
@@ -58,10 +46,40 @@ export type Metrics = {
   checkedIn: number
   groups: number
   brands: number
-  raffles: number
+  dynamics: number
 }
 
-export type CheckinParticipant = {
+export type DynamicType =
+  | 'raffle'
+  | 'qr'
+  | 'checkpoint'
+  | 'challenge'
+  | 'trivia'
+  | 'mission'
+  | 'voting'
+  | 'instant_win'
+  | 'points'
+
+export type DynamicStatus = 'draft' | 'open' | 'closed' | 'completed' | 'cancelled'
+
+export type DynamicRow = {
+  id: string
+  name: string
+  description?: string | null
+  type: DynamicType
+  status: DynamicStatus
+  sponsor_brand_id?: string | null
+  points: number
+  requires_checkin: boolean
+  prize?: string | null
+  winner_count: number
+  eligibility_dynamic_id?: string | null
+  config?: Record<string, unknown>
+  participations_count?: number
+  winners_count?: number
+}
+
+export type ScannedParticipant = {
   id: string
   code: string
   firstName: string
@@ -86,7 +104,12 @@ export type AdminResponse<Row = unknown> = {
   error?: string
   winners?: number
   result?: CheckinResult
-  participant?: CheckinParticipant
+  participant?: ScannedParticipant
+  dynamicRows?: DynamicRow[]
+  winnerDetails?: ScannedParticipant[]
+  alreadyCompleted?: boolean
+  won?: boolean
+  prize?: string | null
 }
 
 export type FeedbackValue = { kind: 'success' | 'error'; text: string } | null
