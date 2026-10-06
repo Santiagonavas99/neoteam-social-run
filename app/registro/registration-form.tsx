@@ -1,5 +1,6 @@
 'use client'
 
+import { ArrowRight, Check, CircleAlert, LoaderCircle } from 'lucide-react'
 import { useActionState, useState } from 'react'
 import { type RegistrationState, registerParticipant } from './actions'
 
@@ -7,7 +8,12 @@ const initialState: RegistrationState = { ok: false, message: '' }
 
 function FieldError({ errors }: { errors?: string[] }) {
   if (!errors?.length) return null
-  return <small className="field-error">{errors[0]}</small>
+  return (
+    <small className="field-error inline-flex items-start gap-1">
+      <CircleAlert aria-hidden className="mt-px size-3.5 shrink-0" />
+      {errors[0]}
+    </small>
+  )
 }
 
 export function RegistrationForm() {
@@ -17,7 +23,9 @@ export function RegistrationForm() {
   if (state.ok) {
     return (
       <div className="success-card">
-        <span className="success-check">✓</span>
+        <span className="success-check">
+          <Check aria-hidden className="size-6" />
+        </span>
         <p className="section-label">REGISTRO CONFIRMADO</p>
         <h2>ESTÁS DENTRO.</h2>
         <p>Nos vemos el 18 de octubre en el Social Run del aniversario NeoTeam.</p>
@@ -154,9 +162,19 @@ export function RegistrationForm() {
         <span>Quiero recibir novedades de próximos eventos de NeoTeam. (Opcional)</span>
       </label>
 
-      {state.message && <p className="form-message">{state.message}</p>}
+      {state.message && (
+        <p className="form-message flex items-start gap-2">
+          <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
+          {state.message}
+        </p>
+      )}
       <button className="button submit-button" type="submit" disabled={pending}>
-        {pending ? 'Registrando...' : 'Confirmar mi registro'} <span>↗</span>
+        {pending ? 'Registrando…' : 'Confirmar mi registro'}
+        {pending ? (
+          <LoaderCircle aria-hidden className="size-4 shrink-0 motion-safe:animate-spin" />
+        ) : (
+          <ArrowRight aria-hidden className="size-4 shrink-0" />
+        )}
       </button>
     </form>
   )

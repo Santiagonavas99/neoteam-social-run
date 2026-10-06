@@ -1032,7 +1032,7 @@ fieldset {
   }
   .registration-fact {
     display: grid;
-    grid-template-columns: 60px 1fr;
+    grid-template-columns: 88px 1fr;
     align-items: baseline;
     gap: 12px;
     max-width: none;

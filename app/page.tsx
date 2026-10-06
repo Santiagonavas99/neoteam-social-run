@@ -1,3 +1,4 @@
+import { ArrowDown, ArrowRight, CalendarDays, Clock, Gift, MapPin, Route } from 'lucide-react'
 import Link from 'next/link'
 import { CommunityCarousel } from '@/components/community-carousel'
 import { Footer } from '@/components/footer'
@@ -22,9 +23,18 @@ export default async function Home() {
         <SiteHeader />
 
         <div className="v2-hero-meta shell">
-          <span className="v2-meta-pill accent">18 OCT · 2026</span>
-          <span className="v2-meta-pill">07:30 A. M.</span>
-          <span className="v2-meta-pill">5K SOCIAL</span>
+          <span className="v2-meta-pill accent gap-1.5">
+            <CalendarDays aria-hidden className="size-3.5 shrink-0 max-sm:hidden" />
+            18 OCT · 2026
+          </span>
+          <span className="v2-meta-pill gap-1.5">
+            <Clock aria-hidden className="size-3.5 shrink-0 max-sm:hidden" />
+            07:30 A. M.
+          </span>
+          <span className="v2-meta-pill gap-1.5">
+            <Route aria-hidden className="size-3.5 shrink-0 max-sm:hidden" />
+            5K SOCIAL
+          </span>
         </div>
 
         <div className="v2-hero-grid shell">
@@ -40,16 +50,19 @@ export default async function Home() {
             <p>{eventConfig.headline}</p>
             <div className="v2-hero-actions">
               <Link href="/registro" className="button">
-                Quiero participar <span>↗</span>
+                Quiero participar <ArrowRight aria-hidden className="size-4 shrink-0" />
               </Link>
               <a href="#agenda" className="text-link">
-                Ver agenda ↓
+                Ver agenda <ArrowDown aria-hidden className="size-4 shrink-0" />
               </a>
             </div>
             <div className="v2-route-card">
               <strong>5K</strong>
               <span>RUTA SOCIAL</span>
-              <small>Parque del Ingenio y sus alrededores</small>
+              <small className="inline-flex items-start gap-1.5">
+                <MapPin aria-hidden className="mt-0.5 size-3.5 shrink-0" />
+                Parque del Ingenio y sus alrededores
+              </small>
             </div>
           </div>
         </div>
@@ -198,14 +211,17 @@ export default async function Home() {
           </p>
         </div>
         <div className="v2-raffle-side">
-          <span>DESPUÉS DE LA RUTA</span>
+          <span className="inline-flex items-center gap-2">
+            <Gift aria-hidden className="size-4 shrink-0" />
+            DESPUÉS DE LA RUTA
+          </span>
           <strong>8:45</strong>
           <p>
             Celebración, reconocimiento a las marcas aliadas, rifas, premios y contenido con la
             comunidad.
           </p>
           <Link href="/registro" className="button">
-            Registrarme <span>↗</span>
+            Registrarme <ArrowRight aria-hidden className="size-4 shrink-0" />
           </Link>
         </div>
       </section>
@@ -217,7 +233,7 @@ export default async function Home() {
             <p>DOMINGO · SOCIAL RUN · ANIVERSARIO NEOTEAM</p>
             <h2>18.10.26</h2>
             <Link href="/registro" className="button">
-              Quiero estar ahí <span>↗</span>
+              Quiero estar ahí <ArrowRight aria-hidden className="size-4 shrink-0" />
             </Link>
           </div>
         </div>

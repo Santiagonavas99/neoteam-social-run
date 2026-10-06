@@ -1,5 +1,6 @@
 'use client'
 
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { type ReactNode, useEffect, useId, useRef, useState } from 'react'
 
 export function HorizontalCarousel({
@@ -73,7 +74,7 @@ export function HorizontalCarousel({
           disabled={edges.start}
           onClick={() => move(-1)}
         >
-          ←
+          <ChevronLeft aria-hidden className="mx-auto block size-5" />
         </button>
         <button
           type="button"
@@ -82,7 +83,7 @@ export function HorizontalCarousel({
           disabled={edges.end}
           onClick={() => move(1)}
         >
-          →
+          <ChevronRight aria-hidden className="mx-auto block size-5" />
         </button>
       </div>
       {/* biome-ignore lint/a11y/useSemanticElements: a scroll track, not a form fieldset */}
