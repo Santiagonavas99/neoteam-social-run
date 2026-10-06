@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Letra más legible en la página principal:** botones y enlaces a 14–15 px, la agenda a 15 px y ninguna etiqueta por debajo de 12 px.
 - **Registration form keeps your answers** when the server reports an error, including the document type and running group. Before, every field came back empty.
 - **Phone numbers must have 10 digits.** Numbers autofilled as `+57 300 123 4567` are corrected automatically.
 
