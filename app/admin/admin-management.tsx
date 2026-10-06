@@ -436,87 +436,89 @@ export function AdminManagement({
                   <th>Participante</th>
                   <th>Registro</th>
                   <th>Estado</th>
-                  <th>Gestión</th>
                 </tr>
               </thead>
               <tbody>
-                {visible.map((row) => (
-                  <tr key={row.id}>
-                    <td data-label="Participante">
-                      <div className="participant-identity">
-                        <span className="participant-avatar" aria-hidden="true">
-                          {participantInitials(row)}
-                        </span>
-                        <span className="participant-name">
-                          <strong>
-                            {row.first_name} {row.last_name}
-                          </strong>
-                          <small>
-                            {row.document_type} {row.document_number}
-                          </small>
-                          <span className="participant-contact-details">
-                            <span>{row.email}</span>
-                            <span>{row.phone}</span>
+                {visible.map((row) => {
+                  const participantStatus = row.status ?? 'registered'
+
+                  return (
+                    <tr key={row.id}>
+                      <td data-label="Participante">
+                        <div className="participant-identity">
+                          <span className="participant-avatar" aria-hidden="true">
+                            {participantInitials(row)}
                           </span>
+                          <span className="participant-name">
+                            <strong>
+                              {row.first_name} {row.last_name}
+                            </strong>
+                            <small>
+                              {row.document_type} {row.document_number}
+                            </small>
+                            <small className="participant-phone">{row.phone || 'Sin teléfono'}</small>
+                            <span className="participant-email">{row.email}</span>
+                          </span>
+                        </div>
+                      </td>
+                      <td data-label="Registro" className="participant-registration">
+                        <span className="registration-code-chip mono-value">
+                          {row.registration_code || `#${row.registration_number}`}
                         </span>
-                      </div>
-                    </td>
-                    <td data-label="Registro" className="participant-registration">
-                      <span className="registration-code-chip mono-value">
-                        {row.registration_code || `#${row.registration_number}`}
-                      </span>
-                      <span className="participant-registration-meta">
-                        <span className="group-pill">
-                          {row.running_groups?.name || row.other_running_group || 'Independiente'}
+                        <span className="participant-registration-meta">
+                          <span className="group-pill">
+                            {row.running_groups?.name || row.other_running_group || 'Independiente'}
+                          </span>
+                          <small>Talla {row.shirt_size || '—'}</small>
                         </span>
-                        <small>Talla {row.shirt_size || '—'}</small>
-                      </span>
-                    </td>
-                    <td data-label="Estado">
-                      <StatusBadge
-                        status={row.status ?? 'registered'}
-                        label={
-                          participantStates[row.status ?? 'registered'] ?? row.status ?? 'Inscrito'
-                        }
-                      />
-                    </td>
-                    <td data-label="Gestión">
-                      <div className="attendance-actions participant-actions">
-                        {row.status === 'registered' && (
+                      </td>
+                      <td data-label="Estado" className="participant-state-cell">
+                        <div className="participant-state-actions">
+                          <label
+                            className={`participant-state-control participant-state-${participantStatus}`}
+                          >
+                            <span className="sr-only">
+                              Estado de {row.first_name} {row.last_name}
+                            </span>
+                            <span className="participant-state-dot" aria-hidden="true" />
+                            <select
+                              aria-label={`Estado de ${row.first_name} ${row.last_name}`}
+                              value={participantStatus}
+                              onChange={(e) => void changeAttendance(row, e.target.value)}
+                              disabled={!!busy}
+                            >
+                              {Object.entries(participantStates).map(([key, label]) => (
+                                <option key={key} value={key}>
+                                  {label}
+                                </option>
+                              ))}
+                            </select>
+                            <svg
+                              className="participant-state-chevron"
+                              viewBox="0 0 20 20"
+                              aria-hidden="true"
+                            >
+                              <path d="m6 8 4 4 4-4" />
+                            </svg>
+                          </label>
                           <button
                             type="button"
-                            className="button button-small participant-checkin"
-                            onClick={() => void changeAttendance(row, 'checked_in')}
+                            className="participant-delete-icon"
+                            aria-label={`Eliminar a ${row.first_name} ${row.last_name}`}
+                            title="Eliminar participante"
+                            onClick={() => setConfirmation({ row, action: 'delete' })}
                             disabled={!!busy}
                           >
-                            {busy === row.id ? 'Guardando…' : 'Check-in ✓'}
+                            <svg viewBox="0 0 20 20" aria-hidden="true">
+                              <path d="M4.75 6.25h10.5M8 6.25V4.5h4v1.75m-5.75 0 .5 9.25h6.5l.5-9.25M8.5 9v4.25M11.5 9v4.25" />
+                            </svg>
                           </button>
-                        )}
-                        <select
-                          className="participant-status-select"
-                          aria-label={`Estado de ${row.first_name} ${row.last_name}`}
-                          value={row.status}
-                          onChange={(e) => void changeAttendance(row, e.target.value)}
-                          disabled={!!busy}
-                        >
-                          {Object.entries(participantStates).map(([key, label]) => (
-                            <option key={key} value={key}>
-                              {label}
-                            </option>
-                          ))}
-                        </select>
-                        <button
-                          type="button"
-                          className="button button-small participant-delete"
-                          onClick={() => setConfirmation({ row, action: 'delete' })}
-                          disabled={!!busy}
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                        </div>
+                        {busy === row.id && <small className="participant-saving">Guardando…</small>}
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
