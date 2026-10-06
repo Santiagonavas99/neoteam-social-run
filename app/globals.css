@@ -68,8 +68,8 @@ html {
 }
 body {
   margin: 0;
-  background: var(--neo-white);
-  color: var(--neo-black);
+  background: var(--neo-surface);
+  color: var(--neo-text);
   font-family: var(--font-host-grotesk), "Host Grotesk", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -221,7 +221,7 @@ fieldset {
 .button:hover:not(:disabled) {
   background: var(--neo-accent-dark);
   border-color: var(--neo-accent-dark);
-  color: white;
+  color: var(--neo-white);
 }
 .button-small {
   min-height: 44px;
@@ -375,7 +375,7 @@ fieldset {
   color: var(--neo-on-dark-secondary);
 }
 .site-header nav > a:hover {
-  color: white;
+  color: var(--neo-white);
 }
 .site-header .button {
   background: var(--neo-white);
@@ -728,7 +728,7 @@ fieldset {
   color: var(--neo-text-secondary);
 }
 .footer strong {
-  color: var(--neo-black);
+  color: var(--neo-text);
   letter-spacing: -0.02em;
 }
 

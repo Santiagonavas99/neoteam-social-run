@@ -19,11 +19,11 @@ export function PassCard({ pass }: { pass: Pass }) {
       {pass.googleWalletUrl ? (
         <a
           href={pass.googleWalletUrl}
-          className="mt-2 inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-control border border-neo-black bg-neo-black px-5 py-3 transition-colors hover:border-neo-accent-dark hover:bg-neo-accent-dark md:max-w-80"
+          className="mt-2 inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-control border border-neo-text bg-neo-text px-5 py-3 transition-colors hover:border-neo-accent-dark hover:bg-neo-accent-dark md:max-w-80"
         >
           {/* Global `a { color: inherit }` beats utilities on the link itself. */}
-          <Wallet aria-hidden className="size-4 shrink-0 text-neo-white" />
-          <span className="text-[13px] font-bold text-neo-white">Añadir a Google Wallet</span>
+          <Wallet aria-hidden className="size-4 shrink-0 text-neo-surface" />
+          <span className="text-[13px] font-bold text-neo-surface">Añadir a Google Wallet</span>
         </a>
       ) : null}
       <p className="m-0 text-sm leading-normal text-neo-text-secondary">

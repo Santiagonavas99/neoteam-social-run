@@ -86,7 +86,7 @@ export function CheckboxField({
         />
         <label htmlFor={name} className="cursor-pointer">
           <span
-            className={`text-sm font-normal leading-normal ${muted ? 'text-neo-text-secondary' : 'text-neo-black'}`}
+            className={`text-sm font-normal leading-normal ${muted ? 'text-neo-text-secondary' : 'text-neo-text'}`}
           >
             {children}
           </span>
@@ -136,7 +136,7 @@ export function SubmitButton({
     <button
       type="submit"
       disabled={pending}
-      className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-4 rounded-control border border-neo-black bg-neo-black px-5 py-3 text-neo-white transition-colors hover:border-neo-accent-dark hover:bg-neo-accent-dark"
+      className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-4 rounded-control border border-neo-text bg-neo-text px-5 py-3 text-neo-surface transition-colors hover:border-neo-accent-dark hover:bg-neo-accent-dark"
     >
       {/* Global `button { font: inherit }` beats utilities on the button itself. */}
       <span className="text-[13px] font-bold">{pending ? busy : idle}</span>
