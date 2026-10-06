@@ -4,6 +4,8 @@ export const eventConfig = {
   reason: 'Aniversario NeoTeam',
   dateLabel: '18 de octubre de 2026',
   dateShort: '18 OCT · 2026',
+  startsAt: '2026-10-18T07:30:00-05:00',
+  endsAt: '2026-10-18T11:00:00-05:00',
   location: 'Punto de encuentro por confirmar',
   route: 'Ruta 5K · Parque del Ingenio y sus alrededores',
   eyebrow: 'ANIVERSARIO NEOTEAM',

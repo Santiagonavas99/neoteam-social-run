@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowRight, CalendarDays, Clock, Gift, MapPin, Route } from 'lucide-react'
 import Link from 'next/link'
 import { CommunityCarousel } from '@/components/community-carousel'
+import { EventCountdown } from '@/components/event-countdown'
 import { Footer } from '@/components/footer'
 import { LogoMarquee } from '@/components/logo-marquee'
 import { SiteHeader } from '@/components/site-header'
@@ -48,6 +49,11 @@ export default async function Home() {
 
           <div className="v2-hero-side">
             <p>{eventConfig.headline}</p>
+            <EventCountdown
+              startsAt={eventConfig.startsAt}
+              endsAt={eventConfig.endsAt}
+              initialNow={Date.now()}
+            />
             <div className="v2-hero-actions">
               <Link href="/registro" className="button">
                 Quiero participar <ArrowRight aria-hidden className="size-4 shrink-0" />
