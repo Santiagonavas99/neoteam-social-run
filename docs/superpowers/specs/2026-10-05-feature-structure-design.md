@@ -1,6 +1,6 @@
 # Feature structure (DDD-lite) and component split — spec
 
-Date: 2026-10-05 · Branch: `refactor/feature-structure` (from `main` at 0.2.0) · Status: **draft, waiting for Iván's OK**
+Date: 2026-10-05 · Branch: `refactor/feature-structure` (from `main` at 0.2.0) · Status: **approved 2026-10-05**
 
 ## Problem
 

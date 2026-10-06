@@ -1,6 +1,6 @@
 # Feature structure and component split — plan
 
-Spec: `docs/superpowers/specs/2026-10-05-feature-structure-design.md`. Branch: `refactor/feature-structure`, cut from `main` at 0.2.0. Status: **waiting for Iván's OK** (includes approval of the new top-level `features/` folder).
+Spec: `docs/superpowers/specs/2026-10-05-feature-structure-design.md`. Branch: `refactor/feature-structure`, cut from `main` at 0.2.0. Status: **approved 2026-10-05, including the new top-level `features/` folder and deleting the home cards editor**.
 
 ## Ground rules
 
