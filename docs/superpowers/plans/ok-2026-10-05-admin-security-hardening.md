@@ -1,6 +1,6 @@
 # Admin security hardening — plan
 
-Spec: `docs/superpowers/specs/2026-10-05-admin-security-hardening-design.md`. Branch: `fix/admin-security-hardening`, cut from `main` after `chore/professionalize-tooling` merges (or rebased onto it). Status: **awaiting OK**.
+Spec: `docs/superpowers/specs/2026-10-05-admin-security-hardening-design.md`. Branch: `fix/admin-security-hardening`, cut from `main` after `chore/professionalize-tooling` merges (or rebased onto it). Status: **approved 2026-10-05**. Done: 1b `16f3e05`, 2 `1a62bfb`, 4 `caf6d9e`, 5 PIN part `04c9619`. Pending: 1 (Iván), 3, 5 draws, 6.
 
 One commit per task. Steps marked **(Iván)** touch secrets or production and are done by Iván. No agent handles secret values.
 
