@@ -196,8 +196,7 @@ fieldset {
   align-items: center;
   min-height: 44px;
 }
-.site-header,
-.admin-sidebar {
+.site-header {
   --neo-brand-cyan: var(--neo-accent);
 }
 .button {
