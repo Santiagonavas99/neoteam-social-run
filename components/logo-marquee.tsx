@@ -1,37 +1,39 @@
-import Image from "next/image";
-import type { HomeLogoCarouselItem } from "@/lib/home-features";
+import Image from 'next/image'
+import type { HomeLogoCarouselItem } from '@/lib/home-features'
 
 function externalUrl(value?: string | null) {
-  if (!value?.trim()) return undefined;
+  if (!value?.trim()) return undefined
   try {
-    const url = new URL(/^https?:\/\//i.test(value.trim()) ? value.trim() : `https://${value.trim()}`);
-    return ["https:", "http:"].includes(url.protocol) ? url.href : undefined;
+    const url = new URL(
+      /^https?:\/\//i.test(value.trim()) ? value.trim() : `https://${value.trim()}`,
+    )
+    return ['https:', 'http:'].includes(url.protocol) ? url.href : undefined
   } catch {
-    return undefined;
+    return undefined
   }
 }
 
 export function LogoMarquee({ items }: { items: HomeLogoCarouselItem[] }) {
-  const visibleItems = items.filter((item) => item.logo_url?.trim());
-  if (!visibleItems.length) return null;
+  const visibleItems = items.filter((item) => item.logo_url?.trim())
+  if (!visibleItems.length) return null
 
-  const repeatCount = Math.max(1, Math.ceil(8 / visibleItems.length));
-  const repeatedItems = Array.from({ length: repeatCount }, () => visibleItems).flat();
+  const repeatCount = Math.max(1, Math.ceil(8 / visibleItems.length))
+  const repeatedItems = Array.from({ length: repeatCount }, () => visibleItems).flat()
 
   function group(hidden = false) {
     return (
       <div className="brand-marquee-group" aria-hidden={hidden || undefined}>
         {repeatedItems.map((item, index) => {
-          const href = externalUrl(item.link_url);
+          const href = externalUrl(item.link_url)
           const image = (
             <Image
               unoptimized
               src={item.logo_url}
               width={220}
               height={88}
-              alt={hidden ? "" : item.name}
+              alt={hidden ? '' : item.name}
             />
-          );
+          )
 
           return href ? (
             <a
@@ -49,10 +51,10 @@ export function LogoMarquee({ items }: { items: HomeLogoCarouselItem[] }) {
             <div className="brand-marquee-item" key={`${item.id}-${index}`}>
               {image}
             </div>
-          );
+          )
         })}
       </div>
-    );
+    )
   }
 
   return (
@@ -64,5 +66,5 @@ export function LogoMarquee({ items }: { items: HomeLogoCarouselItem[] }) {
         </div>
       </div>
     </section>
-  );
+  )
 }

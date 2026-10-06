@@ -1,5 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
-import { supabasePublishableKey, supabaseUrl } from "@/lib/supabase/config";
+import { createClient } from '@supabase/supabase-js'
+import { supabasePublishableKey, supabaseUrl } from '@/lib/supabase/config'
 
 export function createServerSupabaseClient() {
   return createClient(supabaseUrl, supabasePublishableKey, {
@@ -8,5 +8,5 @@ export function createServerSupabaseClient() {
       autoRefreshToken: false,
       detectSessionInUrl: false,
     },
-  });
+  })
 }

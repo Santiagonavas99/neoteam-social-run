@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from 'next/link'
 
 export function SiteHeader() {
   return (
@@ -11,9 +11,10 @@ export function SiteHeader() {
         <a href="/#evento">Evento</a>
         <a href="/#agenda">Agenda</a>
         <a href="/#invitados">Invitados</a>
-        <Link className="button button-small" href="/registro">Registrarme</Link>
+        <Link className="button button-small" href="/registro">
+          Registrarme
+        </Link>
       </nav>
     </header>
-  );
+  )
 }
-

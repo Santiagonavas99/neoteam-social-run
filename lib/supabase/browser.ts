@@ -1,7 +1,7 @@
-"use client";
+'use client'
 
-import { createClient } from "@supabase/supabase-js";
-import { supabasePublishableKey, supabaseUrl } from "@/lib/supabase/config";
+import { createClient } from '@supabase/supabase-js'
+import { supabasePublishableKey, supabaseUrl } from '@/lib/supabase/config'
 
 export function createBrowserSupabaseClient() {
   return createClient(supabaseUrl, supabasePublishableKey, {
@@ -10,5 +10,5 @@ export function createBrowserSupabaseClient() {
       autoRefreshToken: true,
       detectSessionInUrl: true,
     },
-  });
+  })
 }

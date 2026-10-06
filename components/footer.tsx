@@ -5,5 +5,5 @@ export function Footer() {
       <span>18 de octubre de 2026</span>
       <span>Hecho para correr juntos.</span>
     </footer>
-  );
+  )
 }

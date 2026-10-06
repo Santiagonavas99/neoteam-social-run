@@ -1,18 +1,20 @@
-import Link from "next/link";
-import { Footer } from "@/components/footer";
-import { SiteHeader } from "@/components/site-header";
-import { CommunityCarousel } from "@/components/community-carousel";
-import { LogoMarquee } from "@/components/logo-marquee";
-import { agenda, eventConfig } from "@/lib/event";
-import { getHomeCommunity, getHomeLogoCarouselItems } from "@/lib/home-features";
+import Link from 'next/link'
+import { CommunityCarousel } from '@/components/community-carousel'
+import { Footer } from '@/components/footer'
+import { LogoMarquee } from '@/components/logo-marquee'
+import { SiteHeader } from '@/components/site-header'
+import { agenda, eventConfig } from '@/lib/event'
+import { getHomeCommunity, getHomeLogoCarouselItems } from '@/lib/home-features'
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic'
 
 export default async function Home() {
-  const [logoItems, community] = await Promise.all([getHomeLogoCarouselItems(), getHomeCommunity()]);
-  const organizers = community.brands.filter((brand) => brand.type === "organizer");
-  const sponsors = community.brands.filter((brand) => brand.type === "sponsor");
-  const partners = community.brands.filter((brand) => brand.type === "main_partner" || brand.type === "invited");
+  const [logoItems, community] = await Promise.all([getHomeLogoCarouselItems(), getHomeCommunity()])
+  const organizers = community.brands.filter((brand) => brand.type === 'organizer')
+  const sponsors = community.brands.filter((brand) => brand.type === 'sponsor')
+  const partners = community.brands.filter(
+    (brand) => brand.type === 'main_partner' || brand.type === 'invited',
+  )
 
   return (
     <main className="home-v2">
@@ -28,14 +30,21 @@ export default async function Home() {
         <div className="v2-hero-grid shell">
           <div className="v2-hero-title">
             <p className="kicker">{eventConfig.eyebrow}</p>
-            <h1><span>SOCIAL</span><span>RUN</span></h1>
+            <h1>
+              <span>SOCIAL</span>
+              <span>RUN</span>
+            </h1>
           </div>
 
           <div className="v2-hero-side">
             <p>{eventConfig.headline}</p>
             <div className="v2-hero-actions">
-              <Link href="/registro" className="button">Quiero participar <span>↗</span></Link>
-              <a href="#agenda" className="text-link">Ver agenda ↓</a>
+              <Link href="/registro" className="button">
+                Quiero participar <span>↗</span>
+              </Link>
+              <a href="#agenda" className="text-link">
+                Ver agenda ↓
+              </a>
             </div>
             <div className="v2-route-card">
               <strong>5K</strong>
@@ -56,14 +65,27 @@ export default async function Home() {
         <span className="v2-index">01 / EL PLAN</span>
         <div className="v2-story-copy">
           <p className="section-label">UN PUNTO DE ENCUENTRO</p>
-          <h2>NO VENIMOS A <em>COMPETIR.</em><br />VENIMOS A CORRER JUNTOS.</h2>
+          <h2>
+            NO VENIMOS A <em>COMPETIR.</em>
+            <br />
+            VENIMOS A CORRER JUNTOS.
+          </h2>
         </div>
         <div className="v2-story-aside">
           <p>{eventConfig.description}</p>
           <div className="v2-fact-list">
-            <div className="v2-fact"><strong>18 OCT</strong><span>Fecha</span></div>
-            <div className="v2-fact"><strong>07:30</strong><span>Encuentro</span></div>
-            <div className="v2-fact"><strong>5K</strong><span>Ruta social</span></div>
+            <div className="v2-fact">
+              <strong>18 OCT</strong>
+              <span>Fecha</span>
+            </div>
+            <div className="v2-fact">
+              <strong>07:30</strong>
+              <span>Encuentro</span>
+            </div>
+            <div className="v2-fact">
+              <strong>5K</strong>
+              <span>Ruta social</span>
+            </div>
           </div>
         </div>
       </section>
@@ -74,42 +96,85 @@ export default async function Home() {
         <div className="shell">
           <header className="v2-section-head">
             <span className="v2-index">02 / AGENDA</span>
-            <h2>UNA MAÑANA<br />CON RITMO.</h2>
-            <p>Desde la llegada hasta la foto final: correr, recuperar, compartir y celebrar el aniversario juntos.</p>
+            <h2>
+              UNA MAÑANA
+              <br />
+              CON RITMO.
+            </h2>
+            <p>
+              Desde la llegada hasta la foto final: correr, recuperar, compartir y celebrar el
+              aniversario juntos.
+            </p>
           </header>
 
           <div className="v2-agenda-grid">
             {agenda.map(({ time, meridiem, title, details }, index) => {
-              const specialClass = title === "Ruta 5K" ? " route" : title === "Celebración y rifas" ? " celebration" : "";
+              const specialClass =
+                title === 'Ruta 5K'
+                  ? ' route'
+                  : title === 'Celebración y rifas'
+                    ? ' celebration'
+                    : ''
               return (
                 <article className={`v2-agenda-card${specialClass}`} key={`${time}-${title}`}>
                   <div className="v2-agenda-top">
-                    <div className="v2-agenda-time">{time}<small>{meridiem}</small></div>
-                    <span className="v2-agenda-number">{String(index + 1).padStart(2, "0")}</span>
+                    <div className="v2-agenda-time">
+                      {time}
+                      <small>{meridiem}</small>
+                    </div>
+                    <span className="v2-agenda-number">{String(index + 1).padStart(2, '0')}</span>
                   </div>
                   <h3>{title}</h3>
-                  <ul>{details.map((detail) => <li key={detail}>{detail}</li>)}</ul>
+                  <ul>
+                    {details.map((detail) => (
+                      <li key={detail}>{detail}</li>
+                    ))}
+                  </ul>
                 </article>
-              );
+              )
             })}
           </div>
         </div>
       </section>
 
-      {(community.groups.length > 0 || organizers.length + sponsors.length + partners.length > 0) && (
+      {(community.groups.length > 0 ||
+        organizers.length + sponsors.length + partners.length > 0) && (
         <section className="v2-community" id="invitados">
           <div className="shell">
             <header className="v2-community-head">
               <span className="v2-index">03 / COMUNIDAD</span>
-              <h2>CORREMOS<br />ACOMPAÑADOS.</h2>
-              <p>Crews, marcas y aliados que hacen que el encuentro sea más grande que solo cinco kilómetros.</p>
+              <h2>
+                CORREMOS
+                <br />
+                ACOMPAÑADOS.
+              </h2>
+              <p>
+                Crews, marcas y aliados que hacen que el encuentro sea más grande que solo cinco
+                kilómetros.
+              </p>
             </header>
 
             <div className="logo-panels">
-              <CommunityCarousel items={community.groups} title="RUNNING CREWS" description="comunidades que se suman" />
-              <CommunityCarousel items={organizers} title="ORGANIZACIÓN" description="quienes hacen posible este encuentro" />
-              <CommunityCarousel items={sponsors} title="MARCAS" description="marcas que nos acompañan" />
-              <CommunityCarousel items={partners} title="PARTNERS / MARCAS INVITADAS" description="activaciones · producto · experiencias" />
+              <CommunityCarousel
+                items={community.groups}
+                title="RUNNING CREWS"
+                description="comunidades que se suman"
+              />
+              <CommunityCarousel
+                items={organizers}
+                title="ORGANIZACIÓN"
+                description="quienes hacen posible este encuentro"
+              />
+              <CommunityCarousel
+                items={sponsors}
+                title="MARCAS"
+                description="marcas que nos acompañan"
+              />
+              <CommunityCarousel
+                items={partners}
+                title="PARTNERS / MARCAS INVITADAS"
+                description="activaciones · producto · experiencias"
+              />
             </div>
           </div>
         </section>
@@ -119,15 +184,29 @@ export default async function Home() {
         <div className="v2-raffle-copy">
           <div>
             <p className="section-label">04 / RIFAS</p>
-            <h2 id="raffle-title">CORRES.<br />CELEBRAS.<br />GANAS.</h2>
+            <h2 id="raffle-title">
+              CORRES.
+              <br />
+              CELEBRAS.
+              <br />
+              GANAS.
+            </h2>
           </div>
-          <p>Premios e inscripciones aportados por nuestras marcas aliadas para cerrar la mañana celebrando a la comunidad.</p>
+          <p>
+            Premios e inscripciones aportados por nuestras marcas aliadas para cerrar la mañana
+            celebrando a la comunidad.
+          </p>
         </div>
         <div className="v2-raffle-side">
           <span>DESPUÉS DE LA RUTA</span>
           <strong>8:45</strong>
-          <p>Celebración, reconocimiento a las marcas aliadas, rifas, premios y contenido con la comunidad.</p>
-          <Link href="/registro" className="button">Registrarme <span>↗</span></Link>
+          <p>
+            Celebración, reconocimiento a las marcas aliadas, rifas, premios y contenido con la
+            comunidad.
+          </p>
+          <Link href="/registro" className="button">
+            Registrarme <span>↗</span>
+          </Link>
         </div>
       </section>
 
@@ -137,12 +216,14 @@ export default async function Home() {
           <div className="v2-final-main">
             <p>DOMINGO · SOCIAL RUN · ANIVERSARIO NEOTEAM</p>
             <h2>18.10.26</h2>
-            <Link href="/registro" className="button">Quiero estar ahí <span>↗</span></Link>
+            <Link href="/registro" className="button">
+              Quiero estar ahí <span>↗</span>
+            </Link>
           </div>
         </div>
       </section>
 
       <Footer />
     </main>
-  );
+  )
 }
