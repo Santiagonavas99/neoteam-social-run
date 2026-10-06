@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-05
+
+### Added
+
+- **NeoTeam logo** in the home header, the registration page and the admin panel. It adapts its colors to light and dark backgrounds, so it can be read everywhere.
+- **Favicon**: the "NT" mark on a black square, visible on light and dark browser tabs.
+
 ## [0.2.1] - 2026-10-05
 
 ### Changed
