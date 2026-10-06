@@ -8,7 +8,7 @@ One commit per task. Every task ends with `pnpm ci:check` green. Phase B (public
 
 ## Task 0 — Baseline screenshots
 
-- [ ] Screenshots of `/`, `/registro` and every admin section (`metrics`, `logos`, `participants`, `groups`, `brands`, `raffles`, `security`) at 1440 px and 390 px, saved under `design/baseline/2026-10-05/`.
+- [ ] Screenshots of `/`, `/registro` and every admin section (`metrics`, `logos`, `participants`, `groups`, `brands`, `raffles`, `security`) at **390 px** and 1440 px, saved under `design/baseline/2026-10-05/`.
 - No commit of code; commit the screenshots: `docs(design): baseline screenshots before Tailwind`
 
 ## Task 1 — Install Tailwind 4 without preflight
@@ -50,14 +50,14 @@ One commit per task. Every task ends with `pnpm ci:check` green. Phase B (public
 
 ## Task 4 — Admin panel to Tailwind (one commit per file)
 
-For each file, move its markup to utilities and **delete the same rules from the legacy CSS** in the same commit (the admin rules live in `app/globals.css` and `app/neo-overrides.css`; `grep` each class name before deleting to be sure the public site does not use it).
+Mobile first: unprefixed utilities = 390 px, `md:`/`lg:` for desktop; `max-width` legacy queries are inverted. For each file, move its markup to utilities and **delete the same rules from the legacy CSS** in the same commit (the admin rules live in `app/globals.css` and `app/neo-overrides.css`; `grep` each class name before deleting to be sure the public site does not use it).
 
 - [ ] 4a `app/admin/admin-ui.tsx` (Feedback, StatusBadge, Logo)
 - [ ] 4b `app/admin/record-editor.tsx`
 - [ ] 4c `app/admin/logo-carousel-admin.tsx`
 - [ ] 4d `app/admin/admin-management.tsx`
 - [ ] 4e `app/admin/admin-dashboard.tsx` (shell, sidebar, login, security)
-- Check per commit: screenshots of the affected admin sections at 1440/390 vs baseline; keyboard pass (tab order, visible focus); `pnpm ci:check`.
+- Check per commit: screenshots at **390 px first**, then 1440, vs baseline; tables/lists usable on a phone (no horizontal page scroll, 44 px targets); keyboard pass (tab order, visible focus); `pnpm ci:check`.
 - Commits: `refactor(admin): <file> to Tailwind`
 
 ## Task 5 — Close Phase A

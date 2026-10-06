@@ -51,7 +51,7 @@ One commit per task. Steps marked **(Iván)** touch secrets or production and ar
 - [ ] **(Iván)** Generate the secret with `openssl rand -hex 32`. Set it in Vercel (`ADMIN_PROXY_SECRET`, Production + Preview + Development, not `NEXT_PUBLIC_`) and in Supabase → Edge Functions → Secrets.
 - [ ] **(Iván)** Push the branch, which deploys the preview proxy.
 - [ ] **(Iván)** `supabase db push` (both migrations), then `supabase functions deploy admin-pin admin-logos`.
-- [ ] Verify on the preview:
+- [ ] Verify on the preview, **from a phone first** (390 px, mobile data), then desktop:
   - login, the dashboard, logo upload, check-in, a test raffle draw (create → draw → draw again → same winners kept / 409), and logout;
   - a direct `curl` to `…/functions/v1/admin-pin` with only the publishable key → 401;
   - 9 wrong PINs → the 9th returns 429;

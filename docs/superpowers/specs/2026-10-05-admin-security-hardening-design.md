@@ -34,6 +34,10 @@ No UI change. Error messages stay in the panel's existing Spanish voice ("Demasi
    - All of them use `security definer`, `search_path = ''`, `service_role` only. The edge function calls them through `supabase.rpc`.
 5. **L1:** `Object.hasOwn(configs, resource)`. **L4:** the logos proxy sanitizes upstream ≥ 500 exactly like `/api/admin`.
 
+## Mobile
+
+Staff run login, check-in, instant-win scans and draws from phones on event day. The new 429/503/401 states use the existing feedback component, which is checked at 390 px. Phones on mobile data change IP often (CGNAT, cell handover): the per-IP limit (8 per 10 min) stays as it is, so a legitimate user who switches network is not punished for someone else's failures; the global cap is the backstop.
+
 ## Rollout (zero downtime)
 
 1. Iván sets `ADMIN_PROXY_SECRET` in Vercel and in Supabase secrets.

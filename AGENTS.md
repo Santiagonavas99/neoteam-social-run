@@ -32,6 +32,15 @@ Trivial fixes (typo, one-line copy change) may skip the spec, never the OK.
 
 Code reviews are written to `docs/superpowers/audits/`, never only left in chat.
 
+## Mobile first
+
+Most participants register from a phone, and staff run check-in, scans and draws from phones on event day. Mobile is the primary target:
+
+- Design and build at **390 px first**, then scale up (1024, 1440). In CSS, base styles are mobile and `min-width` media queries (Tailwind `md:`/`lg:`) add desktop.
+- Touch targets ≥ 44×44 px, no hover-only interactions, inputs use the right `type`/`inputmode`/`autocomplete`.
+- Every spec has a *Mobile* section; every plan's checks include a pass at 390 px (real device or emulation) **before** desktop.
+- Performance on mid-range phones over 4G counts: no new client-side dependency without a mobile cost note.
+
 ## Code rules
 
 - All code, identifiers, file names and comments in **English**. User-facing copy stays in **Spanish**.

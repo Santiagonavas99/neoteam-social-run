@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 @AGENTS.md
 
-**Mandatory workflow (see AGENTS.md):** read `DESIGN.md`, `design/` and the `frontend-design` skill → write spec → write plan → wait for Iván's explicit OK → implement. Never implement in the same turn the plan is written.
+**Mandatory workflow (see AGENTS.md):** read `DESIGN.md`, `design/` and the `frontend-design` skill → write spec → write plan → wait for Iván's explicit OK → implement. **Mobile first** (390 px) in every spec, plan and check. Never implement in the same turn the plan is written.
 
 ## Project
 
