@@ -7,14 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-05
+
 ### Added
 
-- **Pase con código QR al inscribirte** y página **Mi pase** (`/pase`) para recuperarlo con tu documento y correo.
-- **Check-in con escáner QR** en el panel, pensado para el celular del staff. Si dos teléfonos escanean el mismo QR, solo cuenta una vez.
+- **QR pass after registering**, and a **Mi pase** page (`/pase`) to get it back with your document number and email.
+- **Check-in with a QR scanner** in the admin panel, built for staff phones. If two phones scan the same QR, it counts once.
+
+### Changed
+
+- **Registration and pass forms**: every field has its own label, and screen readers announce each error with its field.
 
 ### Fixed
 
-- **Letra más legible en la página principal:** botones y enlaces a 14–15 px, la agenda a 15 px y ninguna etiqueta por debajo de 12 px.
+- **Readable text on the home page**: buttons and links at 14–15 px, the agenda at 15 px and no label under 12 px.
 - **Registration form keeps your answers** when the server reports an error, including the document type and running group. Before, every field came back empty.
 - **Phone numbers must have 10 digits.** Numbers autofilled as `+57 300 123 4567` are corrected automatically.
 
