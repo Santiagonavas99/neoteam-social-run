@@ -1,6 +1,6 @@
 # QR pass and check-in — spec
 
-Date: 2026-10-05 · Branch: `feat/qr-checkin` (from `main` after `fix/registration-form`) · Status: **awaiting OK**
+Date: 2026-10-05 · Branch: `feat/qr-checkin` (from `main` after `fix/registration-form`) · Status: **approved 2026-10-05**
 
 Source: Santiago's `feat/qr-wallet-checkin`. The QR, pass recovery and check-in parts are ported here. Wallet has its own spec (`2026-10-05-wallet-passes-design.md`).
 

@@ -8,6 +8,7 @@ Spec: [`2026-10-05-qr-checkin-design.md`](../specs/2026-10-05-qr-checkin-design.
 
 - Run the two queries in the spec ("State to verify first") and list the deployed Edge Functions.
 - Paste the results into the PR. The answer decides whether Task 1 only records the migration or also runs it.
+- **Result (2026-10-05):** `checkin_token` exists, `NOT NULL`, default `gen_random_uuid()`, unique index `registrations_checkin_token_key`, 0 rows without a token. Task 1 only records the migration. The remote is still in development, so Task 5 deletes and redeploys the functions without checking first.
 
 ### 1. `chore(db): record the checkin_token migration`
 
@@ -84,8 +85,8 @@ Spec: [`2026-10-05-qr-checkin-design.md`](../specs/2026-10-05-qr-checkin-design.
 
 ### 5. Deploy and clean up (Iván)
 
+- `supabase functions delete registration-pass admin-checkin apple-wallet-pass` (an error for one that does not exist is fine; spec 4 recreates the Wallet function).
 - `supabase functions deploy admin-pin registration-pass`
-- `supabase functions delete admin-checkin`, if it was deployed.
 - Close Santiago's `feat/qr-wallet-checkin` PR with a link to this one; spec 4 continues the Wallet part.
 
 ## Done when
