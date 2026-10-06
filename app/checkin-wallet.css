@@ -8,3 +8,73 @@
 
 @media(max-width:860px){.pass-recovery-layout{grid-template-columns:1fr;gap:12px;padding-top:20px}.pass-recovery-copy{position:static;padding:24px 0}.registration-header-actions{gap:14px}.registration-header-actions .text-link:first-child{display:none}}
 @media(max-width:600px){.checkin-floating-link{right:16px;bottom:16px;min-height:44px;padding:10px 15px}.checkin-admin-page{padding:16px}.checkin-admin-card{padding:20px}.checkin-admin-title h1{font-size:36px}.checkin-reader{min-height:280px}.checkin-manual{grid-template-columns:1fr}.checkin-manual .button{width:100%}.checkin-pass{padding:18px}.checkin-pass-heading{display:grid}.checkin-pass-heading small{text-align:left}.pass-recovery-form,.pass-recovery-result{padding:24px}.pass-recovery-form .button{width:100%}}
+
+
+/* NeoTeam web pass / iPhone PWA */
+.wallet-webpass{background:var(--neo-accent);color:#050505;border:1px solid var(--neo-accent)}
+.wallet-webpass:hover{background:#8bb7b1}
+.wallet-webpass-secondary{background:transparent;color:#fff;border:1px solid #46534f}
+.wallet-webpass-secondary:hover{background:#111916}
+
+.neoteam-pass-overlay{position:fixed;inset:0;z-index:1000;background:#050505;color:#fff;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto;overflow:auto;padding:calc(16px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.neoteam-pass-toolbar{width:min(520px,100%);margin:0 auto;display:grid;grid-template-columns:72px 1fr 72px;align-items:center;gap:12px;min-height:52px}
+.neoteam-pass-toolbar>span{text-align:center;font-size:10px;letter-spacing:.16em;font-weight:800;color:#b8c6c1}
+.neoteam-pass-icon-button{min-height:42px;border:1px solid #303936;border-radius:999px;background:#0e1311;color:#fff;font-size:12px;font-weight:700;padding:8px 12px}
+.neoteam-pass-icon-button:first-child{width:42px;padding:0;font-size:24px;line-height:1}
+.neoteam-pass-stage{display:grid;place-items:center;padding:18px 0}
+.neoteam-pass-card{width:min(420px,100%);border-radius:30px;background:linear-gradient(180deg,#0a0a0a 0%,#050505 100%);border:1px solid #27322f;box-shadow:0 28px 80px rgba(0,0,0,.4);padding:26px;display:grid;gap:26px;overflow:hidden;position:relative}
+.neoteam-pass-card:before{content:"";position:absolute;inset:0 0 auto;height:5px;background:var(--neo-accent)}
+.neoteam-pass-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.neoteam-pass-eyebrow{display:block;font-size:9px;letter-spacing:.15em;font-weight:800;color:var(--neo-accent);margin-bottom:8px}
+.neoteam-pass-card h2{font-size:24px;line-height:1.05;letter-spacing:-.04em;margin:0;color:#fff;text-align:left}
+.neoteam-pass-status{font-size:8px;letter-spacing:.12em;font-weight:800;color:#050505;background:var(--neo-accent);padding:7px 9px;border-radius:999px;white-space:nowrap}
+.neoteam-pass-event{display:grid;grid-template-columns:1fr auto;gap:4px 16px;padding:18px 0;border-top:1px solid #29322f;border-bottom:1px solid #29322f}
+.neoteam-pass-event span,.neoteam-pass-event strong{font-size:18px;letter-spacing:-.02em}
+.neoteam-pass-event strong{text-align:right}
+.neoteam-pass-event small{grid-column:1/-1;color:#9eaaa6;font-size:12px;margin-top:4px}
+.neoteam-pass-qr{display:grid;place-items:center}
+.neoteam-pass-qr .checkin-qr{width:min(310px,100%);padding:16px;border-radius:18px}
+.neoteam-pass-code{text-align:center;display:grid;gap:6px}
+.neoteam-pass-code span{font-size:9px;letter-spacing:.15em;color:#8c9995}
+.neoteam-pass-code strong{font-size:25px;letter-spacing:.08em}
+.neoteam-pass-actions{width:min(520px,100%);margin:0 auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.neoteam-pass-action{min-height:48px;border-radius:12px;border:1px solid var(--neo-accent);background:var(--neo-accent);color:#050505;font-size:12px;font-weight:800;padding:12px 16px}
+.neoteam-pass-action.secondary{background:#0e1311;border-color:#394640;color:#fff}
+.neoteam-pass-note{width:min(520px,100%);margin:12px auto 0;text-align:center;font-size:11px;line-height:1.45;color:#7f8b87}
+
+.neoteam-pass-overlay.is-scan-mode{background:#fff;color:#050505}
+.neoteam-pass-overlay.is-scan-mode .neoteam-pass-toolbar>span{color:#4d5754}
+.neoteam-pass-overlay.is-scan-mode .neoteam-pass-icon-button{background:#fff;color:#050505;border-color:#d2d8d5}
+.neoteam-pass-overlay.is-scan-mode .neoteam-pass-stage{padding:8px 0}
+.neoteam-pass-overlay.is-scan-mode .neoteam-pass-card{background:#fff;color:#050505;border-color:#d7ddda;box-shadow:none}
+.neoteam-pass-overlay.is-scan-mode .neoteam-pass-card:before{background:#050505}
+.neoteam-pass-overlay.is-scan-mode .neoteam-pass-card h2{color:#050505}
+.neoteam-pass-overlay.is-scan-mode .neoteam-pass-event{border-color:#d8dddb}
+.neoteam-pass-overlay.is-scan-mode .neoteam-pass-event small{color:#5d6864}
+.neoteam-pass-overlay.is-scan-mode .neoteam-pass-eyebrow{color:#315e58}
+.neoteam-pass-overlay.is-scan-mode .neoteam-pass-qr .checkin-qr{width:min(340px,100%);border:2px solid #050505}
+.neoteam-pass-overlay.is-scan-mode .neoteam-pass-code span{color:#59635f}
+.neoteam-pass-overlay.is-scan-mode .neoteam-pass-action{background:#050505;color:#fff;border-color:#050505}
+.neoteam-pass-overlay.is-scan-mode .neoteam-pass-action.secondary{background:#fff;color:#050505;border-color:#cfd6d3}
+.neoteam-pass-overlay.is-scan-mode .neoteam-pass-note{color:#5b6662}
+
+.neoteam-install-sheet{position:fixed;inset:0;z-index:1010;background:rgba(0,0,0,.7);display:grid;align-items:end;padding:16px}
+.neoteam-install-sheet-card{width:min(520px,100%);margin:0 auto;background:#fff;color:#050505;border-radius:24px;padding:26px;box-shadow:0 -20px 80px rgba(0,0,0,.28)}
+.neoteam-install-sheet-card h3{font-size:30px;letter-spacing:-.045em;margin:8px 0 18px}
+.neoteam-install-sheet-card ol{display:grid;gap:10px;margin:0 0 18px;padding-left:22px;font-size:14px;line-height:1.45}
+.neoteam-install-sheet-card p{font-size:12px;line-height:1.55;color:var(--neo-text-secondary);margin-bottom:18px}
+
+.saved-pass-result>.section-label:after{content:" · EN ESTE DISPOSITIVO"}
+
+@media(max-width:600px){
+  .neoteam-pass-overlay{padding-top:calc(10px + env(safe-area-inset-top));padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+  .neoteam-pass-toolbar{grid-template-columns:54px 1fr 70px}
+  .neoteam-pass-stage{padding:10px 0}
+  .neoteam-pass-card{padding:22px 18px;border-radius:26px;gap:20px}
+  .neoteam-pass-card h2{font-size:22px}
+  .neoteam-pass-event span,.neoteam-pass-event strong{font-size:16px}
+  .neoteam-pass-qr .checkin-qr{width:min(285px,100%);padding:14px}
+  .neoteam-pass-overlay.is-scan-mode .neoteam-pass-qr .checkin-qr{width:min(320px,100%)}
+  .neoteam-pass-actions{grid-template-columns:1fr}
+  .neoteam-pass-note{font-size:10px}
+}
