@@ -6,15 +6,50 @@ import { type FormEvent, useState } from 'react'
 import { BrandLink } from '@/components/brand-link'
 import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
-import type { FeedbackValue } from '../types'
+import type { AdminResponse, FeedbackValue } from '../types'
 import { Feedback } from '../ui/admin-ui'
 import { LoadingState } from '../ui/loading-state'
 import { isPin } from './pin'
 import { PinField } from './pin-field'
 import type { AdminSession } from './use-admin-session'
+import { isUsername, normalizeUsername } from './username'
+
+const USERNAME_RULE = 'El usuario usa de 3 a 32 letras minúsculas, números, punto o guion.'
+
+export function UsernameField({
+  label,
+  value,
+  onChange,
+  autoFocus = false,
+}: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+  autoFocus?: boolean
+}) {
+  return (
+    <label>
+      {label}
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        autoComplete="username"
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
+        maxLength={32}
+        required
+        autoFocus={autoFocus}
+      />
+    </label>
+  )
+}
 
 export function AuthScreen({ session }: { session: AdminSession }) {
   const [setupSecret, setSetupSecret] = useState('')
+  const [name, setName] = useState('')
+  const [username, setUsername] = useState('')
   const [pin, setPin] = useState('')
   const [confirmPin, setConfirmPin] = useState('')
   const [busy, setBusy] = useState(false)
@@ -25,7 +60,7 @@ export function AuthScreen({ session }: { session: AdminSession }) {
   async function submit(
     event: FormEvent<HTMLFormElement>,
     validate: () => string,
-    request: () => Promise<{ token?: string }>,
+    request: () => Promise<AdminResponse>,
     fallback: string,
   ) {
     event.preventDefault()
@@ -39,7 +74,7 @@ export function AuthScreen({ session }: { session: AdminSession }) {
     try {
       const data = await request()
       if (!data.token) throw new Error('No pudimos crear la sesión administrativa.')
-      session.remember(data.token)
+      session.remember(data.token, data)
     } catch (caught) {
       setError(errorMessage(caught, fallback))
       setBusy(false)
@@ -50,24 +85,38 @@ export function AuthScreen({ session }: { session: AdminSession }) {
     submit(
       event,
       () =>
-        !isPin(pin)
-          ? 'El PIN debe tener exactamente 6 dígitos.'
-          : pin !== confirmPin
-            ? 'Los dos PIN no coinciden.'
-            : '',
+        name.trim().length < 2
+          ? 'Escribe tu nombre.'
+          : !isUsername(username)
+            ? USERNAME_RULE
+            : !isPin(pin)
+              ? 'El PIN debe tener exactamente 6 dígitos.'
+              : pin !== confirmPin
+                ? 'Los dos PIN no coinciden.'
+                : '',
       async () => {
-        const data = await callAdmin('setup', { pin, setupSecret })
+        const data = await callAdmin('setup', {
+          pin,
+          setupSecret,
+          name: name.trim(),
+          username: normalizeUsername(username),
+        })
         if (data.token) session.markConfigured()
         return data
       },
-      'No pudimos configurar el PIN.',
+      'No pudimos configurar el acceso.',
     )
 
   const login = (event: FormEvent<HTMLFormElement>) =>
     submit(
       event,
-      () => (isPin(pin) ? '' : 'Escribe tu PIN de 6 dígitos.'),
-      () => callAdmin('login', { pin }),
+      () =>
+        !isUsername(username)
+          ? 'Escribe tu usuario.'
+          : isPin(pin)
+            ? ''
+            : 'Escribe tu PIN de 6 dígitos.',
+      () => callAdmin('login', { username: normalizeUsername(username), pin }),
       'No pudimos iniciar sesión.',
     )
 
@@ -87,8 +136,7 @@ export function AuthScreen({ session }: { session: AdminSession }) {
         ) : session.configured === false ? (
           <>
             <p className="m-0 text-sm text-neo-text-secondary">
-              Primer acceso. Usa tu clave de configuración y elige el PIN con el que entrarás al
-              panel.
+              Primer acceso. Usa tu clave de configuración y crea tu usuario de administrador.
             </p>
             {session.setupSecretReady === false && (
               <Feedback
@@ -110,8 +158,20 @@ export function AuthScreen({ session }: { session: AdminSession }) {
                 />
                 <small>Solo se utiliza en este primer acceso.</small>
               </label>
-              <PinField label="2. Crea tu PIN" value={pin} onChange={setPin} />
-              <PinField label="3. Confirma tu PIN" value={confirmPin} onChange={setConfirmPin} />
+              <label>
+                2. Tu nombre
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  autoComplete="name"
+                  maxLength={80}
+                  required
+                />
+              </label>
+              <UsernameField label="3. Elige tu usuario" value={username} onChange={setUsername} />
+              <PinField label="4. Crea tu PIN" value={pin} onChange={setPin} />
+              <PinField label="5. Confirma tu PIN" value={confirmPin} onChange={setConfirmPin} />
               <Feedback value={feedback} />
               <button
                 type="submit"
@@ -120,24 +180,30 @@ export function AuthScreen({ session }: { session: AdminSession }) {
                   busy ||
                   session.setupSecretReady === false ||
                   !setupSecret ||
+                  !isUsername(username) ||
                   !isPin(pin) ||
                   !isPin(confirmPin)
                 }
               >
                 <LogIn aria-hidden className="size-4 shrink-0" />
-                {busy ? 'Configurando…' : 'Guardar PIN y entrar'}
+                {busy ? 'Configurando…' : 'Crear acceso y entrar'}
               </button>
             </form>
           </>
         ) : (
           <>
             <p className="m-0 text-sm text-neo-text-secondary">
-              Introduce tu PIN de 6 dígitos para continuar.
+              Entra con tu usuario y tu PIN de 6 dígitos.
             </p>
             <form onSubmit={login} className="stack-form">
-              <PinField label="PIN de acceso" value={pin} onChange={setPin} current autoFocus />
+              <UsernameField label="Usuario" value={username} onChange={setUsername} autoFocus />
+              <PinField label="PIN de acceso" value={pin} onChange={setPin} current />
               <Feedback value={feedback} />
-              <button type="submit" className="button full-width" disabled={busy || !isPin(pin)}>
+              <button
+                type="submit"
+                className="button full-width"
+                disabled={busy || !isUsername(username) || !isPin(pin)}
+              >
                 <LogIn aria-hidden className="size-4 shrink-0" />
                 {busy ? 'Entrando…' : 'Entrar'}
               </button>

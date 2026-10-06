@@ -9,19 +9,26 @@ import { DynamicsView } from './dynamics/dynamics-view'
 import { LogosView } from './logos/logos-view'
 import { OverviewView } from './overview/overview-view'
 import { ParticipantsView } from './participants/participants-view'
-import type { AdminSection } from './sections'
+import { type AdminSection, sectionsFor } from './sections'
 import { ChangePinForm } from './security/change-pin-form'
 import { AdminShell } from './shell/admin-shell'
 
 export function AdminApp() {
   const session = useAdminSession()
-  const [section, setSection] = useState<AdminSection>('metrics')
+  const [picked, setSection] = useState<AdminSection | null>(null)
 
   if (!session.ready || !session.token) return <AuthScreen session={session} />
   const token = session.token
+  const allowed = sectionsFor(session.role)
+  const section = allowed.find((item) => item.id === picked)?.id ?? allowed[0]?.id ?? 'checkin'
 
   return (
-    <AdminShell section={section} onNavigate={setSection} onSignOut={() => void session.signOut()}>
+    <AdminShell
+      sections={allowed}
+      section={section}
+      onNavigate={setSection}
+      onSignOut={() => void session.signOut()}
+    >
       {section === 'checkin' ? (
         <CheckinView token={token} />
       ) : section === 'logos' ? (

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
+import type { StaffRole } from '../types'
 
 const SESSION_KEY = 'neoteam_admin_pin_session'
 
@@ -11,6 +12,8 @@ export function useAdminSession() {
   const [configured, setConfigured] = useState<boolean | null>(null)
   const [setupSecretReady, setSetupSecretReady] = useState<boolean | null>(null)
   const [token, setToken] = useState<string | null>(null)
+  const [role, setRole] = useState<StaffRole>('checkin')
+  const [name, setName] = useState('')
   const [bootError, setBootError] = useState('')
 
   useEffect(() => {
@@ -28,8 +31,11 @@ export function useAdminSession() {
 
         const validation = await callAdmin('validate', { token: storedToken })
         if (!active) return
-        if (validation.valid) setToken(storedToken)
-        else window.localStorage.removeItem(SESSION_KEY)
+        if (validation.valid) {
+          setRole(validation.role ?? 'checkin')
+          setName(validation.name ?? '')
+          setToken(storedToken)
+        } else window.localStorage.removeItem(SESSION_KEY)
       } catch (error) {
         if (active) setBootError(errorMessage(error, 'No pudimos cargar el acceso administrativo.'))
       } finally {
@@ -43,8 +49,11 @@ export function useAdminSession() {
     }
   }, [])
 
-  function remember(next: string) {
+  // Role and name only pick which sections to show; the edge function enforces access.
+  function remember(next: string, profile?: { role?: StaffRole; name?: string }) {
     window.localStorage.setItem(SESSION_KEY, next)
+    if (profile?.role) setRole(profile.role)
+    if (profile?.name) setName(profile.name)
     setToken(next)
   }
 
@@ -66,6 +75,8 @@ export function useAdminSession() {
     configured,
     setupSecretReady,
     token,
+    role,
+    name,
     bootError,
     remember,
     markConfigured: () => setConfigured(true),

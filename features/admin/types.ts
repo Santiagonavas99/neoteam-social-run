@@ -91,8 +91,12 @@ export type ScannedParticipant = {
 
 export type CheckinResult = 'checkedIn' | 'alreadyCheckedIn' | 'cancelled'
 
+export type StaffRole = 'admin' | 'checkin'
+
 export type AdminResponse<Row = unknown> = {
   ok?: boolean
+  role?: StaffRole
+  name?: string
   configured?: boolean
   setupSecretReady?: boolean
   valid?: boolean

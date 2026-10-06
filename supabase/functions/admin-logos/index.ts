@@ -1,6 +1,7 @@
 // @ts-nocheck
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { requireSession } from '../_shared/session.ts'
 
 function requireEnv(name: string) {
   const value = Deno.env.get(name)
@@ -37,21 +38,6 @@ async function fromProxy(req: Request) {
   return diff === 0
 }
 
-async function requireSession(token: unknown) {
-  if (typeof token !== 'string' || token.length < 32) return null
-  const tokenHash = await sha256(token)
-  const now = new Date().toISOString()
-  const { data, error } = await supabase
-    .from('admin_pin_sessions')
-    .select('id,expires_at')
-    .eq('token_hash', tokenHash)
-    .gt('expires_at', now)
-    .maybeSingle()
-  if (error || !data) return null
-  await supabase.from('admin_pin_sessions').update({ last_seen_at: now }).eq('id', data.id)
-  return data
-}
-
 function cleanUrl(value: unknown, required = false) {
   const raw = typeof value === 'string' ? value.trim() : ''
   if (!raw) return required ? null : ''
@@ -69,8 +55,10 @@ Deno.serve(async (req: Request) => {
 
   try {
     const body = await req.json().catch(() => ({}))
-    const session = await requireSession(body?.token)
+    const session = await requireSession(supabase, body?.token)
     if (!session) return json({ error: 'Sesión no válida.' }, 401)
+    if (session.role !== 'admin')
+      return json({ error: 'Tu usuario no tiene acceso a esta sección.' }, 403)
 
     const action = body?.action
     if (action === 'list') {

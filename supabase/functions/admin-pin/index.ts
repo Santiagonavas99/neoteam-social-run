@@ -9,6 +9,7 @@ import {
   participantPayload,
 } from '../_shared/participants.ts'
 import { fromProxy, secretsMatch, sha256 } from '../_shared/proxy.ts'
+import { requireSession } from '../_shared/session.ts'
 
 function requireEnv(name: string) {
   const value = Deno.env.get(name)
@@ -92,6 +93,23 @@ function validPin(pin: unknown): pin is string {
   return typeof pin === 'string' && /^\d{6}$/.test(pin)
 }
 
+// Keep in sync with features/admin/auth/username.ts and the admin_users check.
+function cleanUsername(value: unknown) {
+  const username = typeof value === 'string' ? value.trim().toLowerCase() : ''
+  return /^[a-z0-9._-]{3,32}$/.test(username) ? username : null
+}
+
+function cleanName(value: unknown) {
+  const name = typeof value === 'string' ? value.trim().replace(/\s+/g, ' ') : ''
+  return name.length >= 2 && name.length <= 80 ? name : null
+}
+
+// Verified when the username does not exist, so a wrong user and a wrong PIN take the same time.
+const DUMMY_PIN_HASH = `pbkdf2$${PBKDF2_ITERATIONS}$${'A'.repeat(22)}==$${'A'.repeat(43)}=`
+
+const PUBLIC_ACTIONS = new Set(['status', 'setup', 'login', 'validate', 'logout'])
+const STAFF_ACTIONS = new Set(['checkin', 'changePin'])
+
 type IdRow = { id: string }
 type ParticipationRow = { dynamic_id: string; status: string }
 
@@ -111,7 +129,7 @@ function getClientIp(req: Request) {
   return req.headers.get('x-admin-client-ip')?.trim() || 'unknown'
 }
 
-async function createSession() {
+async function createSession(userId: string) {
   const bytes = crypto.getRandomValues(new Uint8Array(32))
   const token = [...bytes].map((b) => b.toString(16).padStart(2, '0')).join('')
   const tokenHash = await sha256(token)
@@ -119,24 +137,25 @@ async function createSession() {
   const { error } = await supabase.from('admin_pin_sessions').insert({
     token_hash: tokenHash,
     expires_at: expiresAt,
+    user_id: userId,
   })
   if (error) throw error
   return { token, expiresAt }
 }
 
-async function requireSession(token: unknown) {
-  if (typeof token !== 'string' || token.length < 32) return null
-  const tokenHash = await sha256(token)
-  const now = new Date().toISOString()
-  const { data, error } = await supabase
-    .from('admin_pin_sessions')
-    .select('id,expires_at')
-    .eq('token_hash', tokenHash)
-    .gt('expires_at', now)
-    .maybeSingle()
-  if (error || !data) return null
-  await supabase.from('admin_pin_sessions').update({ last_seen_at: now }).eq('id', data.id)
-  return data
+async function hasActiveAdmin() {
+  const { count, error } = await supabase
+    .from('admin_users')
+    .select('id', { count: 'exact', head: true })
+    .eq('role', 'admin')
+    .eq('active', true)
+  if (error) throw error
+  return (count ?? 0) > 0
+}
+
+async function revokeSessions(userId: string) {
+  const { error } = await supabase.from('admin_pin_sessions').delete().eq('user_id', userId)
+  if (error) throw error
 }
 
 async function reserveAttempt(ip: string): Promise<number | Response> {
@@ -179,30 +198,35 @@ Deno.serve(async (req: Request) => {
     const action = body?.action
     const ip = getClientIp(req)
 
+    let session = null
+    if (!PUBLIC_ACTIONS.has(action)) {
+      session = await requireSession(supabase, body?.token)
+      if (!session) return json({ error: 'Sesión no válida.' }, 401)
+      if (session.role !== 'admin' && !STAFF_ACTIONS.has(action))
+        return json({ error: 'Tu usuario no tiene acceso a esta sección.' }, 403)
+    }
+
     if (action === 'status') {
-      const { data, error } = await supabase
-        .from('admin_pin_settings')
-        .select('id')
-        .eq('id', 1)
-        .maybeSingle()
-      if (error) throw error
+      const configured = await hasActiveAdmin()
       return json({
-        configured: Boolean(data),
-        setupRequiresSecret: !data,
-        setupSecretReady: Boolean(data) || ADMIN_SETUP_SECRET.length >= 12,
+        configured,
+        setupRequiresSecret: !configured,
+        setupSecretReady: configured || ADMIN_SETUP_SECRET.length >= 12,
       })
     }
 
     if (action === 'setup') {
       const pin = body?.pin
+      const name = cleanName(body?.name)
+      const username = cleanUsername(body?.username)
+      if (!name) return json({ error: 'Escribe tu nombre (2 a 80 caracteres).' }, 400)
+      if (!username)
+        return json(
+          { error: 'El usuario usa de 3 a 32 letras minúsculas, números, punto o guion.' },
+          400,
+        )
       if (!validPin(pin)) return json({ error: 'El PIN debe tener exactamente 6 dígitos.' }, 400)
-      const { data: existing, error: existingError } = await supabase
-        .from('admin_pin_settings')
-        .select('id')
-        .eq('id', 1)
-        .maybeSingle()
-      if (existingError) throw existingError
-      if (existing) return json({ error: 'El PIN ya fue configurado.' }, 409)
+      if (await hasActiveAdmin()) return json({ error: 'El acceso ya fue configurado.' }, 409)
 
       if (ADMIN_SETUP_SECRET.length < 12) {
         return json({ error: 'Falta configurar la clave privada de setup en Supabase.' }, 503)
@@ -213,45 +237,50 @@ Deno.serve(async (req: Request) => {
       if (setupAuthorized) await markAttemptSuccess(attempt)
       if (!setupAuthorized) return json({ error: 'La clave privada de setup no es correcta.' }, 401)
 
-      const pinHash = await hashPin(pin)
-      const { error } = await supabase
-        .from('admin_pin_settings')
-        .insert({ id: 1, pin_hash: pinHash })
+      const { data: user, error } = await supabase
+        .from('admin_users')
+        .insert({ name, username, role: 'admin', pin_hash: await hashPin(pin) })
+        .select('id,name,role')
+        .single()
       if (error) {
         if ((error as { code?: string }).code === '23505')
-          return json({ error: 'El PIN ya fue configurado.' }, 409)
+          return json({ error: 'Ese usuario ya existe.' }, 409)
         throw error
       }
 
-      const session = await createSession()
-      return json({ ok: true, ...session })
+      const created = await createSession(user.id)
+      return json({ ok: true, ...created, role: user.role, name: user.name })
     }
 
     if (action === 'login') {
       const pin = body?.pin
+      const username = cleanUsername(body?.username)
+      if (!username) return json({ error: 'Escribe tu usuario.' }, 400)
       if (!validPin(pin)) return json({ error: 'Escribe un PIN de 6 dígitos.' }, 400)
       const attempt = await reserveAttempt(ip)
       if (attempt instanceof Response) return attempt
 
-      const { data, error } = await supabase
-        .from('admin_pin_settings')
-        .select('pin_hash')
-        .eq('id', 1)
+      const { data: user, error } = await supabase
+        .from('admin_users')
+        .select('id,name,role,pin_hash')
+        .eq('username', username)
+        .eq('active', true)
         .maybeSingle()
       if (error) throw error
-      if (!data) return json({ error: 'El PIN todavía no ha sido configurado.' }, 409)
 
-      const ok = await verifyPin(pin, data.pin_hash)
+      const ok = (await verifyPin(pin, user?.pin_hash ?? DUMMY_PIN_HASH)) && Boolean(user)
       if (ok) await markAttemptSuccess(attempt)
-      if (!ok) return json({ error: 'PIN incorrecto.' }, 401)
+      if (!ok) return json({ error: 'Usuario o PIN incorrecto.' }, 401)
 
-      const session = await createSession()
-      return json({ ok: true, ...session })
+      const created = await createSession(user.id)
+      return json({ ok: true, ...created, role: user.role, name: user.name })
     }
 
     if (action === 'validate') {
-      const session = await requireSession(body?.token)
-      return json({ valid: Boolean(session) })
+      const current = await requireSession(supabase, body?.token)
+      return json(
+        current ? { valid: true, role: current.role, name: current.name } : { valid: false },
+      )
     }
 
     if (action === 'logout') {
@@ -263,8 +292,6 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'listCards') {
-      const session = await requireSession(body?.token)
-      if (!session) return json({ error: 'Sesión no válida.' }, 401)
       const { data, error } = await supabase
         .from('home_feature_cards')
         .select('id,event_code,slot,title,description,enabled,sort_order')
@@ -275,8 +302,6 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'saveCards') {
-      const session = await requireSession(body?.token)
-      if (!session) return json({ error: 'Sesión no válida.' }, 401)
       const cards = Array.isArray(body?.cards) ? body.cards : []
       for (const card of cards) {
         if (!card?.id) continue
@@ -295,12 +320,9 @@ Deno.serve(async (req: Request) => {
       return json({ ok: true })
     }
 
-    // All event-management actions are gated by the PIN session. Keep table and
+    // The guard above already requires an admin session here. Keep table and
     // column names server controlled; the browser never receives the service key.
     if (['adminData', 'uploadAdminImage', 'dynamicData'].includes(action)) {
-      const session = await requireSession(body?.token)
-      if (!session) return json({ error: 'Sesión no válida.' }, 401)
-
       if (action === 'uploadAdminImage') {
         const mime = body?.mime
         const allowedMime = ['image/png', 'image/jpeg', 'image/webp']
@@ -860,8 +882,6 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'checkin') {
-      const session = await requireSession(body?.token)
-      if (!session) return json({ error: 'Sesión no válida.' }, 401)
       const value = normalizeParticipantCode(body?.code)
       if (!value || value.length > 80)
         return json({ error: 'Escanea un QR o escribe un código.' }, 400)
@@ -882,8 +902,6 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'changePin') {
-      const session = await requireSession(body?.token)
-      if (!session) return json({ error: 'Sesión no válida.' }, 401)
       const currentPin = body?.currentPin
       const newPin = body?.newPin
       if (!validPin(currentPin)) return json({ error: 'Escribe tu PIN actual de 6 dígitos.' }, 400)
@@ -891,38 +909,25 @@ Deno.serve(async (req: Request) => {
         return json({ error: 'El nuevo PIN debe tener exactamente 6 dígitos.' }, 400)
       const attempt = await reserveAttempt(ip)
       if (attempt instanceof Response) return attempt
-      const { data: currentSettings, error: currentSettingsError } = await supabase
-        .from('admin_pin_settings')
+      const { data: user, error: userError } = await supabase
+        .from('admin_users')
         .select('pin_hash')
-        .eq('id', 1)
-        .maybeSingle()
-      if (currentSettingsError) throw currentSettingsError
-      const currentPinIsValid = Boolean(
-        currentSettings && (await verifyPin(currentPin, currentSettings.pin_hash)),
-      )
+        .eq('id', session.userId)
+        .single()
+      if (userError) throw userError
+      const currentPinIsValid = await verifyPin(currentPin, user.pin_hash)
       if (currentPinIsValid) await markAttemptSuccess(attempt)
       if (!currentPinIsValid) {
         return json({ error: 'El PIN actual no es correcto.' }, 401)
       }
-      const pinHash = await hashPin(newPin)
-      const freshSession = await createSession()
       const { error } = await supabase
-        .from('admin_pin_settings')
-        .update({ pin_hash: pinHash, updated_at: new Date().toISOString() })
-        .eq('id', 1)
-      if (error) {
-        await supabase
-          .from('admin_pin_sessions')
-          .delete()
-          .eq('token_hash', await sha256(freshSession.token))
-        throw error
-      }
-      const { error: revokeError } = await supabase
-        .from('admin_pin_sessions')
-        .delete()
-        .neq('token_hash', await sha256(freshSession.token))
-      if (revokeError) throw revokeError
-      return json({ ok: true, ...freshSession })
+        .from('admin_users')
+        .update({ pin_hash: await hashPin(newPin), updated_at: new Date().toISOString() })
+        .eq('id', session.userId)
+      if (error) throw error
+      await revokeSessions(session.userId)
+      const fresh = await createSession(session.userId)
+      return json({ ok: true, ...fresh })
     }
 
     return json({ error: 'Acción no válida.' }, 400)

@@ -59,7 +59,7 @@ The camera check-in screen already exists (`features/admin/checkin`, action `che
 
 - Designed at 390 px first:
   - the sign-in form is two fields and a 44 px button;
-  - the check-in user sees only the scanner with "Salir", and no "Más" sheet.
+  - the check-in user's bottom bar has only "Check-in" and "Más"; "Más" holds Seguridad, the theme and "Cerrar sesión". Empty navigation groups are hidden.
 - **"Equipo"** is a list of cards (name, `@username`, role badge, active state) with 44 px actions, and a create form that uses `PinField`.
 - The username input uses `inputmode="text"`, `autocapitalize="none"` and `spellcheck={false}`.
 

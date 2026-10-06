@@ -5,17 +5,8 @@ import Link from 'next/link'
 import { type ReactNode, useRef } from 'react'
 import { BrandLink } from '@/components/brand-link'
 import { useThemeChoice } from '@/components/use-theme-choice'
-import {
-  type AdminSection,
-  type AdminSectionInfo,
-  adminSections,
-  sectionGroups,
-  sectionInfo,
-} from '../sections'
+import { type AdminSection, type AdminSectionInfo, sectionGroups, sectionInfo } from '../sections'
 import { ThemeSwitch } from './theme-switch'
-
-const primarySections = adminSections.filter((item) => item.primary)
-const moreSections = adminSections.filter((item) => !item.primary)
 
 function NavItem({
   item,
@@ -59,17 +50,21 @@ function SheetItem({ item, onSelect }: { item: AdminSectionInfo; onSelect: () =>
 }
 
 export function AdminShell({
+  sections,
   section,
   onNavigate,
   onSignOut,
   children,
 }: {
+  sections: AdminSectionInfo[]
   section: AdminSection
   onNavigate: (section: AdminSection) => void
   onSignOut: () => void
   children: ReactNode
 }) {
   const current = sectionInfo(section)
+  const primarySections = sections.filter((item) => item.primary)
+  const moreSections = sections.filter((item) => !item.primary)
   const sheet = useRef<HTMLDialogElement>(null)
   const [theme, setTheme] = useThemeChoice()
   const go = (id: AdminSection) => {
@@ -89,28 +84,30 @@ export function AdminShell({
           <BrandLink />
         </div>
         <nav aria-label="Panel del evento" className="flex flex-col gap-6">
-          {sectionGroups.map((group) => (
-            <div key={group.id} className="flex flex-col gap-1">
-              <p className="m-0 px-3 pb-1 text-xs font-bold uppercase tracking-[0.14em] text-neo-on-dark-secondary">
-                {group.label}
-              </p>
-              {adminSections
-                .filter((item) => item.group === group.id)
-                .map((item) => (
-                  <NavItem
-                    key={item.id}
-                    item={item}
-                    current={item.id === section}
-                    onSelect={() => onNavigate(item.id)}
-                  />
-                ))}
-              {group.id === 'account' && (
-                <div className="px-1 pt-2">
-                  <ThemeSwitch tone="onDark" choice={theme} onSelect={setTheme} />
-                </div>
-              )}
-            </div>
-          ))}
+          {sectionGroups
+            .filter((group) => sections.some((item) => item.group === group.id))
+            .map((group) => (
+              <div key={group.id} className="flex flex-col gap-1">
+                <p className="m-0 px-3 pb-1 text-xs font-bold uppercase tracking-[0.14em] text-neo-on-dark-secondary">
+                  {group.label}
+                </p>
+                {sections
+                  .filter((item) => item.group === group.id)
+                  .map((item) => (
+                    <NavItem
+                      key={item.id}
+                      item={item}
+                      current={item.id === section}
+                      onSelect={() => onNavigate(item.id)}
+                    />
+                  ))}
+                {group.id === 'account' && (
+                  <div className="px-1 pt-2">
+                    <ThemeSwitch tone="onDark" choice={theme} onSelect={setTheme} />
+                  </div>
+                )}
+              </div>
+            ))}
         </nav>
         <div className="mt-auto flex flex-col gap-1 border-t border-neo-on-dark-border pt-4">
           <Link
@@ -144,7 +141,7 @@ export function AdminShell({
 
       <nav
         aria-label="Secciones principales"
-        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-neo-border bg-neo-surface pb-[env(safe-area-inset-bottom)] md:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 grid auto-cols-fr grid-flow-col border-t border-neo-border bg-neo-surface pb-[env(safe-area-inset-bottom)] md:hidden"
       >
         {primarySections.map((item) => {
           const Icon = item.icon
