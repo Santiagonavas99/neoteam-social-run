@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Registration form keeps your answers** when the server reports an error, including the document type and running group. Before, every field came back empty.
+- **Phone numbers must have 10 digits.** Numbers autofilled as `+57 300 123 4567` are corrected automatically.
+
 ## [0.3.0] - 2026-10-05
 
 ### Added

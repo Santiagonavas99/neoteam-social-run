@@ -52,3 +52,25 @@ test('rejects an invalid email, a bad birth date and unchecked consents', () => 
 test('rejects an unknown document type', () => {
   assert.deepEqual(errorPaths({ ...valid, documentType: 'XX' }), ['documentType'])
 })
+
+test('accepts 10-digit mobile and landline numbers', () => {
+  assert.equal(registrationSchema.safeParse({ ...valid, phone: '3001234567' }).success, true)
+  assert.equal(
+    registrationSchema.safeParse({ ...valid, emergencyPhone: '6011234567' }).success,
+    true,
+  )
+})
+
+test('normalizes autofilled and formatted phones to 10 digits', () => {
+  for (const phone of ['+57 300 123 4567', '300-123-4567', '(300) 123 4567']) {
+    const result = registrationSchema.safeParse({ ...valid, phone })
+    assert.equal(result.success && result.data.phone, '3001234567', phone)
+  }
+})
+
+test('rejects phones that are not 10 digits', () => {
+  for (const phone of ['300123456', '30012345678', 'abc']) {
+    assert.deepEqual(errorPaths({ ...valid, phone }), ['phone'], phone)
+    assert.deepEqual(errorPaths({ ...valid, emergencyPhone: phone }), ['emergencyPhone'], phone)
+  }
+})
