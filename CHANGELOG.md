@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-10-05
+
+### Changed
+
+- **Code organized by domain**: event, registration, home and admin each live in their own folder, and the admin is split into one screen per section on shared building blocks. Nothing changes on screen.
+- Admin login makes one request fewer: it no longer loads the home cards nobody could edit.
+- A connection error in the logo carousel admin now shows a Spanish message instead of "Failed to fetch".
+
+### Removed
+
+- The home cards editor, which was no longer reachable from the admin menu.
+
+### Fixed
+
+- The logos proxy answers with a generic error (502) when the Edge Function returns something that is not JSON, the same as the admin proxy.
+
 ## [0.2.0] - 2026-10-05
 
 ### Added
