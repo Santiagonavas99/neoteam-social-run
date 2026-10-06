@@ -1,6 +1,6 @@
 # Staff accounts with roles — spec
 
-Date: 2026-10-06 · Branch: `feat/staff-roles` · Status: **draft**, waiting for Iván's OK
+Date: 2026-10-06 · Branch: `feat/staff-roles` · Status: **approved** (Iván, 2026-10-06)
 
 ## Problem
 

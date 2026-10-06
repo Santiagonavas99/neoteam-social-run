@@ -8,7 +8,7 @@ Two PRs, staff roles first: it needs nothing external and is critical on event d
 - **PR 1:** Part A on `feat/staff-roles`, released as `0.9.0` (task 4).
 - **PR 2:** Part B on `feat/pass-email`, cut from `main` after PR 1 merges, released as `0.10.0` (task 9).
 
-Status: **draft**, waiting for Iván's OK. Email setup for Iván: [`docs/email-setup.md`](../../email-setup.md).
+Status: **approved** (Iván, 2026-10-06). Email setup for Iván: [`docs/email-setup.md`](../../email-setup.md).
 
 Remote steps (migrations, `supabase functions deploy`, `supabase secrets set`) are run by Iván, always with `--project-ref ohatsnkgaeccltqwhkbv`.
 
