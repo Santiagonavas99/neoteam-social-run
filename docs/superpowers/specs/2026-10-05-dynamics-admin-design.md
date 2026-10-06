@@ -1,6 +1,6 @@
 # Dynamics admin panel — spec
 
-Date: 2026-10-05 · Branch: `feat/dynamics-admin` (from `main` after `feat/qr-checkin`) · Status: **awaiting OK**
+Date: 2026-10-05 · Branch: `feat/dynamics-admin` (from `main` after `feat/qr-checkin`) · Status: **approved** (Iván, 2026-10-05)
 
 Source: Santiago's `feat/dynamics-mvp`. Its Edge Function work is already on `main`: commit `3213546` brought in the whole `dynamicData` engine, and `b1f8455` made the draws atomic. What is still missing is the panel, plus the migrations in the repo.
 
