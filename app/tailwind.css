@@ -25,6 +25,13 @@
   --color-neo-danger: var(--neo-danger);
   --color-neo-danger-bg: var(--neo-danger-bg);
   --color-neo-success-bg: var(--neo-success-bg);
+  --color-neo-muted-bg: var(--neo-muted-bg);
+  --color-neo-border-strong: var(--neo-border-strong);
+  --color-neo-warning: var(--neo-warning);
+  --color-neo-warning-bg: var(--neo-warning-bg);
+  --color-neo-on-dark-secondary: var(--neo-on-dark-secondary);
+  --color-neo-on-dark-border: var(--neo-on-dark-border);
+  --color-neo-on-dark-hover: var(--neo-on-dark-hover);
   --radius-control: var(--radius-control);
   --radius-card: var(--radius-card);
   --font-sans: var(--font-host-grotesk), system-ui, sans-serif;

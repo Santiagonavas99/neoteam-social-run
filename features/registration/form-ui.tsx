@@ -5,7 +5,7 @@ import type { ComponentProps, ReactNode } from 'react'
 // these blocks add layout and wire label, error and aria attributes together.
 
 export const cardClass =
-  'min-w-0 rounded-card border border-neo-border bg-neo-white px-5 py-6 sm:p-8 lg:p-10'
+  'min-w-0 rounded-card border border-neo-border bg-neo-surface px-5 py-6 sm:p-8 lg:p-10'
 
 export const linkClass =
   'inline-flex min-h-11 items-center gap-2 text-[13px] font-bold hover:underline hover:underline-offset-4'

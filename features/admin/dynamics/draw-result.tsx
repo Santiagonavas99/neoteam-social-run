@@ -30,7 +30,7 @@ export function DrawResult({
           type="button"
           onClick={onClose}
           aria-label="Cerrar resultado"
-          className="inline-flex size-11 shrink-0 items-center justify-center rounded-control text-neo-text hover:bg-neo-white"
+          className="inline-flex size-11 shrink-0 items-center justify-center rounded-control text-neo-text hover:bg-neo-surface"
         >
           <X aria-hidden className="size-5" />
         </button>
