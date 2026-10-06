@@ -1,4 +1,4 @@
-export type Resource = 'participants' | 'groups' | 'brands' | 'raffles'
+export type Resource = 'participants' | 'groups' | 'brands'
 
 export type Participant = {
   id: string
@@ -32,18 +32,6 @@ export type CommunityRecord = {
   sort_order: number
 }
 
-export type Raffle = {
-  id: string
-  name: string
-  prize: string
-  description?: string | null
-  winner_count: number
-  requires_checkin: boolean
-  status: string
-  sponsor_brand_id?: string | null
-  draw_at?: string | null
-}
-
 export type LogoItem = {
   id: string
   name: string
@@ -58,7 +46,6 @@ export type Metrics = {
   checkedIn: number
   groups: number
   brands: number
-  raffles: number
   dynamics: number
 }
 

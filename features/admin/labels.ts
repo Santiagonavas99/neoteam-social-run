@@ -7,13 +7,6 @@ export const participantStates: Record<string, string> = {
   cancelled: 'Cancelado',
 }
 
-export const raffleStates: Record<string, string> = {
-  draft: 'Borrador',
-  open: 'Abierta',
-  drawn: 'Sorteada',
-  cancelled: 'Cancelada',
-}
-
 export const brandTypes: Record<string, string> = {
   organizer: 'Organizador',
   main_partner: 'Aliado principal',

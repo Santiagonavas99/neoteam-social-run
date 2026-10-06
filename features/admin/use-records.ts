@@ -4,7 +4,7 @@ import { errorMessage } from './errors'
 import { type FeedbackValue, isNew, type Resource } from './types'
 import { useAdminData } from './ui/use-admin-data'
 
-export type Confirmation<Row> = { row: Row; action: 'delete' | 'draw' }
+export type Confirmation<Row> = { row: Row; action: 'delete' }
 
 export function useRecords<Row extends { id: string }>(resource: Resource, token: string) {
   const [feedback, setFeedback] = useState<FeedbackValue>(null)
@@ -45,19 +45,13 @@ export function useRecords<Row extends { id: string }>(resource: Resource, token
     setBusy(confirmation.row.id)
     setFeedback(null)
     try {
-      const result = await callAdmin('adminData', {
+      await callAdmin('adminData', {
         token,
         resource,
         operation: confirmation.action,
         id: confirmation.row.id,
       })
-      setFeedback({
-        kind: 'success',
-        text:
-          confirmation.action === 'draw'
-            ? `Sorteo completado. ${result.winners ?? 'Los'} ganadores guardados.`
-            : 'Registro eliminado.',
-      })
+      setFeedback({ kind: 'success', text: 'Registro eliminado.' })
       setConfirmation(null)
       setEditor(null)
       await reload()

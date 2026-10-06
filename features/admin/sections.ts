@@ -1,13 +1,13 @@
 import {
   Flag,
   GalleryHorizontal,
-  Gift,
   LayoutDashboard,
   type LucideIcon,
   ShieldCheck,
   Tag,
   UserCheck,
   Users,
+  Zap,
 } from 'lucide-react'
 
 export type AdminSection =
@@ -17,7 +17,7 @@ export type AdminSection =
   | 'participants'
   | 'groups'
   | 'brands'
-  | 'raffles'
+  | 'dynamics'
   | 'security'
 
 export type AdminSectionInfo = {
@@ -70,11 +70,11 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     quickAccess: 'Aliados y logos',
   },
   {
-    id: 'raffles',
-    label: 'Rifas',
-    description: 'Prepara los premios y gestiona cada sorteo.',
-    icon: Gift,
-    quickAccess: 'Premios y sorteos',
+    id: 'dynamics',
+    label: 'Dinámicas',
+    description: 'Stands, retos, premios instantáneos y sorteos.',
+    icon: Zap,
+    quickAccess: 'Stands, retos y sorteos',
   },
   {
     id: 'security',
