@@ -60,9 +60,8 @@ export function HorizontalCarousel({
   }
 
   return (
-    <div
+    <section
       className={`horizontal-carousel ${className}`}
-      role="region"
       aria-label={ariaLabel}
       aria-roledescription="carrusel"
     >
@@ -86,10 +85,13 @@ export function HorizontalCarousel({
           →
         </button>
       </div>
+      {/* biome-ignore lint/a11y/useSemanticElements: a scroll track, not a form fieldset */}
       <div
         id={id}
         ref={track}
         className="carousel-track"
+        role="group"
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrollable region must be keyboard reachable
         tabIndex={0}
         aria-label={`${ariaLabel}: desplaza para ver más`}
         onKeyDown={(event) => {
@@ -102,6 +104,6 @@ export function HorizontalCarousel({
       >
         {children}
       </div>
-    </div>
+    </section>
   )
 }

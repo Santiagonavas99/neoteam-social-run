@@ -233,7 +233,7 @@ export function AdminManagement({
       </div>
       <Feedback value={feedback} />
       {confirmation && (
-        <section className="confirmation-panel" role="region" aria-label="Confirmar acción">
+        <section className="confirmation-panel" aria-label="Confirmar acción">
           <h2>
             {confirmation.action === 'draw'
               ? '¿Todo listo para el sorteo?'

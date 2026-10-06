@@ -13,6 +13,12 @@ function externalUrl(value?: string | null) {
   }
 }
 
+function logoImage(item: HomeLogoCarouselItem, hidden: boolean) {
+  return (
+    <Image unoptimized src={item.logo_url} width={220} height={88} alt={hidden ? '' : item.name} />
+  )
+}
+
 export function LogoMarquee({ items }: { items: HomeLogoCarouselItem[] }) {
   const visibleItems = items.filter((item) => item.logo_url?.trim())
   if (!visibleItems.length) return null
@@ -25,15 +31,7 @@ export function LogoMarquee({ items }: { items: HomeLogoCarouselItem[] }) {
       <div className="brand-marquee-group" aria-hidden={hidden || undefined}>
         {repeatedItems.map((item, index) => {
           const href = externalUrl(item.link_url)
-          const image = (
-            <Image
-              unoptimized
-              src={item.logo_url}
-              width={220}
-              height={88}
-              alt={hidden ? '' : item.name}
-            />
-          )
+          const image = logoImage(item, hidden)
 
           return href ? (
             <a
@@ -41,6 +39,7 @@ export function LogoMarquee({ items }: { items: HomeLogoCarouselItem[] }) {
               href={href}
               target="_blank"
               rel="noopener noreferrer"
+              // biome-ignore lint/suspicious/noArrayIndexKey: items repeat on purpose to fill the marquee
               key={`${item.id}-${index}`}
               tabIndex={hidden ? -1 : undefined}
               aria-label={hidden ? undefined : `${item.name} (abre en una nueva pestaña)`}
@@ -48,6 +47,7 @@ export function LogoMarquee({ items }: { items: HomeLogoCarouselItem[] }) {
               {image}
             </a>
           ) : (
+            // biome-ignore lint/suspicious/noArrayIndexKey: items repeat on purpose to fill the marquee
             <div className="brand-marquee-item" key={`${item.id}-${index}`}>
               {image}
             </div>
