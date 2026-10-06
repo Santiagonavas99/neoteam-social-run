@@ -5,6 +5,7 @@ import './globals.css'
 import './neo-overrides.css'
 import './logo-marquee.css'
 import './home-v2.css'
+import './home-v3.css'
 
 const hostGrotesk = Host_Grotesk({
   subsets: ['latin'],
