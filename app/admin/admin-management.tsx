@@ -19,6 +19,12 @@ function errorText(error: unknown) {
     : 'No pudimos completar la operación. Inténtalo de nuevo.'
 }
 
+function participantInitials(row: AdminRow) {
+  const first = row.first_name?.trim().charAt(0) ?? ''
+  const last = row.last_name?.trim().charAt(0) ?? ''
+  return `${first}${last}`.toUpperCase() || 'NT'
+}
+
 export function AdminManagement({
   token,
   callApi,
@@ -172,6 +178,17 @@ export function AdminManagement({
   const newLabel =
     section === 'brands' ? 'Añadir marca' : section === 'groups' ? 'Añadir grupo' : 'Crear rifa'
 
+  const participantSummary =
+    section === 'participants'
+      ? {
+          total: rows.length,
+          checkedIn: rows.filter((row) => row.status === 'checked_in').length,
+          pending: rows.filter((row) => row.status === 'registered').length,
+          noShow: rows.filter((row) => row.status === 'no_show').length,
+          cancelled: rows.filter((row) => row.status === 'cancelled').length,
+        }
+      : null
+
   return (
     <section className="management-view" aria-busy={loading}>
       <div className="section-toolbar">
@@ -183,6 +200,15 @@ export function AdminManagement({
               <span className="sr-only">
                 Buscar {section === 'participants' ? 'participantes' : 'registros'}
               </span>
+              <svg
+                className="search-field-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <circle cx="11" cy="11" r="6.5" />
+                <path d="m16 16 4 4" />
+              </svg>
               <input
                 type="search"
                 placeholder={
@@ -232,6 +258,32 @@ export function AdminManagement({
         </div>
       </div>
       <Feedback value={feedback} />
+      {section === 'participants' && participantSummary && !loading && (
+        <div className="participant-overview" aria-label="Resumen de participantes">
+          <div className="participant-overview-total">
+            <strong>{participantSummary.total}</strong>
+            <span>participantes</span>
+          </div>
+          <div className="participant-overview-stats">
+            <span>
+              <i className="overview-dot overview-dot-checkin" aria-hidden="true" />
+              <strong>{participantSummary.checkedIn}</strong> Check-in
+            </span>
+            <span>
+              <i className="overview-dot overview-dot-pending" aria-hidden="true" />
+              <strong>{participantSummary.pending}</strong> Pendientes
+            </span>
+            <span>
+              <i className="overview-dot overview-dot-noshow" aria-hidden="true" />
+              <strong>{participantSummary.noShow}</strong> Ausentes
+            </span>
+            <span>
+              <i className="overview-dot overview-dot-cancelled" aria-hidden="true" />
+              <strong>{participantSummary.cancelled}</strong> Cancelados
+            </span>
+          </div>
+        </div>
+      )}
       {confirmation && (
         <section className="confirmation-panel" aria-label="Confirmar acción">
           <h2>
@@ -375,7 +427,7 @@ export function AdminManagement({
       ) : section === 'participants' ? (
         <>
           <p className="result-count">
-            {visible.length} de {rows.length} participantes
+            Mostrando <strong>{visible.length}</strong> de {rows.length} participantes
           </p>
           <div className="participants-table">
             <table>
@@ -394,22 +446,33 @@ export function AdminManagement({
                 {visible.map((row) => (
                   <tr key={row.id}>
                     <td data-label="Participante">
-                      <strong>
-                        {row.first_name} {row.last_name}
-                      </strong>
-                      <small>
-                        {row.document_type} {row.document_number}
-                      </small>
+                      <div className="participant-identity">
+                        <span className="participant-avatar" aria-hidden="true">
+                          {participantInitials(row)}
+                        </span>
+                        <span className="participant-name">
+                          <strong>
+                            {row.first_name} {row.last_name}
+                          </strong>
+                          <small>
+                            {row.document_type} {row.document_number}
+                          </small>
+                        </span>
+                      </div>
                     </td>
                     <td data-label="Código" className="mono-value">
-                      {row.registration_code || `#${row.registration_number}`}
+                      <span className="registration-code-chip">
+                        {row.registration_code || `#${row.registration_number}`}
+                      </span>
                     </td>
-                    <td data-label="Contacto">
+                    <td data-label="Contacto" className="participant-contact">
                       <span>{row.email}</span>
                       <small>{row.phone}</small>
                     </td>
                     <td data-label="Grupo">
-                      {row.running_groups?.name || row.other_running_group || 'Independiente'}
+                      <span className="group-pill">
+                        {row.running_groups?.name || row.other_running_group || 'Independiente'}
+                      </span>
                     </td>
                     <td data-label="Talla">{row.shirt_size || '—'}</td>
                     <td data-label="Estado">
@@ -421,11 +484,11 @@ export function AdminManagement({
                       />
                     </td>
                     <td data-label="Asistencia">
-                      <div className="attendance-actions">
+                      <div className="attendance-actions participant-actions">
                         {row.status === 'registered' && (
                           <button
                             type="button"
-                            className="button button-small"
+                            className="button button-small participant-checkin"
                             onClick={() => void changeAttendance(row, 'checked_in')}
                             disabled={!!busy}
                           >
@@ -433,6 +496,7 @@ export function AdminManagement({
                           </button>
                         )}
                         <select
+                          className="participant-status-select"
                           aria-label={`Estado de ${row.first_name} ${row.last_name}`}
                           value={row.status}
                           onChange={(e) => void changeAttendance(row, e.target.value)}
@@ -446,7 +510,7 @@ export function AdminManagement({
                         </select>
                         <button
                           type="button"
-                          className="button button-small button-danger"
+                          className="button button-small participant-delete"
                           onClick={() => setConfirmation({ row, action: 'delete' })}
                           disabled={!!busy}
                         >
