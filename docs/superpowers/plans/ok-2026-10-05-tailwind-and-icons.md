@@ -127,11 +127,13 @@ Spec: `docs/superpowers/specs/2026-10-05-event-countdown-design.md`. Needs Tasks
 
 Mobile first: unprefixed utilities = 390 px, `md:`/`lg:` for desktop; `max-width` legacy queries are inverted. For each file, move its markup to utilities and **delete the same rules from the legacy CSS** in the same commit (the admin rules live in `app/globals.css` and `app/neo-overrides.css`; `grep` each class name before deleting to be sure the public site does not use it).
 
-- [ ] 4a `app/admin/admin-ui.tsx` (Feedback, StatusBadge, Logo)
-- [ ] 4b `app/admin/record-editor.tsx`
-- [ ] 4c `app/admin/logo-carousel-admin.tsx`
-- [ ] 4d `app/admin/admin-management.tsx`
-- [ ] 4e `app/admin/admin-dashboard.tsx` (shell, sidebar, login, security)
+Files renamed by `refactor/feature-structure` (2026-10-05); the list below uses the new paths.
+
+- [ ] 4a `features/admin/ui/*` (Feedback, StatusBadge, Logo and the shared blocks: toolbar, record card, editor form, upload field, empty/loading states, confirm panel)
+- [ ] 4b `features/admin/community/*`, `features/admin/raffles/*` (forms and lists)
+- [ ] 4c `features/admin/logos/*`
+- [ ] 4d `features/admin/overview/*`, `features/admin/participants/*`
+- [ ] 4e `features/admin/shell/*`, `features/admin/auth/*`, `features/admin/security/*`
 - Check per commit: screenshots at **390 px first**, then 1440, vs baseline; tables/lists usable on a phone (no horizontal page scroll, 44 px targets); keyboard pass (tab order, visible focus); `pnpm ci:check`.
 - Commits: `refactor(admin): <file> to Tailwind`
 
@@ -141,7 +143,7 @@ On `refactor/admin-tailwind`, after Task 4e, when the whole admin is on tokens.
 
 - [ ] `lib/theme.ts`: `type ThemeChoice = 'light' | 'dark' | 'system'`, `resolveTheme(choice, prefersDark)`, the storage key `neoteam-theme`; plus `lib/theme.test.ts` (resolution and invalid stored values fall back to `system`).
 - [ ] `app/admin/layout.tsx`: wraps the admin in `<div id="neo-theme-root" data-theme="light">`, followed by an inline script (before paint) that reads the stored choice, resolves `system` with `matchMedia` and sets `data-theme` and `style.colorScheme`. The `/admin/checkin` and dynamics screens live under `/admin` and inherit it.
-- [ ] `app/admin/theme-switch.tsx` (client): a radio group "Claro · Oscuro · Sistema" with `Sun` / `Moon` / `Monitor` icons and visible labels, each option ≥ 44 px; stores the choice and, in `system`, listens to `matchMedia` changes.
+- [ ] `features/admin/shell/theme-switch.tsx` (client): a radio group "Claro · Oscuro · Sistema" with `Sun` / `Moon` / `Monitor` icons and visible labels, each option ≥ 44 px; stores the choice and, in `system`, listens to `matchMedia` changes.
 - [ ] Placed in the admin sidebar under the navigation (top bar on phones).
 - Check: **390 px first**, every admin section in light and dark; reload in dark shows no light flash; switching the phone to dark with "Sistema" selected updates the open panel; keyboard (arrow keys move inside the radio group, visible focus); `pnpm ci:check`.
 - Commit: `feat(admin): light, dark and system theme`

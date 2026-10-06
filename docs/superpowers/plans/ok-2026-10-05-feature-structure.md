@@ -1,6 +1,15 @@
 # Feature structure and component split — plan
 
-Spec: `docs/superpowers/specs/2026-10-05-feature-structure-design.md`. Branch: `refactor/feature-structure`, cut from `main` at 0.2.0. Status: **approved 2026-10-05, including the new top-level `features/` folder and deleting the home cards editor**.
+Spec: `docs/superpowers/specs/2026-10-05-feature-structure-design.md`. Branch: `refactor/feature-structure`, cut from `main` at 0.2.0. Status: **approved 2026-10-05, including the new top-level `features/` folder and deleting the home cards editor. Done: 1 `55c778c`, 2 `076c381`, 3 `ad8d11f`, 4 `854e88a`, 5 `0086493`, 6 `9a14d66`, 7 `3f94ae8`, 8 `5c17f82`, 9 this commit.**
+
+**Divergences from the plan, made while implementing.** None changes what users see:
+- groups and brands share one `CommunityRecord` type, because they share one table shape and one form;
+- the list hook is `useAdminData(load, initial, onError)`, which also serves the overview metrics and the raffle sponsors, plus a `useRecords` hook for save, delete and draw;
+- PIN validation is `isPin()`, while each form keeps its own Spanish messages;
+- raffles no longer re-fetch brands after a save or draw;
+- a non-JSON upstream answer on the logos route is now a 502, the same as the admin route.
+
+**Size.** The largest admin file goes from 611 lines to 208. Admin code goes from 2,067 lines in 7 files to about 2,500 in 31 files; that includes 3 new test files, and the extra lines are mostly imports and props. `app/page.tsx` goes from 251 lines to 28..
 
 ## Ground rules
 
