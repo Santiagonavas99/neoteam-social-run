@@ -748,3 +748,103 @@
     justify-content: space-between;
   }
 }
+
+
+.v3-community {
+  padding-block: calc(var(--space-24) + var(--space-6));
+  background: var(--neo-black);
+  color: var(--neo-white);
+}
+
+.v3-community-head {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1.25fr) minmax(280px, 0.55fr);
+  gap: var(--space-8);
+  align-items: end;
+  margin-bottom: var(--space-12);
+}
+
+.v3-community-head .v3-section-index {
+  color: var(--neo-accent);
+}
+
+.v3-community-head h2 {
+  margin: 0;
+  max-width: 920px;
+  font-size: clamp(3.6rem, 7vw, 7.8rem);
+  line-height: 0.82;
+  letter-spacing: -0.07em;
+}
+
+.v3-community-head > p:last-child {
+  margin: 0;
+  color: var(--v3-muted-light);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.v3-community-panels {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.v3-community .logo-panel {
+  padding-top: var(--space-4);
+  border-top-color: var(--v3-line-light);
+}
+
+.v3-community .logo-panel > h3 {
+  color: var(--neo-accent);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+}
+
+.v3-community .logo-panel > small {
+  color: var(--v3-muted-light);
+}
+
+.v3-community .community-logo {
+  background: color-mix(in srgb, var(--neo-white) 5%, var(--neo-black));
+  border-color: var(--v3-line-light);
+  color: var(--neo-white);
+}
+
+.v3-community .community-logo:hover {
+  border-color: var(--neo-accent);
+}
+
+.v3-community .carousel-controls button {
+  background: transparent;
+  border-color: var(--v3-line-light);
+  color: var(--neo-accent);
+}
+
+.v3-community .carousel-controls button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--neo-accent) 10%, var(--neo-black));
+  border-color: var(--neo-accent);
+}
+
+@media (max-width: 1024px) {
+  .v3-community-head {
+    grid-template-columns: 1fr;
+  }
+
+  .v3-community-head > p:last-child {
+    max-width: 680px;
+  }
+}
+
+@media (max-width: 760px) {
+  .v3-community {
+    padding-block: var(--space-16);
+  }
+
+  .v3-community-head {
+    gap: var(--space-6);
+    margin-bottom: var(--space-8);
+  }
+
+  .v3-community-head h2 {
+    font-size: clamp(3rem, 15vw, 4.8rem);
+  }
+}
