@@ -331,7 +331,7 @@
   color: var(--neo-black);
 }
 .v2-raffle-side {
-  background: var(--neo-accent-dark);
+  background: var(--neo-black);
   color: var(--neo-white);
   padding: 64px;
   display: flex;
@@ -376,6 +376,7 @@
   text-align: center;
 }
 .v2-final-main p {
+  text-wrap: balance;
   font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -493,7 +494,17 @@
     grid-column: auto;
   }
   .v2-community-head h2 {
-    font-size: 58px;
+    font-size: clamp(36px, 12vw, 58px);
+  }
+  .v2-fact-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-bottom: 1px solid var(--neo-border);
+  }
+  .v2-fact {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    border-bottom: 0;
   }
   .v2-community {
     padding: 86px 0;
@@ -515,7 +526,7 @@
     gap: 18px;
   }
   .v2-final-main h2 {
-    font-size: 30vw;
+    font-size: 22vw;
     margin-bottom: 42px;
   }
 }

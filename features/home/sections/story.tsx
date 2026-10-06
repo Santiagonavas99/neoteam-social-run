@@ -1,4 +1,11 @@
+import { CalendarDays, Clock, Route } from 'lucide-react'
 import { eventConfig } from '@/features/event/event'
+
+const facts = [
+  { value: '18 OCT', label: 'Fecha', icon: CalendarDays },
+  { value: '07:30', label: 'Encuentro', icon: Clock },
+  { value: '5K', label: 'Ruta social', icon: Route },
+]
 
 export function Story() {
   return (
@@ -15,18 +22,15 @@ export function Story() {
       <div className="v2-story-aside reveal">
         <p>{eventConfig.description}</p>
         <div className="v2-fact-list">
-          <div className="v2-fact">
-            <strong>18 OCT</strong>
-            <span>Fecha</span>
-          </div>
-          <div className="v2-fact">
-            <strong>07:30</strong>
-            <span>Encuentro</span>
-          </div>
-          <div className="v2-fact">
-            <strong>5K</strong>
-            <span>Ruta social</span>
-          </div>
+          {facts.map(({ value, label, icon: Icon }) => (
+            <div className="v2-fact" key={label}>
+              <strong>{value}</strong>
+              <span className="inline-flex items-center gap-1.5">
+                <Icon aria-hidden className="size-3.5 shrink-0" />
+                {label}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </section>
