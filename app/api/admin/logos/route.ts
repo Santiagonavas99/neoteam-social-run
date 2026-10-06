@@ -1,4 +1,4 @@
-import { adminUpstreamHeaders } from '@/lib/admin-proxy'
+import { adminUpstreamHeaders, parseAdminBody } from '@/lib/admin-proxy'
 
 export const runtime = 'nodejs'
 
@@ -23,18 +23,8 @@ export async function POST(request: Request) {
     return Response.json({ error: connectionError }, { status: 503, headers })
   }
 
-  let body: Record<string, unknown>
-  try {
-    const parsed = await request.json()
-    if (
-      !parsed ||
-      typeof parsed !== 'object' ||
-      Array.isArray(parsed) ||
-      typeof parsed.action !== 'string'
-    )
-      throw new Error('Invalid body')
-    body = parsed
-  } catch {
+  const body = await parseAdminBody(request)
+  if (!body) {
     return Response.json({ error: 'No pudimos procesar la solicitud.' }, { status: 400, headers })
   }
 

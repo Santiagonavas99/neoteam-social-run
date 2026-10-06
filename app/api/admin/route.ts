@@ -1,5 +1,4 @@
-import { gunzipSync } from 'node:zlib'
-import { adminUpstreamHeaders } from '@/lib/admin-proxy'
+import { adminUpstreamHeaders, parseAdminBody } from '@/lib/admin-proxy'
 
 export const runtime = 'nodejs'
 const connectionError = 'No pudimos conectar con el panel administrativo. Inténtalo de nuevo.'
@@ -23,27 +22,8 @@ export async function POST(request: Request) {
     return Response.json({ error: connectionError }, { status: 503, headers })
   }
 
-  let body: Record<string, unknown>
-  try {
-    // Compressed transport keeps existing 4 MB image uploads below Vercel's
-    // request limit; the Edge Function receives its original JSON contract.
-    const parsed =
-      request.headers.get('content-encoding') === 'gzip'
-        ? JSON.parse(
-            gunzipSync(Buffer.from(await request.arrayBuffer()), {
-              maxOutputLength: 6 * 1024 * 1024,
-            }).toString('utf8'),
-          )
-        : await request.json()
-    if (
-      !parsed ||
-      typeof parsed !== 'object' ||
-      Array.isArray(parsed) ||
-      typeof parsed.action !== 'string'
-    )
-      throw new Error('Invalid body')
-    body = parsed
-  } catch {
+  const body = await parseAdminBody(request)
+  if (!body) {
     return Response.json({ error: 'No pudimos procesar la solicitud.' }, { status: 400, headers })
   }
 
