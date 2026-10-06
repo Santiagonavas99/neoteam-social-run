@@ -75,6 +75,12 @@ SQL tests pull in the migrations they need with `\ir ../migrations/<file>.sql`; 
 
 A task is done when `pnpm ci:check` passes. Say so with the output; if something fails, report it, do not hide it.
 
+## Changelog
+
+- `CHANGELOG.md` follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and SemVer.
+- Every PR adds its user-visible changes under `## [Unreleased]`, in the right group (`Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`, `Security`), written for the reader of a release note.
+- Never bump `package.json` `version`, create a version section or tag a release unless Iván asks. Releases and tags will be automated from `CHANGELOG.md` when 1.0.0 is cut.
+
 ## Git
 
 - Never commit to `main`. One branch per plan, one commit per task, Conventional Commits (`feat:`, `fix:`, `chore:`…).
