@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-06
+
+### Added
+
+- **Light, dark and system theme** in the admin panel, from the sidebar or the "Más" sheet on phones.
+- **Six-box PIN entry** on the admin login and the change-PIN form; pasting a code still works.
+
+### Changed
+
+- **Cyan palette:** every colour now comes from the brand cyan, with readable contrast in both themes (accent text, focus ring, input borders and status badges).
+- **Admin navigation on phones:** a bottom bar with Check-in, Participantes and Dinámicas, plus "Más" for the rest; on desktop the sidebar is grouped by moment.
+- **Participants as compact rows** that open to show details, with status filters that show counts.
+- **The overview leads with check-in progress** and lists the active dynamics.
+
 ## [0.7.0] - 2026-10-05
 
 ### Added
