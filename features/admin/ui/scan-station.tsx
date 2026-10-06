@@ -113,7 +113,7 @@ export function ScanStation({
         <button
           type="submit"
           disabled={busy}
-          className="inline-flex min-h-12 shrink-0 items-center rounded-control border border-neo-black bg-neo-black px-5 text-neo-white hover:border-neo-accent-dark hover:bg-neo-accent-dark"
+          className="inline-flex min-h-12 shrink-0 items-center rounded-control border border-neo-text bg-neo-text px-5 text-neo-surface hover:border-neo-accent-dark hover:bg-neo-accent-dark"
         >
           <span className="text-[13px] font-bold">Registrar</span>
         </button>

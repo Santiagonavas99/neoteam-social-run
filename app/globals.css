@@ -144,7 +144,7 @@ textarea {
   border: 1px solid var(--neo-border-strong);
   border-radius: var(--radius-control);
   background: var(--neo-surface);
-  color: var(--neo-black);
+  color: var(--neo-text);
   padding: 12px 14px;
   font-size: 16px;
   line-height: 1.4;
@@ -205,11 +205,11 @@ fieldset {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  border: 1px solid var(--neo-black);
+  border: 1px solid var(--neo-text);
   border-radius: var(--radius-control);
   padding: 12px 20px;
-  background: var(--neo-black);
-  color: var(--neo-white);
+  background: var(--neo-text);
+  color: var(--neo-surface);
   font-size: 13px;
   font-weight: 700;
   line-height: 1.4;
@@ -240,7 +240,7 @@ fieldset {
 }
 .button-secondary {
   background: transparent;
-  color: var(--neo-black);
+  color: var(--neo-text);
   border-color: var(--neo-border);
 }
 .button-secondary:hover:not(:disabled) {

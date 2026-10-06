@@ -61,7 +61,7 @@ export function ParticipationPanel({
       <button
         type="button"
         onClick={onClose}
-        className="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-control border border-neo-border bg-neo-surface px-4 text-neo-text hover:border-neo-black"
+        className="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-control border border-neo-border bg-neo-surface px-4 text-neo-text hover:border-neo-text"
       >
         <X aria-hidden className="size-4 shrink-0" />
         <span className="text-[13px] font-bold">Cerrar escáner</span>

@@ -11,6 +11,7 @@ import {
   sectionGroups,
   sectionInfo,
 } from '../sections'
+import { ThemeSwitch, useThemeChoice } from './theme-switch'
 
 const primarySections = adminSections.filter((item) => item.primary)
 const moreSections = adminSections.filter((item) => !item.primary)
@@ -69,6 +70,7 @@ export function AdminShell({
 }) {
   const current = sectionInfo(section)
   const sheet = useRef<HTMLDialogElement>(null)
+  const [theme, setTheme] = useThemeChoice()
   const go = (id: AdminSection) => {
     sheet.current?.close()
     onNavigate(id)
@@ -101,6 +103,11 @@ export function AdminShell({
                     onSelect={() => onNavigate(item.id)}
                   />
                 ))}
+              {group.id === 'account' && (
+                <div className="px-1 pt-2">
+                  <ThemeSwitch tone="onDark" choice={theme} onSelect={setTheme} />
+                </div>
+              )}
             </div>
           ))}
         </nav>
@@ -199,6 +206,9 @@ export function AdminShell({
           {moreSections.map((item) => (
             <SheetItem key={item.id} item={item} onSelect={() => go(item.id)} />
           ))}
+          <div className="border-b border-neo-border py-3">
+            <ThemeSwitch tone="surface" choice={theme} onSelect={setTheme} />
+          </div>
           <Link
             href="/"
             target="_blank"
