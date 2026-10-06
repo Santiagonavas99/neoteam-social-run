@@ -1,5 +1,6 @@
 import { ArrowLeft, CalendarDays, MapPin, Users } from 'lucide-react'
 import Link from 'next/link'
+import { BrandLink } from '@/components/brand-link'
 import { eventConfig } from '@/features/event/event'
 import { RegistrationForm } from '@/features/registration/registration-form'
 
@@ -7,10 +8,7 @@ export default function RegistrationPage() {
   return (
     <main className="registration-page">
       <header className="registration-header shell">
-        <Link href="/" className="brand">
-          <span className="brand-mark">N</span>
-          <span>NEOTEAM</span>
-        </Link>
+        <BrandLink />
         <Link href="/" className="text-link">
           <ArrowLeft aria-hidden className="size-4 shrink-0" />
           Volver al evento

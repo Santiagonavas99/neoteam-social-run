@@ -1,10 +1,10 @@
 import Link from 'next/link'
+import { NeoTeamLogo } from './neoteam-logo'
 
-export function BrandLink({ label }: { label?: string }) {
+export function BrandLink({ label = 'NeoTeam' }: { label?: string }) {
   return (
     <Link href="/" className="brand" aria-label={label}>
-      <span className="brand-mark">N</span>
-      <span>NEOTEAM</span>
+      <NeoTeamLogo className="h-8 w-auto md:h-9" />
     </Link>
   )
 }
