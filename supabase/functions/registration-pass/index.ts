@@ -34,18 +34,28 @@ type PassRow = {
 
 const notFound = () => json({ error: 'No encontramos una inscripción con esos datos.' }, 404)
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const passFields = 'registration_code,checkin_token,first_name,last_name,email,status'
+
+function passBody(row: PassRow) {
+  return {
+    ok: true,
+    code: row.registration_code,
+    checkinToken: row.checkin_token,
+    firstName: row.first_name,
+    lastName: row.last_name,
+    status: row.status,
+  }
+}
+
 Deno.serve(async (req: Request) => {
   if (!(await fromProxy(req))) return json({ error: 'No autorizado.' }, 401)
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
 
   try {
     const body = await req.json().catch(() => ({}))
-    if (body?.action !== 'claim') return json({ error: 'Acción no válida.' }, 400)
-
-    const code = text(body?.code, 40).toUpperCase()
-    const documentNumber = text(body?.documentNumber, 40)
-    const email = text(body?.email, 180).toLowerCase()
-    if (!documentNumber || !email) return json({ error: 'Datos incompletos.' }, 400)
+    if (body?.action !== 'claim' && body?.action !== 'pass')
+      return json({ error: 'Acción no válida.' }, 400)
 
     const { data: event, error: eventError } = await supabase
       .from('events')
@@ -54,9 +64,28 @@ Deno.serve(async (req: Request) => {
       .single()
     if (eventError) throw eventError
 
+    if (body.action === 'pass') {
+      const token = text(body?.token, 40)
+      if (!UUID.test(token)) return notFound()
+      const { data, error } = await supabase
+        .from('registrations')
+        .select(passFields)
+        .eq('event_id', event.id)
+        .eq('checkin_token', token)
+        .maybeSingle()
+      if (error) throw error
+      if (!data || data.status === 'cancelled') return notFound()
+      return json(passBody(data as PassRow))
+    }
+
+    const code = text(body?.code, 40).toUpperCase()
+    const documentNumber = text(body?.documentNumber, 40)
+    const email = text(body?.email, 180).toLowerCase()
+    if (!documentNumber || !email) return json({ error: 'Datos incompletos.' }, 400)
+
     let query = supabase
       .from('registrations')
-      .select('registration_code,checkin_token,first_name,last_name,email,status')
+      .select(passFields)
       .eq('event_id', event.id)
       .eq('document_number', documentNumber)
     if (code) query = query.eq('registration_code', code)
@@ -68,14 +97,7 @@ Deno.serve(async (req: Request) => {
     // Unknown document, wrong email and cancelled look the same, so the endpoint cannot probe people.
     if (!row || row.status === 'cancelled') return notFound()
 
-    return json({
-      ok: true,
-      code: row.registration_code,
-      checkinToken: row.checkin_token,
-      firstName: row.first_name,
-      lastName: row.last_name,
-      status: row.status,
-    })
+    return json(passBody(row))
   } catch (error) {
     console.error('registration-pass', { message: error?.message })
     return json({ error: 'No pudimos preparar el pase.' }, 500)
