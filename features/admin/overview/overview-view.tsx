@@ -83,7 +83,7 @@ export function OverviewView({
                       </strong>
                       <small>{quickAccess}</small>
                     </span>
-                    <ChevronRight aria-hidden className="size-6 shrink-0 text-neo-accent-dark" />
+                    <ChevronRight aria-hidden className="size-6 shrink-0 text-neo-accent-text" />
                   </button>
                 ) : null,
               )}

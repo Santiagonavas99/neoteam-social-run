@@ -8,6 +8,7 @@ Spec: [`2026-10-05-google-wallet-fix-design.md`](../specs/2026-10-05-google-wall
 
 - Iván (or me with `vercel logs`, if allowed) opens the Vercel log for the failed `/api/wallet/google` request and copies the `Google Wallet google-wallet <stage> <status>` line.
 - Check in the Pay & Wallet Console: issuer ID, the service account is a user, the class `<issuer>.neoteam_social_run_2026` exists, and the issuer mode (demo mode only lets test accounts save).
+  - **Confirmed 2026-10-05 (Iván's screenshot):** class `neoteam_social_run_2026`, type Event ticket, state Active. Still to confirm: it belongs to the same issuer as `GOOGLE_WALLET_ISSUER_ID`, and Vercel has no different `GOOGLE_WALLET_CLASS_SUFFIX`.
 - If the cause is config (key, permissions, suffix, demo mode): fix it in Vercel/console, redeploy, retest on Android. Task 1 still ships for future failures.
 - If it is `object-insert 400`: stop, add the field fix to this plan as task 1b and ask again.
 

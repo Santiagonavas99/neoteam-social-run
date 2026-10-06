@@ -14,7 +14,7 @@ export type ScanOutcome = {
 }
 
 const tones: Record<ScanOutcome['tone'], { icon: LucideIcon; className: string }> = {
-  success: { icon: CircleCheck, className: 'bg-neo-success-bg text-neo-accent-dark' },
+  success: { icon: CircleCheck, className: 'bg-neo-success-bg text-neo-accent-text' },
   neutral: { icon: Clock, className: 'bg-neo-surface text-neo-text' },
   danger: { icon: CircleAlert, className: 'bg-neo-danger-bg text-neo-danger' },
 }

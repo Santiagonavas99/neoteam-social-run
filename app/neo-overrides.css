@@ -283,7 +283,7 @@
   font-size: 56px;
   line-height: 1;
   letter-spacing: -0.08em;
-  color: var(--neo-accent);
+  color: var(--neo-accent-text);
 }
 .empty-state h2 {
   font-size: 24px;
