@@ -1,4 +1,5 @@
 import { Dices, Trash2, TriangleAlert } from 'lucide-react'
+import { useReveal } from './use-reveal'
 
 export function ConfirmPanel({
   kind,
@@ -18,8 +19,9 @@ export function ConfirmPanel({
   onConfirm: () => void
 }) {
   const draw = kind === 'draw'
+  const ref = useReveal<HTMLElement>()
   return (
-    <section className="confirmation-panel" aria-label="Confirmar acción">
+    <section ref={ref} className="confirmation-panel scroll-mt-4" aria-label="Confirmar acción">
       <h2 className="flex items-center gap-2">
         {draw ? (
           <Dices aria-hidden className="size-5 shrink-0" />

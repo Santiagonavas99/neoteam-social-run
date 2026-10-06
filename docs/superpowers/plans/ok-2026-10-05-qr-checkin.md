@@ -8,6 +8,7 @@ Spec: [`2026-10-05-qr-checkin-design.md`](../specs/2026-10-05-qr-checkin-design.
 
 - Run the two queries in the spec ("State to verify first") and list the deployed Edge Functions.
 - Paste the results into the PR. The answer decides whether Task 1 only records the migration or also runs it.
+- **Result (2026-10-05):** `checkin_token` exists, `NOT NULL`, default `gen_random_uuid()`, unique index `registrations_checkin_token_key`, 0 rows without a token. Task 1 only records the migration. The remote is still in development, so Task 5 deletes and redeploys the functions without checking first.
 
 ### 1. `chore(db): record the checkin_token migration`
 
@@ -57,7 +58,17 @@ Spec: [`2026-10-05-qr-checkin-design.md`](../specs/2026-10-05-qr-checkin-design.
   - the header at 390 px does not wrap;
   - `pnpm build` shows no growth in the `/registro` client JS (compare the `.next` build output before and after).
 
+### 3b. `refactor(registration): Tailwind forms with explicit labels` (asked by Iván on 2026-10-05)
+
+- `/registro` and `/pase` share `features/registration/registration-shell.tsx` (header, title, facts) and `form-ui.tsx` (`TextField`, `SelectField`, `CheckboxField`, `FormSection`, `FormMessage`, `SubmitButton`).
+- Every input has an `id` and a `<label htmlFor>`; errors are tied with `aria-invalid` and `aria-describedby`; the server message has `role="alert"`.
+- No `<br>` in titles: each line is a `span` that becomes `block` from `md:`.
+- The legacy registration rules in `app/globals.css` are deleted.
+- **Checks:** 390 then 1440 screenshots of empty, error and success states for both pages; `pnpm ci:check`.
+
 ### 4. `feat(admin): check-in section with QR scanner`
+
+- Shared Edge code goes to `supabase/functions/_shared/` (asked by Iván): `proxy.ts` (proxy-secret check, used by `admin-pin` and `registration-pass`) and `participants.ts` (code parsing, lookup, payload and the atomic `checkInParticipant`). `admin-logos` keeps its own copy until the edge-function split plan.
 
 - `pnpm add html5-qrcode` (approved dependency).
 - **`supabase/functions/admin-pin/index.ts`:** the `checkin` action (session required).
@@ -84,8 +95,9 @@ Spec: [`2026-10-05-qr-checkin-design.md`](../specs/2026-10-05-qr-checkin-design.
 
 ### 5. Deploy and clean up (Iván)
 
-- `supabase functions deploy admin-pin registration-pass`
-- `supabase functions delete admin-checkin`, if it was deployed.
+- Always pass `--project-ref ohatsnkgaeccltqwhkbv`: without it the CLI asks for a project and can deploy to the wrong one.
+- `supabase functions deploy admin-pin registration-pass --project-ref ohatsnkgaeccltqwhkbv` (replaces the old `registration-pass`).
+- `supabase functions delete admin-checkin --project-ref ohatsnkgaeccltqwhkbv` and the same for `apple-wallet-pass`: `delete` takes one name per call; an error for one that does not exist is fine. Spec 4 recreates the Wallet function.
 - Close Santiago's `feat/qr-wallet-checkin` PR with a link to this one; spec 4 continues the Wallet part.
 
 ## Done when

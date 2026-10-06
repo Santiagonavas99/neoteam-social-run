@@ -5,6 +5,7 @@ import {
   CircleDashed,
   CircleDot,
   CircleSlash,
+  CircleStop,
   CircleX,
   type LucideIcon,
   Trophy,
@@ -20,6 +21,8 @@ const statusIcons: Record<string, LucideIcon> = {
   draft: CircleDashed,
   open: CircleDot,
   drawn: Trophy,
+  closed: CircleStop,
+  completed: Trophy,
 }
 
 export function Feedback({ value }: { value: FeedbackValue }) {

@@ -1,21 +1,23 @@
 import {
   Flag,
   GalleryHorizontal,
-  Gift,
   LayoutDashboard,
   type LucideIcon,
   ShieldCheck,
   Tag,
+  UserCheck,
   Users,
+  Zap,
 } from 'lucide-react'
 
 export type AdminSection =
+  | 'checkin'
   | 'metrics'
   | 'logos'
   | 'participants'
   | 'groups'
   | 'brands'
-  | 'raffles'
+  | 'dynamics'
   | 'security'
 
 export type AdminSectionInfo = {
@@ -27,6 +29,13 @@ export type AdminSectionInfo = {
 }
 
 export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
+  {
+    id: 'checkin',
+    label: 'Check-in',
+    description: 'Escanea el QR o escribe el código de cada corredor.',
+    icon: UserCheck,
+    quickAccess: 'Escáner QR',
+  },
   {
     id: 'metrics',
     label: 'Overview',
@@ -44,7 +53,7 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     label: 'Participantes',
     description: 'Encuentra a cada corredor y gestiona su asistencia.',
     icon: Users,
-    quickAccess: 'Lista y check-in',
+    quickAccess: 'Lista y asistencia',
   },
   {
     id: 'groups',
@@ -61,11 +70,11 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     quickAccess: 'Aliados y logos',
   },
   {
-    id: 'raffles',
-    label: 'Rifas',
-    description: 'Prepara los premios y gestiona cada sorteo.',
-    icon: Gift,
-    quickAccess: 'Premios y sorteos',
+    id: 'dynamics',
+    label: 'Dinámicas',
+    description: 'Stands, retos, premios instantáneos y sorteos.',
+    icon: Zap,
+    quickAccess: 'Stands, retos y sorteos',
   },
   {
     id: 'security',

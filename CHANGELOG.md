@@ -7,8 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-05
+
+### Added
+
+- **Dynamics panel** in the admin: stands, checkpoints, challenges, instant wins and raffles. Staff register each runner by scanning their QR, and a raffle draw shows the winners' names to read aloud.
+
+### Changed
+
+- **Raffles now live inside Dynamics**; the separate Rifas section is gone.
+
+## [0.4.0] - 2026-10-05
+
+### Added
+
+- **QR pass after registering**, and a **Mi pase** page (`/pase`) to get it back with your document number and email.
+- **Check-in with a QR scanner** in the admin panel, built for staff phones. If two phones scan the same QR, it counts once.
+
+### Changed
+
+- **Registration and pass forms**: every field has its own label, and screen readers announce each error with its field.
+
 ### Fixed
 
+- **Readable text on the home page**: buttons and links at 14–15 px, the agenda at 15 px and no label under 12 px.
 - **Registration form keeps your answers** when the server reports an error, including the document type and running group. Before, every field came back empty.
 - **Phone numbers must have 10 digits.** Numbers autofilled as `+57 300 123 4567` are corrected automatically.
 

@@ -36,11 +36,13 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 | `CircleCheck` / `CircleAlert` / `TriangleAlert` | Success / error / destructive confirmation |
 | `LoaderCircle` | Work in progress |
 | `Dices` | Draw winners |
+| `ScanLine` | Register a runner in a dynamic |
 | `UserCheck` | Check-in |
+| `QrCode` | The runner's check-in pass ("Mi pase") |
 | `Eye` / `EyeOff` | Visible / hidden |
 | `CalendarDays` / `Clock` / `MapPin` / `Route` / `Gift` | Date / time / place / route / prizes |
-| `LayoutDashboard`, `GalleryHorizontal`, `Users`, `Flag`, `Tag`, `Gift`, `ShieldCheck` | Admin sections: overview, logo strip, participants, groups, brands, raffles, security |
-| `Circle`, `CircleCheck`, `CircleSlash`, `CircleX`, `CircleDashed`, `CircleDot`, `Trophy` | Status: registered, checked in, no show, cancelled, draft, open, drawn |
+| `UserCheck`, `LayoutDashboard`, `GalleryHorizontal`, `Users`, `Flag`, `Tag`, `Zap`, `ShieldCheck` | Admin sections: check-in, overview, logo strip, participants, groups, brands, dynamics, security |
+| `Circle`, `CircleCheck`, `CircleSlash`, `CircleX`, `CircleDashed`, `CircleDot`, `CircleStop`, `Trophy` | Status: registered, checked in, no show, cancelled, draft, open, closed, drawn or completed |
 
 ## Tokens (`app/globals.css :root`)
 

@@ -5,7 +5,7 @@ export type ProxyEnv = Record<string, string | undefined>
 // Edge Functions accept only requests carrying the shared proxy secret, so the
 // client IP header below is trusted by them and cannot be forged by a caller.
 export function adminUpstreamHeaders(
-  request: Request,
+  request: Pick<Request, 'headers'>,
   key: string,
   env: ProxyEnv = process.env,
 ): Record<string, string> | null {
@@ -51,6 +51,13 @@ export async function parseAdminBody(request: Request): Promise<Record<string, u
 
 const noStore = { 'Cache-Control': 'no-store' }
 
+export function supabaseEndpoint(env: ProxyEnv) {
+  return {
+    url: (env.SUPABASE_URL?.trim() || env.NEXT_PUBLIC_SUPABASE_URL?.trim())?.replace(/\/$/, ''),
+    key: env.SUPABASE_PUBLISHABLE_KEY?.trim() || env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim(),
+  }
+}
+
 export async function proxyToEdgeFunction(
   request: Request,
   functionName: string,
@@ -58,9 +65,7 @@ export async function proxyToEdgeFunction(
   env: ProxyEnv = process.env,
 ): Promise<Response> {
   const log = `${functionName} proxy:`
-  const url = env.SUPABASE_URL?.trim() || env.NEXT_PUBLIC_SUPABASE_URL?.trim()
-  const key =
-    env.SUPABASE_PUBLISHABLE_KEY?.trim() || env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim()
+  const { url, key } = supabaseEndpoint(env)
   if (!url || !key) {
     console.error(`${log} missing Supabase URL or publishable key`, {
       hasUrl: Boolean(url),
@@ -83,7 +88,7 @@ export async function proxyToEdgeFunction(
   }
 
   try {
-    const response = await fetch(`${url.replace(/\/$/, '')}/functions/v1/${functionName}`, {
+    const response = await fetch(`${url}/functions/v1/${functionName}`, {
       method: 'POST',
       headers: upstreamHeaders,
       body: JSON.stringify(body),
