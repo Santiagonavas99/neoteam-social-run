@@ -263,8 +263,8 @@
   color: var(--neo-accent);
 }
 .v2-community-head h2 {
-  font-size: clamp(56px, 7.5vw, 112px);
-  line-height: 0.84;
+  font-size: clamp(48px, 5.6vw, 100px);
+  line-height: 0.94;
   letter-spacing: -0.07em;
   margin: 0;
 }
@@ -273,8 +273,13 @@
   margin: 0;
   line-height: 1.6;
 }
+/* Few logos per group: groups sit side by side instead of each taking a full-width row. */
 .v2-community .logo-panels {
-  gap: 18px;
+  gap: 18px 32px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+}
+.v2-community .logo-carousel {
+  --carousel-item-width: 200px;
 }
 .v2-community .logo-panel {
   border-top-color: var(--neo-on-dark-border);
@@ -286,12 +291,19 @@
 .v2-community .logo-panel > small {
   color: var(--neo-on-dark-secondary);
 }
+/* Same white tiles as the "Marcas aliadas" strip: partner logos are drawn for light backgrounds. */
 .v2-community .community-logo {
-  background: var(--neo-on-dark-hover);
+  min-height: 112px;
+  padding: 12px;
+  background: var(--neo-white);
   border: 1px solid var(--neo-on-dark-border);
+  border-radius: 14px;
+}
+.v2-community .community-logo img {
+  height: 88px;
 }
 .v2-community .community-logo strong {
-  color: var(--neo-white);
+  color: var(--neo-black);
 }
 .v2-community .carousel-controls button {
   background: var(--neo-on-dark-hover);
@@ -508,6 +520,15 @@
   }
   .v2-community {
     padding: 86px 0;
+  }
+  .v2-community .logo-carousel {
+    --carousel-item-width: 148px;
+  }
+  .v2-community .community-logo {
+    min-height: 88px;
+  }
+  .v2-community .community-logo img {
+    height: 64px;
   }
   .v2-raffle-copy {
     padding: 64px 24px;
