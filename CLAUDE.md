@@ -20,7 +20,7 @@ pnpm typecheck                # next typegen && tsc --noEmit
 pnpm test                     # node --test on **/*.test.ts (strip-types, no framework)
 node --experimental-strip-types --test path/to/file.test.ts   # single test file
 pnpm build
-pnpm check                    # lint + typecheck + test + build
+pnpm ci:check                 # lint + typecheck + test + build
 ```
 
 `next-env.d.ts` and `.next/` are generated (gitignored); `typecheck` runs `next typegen` first so it works on a clean clone. If `build` panics inside Turbopack, delete `.next/` and retry.

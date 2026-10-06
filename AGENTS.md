@@ -55,10 +55,10 @@ pnpm lint        # Biome
 pnpm typecheck   # next typegen + tsc
 pnpm test        # node --test on **/*.test.ts
 pnpm build
-pnpm check       # all of the above
+pnpm ci:check    # all of the above
 ```
 
-A task is done when `pnpm check` passes. Say so with the output; if something fails, report it, do not hide it.
+A task is done when `pnpm ci:check` passes. Say so with the output; if something fails, report it, do not hide it.
 
 ## Git
 
