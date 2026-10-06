@@ -4,7 +4,12 @@ import { errorMessage } from '../errors'
 import { type DynamicRow, type FeedbackValue, isNew, type ScannedParticipant } from '../types'
 import { useAdminData } from '../ui/use-admin-data'
 
-export type DynamicConfirmation = { row: DynamicRow; action: 'delete' | 'draw' }
+export type DynamicConfirmation =
+  | { row: DynamicRow; action: 'delete' | 'draw' }
+  | { drafts: DynamicRow[]; action: 'deleteDrafts' }
+
+const draftsDeleted = (count: number) =>
+  count === 1 ? '1 borrador eliminado.' : `${count} borradores eliminados.`
 
 export function useDynamics(token: string) {
   const [feedback, setFeedback] = useState<FeedbackValue>(null)
@@ -38,13 +43,18 @@ export function useDynamics(token: string) {
 
   async function confirm() {
     if (!confirmation) return
-    const { row, action } = confirmation
     setBusy(true)
     setFeedback(null)
     try {
-      const result = await callAdmin('dynamicData', { token, operation: action, id: row.id })
-      if (action === 'draw') setWinners({ name: row.name, list: result.winnerDetails ?? [] })
-      else setFeedback({ kind: 'success', text: 'Dinámica eliminada.' })
+      if (confirmation.action === 'deleteDrafts') {
+        const result = await callAdmin('dynamicData', { token, operation: 'deleteDrafts' })
+        setFeedback({ kind: 'success', text: draftsDeleted(result.deleted ?? 0) })
+      } else {
+        const { row, action } = confirmation
+        const result = await callAdmin('dynamicData', { token, operation: action, id: row.id })
+        if (action === 'draw') setWinners({ name: row.name, list: result.winnerDetails ?? [] })
+        else setFeedback({ kind: 'success', text: 'Dinámica eliminada.' })
+      }
       setConfirmation(null)
       setEditor(null)
       await reload()

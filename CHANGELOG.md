@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Delete all draft dynamics** in one step from the Dinámicas panel.
+
 ## [0.5.1] - 2026-10-05
 
 ### Changed

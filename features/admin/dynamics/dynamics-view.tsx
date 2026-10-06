@@ -1,6 +1,6 @@
 'use client'
 
-import { Dices, Plus, ScanLine, Zap } from 'lucide-react'
+import { Dices, Plus, ScanLine, Trash2, Zap } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { callAdmin } from '../api'
 import { matchesQuery } from '../filter'
@@ -42,6 +42,7 @@ export function DynamicsView({ token }: { token: string }) {
   const [type, setType] = useState('')
   const [scanning, setScanning] = useState<string | null>(null)
   const locked = busy || !!editor || !!scanning
+  const drafts = rows.filter((row) => row.status === 'draft')
 
   function addDynamic() {
     dynamics.edit({
@@ -109,28 +110,39 @@ export function DynamicsView({ token }: { token: string }) {
           onClose={() => dynamics.setWinners(null)}
         />
       )}
-      {confirmation &&
-        (confirmation.action === 'draw' ? (
-          <ConfirmPanel
-            kind="draw"
-            title="¿Todo listo para el sorteo?"
-            text={`Se sortearán ${plural(confirmation.row.winner_count, 'ganador', 'ganadores')} para “${confirmation.row.name}”. ${confirmation.row.eligibility_dynamic_id ? 'Participan quienes completaron la dinámica vinculada.' : confirmation.row.requires_checkin ? 'Participan quienes hayan hecho check-in.' : 'Participan los inscritos elegibles.'} Los resultados se guardarán al confirmar.`}
-            confirmLabel="Confirmar y sortear"
-            busy={busy}
-            onCancel={() => dynamics.setConfirmation(null)}
-            onConfirm={() => void dynamics.confirm()}
-          />
-        ) : (
-          <ConfirmPanel
-            kind="delete"
-            title={`¿Eliminar ${confirmation.row.name}?`}
-            text="Se eliminará la dinámica y todas sus participaciones."
-            confirmLabel="Sí, eliminar"
-            busy={busy}
-            onCancel={() => dynamics.setConfirmation(null)}
-            onConfirm={() => void dynamics.confirm()}
-          />
-        ))}
+      {confirmation?.action === 'draw' && (
+        <ConfirmPanel
+          kind="draw"
+          title="¿Todo listo para el sorteo?"
+          text={`Se sortearán ${plural(confirmation.row.winner_count, 'ganador', 'ganadores')} para “${confirmation.row.name}”. ${confirmation.row.eligibility_dynamic_id ? 'Participan quienes completaron la dinámica vinculada.' : confirmation.row.requires_checkin ? 'Participan quienes hayan hecho check-in.' : 'Participan los inscritos elegibles.'} Los resultados se guardarán al confirmar.`}
+          confirmLabel="Confirmar y sortear"
+          busy={busy}
+          onCancel={() => dynamics.setConfirmation(null)}
+          onConfirm={() => void dynamics.confirm()}
+        />
+      )}
+      {confirmation?.action === 'delete' && (
+        <ConfirmPanel
+          kind="delete"
+          title={`¿Eliminar ${confirmation.row.name}?`}
+          text="Se eliminará la dinámica y todas sus participaciones."
+          confirmLabel="Sí, eliminar"
+          busy={busy}
+          onCancel={() => dynamics.setConfirmation(null)}
+          onConfirm={() => void dynamics.confirm()}
+        />
+      )}
+      {confirmation?.action === 'deleteDrafts' && (
+        <ConfirmPanel
+          kind="delete"
+          title={`¿Eliminar ${plural(confirmation.drafts.length, 'borrador', 'borradores')}?`}
+          text={`${confirmation.drafts.map((draft) => draft.name).join(', ')}. Se eliminarán junto con sus participaciones.`}
+          confirmLabel="Sí, eliminar borradores"
+          busy={busy}
+          onCancel={() => dynamics.setConfirmation(null)}
+          onConfirm={() => void dynamics.confirm()}
+        />
+      )}
       {editor?.id.startsWith('new-') && (
         <DynamicForm
           key={editor.id}
@@ -229,6 +241,19 @@ export function DynamicsView({ token }: { token: string }) {
               )}
             </RecordCard>
           ))}
+        </div>
+      )}
+      {!loading && drafts.length > 0 && (
+        <div className="mt-6 flex justify-center md:justify-start">
+          <button
+            type="button"
+            className="text-link danger-text"
+            onClick={() => dynamics.setConfirmation({ action: 'deleteDrafts', drafts })}
+            disabled={locked || !!confirmation}
+          >
+            <Trash2 aria-hidden className="size-4 shrink-0" />
+            Eliminar borradores ({drafts.length})
+          </button>
         </div>
       )}
     </section>
