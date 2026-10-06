@@ -1,6 +1,6 @@
 # Tailwind CSS and icon system — spec
 
-Date: 2026-10-05 · Branch: `feat/tailwind-and-icons` (from `main`) · Status: **approved 2026-10-05; decisions 4 (icons), 8 (theme) and 9 (dates) added the same day, awaiting OK**
+Date: 2026-10-05 · Branch: `feat/tailwind-and-icons` (from `main`) · Status: **approved 2026-10-05; decisions 4 (icons), 8 (theme) and 9 (dates) added and approved the same day**
 
 ## Problem
 

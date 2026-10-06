@@ -1,6 +1,6 @@
 # Event countdown — spec
 
-Date: 2026-10-05 · Branch: `feat/tailwind-and-icons` (Task 3b of its plan) · Status: **awaiting OK** · Must ship before 18 Oct 2026 (it has no use after).
+Date: 2026-10-05 · Branch: `feat/tailwind-and-icons` (Task 3b of its plan) · Status: **approved 2026-10-05** · Must ship before 18 Oct 2026 (it has no use after).
 
 ## Problem
 
