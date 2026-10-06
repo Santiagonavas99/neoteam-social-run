@@ -19,6 +19,7 @@ function FieldError({ errors }: { errors?: string[] }) {
 export function RegistrationForm() {
   const [state, formAction, pending] = useActionState(registerParticipant, initialState)
   const [runningGroup, setRunningGroup] = useState('neoteam')
+  const values = state.values
 
   if (state.ok) {
     return (
@@ -36,7 +37,8 @@ export function RegistrationForm() {
   }
 
   return (
-    <form action={formAction} className="registration-form">
+    // React resets a form after its action, which blanks selects; remounting applies the submitted values.
+    <form key={state.attempt} action={formAction} className="registration-form">
       <div className="form-section-title">
         <span>01</span>
         <div>
@@ -47,19 +49,29 @@ export function RegistrationForm() {
       <div className="form-grid two">
         <label>
           Nombre
-          <input name="firstName" required autoComplete="given-name" />
+          <input
+            name="firstName"
+            defaultValue={values?.firstName}
+            required
+            autoComplete="given-name"
+          />
           <FieldError errors={state.errors?.firstName} />
         </label>
         <label>
           Apellido
-          <input name="lastName" required autoComplete="family-name" />
+          <input
+            name="lastName"
+            defaultValue={values?.lastName}
+            required
+            autoComplete="family-name"
+          />
           <FieldError errors={state.errors?.lastName} />
         </label>
       </div>
       <div className="form-grid document-grid">
         <label>
           Tipo
-          <select name="documentType" defaultValue="CC">
+          <select name="documentType" defaultValue={values?.documentType ?? 'CC'}>
             <option value="CC">CC</option>
             <option value="CE">CE</option>
             <option value="TI">TI</option>
@@ -70,25 +82,43 @@ export function RegistrationForm() {
         </label>
         <label>
           Documento
-          <input name="documentNumber" required inputMode="numeric" />
+          <input
+            name="documentNumber"
+            defaultValue={values?.documentNumber}
+            required
+            inputMode="numeric"
+          />
           <FieldError errors={state.errors?.documentNumber} />
         </label>
       </div>
       <div className="form-grid two">
         <label>
           Correo
-          <input name="email" type="email" required autoComplete="email" />
+          <input
+            name="email"
+            defaultValue={values?.email}
+            type="email"
+            required
+            autoComplete="email"
+          />
           <FieldError errors={state.errors?.email} />
         </label>
         <label>
           WhatsApp
-          <input name="phone" type="tel" required autoComplete="tel" />
+          <input
+            name="phone"
+            type="tel"
+            inputMode="tel"
+            required
+            autoComplete="tel"
+            defaultValue={values?.phone}
+          />
           <FieldError errors={state.errors?.phone} />
         </label>
       </div>
       <label>
         Fecha de nacimiento
-        <input name="birthDate" type="date" required />
+        <input name="birthDate" defaultValue={values?.birthDate} type="date" required />
         <FieldError errors={state.errors?.birthDate} />
       </label>
 
@@ -115,7 +145,12 @@ export function RegistrationForm() {
       {runningGroup === 'otro' && (
         <label>
           Nombre de tu grupo
-          <input name="otherRunningGroup" required placeholder="Escribe el nombre del crew" />
+          <input
+            name="otherRunningGroup"
+            defaultValue={values?.otherRunningGroup}
+            required
+            placeholder="Escribe el nombre del crew"
+          />
           <FieldError errors={state.errors?.otherRunningGroup} />
         </label>
       )}
@@ -130,18 +165,29 @@ export function RegistrationForm() {
       <div className="form-grid two">
         <label>
           Nombre del contacto
-          <input name="emergencyName" required />
+          <input name="emergencyName" defaultValue={values?.emergencyName} required />
           <FieldError errors={state.errors?.emergencyName} />
         </label>
         <label>
           Celular
-          <input name="emergencyPhone" type="tel" required />
+          <input
+            name="emergencyPhone"
+            type="tel"
+            inputMode="tel"
+            required
+            defaultValue={values?.emergencyPhone}
+          />
           <FieldError errors={state.errors?.emergencyPhone} />
         </label>
       </div>
 
       <label className="checkbox-label">
-        <input name="termsAccepted" type="checkbox" required />
+        <input
+          name="termsAccepted"
+          type="checkbox"
+          defaultChecked={values?.termsAccepted === 'on'}
+          required
+        />
         <span>
           Declaro que participaré bajo mi propia responsabilidad y acepto las condiciones del
           evento.
@@ -150,7 +196,12 @@ export function RegistrationForm() {
       <FieldError errors={state.errors?.termsAccepted} />
 
       <label className="checkbox-label">
-        <input name="privacyAccepted" type="checkbox" required />
+        <input
+          name="privacyAccepted"
+          type="checkbox"
+          defaultChecked={values?.privacyAccepted === 'on'}
+          required
+        />
         <span>
           Acepto el tratamiento de mis datos para gestionar mi participación en Social Run NeoTeam.
         </span>
@@ -158,7 +209,11 @@ export function RegistrationForm() {
       <FieldError errors={state.errors?.privacyAccepted} />
 
       <label className="checkbox-label optional-consent">
-        <input name="marketingAccepted" type="checkbox" />
+        <input
+          name="marketingAccepted"
+          type="checkbox"
+          defaultChecked={values?.marketingAccepted === 'on'}
+        />
         <span>Quiero recibir novedades de próximos eventos de NeoTeam. (Opcional)</span>
       </label>
 

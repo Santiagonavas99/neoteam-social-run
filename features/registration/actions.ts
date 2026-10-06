@@ -8,20 +8,28 @@ export type RegistrationState = {
   message: string
   code?: string
   errors?: Record<string, string[] | undefined>
+  values?: Record<string, string>
+  attempt?: number
 }
 
 export async function registerParticipant(
-  _previousState: RegistrationState,
+  previousState: RegistrationState,
   formData: FormData,
 ): Promise<RegistrationState> {
-  const raw = Object.fromEntries(formData.entries())
-  const parsed = registrationSchema.safeParse(raw)
+  const values: Record<string, string> = {}
+  for (const [key, value] of formData) {
+    if (typeof value === 'string' && !key.startsWith('$')) values[key] = value
+  }
+  const attempt = (previousState.attempt ?? 0) + 1
+  const parsed = registrationSchema.safeParse(values)
 
   if (!parsed.success) {
     return {
       ok: false,
       message: 'Hay algunos datos por revisar.',
       errors: parsed.error.flatten().fieldErrors,
+      values,
+      attempt,
     }
   }
 
@@ -47,7 +55,12 @@ export async function registerParticipant(
 
     if (error) {
       if (error.message.includes('Ya existe una inscripción')) {
-        return { ok: false, message: 'Ya existe una inscripción con ese documento o correo.' }
+        return {
+          ok: false,
+          message: 'Ya existe una inscripción con ese documento o correo.',
+          values,
+          attempt,
+        }
       }
       throw error
     }
@@ -65,6 +78,8 @@ export async function registerParticipant(
       message: isMissingConfig
         ? 'La interfaz ya está lista. Falta conectar el proyecto de Supabase para guardar registros reales.'
         : 'No pudimos guardar el registro. Intenta nuevamente.',
+      values,
+      attempt,
     }
   }
 }
