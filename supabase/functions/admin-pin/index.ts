@@ -673,7 +673,43 @@ Deno.serve(async (req: Request) => {
         return json({ ok: true });
       }
       if (operation === "delete") {
-        if (!body?.id || !["brands", "groups", "raffles"].includes(resource)) return json({ error: "No se puede eliminar este registro." }, 400);
+        if (!body?.id || !["brands", "groups", "raffles", "participants"].includes(resource)) {
+          return json({ error: "No se puede eliminar este registro." }, 400);
+        }
+
+        if (resource === "participants") {
+          const { data: event, error: eventError } = await supabase
+            .from("events")
+            .select("id")
+            .eq("code", "SR26")
+            .single();
+          if (eventError) throw eventError;
+
+          const { data: participant, error: participantError } = await supabase
+            .from("registrations")
+            .select("id")
+            .eq("id", body.id)
+            .eq("event_id", event.id)
+            .maybeSingle();
+          if (participantError) throw participantError;
+          if (!participant) return json({ error: "Participante no encontrado." }, 404);
+
+          const [raffleEntries, dynamicParticipations] = await Promise.all([
+            supabase.from("raffle_entries").delete().eq("registration_id", body.id),
+            supabase.from("dynamic_participations").delete().eq("registration_id", body.id),
+          ]);
+          if (raffleEntries.error) throw raffleEntries.error;
+          if (dynamicParticipations.error) throw dynamicParticipations.error;
+
+          const { error } = await supabase
+            .from("registrations")
+            .delete()
+            .eq("id", body.id)
+            .eq("event_id", event.id);
+          if (error) throw error;
+          return json({ ok: true });
+        }
+
         const { error } = await supabase.from(config.table).delete().eq("id", body.id);
         if (error) throw error;
         return json({ ok: true });
