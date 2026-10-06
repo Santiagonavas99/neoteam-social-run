@@ -246,10 +246,6 @@
   text-transform: uppercase;
   color: var(--neo-text-secondary);
 }
-.home-v2 .brand-marquee-section {
-  background: var(--neo-surface);
-  border-block: 1px solid var(--neo-border);
-}
 .v2-agenda {
   padding: 110px 0 120px;
   background: var(--neo-muted-bg);

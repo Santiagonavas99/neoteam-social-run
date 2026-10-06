@@ -36,3 +36,14 @@
   --radius-card: var(--radius-card);
   --font-sans: var(--font-host-grotesk), system-ui, sans-serif;
 }
+
+/* Marquee: the track holds two copies, so -50% loops seamlessly. The component sets the duration from the logo count. */
+@theme {
+  --animate-marquee: marquee 40s linear infinite;
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}

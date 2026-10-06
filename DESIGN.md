@@ -106,7 +106,7 @@ Tailwind 4 (`app/tailwind.css`, loaded first in `app/layout.tsx`) runs **without
 ## CSS architecture
 
 - **Admin (`/admin`)**: Tailwind only, mobile first. No admin rules remain in the global stylesheets. The theme root is `app/admin/layout.tsx` (`#admin-theme`, with a pre-paint script from `lib/theme.ts`); the switch ("Claro · Oscuro · Sistema") lives in the sidebar's "Cuenta" group and in the phone "Más" sheet.
-- **Public (`/`, `/registro`, `/pase`)**: legacy global CSS loaded by `app/layout.tsx` in this order, later files overriding earlier ones: `globals.css` (tokens, base, public components) → `logo-marquee.css` → `home-v2.css`. Registration and the pass card are already Tailwind. The rest moves in Phase B, after 18 Oct.
+- **Public (`/`, `/registro`, `/pase`)**: legacy global CSS loaded by `app/layout.tsx` in this order, later files overriding earlier ones: `globals.css` (tokens, base, public components) → `home-v2.css`. Registration, the pass card, the theme menu and the logo strip are already Tailwind. The rest moves in Phase B, after 18 Oct.
 - Admin navigation is grouped by moment in `features/admin/sections.ts` (`group`, `primary`): phones get a bottom tab bar with the primary sections plus "Más"; from `md` a black sidebar shows the three groups.
 
 ## Known debt (2026-10-05)
