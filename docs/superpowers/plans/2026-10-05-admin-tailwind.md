@@ -12,9 +12,44 @@ Branch: `refactor/admin-tailwind` (from `main` v0.6.0) · Order: **5 of 5** · S
   - This refactor changes no behavior, but it touches every admin screen staff use on 18 Oct.
   - Anything not merged by **15 Oct** waits until after the event.
   - Task 4b (theme) can ship alone, because it only works on surfaces that are already on tokens.
-  - Recommended order if time is short: 4c, 4.1, then Task 4b, and leave the rest for after. The theme switch ("Claro · Oscuro · Sistema") does not exist yet: it is Task 4b, so the admin has no theme button today.
+  - Recommended order if time is short: 4c, 4.0, 4.1, then Task 4b, and leave the rest for after. The theme switch ("Claro · Oscuro · Sistema") does not exist yet: it is Task 4b, so the admin has no theme button today.
 
 ## Tasks
+
+### 4.0 `refactor(ui): palette-only colors` (Iván, 2026-10-05)
+
+The legacy CSS uses colors that are not in the `DESIGN.md` palette. They also break the dark theme, because a hard-coded hex never changes with it.
+
+**Count today (`rg` for hex/rgba outside `:root`):**
+- `neo-overrides.css` (admin): 21;
+- `globals.css`: 18 (admin forms, buttons, header, hero, agenda);
+- `home-v2.css` (public home): 31.
+
+**Mapping.** Every color goes to an existing token, or to one of the new tokens below, each with a light and a dark value and the contrast in `DESIGN.md`:
+
+| Today | Where | Goes to |
+|-------|-------|---------|
+| `#edf1ef`, `#fafcfb`, `#f2f6f4` | table head, editor, upload field | `--neo-bg` |
+| `#879a91`, `#52615a`, `#737d79` | metric index, neutral badge, placeholder | `--neo-text-secondary` |
+| `#fffafa` | invalid input | `--neo-danger-bg` |
+| `#791d1d` | danger button hover | `--neo-danger` with `hover:opacity-90` |
+| `#b8c1be`, `#aebeb7`, `#a4b6ad` | input border, dashed empty and upload borders | **new** `--neo-border-strong`: at least 3:1 on surface in both themes (the input-outline debt in `DESIGN.md`) |
+| `#9cb1a9`, `#b9c5c0`, `#bbc7c1`, `#c0c9c6`, `#cfd8d5`, `#e4ebe8`, `#c0cbc6`, `#a4b7b1`, `#abb7b1` | sidebar, header, hero, agenda text on black | **new** `--neo-on-dark-secondary`: at least 4.5:1 on `--neo-black` |
+| `#15201b`, `#2a3530`, `#303635`, `#36403c`, `#3d4c48`, `#34443d` | sidebar hover, dividers on black | **new** `--neo-on-dark-border` (one value for hover and dividers) |
+| status `completed` `#dfede7`/`#234c3c` | badge | `--neo-success-bg` / `--neo-accent-text` |
+| status `cancelled` `#f7e6e4`/`#923a32` | badge | `--neo-danger-bg` / `--neo-danger` |
+| status `no_show` `#f4edde`/`#6b5627` | badge | **new** `--neo-warning-bg` / `--neo-warning` |
+| status `registered` `#e5eef5`/`#28485e` | badge | neutral: `--neo-bg` / `--neo-text-secondary` (the status icon tells them apart) |
+
+**Scope and order:**
+- `neo-overrides.css` and `globals.css` (admin, registration, header, hero, agenda) in this commit;
+- `home-v2.css` stays for Phase B (after 18 Oct), with its 31 colors listed in `DESIGN.md` Known debt.
+
+**Rule added to `DESIGN.md`:** no raw hex or rgba outside the token blocks in `globals.css`; new UI uses only `--neo-*` tokens.
+
+**Checks:**
+- `rg` finds no hex or rgba in `neo-overrides.css`, or in `globals.css` outside the token blocks;
+- screenshots at 390 px first, then 1440, against `main`. Expected differences are only the remapped greys and badges; Iván reviews them in the PR.
 
 ### 4. `refactor(admin): <area> to Tailwind` (one commit per item)
 
