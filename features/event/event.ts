@@ -40,6 +40,7 @@ export const agenda = [
     time: '7:50',
     meridiem: 'a. m.',
     title: 'Ruta 5K',
+    highlight: true,
     details: ['Salida conjunta de los participantes por el Parque del Ingenio y sus alrededores.'],
   },
   {
@@ -58,6 +59,7 @@ export const agenda = [
     time: '8:45',
     meridiem: 'a. m.',
     title: 'Celebración y rifas',
+    highlight: true,
     details: [
       'Palabras de agradecimiento a nuestra comunidad.',
       'Presentación y reconocimiento de las marcas aliadas.',

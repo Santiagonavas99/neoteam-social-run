@@ -66,10 +66,10 @@ Spec: [`2026-10-06-home-refresh-design.md`](../specs/2026-10-06-home-refresh-des
 ### 5. `feat(home): agenda timeline` (spec decision 4)
 
 - **`features/home/sections/agenda.tsx`:** an `<ol>` timeline in Tailwind, with a sticky heading from `lg`.
-- **`features/event/event.ts`:** each agenda item gains a `summary` (one line) and `highlight?: true`.
+- **`features/event/event.ts`:** two agenda items gain `highlight: true`. No `summary` field: the existing details render as one paragraph instead.
 - The agenda rules are deleted from `home-v2.css`.
 - **Checks:**
-  - the section is at most 1,000 px tall at 390;
+  - the section is at most 1,000 px tall at 390 (result: 1,129 px, down from 2,516; going lower would mean cutting event copy);
   - at 1440 there is no empty column;
   - the highlighted items show the cyan dot.
 
