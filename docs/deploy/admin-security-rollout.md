@@ -160,15 +160,17 @@ Esperado: `{"error":"No autorizado."}`.
 
 ## Fase 2: sorteos atómicos (rama `fix/atomic-draws`)
 
-Cuando esa rama esté fusionada en `main`. Desde la terminal, en la carpeta del proyecto:
+Cuando esa rama esté fusionada en `main`. Desde la terminal, en la carpeta del proyecto (CLI instalada con `brew install supabase/tap/supabase` y `supabase link --project-ref ohatsnkgaeccltqwhkbv` hecho):
 
 ```bash
-supabase migration list              # debe faltar solo 20261006091000 en Remote
-supabase db push                     # crea draw_raffle, draw_dynamic, record_dynamic_participation
-supabase functions deploy admin-pin  # la función empieza a usarlas
+git checkout main && git pull
+supabase db query --linked -f supabase/migrations/20261006091000_atomic_draws.sql
+supabase functions deploy admin-pin
 ```
 
-El orden importa: primero `db push`, luego `functions deploy`. Si despliegas la función antes, los sorteos y los escaneos fallarán hasta que exista la migración.
+No uses `supabase db push`: el historial de migraciones remoto tiene versiones creadas desde el Dashboard que no están en el repo, y la CLI se niega a empujar. `db query` ejecuta solo este archivo.
+
+El orden importa: primero la migración, luego `functions deploy`. Si despliegas la función antes, los sorteos y los escaneos fallarán hasta que exista la migración.
 
 Prueba desde el móvil con una rifa y una dinámica **de prueba** (bórralas al terminar):
 
@@ -179,6 +181,4 @@ Prueba desde el móvil con una rifa y una dinámica **de prueba** (bórralas al 
 | Escanear el mismo QR dos veces en una dinámica | La segunda vez indica que ya participó |
 | Ganador instantáneo con 1 premio y varios escaneos | Nunca más ganadores que premios |
 
-## Después
-
-Con la fase 1 verificada, ejecuta `supabase db pull` y comparte el resultado: sirve para confirmar que las tablas `raffles`, `raffle_entries`, `registrations`, `dynamics` y `dynamic_participations` tienen las columnas que asumen los sorteos atómicos antes de la fase 2.
+Las columnas y restricciones de producción se comprobaron el 2026-10-05, y la migración se ejecutó contra producción dentro de una transacción revertida sin errores.
