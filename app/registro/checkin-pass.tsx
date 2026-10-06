@@ -59,8 +59,17 @@ export function CheckinPass({ code, checkinToken, participantName }: {
   }, [payload]);
 
   useEffect(() => {
-    setPlatform(detectPlatform());
+    const detectedPlatform = detectPlatform();
+    setPlatform(detectedPlatform);
     setStandalone(isStandaloneMode());
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("open") === "1") {
+      setWebPassOpen(true);
+      if (detectedPlatform === "ios" && params.get("install") === "1") {
+        setInstallHelpOpen(true);
+      }
+    }
 
     const displayMode = window.matchMedia("(display-mode: standalone)");
     const onDisplayModeChange = () => setStandalone(isStandaloneMode());
@@ -148,6 +157,11 @@ export function CheckinPass({ code, checkinToken, participantName }: {
   }
 
   function saveOnIPhone() {
+    if (window.location.pathname !== "/pase") {
+      window.location.assign("/pase?open=1&install=1");
+      return;
+    }
+
     setWebPassOpen(true);
     if (!standalone) setInstallHelpOpen(true);
   }
