@@ -848,3 +848,203 @@
     font-size: clamp(3rem, 15vw, 4.8rem);
   }
 }
+
+
+.v3-final {
+  padding-block: calc(var(--space-24) + var(--space-8));
+  background: var(--neo-bg);
+}
+
+.v3-final-grid {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: var(--space-8);
+}
+
+.v3-final-copy h2 {
+  margin: 0;
+  max-width: 1040px;
+  font-size: clamp(3.7rem, 7.6vw, 8.4rem);
+  line-height: 0.83;
+  letter-spacing: -0.075em;
+}
+
+.v3-final-bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-8);
+  margin-top: var(--space-12);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--neo-border);
+}
+
+.v3-final-bottom > strong {
+  font-size: clamp(4.2rem, 10vw, 9.8rem);
+  line-height: 0.76;
+  letter-spacing: -0.085em;
+  font-weight: 700;
+}
+
+.v3-final-action {
+  flex: 0 0 auto;
+  background: var(--neo-black);
+  border-color: var(--neo-black);
+  color: var(--neo-white);
+}
+
+.v3-final-action:hover:not(:disabled) {
+  background: var(--neo-accent-dark);
+  border-color: var(--neo-accent-dark);
+  color: var(--neo-white);
+}
+
+.v3-footer {
+  position: relative;
+  padding-top: var(--space-12);
+  background: var(--neo-accent);
+  color: var(--neo-black);
+  overflow: hidden;
+}
+
+.v3-footer-top {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(260px, 1fr) minmax(180px, 0.45fr);
+  gap: var(--space-8);
+  align-items: start;
+  padding-bottom: var(--space-12);
+  border-bottom: 1px solid color-mix(in srgb, var(--neo-black) 24%, transparent);
+}
+
+.v3-footer-intro {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.v3-footer-intro strong,
+.v3-footer-intro span {
+  font-size: 0.75rem;
+  letter-spacing: 0.11em;
+}
+
+.v3-footer-intro span {
+  opacity: 0.7;
+}
+
+.v3-footer nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-6);
+}
+
+.v3-footer nav a {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid color-mix(in srgb, var(--neo-black) 18%, transparent);
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.v3-footer nav a:hover {
+  border-color: var(--neo-black);
+}
+
+.v3-footer-top > p {
+  margin: 0;
+  text-align: right;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.v3-footer-display {
+  width: max-content;
+  margin: var(--space-12) 0 0;
+  transform: translateX(-0.035em);
+  font-size: clamp(7rem, 18.4vw, 19rem);
+  line-height: 0.66;
+  letter-spacing: -0.09em;
+  font-weight: 800;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.v3-footer-bottom {
+  min-height: 68px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-6);
+  border-top: 1px solid color-mix(in srgb, var(--neo-black) 24%, transparent);
+  font-size: 0.7rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+}
+
+@media (max-width: 900px) {
+  .v3-footer-top {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .v3-footer-top > p {
+    text-align: left;
+  }
+}
+
+@media (max-width: 760px) {
+  .v3-final {
+    padding-block: var(--space-16);
+  }
+
+  .v3-final-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  .v3-final-copy h2 {
+    font-size: clamp(3rem, 15vw, 4.8rem);
+  }
+
+  .v3-final-bottom {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .v3-final-bottom > strong {
+    font-size: clamp(4.3rem, 23vw, 6.2rem);
+  }
+
+  .v3-final-action {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .v3-footer {
+    padding-top: var(--space-8);
+  }
+
+  .v3-footer-top {
+    grid-template-columns: 1fr;
+    padding-bottom: var(--space-8);
+  }
+
+  .v3-footer nav {
+    grid-template-columns: 1fr;
+  }
+
+  .v3-footer-display {
+    margin-top: var(--space-8);
+    font-size: clamp(6rem, 28vw, 8.4rem);
+    line-height: 0.7;
+  }
+
+  .v3-footer-bottom {
+    min-height: 76px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+}
