@@ -1,6 +1,14 @@
 // @ts-nocheck
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import {
+  checkInParticipant,
+  normalizeParticipantCode,
+  participantFields,
+  participantLookup,
+  participantPayload,
+} from '../_shared/participants.ts'
+import { fromProxy, secretsMatch, sha256 } from '../_shared/proxy.ts'
 
 function requireEnv(name: string) {
   const value = Deno.env.get(name)
@@ -18,7 +26,6 @@ const SESSION_DAYS = 30
 const PBKDF2_ITERATIONS = 180_000
 const ADMIN_SETUP_SECRET = Deno.env.get('ADMIN_SETUP_SECRET')?.trim() ?? ''
 
-const ADMIN_PROXY_SECRET = Deno.env.get('ADMIN_PROXY_SECRET')?.trim() ?? ''
 const responseHeaders = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
 
 function json(body: unknown, status = 200) {
@@ -36,11 +43,6 @@ function fromBase64(value: string) {
   const bytes = new Uint8Array(binary.length)
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
   return bytes
-}
-
-async function sha256(value: string) {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value))
-  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
 async function hashPin(pin: string) {
@@ -90,40 +92,8 @@ function validPin(pin: unknown): pin is string {
   return typeof pin === 'string' && /^\d{6}$/.test(pin)
 }
 
-function normalizeParticipantCode(value: unknown) {
-  if (typeof value !== 'string') return ''
-  let result = value.trim()
-  if (result.toUpperCase().startsWith('NEOTEAM-SR26:'))
-    result = result.slice('NEOTEAM-SR26:'.length).trim()
-  return result
-}
-
-function validUuid(value: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
-}
-
-type ParticipantRow = {
-  id: string
-  registration_code: string
-  first_name: string
-  last_name: string
-  status: string
-  other_running_group: string | null
-  running_groups: { name: string } | null
-}
 type IdRow = { id: string }
 type ParticipationRow = { dynamic_id: string; status: string }
-
-function dynamicParticipantPayload(row: ParticipantRow) {
-  return {
-    id: row.id,
-    code: row.registration_code,
-    firstName: row.first_name,
-    lastName: row.last_name,
-    status: row.status,
-    group: row.running_groups?.name || row.other_running_group || 'Independiente',
-  }
-}
 
 function randomUnit() {
   const value = new Uint32Array(1)
@@ -131,27 +101,10 @@ function randomUnit() {
   return value[0] / 0x100000000
 }
 
-function secretsMatch(candidate: unknown, expected: string) {
-  if (typeof candidate !== 'string' || candidate.length > 1024) return false
-  const left = new TextEncoder().encode(candidate.trim())
-  const right = new TextEncoder().encode(expected)
-  if (left.length !== right.length) return false
-  let diff = 0
-  for (let i = 0; i < left.length; i++) diff |= left[i] ^ right[i]
-  return diff === 0
-}
-
 async function verifySetupSecret(candidate: unknown) {
   if (typeof candidate !== 'string' || ADMIN_SETUP_SECRET.length < 12 || candidate.length > 1024)
     return false
   return secretsMatch(await sha256(candidate.trim()), await sha256(ADMIN_SETUP_SECRET))
-}
-
-// Only the Next proxy holds ADMIN_PROXY_SECRET, so its client IP header is trusted.
-async function fromProxy(req: Request) {
-  if (ADMIN_PROXY_SECRET.length < 32) return false
-  const candidate = req.headers.get('x-admin-proxy-secret') ?? ''
-  return secretsMatch(await sha256(candidate.trim()), await sha256(ADMIN_PROXY_SECRET))
 }
 
 function getClientIp(req: Request) {
@@ -552,15 +505,12 @@ Deno.serve(async (req: Request) => {
           const value = normalizeParticipantCode(body?.code)
           if (!value) return json({ error: 'Escanea un QR o escribe un código.' }, 400)
 
-          let participantQuery = supabase
+          const [column, key] = participantLookup(value)
+          const participantQuery = supabase
             .from('registrations')
-            .select(
-              'id,registration_code,first_name,last_name,status,other_running_group,running_groups(name)',
-            )
+            .select(participantFields)
             .eq('event_id', event.id)
-          participantQuery = validUuid(value)
-            ? participantQuery.eq('checkin_token', value)
-            : participantQuery.eq('registration_code', value.toUpperCase())
+            .eq(column, key)
 
           const { data: participant, error: participantError } =
             await participantQuery.maybeSingle()
@@ -586,7 +536,7 @@ Deno.serve(async (req: Request) => {
               alreadyCompleted: true,
               won: existing.status === 'winner',
               prize: dynamic.prize,
-              participant: dynamicParticipantPayload(participant),
+              participant: participantPayload(participant),
             })
           }
 
@@ -608,7 +558,7 @@ Deno.serve(async (req: Request) => {
             return json({
               ok: true,
               alreadyCompleted: true,
-              participant: dynamicParticipantPayload(participant),
+              participant: participantPayload(participant),
             })
           }
 
@@ -617,7 +567,7 @@ Deno.serve(async (req: Request) => {
             alreadyCompleted: false,
             won: participationStatus === 'winner',
             prize: dynamic.prize,
-            participant: dynamicParticipantPayload(participant),
+            participant: participantPayload(participant),
           })
         }
 
@@ -655,7 +605,7 @@ Deno.serve(async (req: Request) => {
           return json({
             ok: true,
             winners: winnerIds.length,
-            winnerDetails: (winners ?? []).map(dynamicParticipantPayload),
+            winnerDetails: (winners ?? []).map(participantPayload),
           })
         }
 
@@ -896,6 +846,28 @@ Deno.serve(async (req: Request) => {
         return json({ ok: true, winners })
       }
       return json({ error: 'Operación administrativa no válida.' }, 400)
+    }
+
+    if (action === 'checkin') {
+      const session = await requireSession(body?.token)
+      if (!session) return json({ error: 'Sesión no válida.' }, 401)
+      const value = normalizeParticipantCode(body?.code)
+      if (!value || value.length > 80)
+        return json({ error: 'Escanea un QR o escribe un código.' }, 400)
+      const { data: event, error: eventError } = await supabase
+        .from('events')
+        .select('id')
+        .eq('code', 'SR26')
+        .single()
+      if (eventError) throw eventError
+      const outcome = await checkInParticipant(supabase, event.id, value)
+      if (outcome.result === 'notFound')
+        return json({ error: 'No encontramos ese QR o código.' }, 404)
+      return json({
+        ok: true,
+        result: outcome.result,
+        participant: participantPayload(outcome.participant),
+      })
     }
 
     if (action === 'changePin') {

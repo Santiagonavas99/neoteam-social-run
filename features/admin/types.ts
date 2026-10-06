@@ -61,6 +61,18 @@ export type Metrics = {
   raffles: number
 }
 
+export type CheckinParticipant = {
+  id: string
+  code: string
+  firstName: string
+  lastName: string
+  status: string
+  group: string
+  checkedInAt: string | null
+}
+
+export type CheckinResult = 'checkedIn' | 'alreadyCheckedIn' | 'cancelled'
+
 export type AdminResponse<Row = unknown> = {
   ok?: boolean
   configured?: boolean
@@ -73,6 +85,8 @@ export type AdminResponse<Row = unknown> = {
   url?: string
   error?: string
   winners?: number
+  result?: CheckinResult
+  participant?: CheckinParticipant
 }
 
 export type FeedbackValue = { kind: 'success' | 'error'; text: string } | null

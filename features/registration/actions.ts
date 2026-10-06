@@ -1,12 +1,14 @@
 'use server'
 
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { claimPass, type Pass } from './pass'
 import { registrationSchema } from './schema'
 
 export type RegistrationState = {
   ok: boolean
   message: string
   code?: string
+  pass?: Pass | null
   errors?: Record<string, string[] | undefined>
   values?: Record<string, string>
   attempt?: number
@@ -65,11 +67,14 @@ export async function registerParticipant(
       throw error
     }
 
-    return {
-      ok: true,
-      message: '¡Registro completado!',
-      code: data as string,
-    }
+    const code = data as string
+    // The registration is already saved; a failed claim only hides the QR, recoverable at /pase.
+    const pass = await claimPass({
+      code,
+      documentNumber: parsed.data.documentNumber,
+      email: parsed.data.email.toLowerCase(),
+    })
+    return { ok: true, message: '¡Registro completado!', code, pass }
   } catch (error) {
     const isMissingConfig = error instanceof Error && error.message.includes('no está configurado')
     console.error('Registration error', error)

@@ -6,10 +6,12 @@ import {
   type LucideIcon,
   ShieldCheck,
   Tag,
+  UserCheck,
   Users,
 } from 'lucide-react'
 
 export type AdminSection =
+  | 'checkin'
   | 'metrics'
   | 'logos'
   | 'participants'
@@ -28,6 +30,13 @@ export type AdminSectionInfo = {
 
 export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
   {
+    id: 'checkin',
+    label: 'Check-in',
+    description: 'Escanea el QR o escribe el código de cada corredor.',
+    icon: UserCheck,
+    quickAccess: 'Escáner QR',
+  },
+  {
     id: 'metrics',
     label: 'Overview',
     description: 'El pulso del Social Run, en un vistazo.',
@@ -44,7 +53,7 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     label: 'Participantes',
     description: 'Encuentra a cada corredor y gestiona su asistencia.',
     icon: Users,
-    quickAccess: 'Lista y check-in',
+    quickAccess: 'Lista y asistencia',
   },
   {
     id: 'groups',
