@@ -7,11 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-05
+
 ### Added
 
 - **Countdown to the event** on the home hero: days, hours, minutes and seconds to the 18 Oct meeting at 7:30, "En curso" during the event, hidden afterwards.
 - **Icon system** (`lucide-react`) on every screen: actions, admin sections, metrics, empty states, and status badges and messages that no longer rely on color alone.
 - **Tailwind CSS 4** next to the existing styles, reading the same design tokens, plus the dark palette that the coming theme switch will use.
+- **CI on pull requests**: `pnpm ci:check` (lint, typecheck, tests, build) and the SQL tests run on every ready pull request into `main`.
+- **`DESIGN.md`** with tokens, mobile-first standing rules, the icon vocabulary and the measured design debt, plus `design/` for studies and baseline screenshots.
+- Tests for the registration form rules, the admin proxy body parsing (including oversized gzip bodies) and the countdown.
 
 ### Changed
 
@@ -21,18 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Draws are atomic**: raffle draws, dynamic draws and instant-win scans run in one database transaction. A double click or two staff members acting at once can no longer overwrite winners or award more prizes than configured, and a failed draw keeps the previous winners.
 - Drawing an unknown raffle or dynamic returns "not found" instead of a server error.
-
-### Added
-
-- **CI on pull requests**: `pnpm ci:check` (lint, typecheck, tests, build) and the SQL tests run on every ready pull request into `main`.
-- **`DESIGN.md`** with tokens, mobile-first standing rules and the measured design debt, plus `design/` for studies and baseline screenshots.
-- Tests for the registration form rules and the admin proxy body parsing (including oversized gzip bodies).
-
-### Fixed
-
 - Every admin button declares its type, so actions never submit a form by accident.
 - The home carousels no longer re-subscribe their observers on every render.
 - Carousel and admin markup use correct semantics for assistive technologies.
+- Opening another page starts at its top instead of smooth-scrolling from the previous position.
 
 ### Security
 
