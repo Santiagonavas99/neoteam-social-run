@@ -1,4 +1,4 @@
-import type { LucideIcon } from 'lucide-react'
+import { type LucideIcon, SearchX, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 export function EmptyState({
@@ -21,5 +21,21 @@ export function EmptyState({
       <p>{text}</p>
       {action}
     </div>
+  )
+}
+
+export function NoMatches({ onClear }: { onClear: () => void }) {
+  return (
+    <EmptyState
+      icon={SearchX}
+      title="Sin coincidencias"
+      text="Prueba otra búsqueda o cambia el filtro."
+      action={
+        <button type="button" className="button button-secondary" onClick={onClear}>
+          <X aria-hidden className="size-4 shrink-0" />
+          Limpiar filtros
+        </button>
+      }
+    />
   )
 }

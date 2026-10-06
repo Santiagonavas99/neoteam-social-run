@@ -1,3 +1,4 @@
+import { Pencil } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 export function RecordCard({
@@ -28,5 +29,28 @@ export function RecordCard({
       </div>
       {children}
     </article>
+  )
+}
+
+export function EditButton({
+  open,
+  disabled,
+  onClick,
+}: {
+  open: boolean
+  disabled: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      className="button button-secondary"
+      aria-expanded={open}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      <Pencil aria-hidden className="size-4 shrink-0" />
+      Editar
+    </button>
   )
 }

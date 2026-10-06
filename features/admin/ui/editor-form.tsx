@@ -1,5 +1,6 @@
 import { Check, Trash2 } from 'lucide-react'
-import type { FormEvent, ReactNode } from 'react'
+import { type FormEvent, type ReactNode, useState } from 'react'
+import { errorMessage } from '../errors'
 import type { FeedbackValue } from '../types'
 import { Feedback } from './admin-ui'
 
@@ -67,4 +68,38 @@ export function EditorForm({
       </div>
     </form>
   )
+}
+
+export function useEditor<Row>(
+  row: Row,
+  onSave: (values: Row) => Promise<void>,
+  validate?: (values: Row) => string | null,
+) {
+  const [values, setValues] = useState({ ...row })
+  const [busy, setBusy] = useState(false)
+  const [feedback, setFeedback] = useState<FeedbackValue>(null)
+
+  function update<K extends keyof Row>(key: K, value: Row[K]) {
+    setValues((current) => ({ ...current, [key]: value }))
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const invalid = validate?.(values)
+    if (invalid) {
+      setFeedback({ kind: 'error', text: invalid })
+      return
+    }
+    setBusy(true)
+    setFeedback(null)
+    try {
+      await onSave(values)
+    } catch (error) {
+      setFeedback({ kind: 'error', text: errorMessage(error, 'No pudimos guardar los cambios.') })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return { values, update, busy, feedback, setFeedback, submit }
 }

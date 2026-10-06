@@ -1,11 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { AdminManagement } from '@/app/admin/admin-management'
 import { LogoCarouselAdmin } from '@/app/admin/logo-carousel-admin'
 import { callAdmin } from './api'
 import { AuthScreen } from './auth/auth-screen'
 import { useAdminSession } from './auth/use-admin-session'
+import { CommunityView } from './community/community-view'
+import { OverviewView } from './overview/overview-view'
+import { ParticipantsView } from './participants/participants-view'
+import { RafflesView } from './raffles/raffles-view'
 import type { AdminSection } from './sections'
 import { ChangePinForm } from './security/change-pin-form'
 import { AdminShell } from './shell/admin-shell'
@@ -23,14 +26,14 @@ export function AdminApp() {
         <LogoCarouselAdmin token={token} callApi={callAdmin} />
       ) : section === 'security' ? (
         <ChangePinForm token={token} onToken={session.remember} />
+      ) : section === 'participants' ? (
+        <ParticipantsView token={token} />
+      ) : section === 'groups' || section === 'brands' ? (
+        <CommunityView key={section} resource={section} token={token} />
+      ) : section === 'raffles' ? (
+        <RafflesView token={token} />
       ) : (
-        <AdminManagement
-          key={section}
-          section={section}
-          token={token}
-          callApi={callAdmin}
-          navigate={setSection}
-        />
+        <OverviewView token={token} navigate={setSection} />
       )}
     </AdminShell>
   )
