@@ -1,3 +1,4 @@
+import { ArrowLeft, CalendarDays, MapPin, Users } from 'lucide-react'
 import Link from 'next/link'
 import { eventConfig } from '@/lib/event'
 import { RegistrationForm } from './registration-form'
@@ -11,7 +12,8 @@ export default function RegistrationPage() {
           <span>NEOTEAM</span>
         </Link>
         <Link href="/" className="text-link">
-          ← Volver al evento
+          <ArrowLeft aria-hidden className="size-4 shrink-0" />
+          Volver al evento
         </Link>
       </header>
       <div className="registration-layout shell">
@@ -27,15 +29,24 @@ export default function RegistrationPage() {
             organizar asistentes, grupos invitados, check-in y rifas.
           </p>
           <div className="registration-fact">
-            <span>FECHA</span>
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarDays aria-hidden className="size-3.5 shrink-0" />
+              FECHA
+            </span>
             <strong>{eventConfig.dateLabel}</strong>
           </div>
           <div className="registration-fact">
-            <span>PUNTO</span>
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin aria-hidden className="size-3.5 shrink-0" />
+              PUNTO
+            </span>
             <strong>{eventConfig.location}</strong>
           </div>
           <div className="registration-fact">
-            <span>FORMATO</span>
+            <span className="inline-flex items-center gap-1.5">
+              <Users aria-hidden className="size-3.5 shrink-0" />
+              FORMATO
+            </span>
             <strong>Social Run · comunidad</strong>
           </div>
         </aside>

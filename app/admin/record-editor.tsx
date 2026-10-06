@@ -1,5 +1,6 @@
 'use client'
 
+import { Check, ImagePlus, ImageUp, Trash2 } from 'lucide-react'
 import { type ChangeEvent, type FormEvent, useState } from 'react'
 import type { AdminApi, AdminRow, FeedbackValue, Resource } from './admin-types'
 import { brandTypes, raffleStates } from './admin-types'
@@ -223,7 +224,12 @@ export function RecordEditor({
               <label className="upload-field span-full">
                 <Logo url={values.logo_url} name={values.name || 'Logo'} />
                 <span>
-                  <strong>
+                  <strong className="inline-flex items-center gap-2">
+                    {values.logo_url ? (
+                      <ImageUp aria-hidden className="size-4 shrink-0" />
+                    ) : (
+                      <ImagePlus aria-hidden className="size-4 shrink-0" />
+                    )}
                     {uploading
                       ? 'Subiendo imagen…'
                       : values.logo_url
@@ -262,6 +268,7 @@ export function RecordEditor({
       <Feedback value={feedback} />
       <div className="editor-actions">
         <button type="submit" className="button" disabled={busy || uploading}>
+          <Check aria-hidden className="size-4 shrink-0" />
           {busy ? 'Guardando…' : uploading ? 'Subiendo imagen…' : 'Guardar cambios'}
         </button>
         <button
@@ -279,6 +286,7 @@ export function RecordEditor({
             onClick={onDelete}
             disabled={busy || uploading}
           >
+            <Trash2 aria-hidden className="size-4 shrink-0" />
             Eliminar
           </button>
         )}

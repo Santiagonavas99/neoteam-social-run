@@ -1,5 +1,25 @@
 'use client'
 
+import {
+  ChevronRight,
+  Dices,
+  Eye,
+  EyeOff,
+  Flag,
+  Gift,
+  LoaderCircle,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Search,
+  SearchX,
+  Tag,
+  Trash2,
+  TriangleAlert,
+  UserCheck,
+  Users,
+  X,
+} from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type {
   AdminApi,
@@ -10,7 +30,7 @@ import type {
   Resource,
 } from './admin-types'
 import { brandTypes, participantStates, raffleStates } from './admin-types'
-import { Feedback, Logo, StatusBadge } from './admin-ui'
+import { Feedback, Logo, StatusBadge, sectionIcons } from './admin-ui'
 import { RecordEditor } from './record-editor'
 
 function errorText(error: unknown) {
@@ -169,6 +189,7 @@ export function AdminManagement({
       .toLocaleLowerCase()
     return text.includes(query.toLocaleLowerCase()) && (!status || row.status === status)
   })
+  const SectionIcon = sectionIcons[section]
   const newLabel =
     section === 'brands' ? 'Añadir marca' : section === 'groups' ? 'Añadir grupo' : 'Crear rifa'
 
@@ -179,12 +200,17 @@ export function AdminManagement({
           <p className="muted">Resumen del evento</p>
         ) : (
           <div className="list-filters">
-            <label className="search-field">
+            <label className="search-field relative">
+              <Search
+                aria-hidden
+                className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-neo-text-secondary"
+              />
               <span className="sr-only">
                 Buscar {section === 'participants' ? 'participantes' : 'registros'}
               </span>
               <input
                 type="search"
+                className="pl-10!"
                 placeholder={
                   section === 'participants' ? 'Nombre, código, contacto…' : 'Buscar por nombre…'
                 }
@@ -217,7 +243,11 @@ export function AdminManagement({
             }}
             disabled={loading || !!busy || !!editor}
           >
-            {loading ? 'Cargando…' : '↻ Actualizar'}
+            <RefreshCw
+              aria-hidden
+              className={`size-4 shrink-0 ${loading ? 'motion-safe:animate-spin' : ''}`}
+            />
+            {loading ? 'Cargando…' : 'Actualizar'}
           </button>
           {section !== 'metrics' && section !== 'participants' && (
             <button
@@ -226,7 +256,8 @@ export function AdminManagement({
               onClick={addRecord}
               disabled={!!editor || !!busy}
             >
-              + {newLabel}
+              <Plus aria-hidden className="size-4 shrink-0" />
+              {newLabel}
             </button>
           )}
         </div>
@@ -234,7 +265,12 @@ export function AdminManagement({
       <Feedback value={feedback} />
       {confirmation && (
         <section className="confirmation-panel" aria-label="Confirmar acción">
-          <h2>
+          <h2 className="flex items-center gap-2">
+            {confirmation.action === 'draw' ? (
+              <Dices aria-hidden className="size-5 shrink-0" />
+            ) : (
+              <TriangleAlert aria-hidden className="size-5 shrink-0 text-neo-danger" />
+            )}
             {confirmation.action === 'draw'
               ? '¿Todo listo para el sorteo?'
               : `¿Eliminar ${section === 'participants' ? `${confirmation.row.first_name ?? ''} ${confirmation.row.last_name ?? ''}`.trim() : confirmation.row.name}?`}
@@ -262,6 +298,11 @@ export function AdminManagement({
               onClick={() => void confirmAction()}
               disabled={!!busy}
             >
+              {confirmation.action === 'draw' ? (
+                <Dices aria-hidden className="size-4 shrink-0" />
+              ) : (
+                <Trash2 aria-hidden className="size-4 shrink-0" />
+              )}
               {busy
                 ? 'Procesando…'
                 : confirmation.action === 'draw'
@@ -284,8 +325,8 @@ export function AdminManagement({
         />
       )}
       {loading ? (
-        <div className="loading-state" role="status">
-          <span className="loading-line" />
+        <div className="loading-state flex items-center gap-2" role="status">
+          <LoaderCircle aria-hidden className="size-4 shrink-0 motion-safe:animate-spin" />
           Cargando {section === 'metrics' ? 'resumen' : 'registros'}…
         </div>
       ) : section === 'metrics' ? (
@@ -293,20 +334,18 @@ export function AdminManagement({
           <div className="metric-grid">
             {(
               [
-                ['Inscritos', metrics?.registered, 'Registros no cancelados'],
-                ['Check-in', metrics?.checkedIn, 'Asistencia confirmada'],
-                ['Grupos', metrics?.groups, 'Representados en registros'],
-                ['Marcas', metrics?.brands, 'Aliados activos'],
-                ['Rifas', metrics?.raffles, 'Premios configurados'],
+                ['Inscritos', metrics?.registered, 'Registros no cancelados', Users],
+                ['Check-in', metrics?.checkedIn, 'Asistencia confirmada', UserCheck],
+                ['Grupos', metrics?.groups, 'Representados en registros', Flag],
+                ['Marcas', metrics?.brands, 'Aliados activos', Tag],
+                ['Rifas', metrics?.raffles, 'Premios configurados', Gift],
               ] as const
-            ).map(([label, value, detail], index) => (
+            ).map(([label, value, detail, Icon]) => (
               <article key={label}>
                 <span>{label}</span>
                 <strong>{value ?? '—'}</strong>
                 <small>{detail}</small>
-                <span className="metric-index" aria-hidden="true">
-                  0{index + 1}
-                </span>
+                <Icon aria-hidden className="metric-index size-5" />
               </article>
             ))}
           </div>
@@ -321,22 +360,32 @@ export function AdminManagement({
                   ['brands', 'Marcas', 'Aliados y logos'],
                   ['raffles', 'Rifas', 'Premios y sorteos'],
                 ] as const
-              ).map(([id, title, detail]) => (
-                <button type="button" key={id} onClick={() => navigate(id)}>
-                  <span>
-                    <strong>{title}</strong>
-                    <small>{detail}</small>
-                  </span>
-                  <span aria-hidden="true">↗</span>
-                </button>
-              ))}
+              ).map(([id, title, detail]) => {
+                const Icon = sectionIcons[id]
+                return (
+                  <button type="button" key={id} onClick={() => navigate(id)}>
+                    <span>
+                      <strong className="flex items-center gap-2">
+                        <Icon aria-hidden className="size-5 shrink-0" />
+                        {title}
+                      </strong>
+                      <small>{detail}</small>
+                    </span>
+                    <ChevronRight aria-hidden className="size-6 shrink-0 text-neo-accent-dark" />
+                  </button>
+                )
+              })}
             </div>
           </section>
         </>
       ) : !visible.length ? (
         <div className="empty-state">
           <span className="empty-number" aria-hidden="true">
-            00
+            {query || status ? (
+              <SearchX aria-hidden className="mx-auto block size-8" />
+            ) : (
+              <SectionIcon aria-hidden className="mx-auto block size-8" />
+            )}
           </span>
           <h2>
             {query || status
@@ -361,12 +410,14 @@ export function AdminManagement({
                 setStatus('')
               }}
             >
+              <X aria-hidden className="size-4 shrink-0" />
               Limpiar filtros
             </button>
           ) : (
             section !== 'participants' &&
             !editor && (
               <button type="button" className="button" onClick={addRecord}>
+                <Plus aria-hidden className="size-4 shrink-0" />
                 {newLabel}
               </button>
             )
@@ -429,7 +480,8 @@ export function AdminManagement({
                             onClick={() => void changeAttendance(row, 'checked_in')}
                             disabled={!!busy}
                           >
-                            {busy === row.id ? 'Guardando…' : 'Check-in ✓'}
+                            <UserCheck aria-hidden className="size-4 shrink-0" />
+                            {busy === row.id ? 'Guardando…' : 'Check-in'}
                           </button>
                         )}
                         <select
@@ -450,6 +502,7 @@ export function AdminManagement({
                           onClick={() => setConfirmation({ row, action: 'delete' })}
                           disabled={!!busy}
                         >
+                          <Trash2 aria-hidden className="size-4 shrink-0" />
                           Eliminar
                         </button>
                       </div>
@@ -503,6 +556,7 @@ export function AdminManagement({
                       <StatusBadge
                         status={row.active ? 'open' : 'cancelled'}
                         label={row.active ? 'Activo' : 'Inactivo'}
+                        icon={row.active ? Eye : EyeOff}
                       />
                       <small>{row.show_on_home ? 'Visible en web' : 'Oculto en web'}</small>
                       <small>{row.instagram || row.website || 'Sin redes añadidas'}</small>
@@ -520,6 +574,7 @@ export function AdminManagement({
                     }}
                     disabled={!!busy || (!!editor && editor.id !== row.id)}
                   >
+                    <Pencil aria-hidden className="size-4 shrink-0" />
                     Editar
                   </button>
                   {section === 'raffles' && row.status === 'open' && (
@@ -529,7 +584,8 @@ export function AdminManagement({
                       onClick={() => setConfirmation({ row, action: 'draw' })}
                       disabled={!!busy || !!editor}
                     >
-                      Sortear →
+                      <Dices aria-hidden className="size-4 shrink-0" />
+                      Sortear
                     </button>
                   )}
                 </div>

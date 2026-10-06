@@ -2,6 +2,7 @@
 :root {
   --neo-black: #050505;
   --neo-white: #fff;
+  --neo-text: #050505;
   --neo-accent: #6fa39c;
   --neo-accent-dark: #263f3c;
   --neo-bg: #f4f6f5;
@@ -22,6 +23,21 @@
   --space-24: 96px;
   --radius-control: 8px;
   --radius-card: 12px;
+}
+
+/* Inert until a surface sets data-theme (admin theme switch, plan Task 4b).
+   --neo-black and --neo-white stay absolute: the hero is black in both themes. */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --neo-text: #f2f5f4;
+  --neo-accent-dark: #8fc0b8;
+  --neo-bg: #0b0f0e;
+  --neo-surface: #141a19;
+  --neo-text-secondary: #9aa5a2;
+  --neo-border: rgba(255, 255, 255, 0.12);
+  --neo-danger: #f08a8a;
+  --neo-danger-bg: #2a1515;
+  --neo-success-bg: #13261f;
 }
 * {
   box-sizing: border-box;
@@ -1016,7 +1032,7 @@ fieldset {
   }
   .registration-fact {
     display: grid;
-    grid-template-columns: 60px 1fr;
+    grid-template-columns: 88px 1fr;
     align-items: baseline;
     gap: 12px;
     max-width: none;

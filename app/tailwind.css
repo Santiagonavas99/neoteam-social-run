@@ -1,0 +1,26 @@
+@layer theme, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@source "../app";
+@source "../components";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Spacing and the 4 px scale are Tailwind's defaults (--spacing: 0.25rem), equal to --space-*. */
+@theme inline {
+  --color-neo-black: var(--neo-black);
+  --color-neo-white: var(--neo-white);
+  --color-neo-text: var(--neo-text);
+  --color-neo-accent: var(--neo-accent);
+  --color-neo-accent-dark: var(--neo-accent-dark);
+  --color-neo-bg: var(--neo-bg);
+  --color-neo-surface: var(--neo-surface);
+  --color-neo-text-secondary: var(--neo-text-secondary);
+  --color-neo-border: var(--neo-border);
+  --color-neo-danger: var(--neo-danger);
+  --color-neo-danger-bg: var(--neo-danger-bg);
+  --color-neo-success-bg: var(--neo-success-bg);
+  --radius-control: var(--radius-control);
+  --radius-card: var(--radius-card);
+  --font-sans: var(--font-host-grotesk), system-ui, sans-serif;
+}

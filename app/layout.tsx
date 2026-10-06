@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Host_Grotesk } from 'next/font/google'
+import './tailwind.css'
 import './globals.css'
 import './neo-overrides.css'
 import './logo-marquee.css'
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={hostGrotesk.variable}>
+    <html lang="es" className={hostGrotesk.variable} data-scroll-behavior="smooth">
       <body>{children}</body>
     </html>
   )
