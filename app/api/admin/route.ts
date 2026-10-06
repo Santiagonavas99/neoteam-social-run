@@ -1,4 +1,5 @@
 import { gunzipSync } from 'node:zlib'
+import { adminUpstreamHeaders } from '@/lib/admin-proxy'
 
 export const runtime = 'nodejs'
 const connectionError = 'No pudimos conectar con el panel administrativo. Inténtalo de nuevo.'
@@ -14,6 +15,11 @@ export async function POST(request: Request) {
       hasUrl: Boolean(url),
       hasKey: Boolean(key),
     })
+    return Response.json({ error: connectionError }, { status: 503, headers })
+  }
+  const upstreamHeaders = adminUpstreamHeaders(request, key)
+  if (!upstreamHeaders) {
+    console.error('Admin proxy: missing ADMIN_PROXY_SECRET', { hasProxySecret: false })
     return Response.json({ error: connectionError }, { status: 503, headers })
   }
 
@@ -42,15 +48,6 @@ export async function POST(request: Request) {
   }
 
   try {
-    const upstreamHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
-      apikey: key,
-    }
-    // Vercel supplies this header. Never trust a caller-supplied IP locally.
-    if (process.env.VERCEL === '1') {
-      const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-      if (ip) upstreamHeaders['x-forwarded-for'] = ip
-    }
     const response = await fetch(`${url.replace(/\/$/, '')}/functions/v1/admin-pin`, {
       method: 'POST',
       headers: upstreamHeaders,
