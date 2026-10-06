@@ -130,3 +130,10 @@ Measured on the legacy CSS; each item is fixed when its component moves to Tailw
 - **14 font sizes**, including 9–11 px labels, which are hard to read on phones.
 - **Only 3 `:focus-visible` rules**: most controls rely on the browser default focus ring.
 - **14 specificity inversions** caused by the override layering. Biome's `noDescendingSpecificity` is switched off for `home-v2.css` and `neo-overrides.css` only (`biome.json`); remove that override when those files are deleted.
+
+
+## Home design studies
+
+- Production home remains V2 at `/`.
+- Anniversary V3 lives at `/v3` while it is being evaluated. It is an isolated editorial study: oversized anniversary typography, split media/copy sections and the cyan/neutral palette. V3 styles belong in `app/home-v3.css` and must remain scoped under `.home-v3`.
+- Do not link `/v3` from the production navigation until it is explicitly selected to replace V2.
