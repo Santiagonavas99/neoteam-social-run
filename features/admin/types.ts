@@ -78,9 +78,3 @@ export type AdminResponse<Row = unknown> = {
 export type FeedbackValue = { kind: 'success' | 'error'; text: string } | null
 
 export const isNew = (row: { id: string }) => row.id.startsWith('new-')
-
-export type AdminRow = Partial<Participant & CommunityRecord & Raffle> & { id: string }
-export type AdminApi = (
-  action: string,
-  payload?: Record<string, unknown>,
-) => Promise<AdminResponse<AdminRow>>
