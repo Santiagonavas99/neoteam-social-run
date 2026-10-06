@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowRight, CalendarDays, Clock, MapPin, Route } from 'lucide-react'
+import { ArrowDown, ArrowRight, CalendarDays, Clock, MapPin, QrCode, Route } from 'lucide-react'
 import Link from 'next/link'
 import { SiteHeader } from '@/components/site-header'
 import { eventConfig } from '@/features/event/event'
@@ -43,6 +43,9 @@ export function Hero() {
           <div className="v2-hero-actions">
             <Link href="/registro" className="button">
               Quiero participar <ArrowRight aria-hidden className="size-4 shrink-0" />
+            </Link>
+            <Link href="/pase" className="text-link">
+              Mi pase <QrCode aria-hidden className="size-4 shrink-0" />
             </Link>
             <a href="#agenda" className="text-link">
               Ver agenda <ArrowDown aria-hidden className="size-4 shrink-0" />

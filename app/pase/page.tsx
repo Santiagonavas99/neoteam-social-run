@@ -1,10 +1,16 @@
-import { ArrowLeft, CalendarDays, MapPin, QrCode, Users } from 'lucide-react'
+import { ArrowLeft, CalendarDays, MapPin } from 'lucide-react'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { BrandLink } from '@/components/brand-link'
 import { eventConfig } from '@/features/event/event'
-import { RegistrationForm } from '@/features/registration/registration-form'
+import { ClaimForm } from '@/features/registration/claim-form'
 
-export default function RegistrationPage() {
+export const metadata: Metadata = {
+  title: 'Tu pase · Social Run NeoTeam',
+  robots: { index: false },
+}
+
+export default function PassPage() {
   return (
     <main className="registration-page">
       <header className="registration-header shell">
@@ -18,12 +24,11 @@ export default function RegistrationPage() {
         <aside className="registration-copy">
           <p className="kicker">SOCIAL RUN · {eventConfig.dateShort}</p>
           <h1>
-            RESERVA <br />
-            TU LUGAR.
+            UN QR. <br />Y A CORRER.
           </h1>
           <p>
-            El registro es gratuito y toma menos de dos minutos. Estos datos nos permitirán
-            organizar asistentes, grupos invitados, check-in y rifas.
+            Tu pase identifica tu inscripción y nos permite hacer el check-in rápido el día del
+            evento.
           </p>
           <div className="registration-fact">
             <span className="inline-flex items-center gap-1.5">
@@ -39,19 +44,8 @@ export default function RegistrationPage() {
             </span>
             <strong>{eventConfig.location}</strong>
           </div>
-          <div className="registration-fact">
-            <span className="inline-flex items-center gap-1.5">
-              <Users aria-hidden className="size-3.5 shrink-0" />
-              FORMATO
-            </span>
-            <strong>Social Run · comunidad</strong>
-          </div>
-          <Link href="/pase" className="text-link">
-            <QrCode aria-hidden className="size-4 shrink-0" />
-            ¿Ya te inscribiste? Recupera tu pase
-          </Link>
         </aside>
-        <RegistrationForm />
+        <ClaimForm />
       </div>
     </main>
   )

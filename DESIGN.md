@@ -37,6 +37,7 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 | `LoaderCircle` | Work in progress |
 | `Dices` | Draw winners |
 | `UserCheck` | Check-in |
+| `QrCode` | The runner's check-in pass ("Mi pase") |
 | `Eye` / `EyeOff` | Visible / hidden |
 | `CalendarDays` / `Clock` / `MapPin` / `Route` / `Gift` | Date / time / place / route / prizes |
 | `LayoutDashboard`, `GalleryHorizontal`, `Users`, `Flag`, `Tag`, `Gift`, `ShieldCheck` | Admin sections: overview, logo strip, participants, groups, brands, raffles, security |

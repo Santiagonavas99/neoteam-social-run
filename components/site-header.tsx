@@ -9,6 +9,7 @@ export function SiteHeader() {
         <a href="/#evento">Evento</a>
         <a href="/#agenda">Agenda</a>
         <a href="/#invitados">Invitados</a>
+        <Link href="/pase">Mi pase</Link>
         <Link className="button button-small" href="/registro">
           Registrarme
         </Link>

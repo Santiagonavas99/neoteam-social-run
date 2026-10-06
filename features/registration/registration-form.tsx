@@ -1,12 +1,14 @@
 'use client'
 
 import { ArrowRight, Check, CircleAlert, LoaderCircle } from 'lucide-react'
+import Link from 'next/link'
 import { useActionState, useState } from 'react'
 import { type RegistrationState, registerParticipant } from './actions'
+import { PassCard } from './pass-card'
 
 const initialState: RegistrationState = { ok: false, message: '' }
 
-function FieldError({ errors }: { errors?: string[] }) {
+export function FieldError({ errors }: { errors?: string[] }) {
   if (!errors?.length) return null
   return (
     <small className="field-error inline-flex items-start gap-1">
@@ -30,8 +32,20 @@ export function RegistrationForm() {
         <p className="section-label">REGISTRO CONFIRMADO</p>
         <h2>ESTÁS DENTRO.</h2>
         <p>Nos vemos el 18 de octubre en el Social Run del aniversario NeoTeam.</p>
-        <strong>{state.code}</strong>
-        <small>Guarda este código. Lo usaremos más adelante para check-in y rifas.</small>
+        {state.pass ? (
+          <PassCard pass={state.pass} />
+        ) : (
+          <>
+            <strong>{state.code}</strong>
+            <small>
+              Guarda este código. Tu QR de check-in estará en{' '}
+              <Link href="/pase" className="text-link">
+                Mi pase
+              </Link>
+              .
+            </small>
+          </>
+        )}
       </div>
     )
   }

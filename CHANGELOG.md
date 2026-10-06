@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Pase con código QR al inscribirte** y página **Mi pase** (`/pase`) para recuperarlo con tu documento y correo.
+
 ### Fixed
 
 - **Registration form keeps your answers** when the server reports an error, including the document type and running group. Before, every field came back empty.
