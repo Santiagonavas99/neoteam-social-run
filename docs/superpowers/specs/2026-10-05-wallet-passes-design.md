@@ -1,6 +1,6 @@
 # Google Wallet pass — spec
 
-Date: 2026-10-05 · Branch: `feat/wallet-google` (from `main` v0.6.0) · Status: **awaiting OK**
+Date: 2026-10-05 · Branch: `feat/wallet-google` (from `main` v0.6.0) · Status: **approved** (Iván, 2026-10-05)
 
 Source: the Google Wallet commits on Santiago's `feat/qr-wallet-checkin` (`aa2e59b` through `74446cf`). Santiago tested that flow with a validated issuer and class.
 

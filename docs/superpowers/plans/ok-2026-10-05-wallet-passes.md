@@ -1,6 +1,6 @@
 # Google Wallet pass — plan
 
-Spec: [`2026-10-05-wallet-passes-design.md`](../specs/2026-10-05-wallet-passes-design.md) · Branch: `feat/wallet-google` · Status: **awaiting OK** · Revised 2026-10-05: Google only.
+Spec: [`2026-10-05-wallet-passes-design.md`](../specs/2026-10-05-wallet-passes-design.md) · Branch: `feat/wallet-google` · Status: **approved** (Iván, 2026-10-05) · Revised 2026-10-05: Google only.
 
 ## Tasks
 
