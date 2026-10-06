@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={hostGrotesk.variable}>
+    <html lang="es" className={hostGrotesk.variable} data-scroll-behavior="smooth">
       <body>{children}</body>
     </html>
   )
