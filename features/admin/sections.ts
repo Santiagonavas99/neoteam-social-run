@@ -29,7 +29,6 @@ export type AdminSectionInfo = {
   icon: LucideIcon
   group: AdminSectionGroup
   primary?: true
-  quickAccess?: string
 }
 
 export const sectionGroups: { id: AdminSectionGroup; label: string }[] = [
@@ -53,7 +52,6 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     icon: UserCheck,
     group: 'event',
     primary: true,
-    quickAccess: 'Escáner QR',
   },
   {
     id: 'participants',
@@ -62,7 +60,6 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     icon: Users,
     group: 'event',
     primary: true,
-    quickAccess: 'Lista y asistencia',
   },
   {
     id: 'dynamics',
@@ -71,7 +68,6 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     icon: Zap,
     group: 'event',
     primary: true,
-    quickAccess: 'Stands, retos y sorteos',
   },
   {
     id: 'logos',
@@ -86,7 +82,6 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     description: 'Las comunidades que corren con nosotros.',
     icon: Flag,
     group: 'content',
-    quickAccess: 'Comunidades invitadas',
   },
   {
     id: 'brands',
@@ -94,7 +89,6 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     description: 'Los aliados que hacen parte del encuentro.',
     icon: Tag,
     group: 'content',
-    quickAccess: 'Aliados y logos',
   },
   {
     id: 'security',
