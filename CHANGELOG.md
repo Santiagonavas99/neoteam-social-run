@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The home carousels no longer re-subscribe their observers on every render.
 - Carousel and admin markup use correct semantics for assistive technologies.
 
+### Security
+
+- Security headers on every response (`X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` with camera limited to the site, `X-Frame-Options: DENY`).
+
 ## [0.1.0] - 2026-10-05
 
 ### Added
