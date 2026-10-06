@@ -3,8 +3,12 @@
   --neo-black: #050505;
   --neo-white: #fff;
   --neo-text: #050505;
-  --neo-accent: #6fa39c;
-  --neo-accent-dark: #263f3c;
+  --neo-accent: #03f8f6;
+  --neo-accent-dark: #007a78;
+  --neo-accent-text: #007a78;
+  --neo-accent-hover: #02d9d7;
+  --neo-accent-soft: #e7fbfb;
+  --neo-accent-border: #7fd8d6;
   --neo-bg: #f4f6f5;
   --neo-surface: #fff;
   --neo-text-secondary: #68716f;
@@ -32,7 +36,8 @@
   --neo-brand-cyan: #02f2f8;
   color-scheme: dark;
   --neo-text: #f2f5f4;
-  --neo-accent-dark: #8fc0b8;
+  --neo-accent-dark: #006b6a;
+  --neo-accent-text: #67fffd;
   --neo-bg: #0b0f0e;
   --neo-surface: #141a19;
   --neo-text-secondary: #9aa5a2;
@@ -142,7 +147,7 @@ textarea:hover {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: var(--neo-accent-dark);
+  border-color: var(--neo-accent-text);
 }
 input::placeholder,
 textarea::placeholder {
@@ -161,7 +166,7 @@ input[type="checkbox"] {
   flex: 0 0 20px;
   padding: 0;
   margin: 0;
-  accent-color: var(--neo-accent-dark);
+  accent-color: var(--neo-accent-text);
 }
 fieldset {
   border: 0;
@@ -217,8 +222,8 @@ fieldset {
   color: var(--neo-black);
 }
 .button-light:hover:not(:disabled) {
-  background: #8bb7b1;
-  border-color: #8bb7b1;
+  background: var(--neo-accent-hover);
+  border-color: var(--neo-accent-hover);
   color: var(--neo-black);
 }
 .button-secondary {
@@ -227,9 +232,9 @@ fieldset {
   border-color: var(--neo-border);
 }
 .button-secondary:hover:not(:disabled) {
-  background: #e8efec;
-  color: var(--neo-accent-dark);
-  border-color: #a6bcb5;
+  background: var(--neo-accent-soft);
+  color: var(--neo-accent-text);
+  border-color: var(--neo-accent-border);
 }
 .button-danger {
   background: var(--neo-danger);
@@ -266,7 +271,7 @@ fieldset {
   line-height: 1.5;
 }
 .section-label {
-  color: var(--neo-accent-dark);
+  color: var(--neo-accent-text);
 }
 .light {
   color: var(--neo-accent);
@@ -303,7 +308,7 @@ fieldset {
   font-size: 14px;
   line-height: 1.5;
   background: var(--neo-success-bg);
-  color: var(--neo-accent-dark);
+  color: var(--neo-accent-text);
   overflow-wrap: anywhere;
 }
 .feedback-error {
@@ -408,7 +413,7 @@ fieldset {
   color: var(--neo-black);
 }
 .hero-actions .button:hover {
-  background: #a3c5bf;
+  background: var(--neo-accent-hover);
 }
 .hero-actions .text-link {
   color: #e4ebe8;
@@ -544,7 +549,7 @@ fieldset {
   border: 1px solid var(--neo-border);
   border-radius: 6px;
   background: var(--neo-white);
-  color: var(--neo-accent-dark);
+  color: var(--neo-accent-text);
   font-size: 20px;
 }
 .carousel-controls button:hover:not(:disabled) {
@@ -570,7 +575,7 @@ fieldset {
   font-size: 32px;
   font-weight: 500;
   letter-spacing: -0.05em;
-  color: var(--neo-accent-dark);
+  color: var(--neo-accent-text);
 }
 .feature-card h3 {
   font-size: 22px;
@@ -660,7 +665,7 @@ fieldset {
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: var(--neo-accent-dark);
+  color: var(--neo-accent-text);
   margin: 0 0 16px;
 }
 .logo-panel > small {
