@@ -212,24 +212,55 @@ export async function GET(request: Request) {
     );
   }
 
-  const token = new URL(request.url).searchParams.get("token")?.trim() ?? "";
+  const requestUrl = new URL(request.url);
+  const classSuffix =
+    process.env.GOOGLE_WALLET_CLASS_SUFFIX?.trim() ||
+    "neoteam_social_run_2026";
+  const classId = `${issuerId}.${classSuffix}`;
+  const privateKey = Buffer.from(privateKeyBase64, "base64").toString("utf8");
+
+  if (requestUrl.searchParams.get("diagnose") === "1") {
+    try {
+      const accessToken = await getGoogleAccessToken(
+        serviceAccountEmail,
+        privateKey,
+      );
+      const diagnostics = await diagnoseGoogleWalletAccess(
+        accessToken,
+        issuerId,
+        classId,
+      );
+      return Response.json(
+        {
+          ok: true,
+          serviceAccountEmail,
+          diagnostics,
+        },
+        {
+          headers: { "Cache-Control": "no-store" },
+        },
+      );
+    } catch (error) {
+      const googleError = safeGoogleError(error);
+      return Response.json(
+        { ok: false, google: googleError },
+        { status: googleError.status >= 400 ? googleError.status : 500 },
+      );
+    }
+  }
+
+  const token = requestUrl.searchParams.get("token")?.trim() ?? "";
   if (!token) {
     return Response.json({ error: "Pase no válido." }, { status: 400 });
   }
 
   try {
     const pass = await getWalletPassData(token);
-    const classSuffix =
-      process.env.GOOGLE_WALLET_CLASS_SUFFIX?.trim() ||
-      "neoteam_social_run_2026";
-    const classId = `${issuerId}.${classSuffix}`;
     const objectId = `${issuerId}.${classSuffix}_${pass.checkinToken.replace(
       /-/g,
       "",
     )}`;
     const qrValue = `NEOTEAM-SR26:${pass.checkinToken}`;
-    const privateKey = Buffer.from(privateKeyBase64, "base64").toString("utf8");
-
     const eventObject = {
       id: objectId,
       classId,
@@ -266,26 +297,6 @@ export async function GET(request: Request) {
       serviceAccountEmail,
       privateKey,
     );
-
-    const diagnose =
-      new URL(request.url).searchParams.get("diagnose") === "1";
-    if (diagnose) {
-      const diagnostics = await diagnoseGoogleWalletAccess(
-        accessToken,
-        issuerId,
-        classId,
-      );
-      return Response.json(
-        {
-          ok: true,
-          serviceAccountEmail,
-          diagnostics,
-        },
-        {
-          headers: { "Cache-Control": "no-store" },
-        },
-      );
-    }
 
     await ensureGoogleWalletObject(accessToken, eventObject);
 
