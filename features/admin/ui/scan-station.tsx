@@ -5,12 +5,19 @@ import { type FormEvent, useRef, useState } from 'react'
 import { errorMessage } from '../errors'
 import type { ScannedParticipant } from '../types'
 import { QrScanner } from './qr-scanner'
+import { playScanFeedback, type ScanFeedback, unlockScanSound } from './scan-feedback'
 
 export type ScanOutcome = {
   tone: 'success' | 'neutral' | 'danger'
   headline: string
   icon?: LucideIcon
   participant?: ScannedParticipant
+}
+
+const feedbackFor: Record<ScanOutcome['tone'], ScanFeedback> = {
+  success: 'success',
+  neutral: 'success',
+  danger: 'error',
 }
 
 const tones: Record<ScanOutcome['tone'], { icon: LucideIcon; className: string }> = {
@@ -62,10 +69,11 @@ export function ScanStation({
     try {
       const next = await onCode(code)
       setOutcome(next)
-      if (next.tone === 'success') navigator.vibrate?.(80)
+      playScanFeedback(feedbackFor[next.tone])
       return true
     } catch (error) {
       setOutcome({ tone: 'danger', headline: errorMessage(error) })
+      playScanFeedback('error')
       return false
     } finally {
       busyRef.current = false
@@ -81,7 +89,7 @@ export function ScanStation({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4" onPointerDown={unlockScanSound}>
       <QrScanner onScan={(text) => void run(text)} />
       <div aria-live="polite" className="min-h-24">
         {busy ? (
