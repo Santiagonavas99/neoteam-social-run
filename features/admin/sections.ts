@@ -78,7 +78,7 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
   {
     id: 'home-order',
     label: 'Orden de la Home',
-    description: 'Sube o baja las secciones para definir el orden de la página.',
+    description: 'Ordena las secciones y muestra u oculta las que necesites.',
     icon: ListOrdered,
     group: 'content',
   },

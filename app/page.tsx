@@ -19,7 +19,7 @@ import { Raffle } from '@/features/home/sections/raffle'
 import { Story } from '@/features/home/sections/story'
 
 // Served from the CDN and rebuilt in the background at most once a minute; counter, logos and
-// section ordering may lag 60 s.
+// section ordering and visibility may lag 60 s.
 export const revalidate = 60
 
 const numberedSections = new Set(['story', 'agenda', 'community', 'raffle', 'final'])
@@ -33,9 +33,10 @@ export default async function Home() {
   ])
 
   const otherBrands = community.brands.filter((brand) => brand.type !== 'organizer')
+  const visibleSections = sectionOrder.filter((section) => section.visible)
   let editorialIndex = 0
 
-  const sections = sectionOrder.map(({ section_key }) => {
+  const sections = visibleSections.map(({ section_key }) => {
     const index = numberedSections.has(section_key)
       ? String(++editorialIndex).padStart(2, '0')
       : undefined
@@ -44,9 +45,7 @@ export default async function Home() {
       case 'story':
         return <Story key={section_key} index={index} />
       case 'numbers':
-        return (
-          <Numbers key={section_key} registered={registered} brands={logoItems.length} />
-        )
+        return <Numbers key={section_key} registered={registered} brands={logoItems.length} />
       case 'allies':
         return <LogoMarquee key={section_key} items={logoItems} />
       case 'running_crews':
@@ -73,6 +72,8 @@ export default async function Home() {
         return <Raffle key={section_key} index={index} />
       case 'final':
         return <Final key={section_key} index={index} />
+      default:
+        return null
     }
   })
 

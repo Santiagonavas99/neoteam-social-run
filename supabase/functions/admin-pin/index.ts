@@ -252,7 +252,7 @@ Deno.serve(async (req: Request) => {
     if (action === 'listHomeSections') {
       const { data, error } = await supabase
         .from('home_section_order')
-        .select('section_key,sort_order')
+        .select('section_key,sort_order,visible')
         .eq('event_code', 'SR26')
         .order('sort_order', { ascending: true })
         .order('section_key', { ascending: true })
@@ -269,6 +269,7 @@ Deno.serve(async (req: Request) => {
       for (const section of sections) {
         const key = typeof section?.section_key === 'string' ? section.section_key : ''
         const sortOrder = Number(section?.sort_order)
+        const visible = section?.visible !== false
         if (
           !HOME_SECTION_KEYS.has(key) ||
           seen.has(key) ||
@@ -283,6 +284,7 @@ Deno.serve(async (req: Request) => {
           event_code: 'SR26',
           section_key: key,
           sort_order: sortOrder,
+          visible,
           updated_at: new Date().toISOString(),
         })
       }

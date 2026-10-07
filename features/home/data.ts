@@ -1,8 +1,8 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import {
   defaultHomeSectionOrder,
-  normalizeHomeSectionOrder,
   type HomeSectionOrder,
+  normalizeHomeSectionOrder,
 } from './section-order'
 
 // Supabase errors are plain objects, so logging them whole prints "{}".
@@ -102,7 +102,7 @@ export async function getHomeSectionOrder(): Promise<HomeSectionOrder[]> {
     const supabase = createServerSupabaseClient()
     const { data, error } = await supabase
       .from('home_section_order')
-      .select('section_key,sort_order')
+      .select('section_key,sort_order,visible')
       .eq('event_code', 'SR26')
       .order('sort_order', { ascending: true })
       .order('section_key', { ascending: true })
