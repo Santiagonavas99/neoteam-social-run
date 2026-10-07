@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.2] - 2026-10-07
+
+### Fixed
+
+- **"Agregar a mi agenda" is readable in dark mode:** its text was white on cyan; it is black now, as in light mode.
+
 ## [0.15.1] - 2026-10-07
 
 ### Changed
