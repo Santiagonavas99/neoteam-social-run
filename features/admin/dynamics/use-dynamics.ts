@@ -41,6 +41,21 @@ export function useDynamics() {
     await reload()
   }
 
+  async function activate(row: DynamicRow) {
+    setBusy(true)
+    setFeedback(null)
+    setWinners(null)
+    try {
+      await callAdmin('dynamicData', { operation: 'save', values: { ...row, status: 'open' } })
+      setFeedback({ kind: 'success', text: 'Dinámica activada.' })
+      await reload()
+    } catch (error) {
+      onError(error)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   async function confirm() {
     if (!confirmation) return
     setBusy(true)
@@ -80,6 +95,7 @@ export function useDynamics() {
     winners,
     setWinners,
     save,
+    activate,
     confirm,
     onError,
   }

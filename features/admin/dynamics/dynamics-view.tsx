@@ -1,6 +1,6 @@
 'use client'
 
-import { Dices, Plus, ScanLine, Trash2, Zap } from 'lucide-react'
+import { Dices, Play, Plus, ScanLine, Trash2, Zap } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { callAdmin } from '../api'
 import { matchesQuery } from '../filter'
@@ -199,6 +199,17 @@ export function DynamicsView() {
                     onClick={() => dynamics.edit(editor?.id === row.id ? null : row)}
                     disabled={busy || !!scanning || (!!editor && editor.id !== row.id)}
                   />
+                  {row.status === 'draft' && (
+                    <button
+                      type="button"
+                      className="button"
+                      onClick={() => void dynamics.activate(row)}
+                      disabled={locked}
+                    >
+                      <Play aria-hidden className="size-4 shrink-0" />
+                      Activar
+                    </button>
+                  )}
                   {row.status === 'open' && row.type === 'raffle' && (
                     <button
                       type="button"

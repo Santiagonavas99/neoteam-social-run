@@ -77,6 +77,7 @@ export function DynamicForm({
         >
           <LabelOptions labels={dynamicStates} />
         </select>
+        <small>Borrador no recibe participaciones; actívala para escanear o sortear.</small>
       </label>
       {!raffle && (
         <label>

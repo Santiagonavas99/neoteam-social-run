@@ -36,6 +36,7 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 | `CircleCheck` / `CircleAlert` / `TriangleAlert` | Success / error / destructive confirmation |
 | `LoaderCircle` | Work in progress |
 | `Dices` | Draw winners |
+| `Play` | Activate a draft dynamic |
 | `ScanLine` | Register a runner in a dynamic |
 | `UserCheck` | Check-in |
 | `QrCode` | The runner's check-in pass ("Mi pase") |
