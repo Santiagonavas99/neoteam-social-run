@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-10-07
+
+### Added
+
+- **Landak Studio creative partner section.** The Home now includes a configurable Landak Studio credit with services and a direct link to landak.pro; it can be moved or hidden from the admin like other Home sections.
+
 ## [0.24.0] - 2026-10-07
 
 ### Added
