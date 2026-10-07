@@ -111,3 +111,16 @@ No auth, API, Supabase, QR or data changes.
 - Changing hero copy.
 - Changing the desktop hero composition.
 - Reworking the rest of the landing page.
+
+
+## Final mobile alignment decision
+
+After reviewing the first aligned preview, Santiago requested the mobile hero to read as a centered composition rather than a left-aligned editorial stack.
+
+At phone widths:
+- meta pills are centered as a 2 + 1 group;
+- kicker, SOCIAL and RUN are centered;
+- supporting copy and hero actions are centered;
+- the countdown label and its four equal columns are centered;
+- the route card is centered as a block while preserving left-aligned internal details;
+- desktop remains unchanged.
