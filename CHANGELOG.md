@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-10-07
+
+### Added
+
+- **Meeting point on a map.** The home page shows Parque del Ingenio, Cali, on a Google map with "Abrir en Google Maps". On `/registro` and `/pase`, the "Punto" line links to Google Maps.
+- **"Agregar a mi agenda"** on the home page: iPhone, iPad and Safari open the Calendar sheet, and other devices open Google Calendar with the event filled in and a reminder one day before.
+
+### Changed
+
+- **Google Wallet** uses Google's official "Agregar a la Billetera de Google" button, and is hidden on iPhone, iPad and Safari, where it does not work.
+
 ## [0.10.0] - 2026-10-07
 
 ### Added
