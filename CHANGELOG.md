@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-10-07
+
+### Added
+
+- **Numbers on the home page:** "+N corredores inscritos" (20 plus the real registrations) and "N marcas aliadas" (the logos in the strip). They count up once when they scroll into view.
+
+### Changed
+
+- **Home page motion:**
+  - "SOCIAL" and "RUN" rise in on load, and the dates and buttons follow;
+  - a line runs along the 5K card;
+  - the facts and numbers reveal one after another;
+  - arrows lean toward where they lead on hover or focus, and buttons press in when tapped.
+  - All of it stays still with "reduce motion".
+- **"Landak Studio"** in the footer credit uses Landak's purple.
+
 ## [0.13.0] - 2026-10-07
 
 ### Changed
