@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.4] - 2026-10-07
+
+### Fixed
+
+- **Running crews selected in registration now stay attached to their real crew.** Neo Team no longer falls back to Independiente, listed crews use relational group IDs, and only “Otro grupo / crew” is stored as free text.
+
 ## [0.26.3] - 2026-10-07
 
 ### Fixed
