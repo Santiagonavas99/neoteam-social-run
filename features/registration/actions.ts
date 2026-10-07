@@ -4,7 +4,6 @@ import { headers } from 'next/headers'
 import { calendarUrlFor } from '@/features/event/calendar'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { type Pass, registeredPass } from './pass'
-import { listedExternalRunningGroupName } from './running-groups'
 import { registrationSchema } from './schema'
 
 export type RegistrationState = {
@@ -41,7 +40,6 @@ export async function registerParticipant(
 
   try {
     const supabase = createServerSupabaseClient()
-    const listedRunningGroup = listedExternalRunningGroupName(parsed.data.runningGroup)
     const { data, error } = await supabase.rpc('register_social_run_participant', {
       p_first_name: parsed.data.firstName,
       p_last_name: parsed.data.lastName,
@@ -51,10 +49,9 @@ export async function registerParticipant(
       p_phone: parsed.data.phone,
       p_birth_date: parsed.data.birthDate,
       p_gender: parsed.data.gender,
-      p_running_group_slug: listedRunningGroup ? 'otro' : parsed.data.runningGroup,
+      p_running_group_slug: parsed.data.runningGroup,
       p_other_running_group:
-        listedRunningGroup ??
-        (parsed.data.runningGroup === 'otro' ? (parsed.data.otherRunningGroup ?? null) : null),
+        parsed.data.runningGroup === 'otro' ? (parsed.data.otherRunningGroup ?? null) : null,
       p_emergency_name: parsed.data.emergencyName,
       p_emergency_phone: parsed.data.emergencyPhone,
       p_terms_accepted: true,
