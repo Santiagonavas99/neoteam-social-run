@@ -35,6 +35,16 @@ Status: **approved** (Iván, 2026-10-07).
   - the QR measures at least 280 px;
   - a phone scan with the admin Check-in works, against a local mock or the preview.
 
+## 2b. `feat(registration): add to my calendar after registering` (Iván, 2026-10-07)
+
+- Iván: a prominent "Agregar a mi agenda" when someone registers, and none on the home page.
+- **`features/registration/actions.ts`:** the success state carries `calendarUrl`, which is `/evento.ics` on Apple and `googleCalendarUrl()` elsewhere.
+- **`registration-form.tsx`:** a full-width cyan button with the `CalendarPlus` icon and the line "18 OCT · 2026 · 7:30 a. m. · Parque del Ingenio, Cali", above the bib. It also shows when the pass lookup fails.
+- **Home:** the button and `features/home/add-to-calendar.tsx` are removed; the meeting-point map stays.
+- **Checks:**
+  - 390 px, iPhone and Android user agents, light and dark;
+  - the home has no calendar button.
+
 ## 3. `feat(pass): save the pass as an image on iPhone`
 
 - **`app/api/pass-image/route.ts`:**

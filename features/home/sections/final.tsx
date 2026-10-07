@@ -2,7 +2,6 @@ import { ArrowRight, ArrowUpRight, MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { eventConfig } from '@/features/event/event'
 import { mapsEmbedUrl, mapsUrl } from '@/features/event/maps'
-import { AddToCalendar } from '../add-to-calendar'
 
 export function Final() {
   return (
@@ -12,12 +11,9 @@ export function Final() {
         <div className="v2-final-main reveal">
           <p>DOMINGO · SOCIAL RUN · ANIVERSARIO NEOTEAM</p>
           <h2>18.10.26</h2>
-          <div className="v2-final-actions">
-            <Link href="/registro" className="button">
-              Quiero estar ahí <ArrowRight aria-hidden className="size-4 shrink-0" />
-            </Link>
-            <AddToCalendar />
-          </div>
+          <Link href="/registro" className="button">
+            Quiero estar ahí <ArrowRight aria-hidden className="size-4 shrink-0" />
+          </Link>
         </div>
         <div className="v2-meeting reveal">
           <p className="section-label inline-flex items-center gap-1.5">
