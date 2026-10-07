@@ -13,6 +13,7 @@ export type Participant = {
   running_groups?: { name: string } | null
   other_running_group?: string | null
   shirt_size?: string | null
+  gender?: string | null
   status: string
   checked_in_at?: string | null
 }

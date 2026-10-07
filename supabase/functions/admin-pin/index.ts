@@ -626,7 +626,7 @@ Deno.serve(async (req: Request) => {
         participants: {
           table: 'registrations',
           fields:
-            'id,registration_number,registration_code,first_name,last_name,document_type,document_number,email,phone,running_group_id,other_running_group,shirt_size,status,checked_in_at,created_at,running_groups(name)',
+            'id,registration_number,registration_code,first_name,last_name,document_type,document_number,email,phone,gender,running_group_id,other_running_group,shirt_size,status,checked_in_at,created_at,running_groups(name)',
           writable: ['status', 'checked_in_at'],
         },
         raffles: {
