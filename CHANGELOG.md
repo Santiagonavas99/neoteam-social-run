@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **Clear live states in the admin QR scanner.** Starting, ready, validating, success, repeated scans and camera errors now appear directly over the camera; manual code entry stays collapsed until staff needs it.
+- **Clear live states in the admin QR scanner.** Starting, ready, validating, success, repeated scans and camera errors now appear directly over a compact mobile camera with one NeoTeam scan guide; manual code entry stays collapsed until staff needs it.
 
 ## [0.22.1] - 2026-10-07
 
