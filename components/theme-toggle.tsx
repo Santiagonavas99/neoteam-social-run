@@ -26,16 +26,37 @@ export function ThemeToggle() {
     const x = rect.left + rect.width / 2
     const y = rect.top + rect.height / 2
     const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
-    document.startViewTransition(swap).ready.then(() =>
+    const timing = { duration: 450, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' }
+    // The hero is black in both themes, so a cyan ring on the circle's edge keeps the change
+    // visible there. Added inside the swap, it is part of the new snapshot, under the circle.
+    const ring = document.createElement('div')
+    ring.setAttribute('aria-hidden', 'true')
+    ring.className = 'theme-ring'
+    Object.assign(ring.style, {
+      left: `${x - radius}px`,
+      top: `${y - radius}px`,
+      width: `${radius * 2}px`,
+      height: `${radius * 2}px`,
+    })
+    const transition = document.startViewTransition(() => {
+      swap()
+      document.body.append(ring)
+    })
+    transition.ready.then(() => {
       root.animate(
         { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
-        {
-          duration: 450,
-          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-          pseudoElement: '::view-transition-new(root)',
-        },
-      ),
-    )
+        { ...timing, pseudoElement: '::view-transition-new(root)' },
+      )
+      ring.animate(
+        [
+          { transform: 'scale(0)', opacity: 1 },
+          { opacity: 1, offset: 0.65 },
+          { transform: 'scale(1)', opacity: 0 },
+        ],
+        timing,
+      )
+    })
+    transition.finished.finally(() => ring.remove())
   }
 
   return (

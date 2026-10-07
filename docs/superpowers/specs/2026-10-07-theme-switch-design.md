@@ -27,6 +27,10 @@ Iván, 2026-10-07, chose "claro/oscuro con auto inicial".
    - **CSS:** two rules turn off the default cross-fade (`::view-transition-old(root)`, `::view-transition-new(root)`).
    - **Fallbacks:** browsers without View Transitions (Firefox before 144, Safari before 18) and `prefers-reduced-motion` change instantly, as today.
    - **What moves:** the thumb also slides, 200 ms, `transform` only.
+   - **A cyan ring rides the edge of the circle.** This was added during implementation (Iván, 2026-10-07: "onda cian + círculo").
+     - **Why:** the hero is black in both themes and fills the first screen, so the circle alone grows "black over black" and can hardly be seen where the switch is.
+     - **How:** a 2 px ring in `--neo-accent` grows from the switch with the same timing and curve as the circle. Its outer edge follows the circle's edge, and it fades out over the last third. It is drawn inside the new theme's live snapshot, so it shows on the hero and on light sections alike.
+     - **Lifetime:** it is removed when the transition ends.
 
 ## Alternatives rejected
 
@@ -48,5 +52,5 @@ Iván, 2026-10-07, chose "claro/oscuro con auto inicial".
 
 ## Out of scope
 
-- Adding the switch to `/registro` and `/pase` headers if they differ (they use `SiteHeader`, so they get it automatically).
+- **Adding the switch to `/registro` and `/pase`:** they do not use `SiteHeader`, so they keep their current headers.
 - Changing the admin's selector.

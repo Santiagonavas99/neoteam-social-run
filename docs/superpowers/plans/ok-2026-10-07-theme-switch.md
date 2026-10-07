@@ -19,6 +19,7 @@ Spec: `docs/superpowers/specs/2026-10-07-theme-switch-design.md` · Branch: `fea
 2. **`feat(header): animated theme change`**
    - `components/theme-toggle.tsx`: `startViewTransition` plus the circle `clip-path` from the switch center.
    - `app/tailwind.css`: the view-transition rules.
+   - The cyan ring on the circle's edge (spec 3, added with Iván's OK on 2026-10-07).
    - Check:
      - a screenshot halfway through the transition shows the circle;
      - with `prefers-reduced-motion`, no transition runs (`startViewTransition` is not called);

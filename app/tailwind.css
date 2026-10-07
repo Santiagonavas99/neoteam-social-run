@@ -104,3 +104,12 @@
   animation: none;
   mix-blend-mode: normal;
 }
+
+.theme-ring {
+  position: fixed;
+  z-index: 2147483647;
+  border: 2px solid var(--neo-accent);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: scale(0);
+}
