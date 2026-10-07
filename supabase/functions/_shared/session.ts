@@ -14,8 +14,16 @@ export async function requireSession(supabase, token: unknown): Promise<StaffSes
     .gt('expires_at', now)
     .eq('admin_users.active', true)
     .maybeSingle()
-  if (error || !data) return null
-  await supabase.from('admin_pin_sessions').update({ last_seen_at: now }).eq('id', data.id)
+  // A failed query is not an invalid session: throwing becomes a 500, and the proxy keeps the
+  // cookie, whereas null makes it expire the cookie and sends staff back to the sign-in screen.
+  if (error) throw error
+  if (!data) return null
+  const seen = await supabase
+    .from('admin_pin_sessions')
+    .update({ last_seen_at: now })
+    .eq('id', data.id)
+  if (seen.error)
+    console.error('admin session last_seen_at update failed', { code: seen.error.code })
   return {
     id: data.id,
     userId: data.user_id,

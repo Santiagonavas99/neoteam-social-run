@@ -105,6 +105,16 @@ export function AuthScreen({ session }: { session: AdminSession }) {
                 />
               </label>
               <Feedback value={shown} />
+              {session.bootError && !feedback ? (
+                <button
+                  type="button"
+                  className="button button-secondary full-width"
+                  onClick={() => void session.retry()}
+                >
+                  <RefreshCw aria-hidden className="size-4 shrink-0" />
+                  Reintentar
+                </button>
+              ) : null}
               <button
                 type="submit"
                 className="button full-width"

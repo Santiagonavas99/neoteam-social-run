@@ -31,7 +31,10 @@ Iván, 2026-10-07: "en la página de admin, ¿no podemos guardar una cookie para
    - The edge function already turns thrown errors into a 500.
    - The proxy turns that into its generic 502 ("connection error"), and it **keeps** the cookie.
 2. **The `last_seen_at` update** stays best effort: a failure there neither throws nor signs out.
-3. **The client** (`use-admin-session.ts`) already shows `bootError` with a retry when `validate` fails with a network or 5xx error, instead of the sign-in screen. Nothing changes there; the check confirms it.
+3. **The client gets a "Reintentar" button.** This was found while checking: when `validate` fails, the sign-in form already shows "No pudimos conectar… Inténtalo de nuevo", but staff could only reload or ask for a new code.
+   - "Reintentar" (`RefreshCw`, secondary button) appears under the message;
+   - it runs `validate` again (`retry` in `use-admin-session.ts`);
+   - since the cookie was kept, it opens the panel without a code.
 
 ## Alternatives rejected
 
@@ -54,6 +57,10 @@ Iván, 2026-10-07: "cuando le doy a una tarjeta de marca o running me redirige, 
 
 - **Cause:** the strip pauses on `group-focus-within`, meant for keyboard users. A click or a tap leaves the focus on the link, and the focus is still there after coming back from the new tab, so the strip never resumes.
 - **Fix:** pause on keyboard focus only (`:focus-visible`), and keep the hover pause (Tailwind's `hover:` already applies only on devices that hover).
+
+## Also in this branch: centered numbers band
+
+Iván, 2026-10-07: "¿puedes centrar estos números en desktop y móvil también?" (the "+25 CORREDORES INSCRITOS · 8 MARCAS ALIADAS" band, `features/home/sections/numbers.tsx`). Each number and its label are centered in its column, on phone and desktop.
 
 ## Out of scope
 
