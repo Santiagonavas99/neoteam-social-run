@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.2] - 2026-10-07
+
+### Fixed
+
+- **The header no longer shows "Invitados",** which pointed to a section that is not on the page.
+
 ## [0.26.1] - 2026-10-07
 
 ### Changed
