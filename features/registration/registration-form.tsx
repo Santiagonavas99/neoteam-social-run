@@ -5,6 +5,7 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { useActionState, useState } from 'react'
 import { type RegistrationState, registerParticipant } from './actions'
+import { RUNNING_GROUP_OPTIONS } from './running-groups'
 import { CalendarButton } from './calendar-button'
 import {
   CheckboxField,
@@ -198,7 +199,11 @@ export function RegistrationForm() {
           onChange={(event) => setRunningGroup(event.target.value)}
           errors={errors?.runningGroup}
         >
-          <option value="neoteam">NeoTeam</option>
+          {RUNNING_GROUP_OPTIONS.map((group) => (
+            <option key={group.value} value={group.value}>
+              {group.label}
+            </option>
+          ))}
           <option value="independiente">Independiente</option>
           <option value="otro">Otro grupo / crew</option>
         </SelectField>
