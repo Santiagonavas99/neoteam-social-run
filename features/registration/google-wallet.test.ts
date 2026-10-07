@@ -60,7 +60,7 @@ test('creates the object once, then saves with a JWT that only references it', a
     ['POST', 'GET', 'POST'],
   )
   const object = JSON.parse(calls[2]?.body ?? '{}')
-  assert.equal(object.id, '123.neoteam_social_run_2026_0f8fad5bd9cb469fa16570867728950e')
+  assert.equal(object.id, '123.0f8fad5bd9cb469fa16570867728950e')
   assert.equal(object.barcode.value, `NEOTEAM-SR26:${token}`)
 
   const jwt = url.replace('https://pay.google.com/gp/v/save/', '')

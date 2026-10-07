@@ -41,8 +41,9 @@ export function signJwt(payload: Record<string, unknown>, privateKey: string) {
 
 export function walletObject(pass: PassData, config: GoogleWalletConfig) {
   const classId = `${config.issuerId}.${config.classSuffix}`
+  const objectId = `${config.issuerId}.${pass.checkinToken.replaceAll('-', '')}`
   return {
-    id: `${classId}_${pass.checkinToken.replaceAll('-', '')}`,
+    id: objectId,
     classId,
     state: 'ACTIVE',
     ticketHolderName: pass.name,
@@ -79,7 +80,15 @@ export function saveJwt(object: { id: string; classId: string }, config: GoogleW
   )
 }
 
-const fail = (stage: string, status: number) => new Error(`google-wallet ${stage} ${status}`)
+function googleErrorReason(body: unknown): string | null {
+  if (typeof body !== 'object' || body === null || !('error' in body)) return null
+  const error = body.error
+  if (typeof error !== 'object' || error === null || !('status' in error)) return null
+  return typeof error.status === 'string' ? error.status : null
+}
+
+const fail = (stage: string, status: number, reason?: string | null) =>
+  new Error(`google-wallet ${stage} ${status}${reason ? ` ${reason}` : ''}`)
 
 let cachedToken: { value: string; expiresAt: number } | null = null
 
@@ -117,14 +126,20 @@ async function ensureObject(token: string, object: { id: string }, fetcher: Fetc
     cache: 'no-store',
   })
   if (existing.ok) return
-  if (existing.status !== 404) throw fail('object-get', existing.status)
+  if (existing.status !== 404) {
+    const body: unknown = await existing.json().catch(() => null)
+    throw fail('object-get', existing.status, googleErrorReason(body))
+  }
   const created = await fetcher(OBJECT_URL, {
     method: 'POST',
     headers: { ...headers, 'Content-Type': 'application/json' },
     body: JSON.stringify(object),
     cache: 'no-store',
   })
-  if (!created.ok && created.status !== 409) throw fail('object-insert', created.status)
+  if (!created.ok && created.status !== 409) {
+    const body: unknown = await created.json().catch(() => null)
+    throw fail('object-insert', created.status, googleErrorReason(body))
+  }
 }
 
 // Creating the object over REST first is the flow Santiago validated with this issuer.
