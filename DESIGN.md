@@ -39,6 +39,7 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 | `ScanLine` | Register a runner in a dynamic |
 | `UserCheck` | Check-in |
 | `QrCode` | The runner's check-in pass ("Mi pase") |
+| `Mail` | Send the pass by email |
 | `Wallet` | Add the pass to Google Wallet |
 | `Ellipsis` | "Más": the phone sheet with the remaining admin sections |
 | `Sun` / `Moon` / `Monitor` | Theme: light / dark / system |

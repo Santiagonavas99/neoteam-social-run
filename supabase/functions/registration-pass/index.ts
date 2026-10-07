@@ -169,7 +169,7 @@ Deno.serve(async (req: Request) => {
       if (!delivery.ok)
         return json(
           { error: 'No pudimos enviar el código. Intenta de nuevo en unos minutos.' },
-          503,
+          424,
         )
       return sent
     }

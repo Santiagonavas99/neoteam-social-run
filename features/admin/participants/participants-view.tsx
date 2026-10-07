@@ -1,6 +1,6 @@
 'use client'
 
-import { Trash2, UserCheck, Users } from 'lucide-react'
+import { Mail, Trash2, UserCheck, Users } from 'lucide-react'
 import { useState } from 'react'
 import { callAdmin } from '../api'
 import { matchesQuery } from '../filter'
@@ -38,6 +38,19 @@ export function ParticipantsView() {
         kind: 'success',
         text: `${row.first_name}: ${participantStates[next]}.`,
       })
+    } catch (error) {
+      records.onError(error)
+    } finally {
+      records.setBusy(null)
+    }
+  }
+
+  async function resendPass(row: Participant) {
+    records.setBusy(`mail-${row.id}`)
+    records.setFeedback(null)
+    try {
+      await callAdmin('resendPass', { participantId: row.id })
+      records.setFeedback({ kind: 'success', text: `Pase enviado a ${row.email}.` })
     } catch (error) {
       records.onError(error)
     } finally {
@@ -186,6 +199,17 @@ export function ParticipantsView() {
                           >
                             <UserCheck aria-hidden className="size-4 shrink-0" />
                             {busy === row.id ? 'Guardando…' : 'Check-in'}
+                          </button>
+                        )}
+                        {state !== 'cancelled' && (
+                          <button
+                            type="button"
+                            className="button button-small button-secondary"
+                            onClick={() => void resendPass(row)}
+                            disabled={!!busy}
+                          >
+                            <Mail aria-hidden className="size-4 shrink-0" />
+                            {busy === `mail-${row.id}` ? 'Enviando…' : 'Reenviar pase'}
                           </button>
                         )}
                         <select

@@ -5,7 +5,8 @@ const EMAIL_FROM = Deno.env.get('EMAIL_FROM')?.trim() ?? ''
 type Attachment = { filename: string; content: string; content_id?: string }
 type Email = { to: string; subject: string; html: string; text: string; attachments?: Attachment[] }
 
-// Resend's answer body never leaves this function; callers only see the status.
+// Resend's answer body never leaves this function; callers only see the status. Callers answer
+// a failed delivery with 424, because the Next proxy replaces every 5xx with a generic message.
 export async function sendEmail(email: Email): Promise<{ ok: boolean; status: number }> {
   if (!RESEND_API_KEY || !EMAIL_FROM) {
     console.error('email not configured')
