@@ -44,7 +44,7 @@ begin
   if char_length(trim(coalesce(p_emergency_phone, ''))) < 7 or char_length(trim(p_emergency_phone)) > 30 then
     raise exception 'Teléfono de emergencia inválido';
   end if;
-  if p_gender is not null and p_gender not in ('female','male','prefer_not_to_say') then
+  if p_gender is not null and p_gender not in ('female','male','other') then
     raise exception 'Categoría inválida';
   end if;
   if p_terms_accepted is not true or p_privacy_accepted is not true then
