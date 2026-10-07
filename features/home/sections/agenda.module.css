@@ -1,0 +1,521 @@
+.section {
+  background: var(--neo-bg);
+  color: var(--neo-text);
+  padding: clamp(56px, 7vw, 112px) 0;
+  overflow: clip;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.83fr) minmax(0, 1.17fr);
+  gap: clamp(48px, 6vw, 104px);
+  align-items: start;
+}
+
+.heading {
+  position: sticky;
+  top: 116px;
+  min-width: 0;
+}
+
+.eyebrow {
+  display: block;
+  margin-top: 34px;
+  color: var(--neo-accent-text);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 16px 0 24px;
+  font-size: clamp(44px, 5.5vw, 82px);
+  font-weight: 850;
+  letter-spacing: -0.078em;
+  line-height: 0.92;
+}
+
+.title span {
+  display: block;
+}
+
+.title em {
+  color: var(--neo-accent-text);
+  font-style: normal;
+}
+
+.description {
+  max-width: 370px;
+  margin: 0;
+  color: var(--neo-text-secondary);
+  font-size: clamp(15px, 1.45vw, 17px);
+  line-height: 1.65;
+}
+
+.eventMark {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  max-width: 340px;
+  margin-top: 48px;
+  padding-top: 20px;
+  border-top: 1px solid var(--neo-border);
+}
+
+.eventDay {
+  color: var(--neo-text);
+  font-size: 86px;
+  font-weight: 800;
+  letter-spacing: -0.09em;
+  line-height: 0.84;
+  font-variant-numeric: tabular-nums;
+}
+
+.eventMeta {
+  display: grid;
+  gap: 5px;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.eventMeta span:last-child {
+  color: var(--neo-text-secondary);
+  font-weight: 500;
+  letter-spacing: 0.07em;
+}
+
+.board {
+  min-width: 0;
+}
+
+.boardTop {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--neo-border);
+}
+
+.boardDate {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.boardDate strong {
+  font-size: clamp(34px, 4vw, 52px);
+  font-weight: 800;
+  letter-spacing: -0.075em;
+  line-height: 0.95;
+}
+
+.boardDate span {
+  color: var(--neo-text-secondary);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.boardCount {
+  color: var(--neo-text-secondary);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+  text-align: right;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.timeline {
+  position: relative;
+}
+
+.timeline::before {
+  position: absolute;
+  top: 25px;
+  bottom: 40px;
+  left: 15px;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    var(--neo-accent-text),
+    var(--neo-accent-border) 40%,
+    var(--neo-accent-border) 90%,
+    transparent
+  );
+  content: "";
+}
+
+.list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+  min-width: 0;
+}
+
+.marker {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  margin: 26px 0 0 8px;
+  border: 2px solid var(--neo-accent-text);
+  border-radius: 50%;
+  background: var(--neo-bg);
+}
+
+.marker::after {
+  position: absolute;
+  inset: -5px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  content: "";
+}
+
+.featuredMarker {
+  border-color: var(--neo-black);
+  background: var(--neo-accent);
+}
+
+.featuredMarker::after {
+  border-color: var(--neo-accent-text);
+}
+
+.finishedMarker {
+  background: var(--neo-accent-text);
+}
+
+.card {
+  position: relative;
+  min-width: 0;
+  padding: clamp(18px, 2.6vw, 27px);
+  overflow: hidden;
+  border: 1px solid var(--neo-border);
+  border-radius: 18px;
+  background: var(--neo-surface);
+  box-shadow: 0 6px 28px rgba(8, 32, 29, 0.025);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    background 220ms ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 38px rgba(8, 32, 29, 0.07);
+}
+
+.featuredCard {
+  border-color: var(--neo-accent);
+  background: var(--neo-accent);
+  color: var(--neo-black);
+  box-shadow: 0 18px 38px rgba(0, 139, 137, 0.12);
+}
+
+.featuredCard:hover {
+  box-shadow: 0 23px 48px rgba(0, 139, 137, 0.18);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cardTitleGroup {
+  min-width: 0;
+}
+
+.sequence {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--neo-text-secondary);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.featuredCard .sequence {
+  color: var(--neo-accent-dark);
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: clamp(19px, 2.3vw, 25px);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+}
+
+.featuredCard .cardTitle {
+  font-size: clamp(25px, 3.5vw, 35px);
+  letter-spacing: -0.055em;
+}
+
+.time {
+  display: grid;
+  justify-items: end;
+  gap: 1px;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.time strong {
+  font-size: clamp(17px, 2vw, 22px);
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.time small {
+  color: var(--neo-text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.featuredCard .time small {
+  color: var(--neo-accent-dark);
+}
+
+.summary {
+  position: relative;
+  z-index: 1;
+  max-width: 42ch;
+  margin: 14px 0 0;
+  color: var(--neo-text-secondary);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.featuredCard .summary {
+  color: var(--neo-accent-dark);
+  font-size: 14px;
+}
+
+.badgeRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid var(--neo-accent-border);
+  border-radius: 99px;
+  color: var(--neo-accent-text);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.status::before {
+  width: 5px;
+  height: 5px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+}
+
+.featuredCard .status {
+  border-color: rgba(5, 5, 5, 0.2);
+  color: var(--neo-black);
+}
+
+.more {
+  position: relative;
+  z-index: 2;
+  width: fit-content;
+  margin-top: 16px;
+}
+
+.more summary {
+  width: fit-content;
+  padding: 4px 0;
+  color: var(--neo-accent-text);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+  list-style-position: inside;
+}
+
+.featuredCard .more summary {
+  color: var(--neo-black);
+}
+
+.more summary:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.more ul {
+  display: grid;
+  gap: 7px;
+  max-width: 43ch;
+  margin: 10px 0 0;
+  padding-left: 20px;
+  color: var(--neo-text-secondary);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.featuredCard .more ul {
+  color: var(--neo-accent-dark);
+}
+
+.footerNote {
+  margin: 18px 0 0 48px;
+  color: var(--neo-text-secondary);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .heading {
+    position: static;
+  }
+
+  .eyebrow {
+    margin-top: 22px;
+  }
+
+  .description {
+    max-width: 540px;
+  }
+
+  .eventMark {
+    display: none;
+  }
+
+  .board {
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .section {
+    padding: 52px 0 66px;
+  }
+
+  .grid {
+    gap: 28px;
+  }
+
+  .title {
+    margin-top: 12px;
+    margin-bottom: 18px;
+    font-size: clamp(44px, 12vw, 62px);
+  }
+
+  .description {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .boardTop {
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+  }
+
+  .boardDate strong {
+    font-size: 38px;
+  }
+
+  .boardCount {
+    font-size: 9px;
+  }
+
+  .list {
+    gap: 11px;
+  }
+
+  .step {
+    grid-template-columns: 22px minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .timeline::before {
+    left: 10px;
+    top: 22px;
+    bottom: 34px;
+  }
+
+  .marker {
+    margin: 25px 0 0 3px;
+  }
+
+  .card {
+    padding: 19px 17px;
+    border-radius: 16px;
+  }
+
+  .cardHeader {
+    gap: 10px;
+  }
+
+  .cardTitle {
+    font-size: 18px;
+  }
+
+  .featuredCard .cardTitle {
+    font-size: 26px;
+  }
+
+  .time strong {
+    font-size: 17px;
+  }
+
+  .time small {
+    font-size: 9px;
+  }
+
+  .summary {
+    margin-top: 12px;
+    font-size: 12px;
+  }
+
+  .footerNote {
+    margin-left: 31px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+}
