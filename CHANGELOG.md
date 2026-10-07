@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.2] - 2026-10-07
+
+### Fixed
+
+- **Centered the mobile hero composition.** Event pills, SOCIAL/RUN, supporting copy, actions and the countdown now share a centered phone layout while desktop remains unchanged.
+
 ## [0.23.1] - 2026-10-07
 
 ### Fixed
