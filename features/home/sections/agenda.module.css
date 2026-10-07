@@ -1,6 +1,6 @@
 .section {
-  background: #f2f5f4;
-  color: #050505;
+  background: var(--neo-bg);
+  color: var(--neo-text);
   padding: clamp(56px, 7vw, 112px) 0;
   overflow: clip;
 }
@@ -21,7 +21,7 @@
 .eyebrow {
   display: block;
   margin-top: 34px;
-  color: #077271;
+  color: var(--neo-accent-text);
   font-size: 11px;
   font-weight: 750;
   letter-spacing: 0.15em;
@@ -41,14 +41,14 @@
 }
 
 .title em {
-  color: #087d7b;
+  color: var(--neo-accent-text);
   font-style: normal;
 }
 
 .description {
   max-width: 370px;
   margin: 0;
-  color: #566361;
+  color: var(--neo-text-secondary);
   font-size: clamp(15px, 1.45vw, 17px);
   line-height: 1.65;
 }
@@ -60,11 +60,11 @@
   max-width: 340px;
   margin-top: 48px;
   padding-top: 20px;
-  border-top: 1px solid rgba(5, 5, 5, 0.16);
+  border-top: 1px solid var(--neo-border);
 }
 
 .eventDay {
-  color: #050505;
+  color: var(--neo-text);
   font-size: 86px;
   font-weight: 800;
   letter-spacing: -0.09em;
@@ -82,7 +82,7 @@
 }
 
 .eventMeta span:last-child {
-  color: #66716f;
+  color: var(--neo-text-secondary);
   font-weight: 500;
   letter-spacing: 0.07em;
 }
@@ -98,7 +98,7 @@
   gap: 16px;
   padding-bottom: 20px;
   margin-bottom: 20px;
-  border-bottom: 1px solid rgba(5, 5, 5, 0.14);
+  border-bottom: 1px solid var(--neo-border);
 }
 
 .boardDate {
@@ -115,14 +115,14 @@
 }
 
 .boardDate span {
-  color: #687271;
+  color: var(--neo-text-secondary);
   font-size: 11px;
   font-weight: 750;
   letter-spacing: 0.12em;
 }
 
 .boardCount {
-  color: #697270;
+  color: var(--neo-text-secondary);
   font-size: 10px;
   font-weight: 750;
   letter-spacing: 0.13em;
@@ -141,7 +141,7 @@
   bottom: 40px;
   left: 15px;
   width: 2px;
-  background: linear-gradient(180deg, #03c9c8, #a9c2c0 40%, #a9c2c0 90%, transparent);
+  background: linear-gradient(180deg, var(--neo-accent-text), var(--neo-accent-border) 40%, var(--neo-accent-border) 90%, transparent);
   content: "";
 }
 
@@ -169,9 +169,9 @@
   width: 16px;
   height: 16px;
   margin: 26px 0 0 8px;
-  border: 2px solid #088b89;
+  border: 2px solid var(--neo-accent-text);
   border-radius: 50%;
-  background: #f2f5f4;
+  background: var(--neo-bg);
 }
 
 .marker::after {
@@ -183,16 +183,16 @@
 }
 
 .featuredMarker {
-  border-color: #050505;
-  background: #03f8f6;
+  border-color: var(--neo-black);
+  background: var(--neo-accent);
 }
 
 .featuredMarker::after {
-  border-color: #087d7b;
+  border-color: var(--neo-accent-text);
 }
 
 .finishedMarker {
-  background: #088b89;
+  background: var(--neo-accent-text);
 }
 
 .card {
@@ -200,9 +200,9 @@
   min-width: 0;
   padding: clamp(18px, 2.6vw, 27px);
   overflow: hidden;
-  border: 1px solid rgba(5, 5, 5, 0.09);
+  border: 1px solid var(--neo-border);
   border-radius: 18px;
-  background: #fff;
+  background: var(--neo-surface);
   box-shadow: 0 6px 28px rgba(8, 32, 29, 0.025);
   transition:
     transform 220ms ease,
@@ -216,8 +216,9 @@
 }
 
 .featuredCard {
-  border-color: #03f8f6;
-  background: #03f8f6;
+  border-color: var(--neo-accent);
+  background: var(--neo-accent);
+  color: var(--neo-black);
   box-shadow: 0 18px 38px rgba(0, 139, 137, 0.12);
 }
 
@@ -239,14 +240,14 @@
 .sequence {
   display: block;
   margin-bottom: 9px;
-  color: #7a8583;
+  color: var(--neo-text-secondary);
   font-size: 10px;
   font-weight: 750;
   letter-spacing: 0.12em;
 }
 
 .featuredCard .sequence {
-  color: #165250;
+  color: var(--neo-accent-dark);
 }
 
 .cardTitle {
@@ -278,14 +279,14 @@
 }
 
 .time small {
-  color: #7a8583;
+  color: var(--neo-text-secondary);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
 }
 
 .featuredCard .time small {
-  color: #165250;
+  color: var(--neo-accent-dark);
 }
 
 .summary {
@@ -293,13 +294,13 @@
   z-index: 1;
   max-width: 42ch;
   margin: 14px 0 0;
-  color: #5d6a68;
+  color: var(--neo-text-secondary);
   font-size: 13px;
   line-height: 1.55;
 }
 
 .featuredCard .summary {
-  color: #164d4b;
+  color: var(--neo-accent-dark);
   font-size: 14px;
 }
 
@@ -318,7 +319,7 @@
   padding: 8px 10px;
   border: 1px solid rgba(5, 5, 5, 0.16);
   border-radius: 99px;
-  color: #0b4442;
+  color: var(--neo-accent-text);
   font-size: 10px;
   font-weight: 800;
   line-height: 1;
@@ -337,7 +338,7 @@
 
 .featuredCard .status {
   border-color: rgba(5, 5, 5, 0.2);
-  color: #050505;
+  color: var(--neo-black);
 }
 
 .more {
@@ -350,7 +351,7 @@
 .more summary {
   width: fit-content;
   padding: 4px 0;
-  color: #077271;
+  color: var(--neo-accent-text);
   cursor: pointer;
   font-size: 11px;
   font-weight: 750;
@@ -359,7 +360,7 @@
 }
 
 .featuredCard .more summary {
-  color: #050505;
+  color: var(--neo-text);
 }
 
 .more summary:hover {
@@ -373,18 +374,18 @@
   max-width: 43ch;
   margin: 10px 0 0;
   padding-left: 20px;
-  color: #5d6a68;
+  color: var(--neo-text-secondary);
   font-size: 12px;
   line-height: 1.55;
 }
 
 .featuredCard .more ul {
-  color: #164d4b;
+  color: var(--neo-accent-dark);
 }
 
 .footerNote {
   margin: 18px 0 0 48px;
-  color: #6c7674;
+  color: var(--neo-text-secondary);
   font-size: 11px;
   line-height: 1.5;
 }
