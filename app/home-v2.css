@@ -545,19 +545,25 @@
     min-height: auto;
   }
   .v2-hero-meta {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: max-content max-content;
+    justify-content: start;
+    gap: 8px;
     padding-top: 20px;
   }
+  .v2-hero-meta .v2-meta-pill:nth-child(3) {
+    grid-column: 1;
+  }
   .v2-hero-grid {
-    padding-top: 54px;
+    padding-top: 36px;
     padding-bottom: 38px;
   }
   .v2-hero-title h1 {
-    font-size: clamp(80px, 27vw, 136px);
-    line-height: 0.76;
+    font-size: clamp(76px, 25vw, 124px);
+    line-height: 0.78;
   }
   .v2-hero-title h1 span:last-child {
-    margin-left: 8%;
+    margin-left: 0;
   }
   .v2-hero-side > p {
     font-size: 20px;
