@@ -6,6 +6,7 @@ import {
   parseThemeChoice,
   resolveTheme,
   THEME_KEY,
+  type Theme,
   type ThemeChoice,
 } from '@/lib/theme'
 
@@ -23,14 +24,18 @@ function readChoice(): ThemeChoice {
 export function useThemeChoice() {
   // null until storage is read: applying the 'system' default first would flash light over a stored dark.
   const [choice, setChoice] = useState<ThemeChoice | null>(null)
+  const [resolved, setResolved] = useState<Theme>('light')
 
   useEffect(() => setChoice(readChoice()), [])
 
   useEffect(() => {
     if (!choice) return
     const media = matchMedia('(prefers-color-scheme: dark)')
-    const apply = () =>
-      document.documentElement.setAttribute('data-theme', resolveTheme(choice, media.matches))
+    const apply = () => {
+      const theme = resolveTheme(choice, media.matches)
+      document.documentElement.setAttribute('data-theme', theme)
+      setResolved(theme)
+    }
     apply()
     if (choice !== 'system') return
     media.addEventListener('change', apply)
@@ -46,5 +51,5 @@ export function useThemeChoice() {
     } catch {}
   }
 
-  return [choice ?? 'system', select] as const
+  return [choice ?? 'system', select, resolved] as const
 }
