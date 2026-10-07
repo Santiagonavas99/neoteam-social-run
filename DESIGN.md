@@ -32,7 +32,7 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 | `ChevronLeft` / `ChevronRight` | Carousel step; `ChevronRight` also ends a navigation row |
 | `Plus` / `Pencil` / `Trash2` / `Check` | Create / edit / delete / save |
 | `RefreshCw` / `Search` / `X` / `SearchX` | Reload / search / clear / no results |
-| `LogIn` / `LogOut` / `KeyRound` | Enter the panel / sign out / PIN |
+| `LogIn` / `LogOut` | Enter the panel / sign out |
 | `CircleCheck` / `CircleAlert` / `TriangleAlert` | Success / error / destructive confirmation |
 | `LoaderCircle` | Work in progress |
 | `Dices` | Draw winners |
@@ -44,7 +44,7 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 | `Sun` / `Moon` / `Monitor` | Theme: light / dark / system |
 | `Eye` / `EyeOff` | Visible / hidden |
 | `CalendarDays` / `Clock` / `MapPin` / `Route` / `Gift` | Date / time / place / route / prizes |
-| `UserCheck`, `LayoutDashboard`, `GalleryHorizontal`, `Users`, `Flag`, `Tag`, `Zap`, `UserCog`, `ShieldCheck` | Admin sections: check-in, overview, logo strip, participants, groups, brands, dynamics, team, security |
+| `UserCheck`, `LayoutDashboard`, `GalleryHorizontal`, `Users`, `Flag`, `Tag`, `Zap`, `UserCog` | Admin sections: check-in, overview, logo strip, participants, groups, brands, dynamics, team |
 | `Circle`, `CircleCheck`, `CircleSlash`, `CircleX`, `CircleDashed`, `CircleDot`, `CircleStop`, `Trophy` | Status: registered, checked in, no show, cancelled, draft, open, closed, drawn or completed |
 
 ## Tokens (`app/globals.css :root`)

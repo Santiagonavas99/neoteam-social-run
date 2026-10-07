@@ -58,7 +58,7 @@ Most participants register from a phone, and staff run check-in, scans and draws
 ## Security boundaries
 
 - The browser never queries Supabase tables directly. Public writes go through RPCs (`register_social_run_participant`); admin operations go through `/api/admin*` → Edge Functions.
-- Never put a service-role key, `ADMIN_SETUP_SECRET` or a PIN in the repo, in a `NEXT_PUBLIC_*` variable or in chat.
+- Never put a service-role key, `RESEND_API_KEY`, a sign-in code or a session token in the repo, in a `NEXT_PUBLIC_*` variable or in chat.
 - The remote Supabase project is the schema's source of truth: never run an initial schema against it. New migrations only, and only from an approved plan.
 
 ## Checks

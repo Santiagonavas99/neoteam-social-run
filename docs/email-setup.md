@@ -2,6 +2,8 @@
 
 Step by step for the pass email and the one-time code on `/pase` (spec: [`2026-10-06-pass-email-design.md`](superpowers/specs/2026-10-06-pass-email-design.md)).
 
+**The admin panel signs in by emailed code (0.9.0), so steps 1–4 must be done before deploying it.** Its rollout is in [Panel sign-in rollout](#panel-sign-in-rollout-090) at the end.
+
 The emails are sent by the Supabase edge functions (`registration-pass` and `admin-pin`), never by Vercel or the browser. That is why **every variable here is a Supabase secret, and Vercel gets nothing new.**
 
 Never paste the API key in chat, in the repo or in a `NEXT_PUBLIC_*` variable.
@@ -93,7 +95,7 @@ supabase secrets list --project-ref ohatsnkgaeccltqwhkbv
 
 Secrets take effect without a redeploy, but the functions need the new code (step 6).
 
-## 5. Migration
+## 5. Migration (pass email, 0.10.0)
 
 When the email PR is ready, run its migration (`supabase/migrations/<ts>_pass_email.sql`) in the SQL editor:
 1. first inside `begin; … rollback;` to check it;
@@ -129,3 +131,32 @@ On a phone:
 - **Over the limit:** Resend answers 429. The function logs `email 429`, and the runner sees "No pudimos enviar el correo, intenta más tarde". The registration still goes through, and the pass still shows on screen.
 - **Logs:** the function log only shows `email <status>`; Resend's response body never reaches the browser.
 - **Key leak:** revoke the key in Resend → API Keys, create a new one, and repeat step 4.
+
+## Panel sign-in rollout (0.9.0)
+
+Do steps 1–4 first. Then, in this order:
+
+1. **Migration:** `supabase/migrations/20261006150000_admin_users.sql` in the SQL editor.
+   - **Check it first:** `begin;`, then the file's contents, then the first-admin insert from step 2 and `select name, email, role from public.admin_users;`, then `rollback;`.
+   - **Then run it for real.** It signs everyone out of the current panel.
+2. **First admin**, in the SQL editor, with the email written in lowercase:
+
+   ```sql
+   insert into public.admin_users (name, email, role)
+   values ('Nombre', 'nombre@example.com', 'admin');
+   ```
+
+3. **Functions:**
+
+   ```bash
+   supabase functions deploy admin-pin admin-logos --project-ref ohatsnkgaeccltqwhkbv
+   ```
+
+4. **Merge the PR right after,** so Vercel deploys the new panel. Until both sides are live, nobody can sign in.
+5. **Check on a phone:**
+   - `/admin` → your email → the code arrives → you are in;
+   - reload, and you are still in.
+   - Then add the team in **Equipo**.
+6. **Cleanup:** the `ADMIN_SETUP_SECRET` function secret is no longer used and can be deleted from Supabase.
+
+If a code does not arrive, check Resend → Logs, and in Supabase the `admin-pin` function logs. Both show only `email <status>`.

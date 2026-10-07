@@ -122,7 +122,7 @@ See the spec's revision. Tasks 1–3 shipped username + PIN; tasks 4–7 replace
 - Docs:
   - `CLAUDE.md`: per-user sign-in by emailed code, and the cookie session;
   - `docs/email-setup.md`: the panel needs email before it can be deployed.
-- The existing release commit is replaced by this one, so it stays last; the branch then needs `git push --force-with-lease`.
+- Iván merged the pushed branch, so no history rewrite: a new `chore(release): 0.9.0` commit goes last and updates the notes.
 
 ## Part B — pass by email
 
