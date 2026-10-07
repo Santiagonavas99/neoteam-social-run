@@ -57,7 +57,7 @@ export function EventCountdown({
         FALTAN
       </p>
       <p className="sr-only">Faltan {summary} para el encuentro.</p>
-      <div aria-hidden className="flex gap-5 md:gap-7">
+      <div aria-hidden className="grid grid-cols-4 gap-3 md:flex md:gap-7">
         {units.map(([key, label]) => (
           <div key={key} className="grid gap-1.5">
             <span
