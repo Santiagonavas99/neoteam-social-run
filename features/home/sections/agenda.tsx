@@ -11,11 +11,11 @@ type LiveAgenda = {
 }
 
 const eventDate = eventConfig.startsAt.slice(0, 10)
-const eventEndMinutes = 11 * 60
+const eventEndMinutes = minutesFromTime(eventConfig.endsAt.slice(11, 16))
 
 function minutesFromTime(time: string) {
-  const [hour, minute] = time.split(':').map(Number)
-  return hour * 60 + minute
+  const [hour = '0', minute = '0'] = time.split(':')
+  return Number(hour) * 60 + Number(minute)
 }
 
 // The status is based on the published schedule in the event's time zone, not on the
@@ -154,7 +154,7 @@ export function Agenda({ index = '02' }: { index?: string }) {
                           </span>
                           <h3 className={styles.cardTitle}>{item.title}</h3>
                         </div>
-                        <time className={styles.time} dateTime={item.time}>
+                        <time className={styles.time} dateTime={item.time.padStart(5, '0')}>
                           <strong>{item.time}</strong>
                           <small>{item.meridiem.includes('aprox.') ? 'AM · APROX.' : 'AM'}</small>
                         </time>
