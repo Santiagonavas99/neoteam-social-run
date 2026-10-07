@@ -10,7 +10,6 @@ export function SiteHeader() {
         <nav aria-label="Navegación principal">
           <a href="/#evento">Evento</a>
           <a href="/#agenda">Agenda</a>
-          <a href="/#invitados">Invitados</a>
           <Link href="/pase">Mi pase</Link>
           <ThemeToggle />
           <Link className="button button-small" href="/registro">
