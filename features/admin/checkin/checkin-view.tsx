@@ -5,8 +5,8 @@ import { formatTime } from '@/features/event/datetime'
 import { callAdmin } from '../api'
 import { type ScanOutcome, ScanStation } from '../ui/scan-station'
 
-async function checkIn(token: string, code: string): Promise<ScanOutcome> {
-  const { result, participant } = await callAdmin('checkin', { token, code })
+async function checkIn(code: string): Promise<ScanOutcome> {
+  const { result, participant } = await callAdmin('checkin', { code })
   if (!result || !participant) throw new Error('No pudimos registrar el check-in.')
   if (result === 'checkedIn') return { tone: 'success', headline: 'Check-in listo', participant }
   if (result === 'cancelled')
@@ -19,10 +19,10 @@ async function checkIn(token: string, code: string): Promise<ScanOutcome> {
   }
 }
 
-export function CheckinView({ token }: { token: string }) {
+export function CheckinView() {
   return (
     <section className="mx-auto w-full max-w-120">
-      <ScanStation inputId="checkin-code" onCode={(code) => checkIn(token, code)} />
+      <ScanStation inputId="checkin-code" onCode={(code) => checkIn(code)} />
     </section>
   )
 }

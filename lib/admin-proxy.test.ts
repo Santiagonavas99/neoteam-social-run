@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { gzipSync } from 'node:zlib'
-import { adminUpstreamHeaders, parseAdminBody, proxyToEdgeFunction } from './admin-proxy.ts'
+import {
+  adminUpstreamHeaders,
+  parseAdminBody,
+  proxyToEdgeFunction,
+  readSessionCookie,
+} from './admin-proxy.ts'
 
 const request = new Request('https://example.test/api/admin', {
   headers: { 'x-forwarded-for': '203.0.113.7, 10.0.0.1' },
@@ -63,23 +68,26 @@ const copy = 'Sin conexión.'
 
 async function proxy(
   upstream: () => Promise<Response>,
-  body: BodyInit = '{"action":"status"}',
+  body: BodyInit = '{"action":"validate"}',
   overrides: Record<string, string | undefined> = {},
+  headers: Record<string, string> = {},
 ) {
   const calls: string[] = []
+  const sent: unknown[] = []
   const original = globalThis.fetch
   const originalError = console.error
-  globalThis.fetch = (input) => {
+  globalThis.fetch = (input, init) => {
     calls.push(String(input))
+    sent.push(JSON.parse(String(init?.body)))
     return upstream()
   }
   console.error = () => {}
   try {
-    const response = await proxyToEdgeFunction(post(body), 'admin-pin', copy, {
+    const response = await proxyToEdgeFunction(post(body, headers), 'admin-pin', copy, {
       ...env,
       ...overrides,
     })
-    return { status: response.status, data: await response.json(), calls, response }
+    return { status: response.status, data: await response.json(), calls, sent, response }
   } finally {
     globalThis.fetch = original
     console.error = originalError
@@ -124,4 +132,52 @@ test('proxy hides upstream 5xx, network failures and non-JSON answers', async ()
     assert.equal(result.status, 502)
     assert.deepEqual(result.data, { error: copy })
   }
+})
+
+test('readSessionCookie finds the session among other cookies', () => {
+  const withCookie = (cookie: string) =>
+    new Request('https://example.test', { headers: { cookie } })
+  assert.equal(readSessionCookie(withCookie('a=1; neoteam_admin_session=abc=; b=2')), 'abc=')
+  assert.equal(readSessionCookie(withCookie('a=1')), '')
+  assert.equal(readSessionCookie(new Request('https://example.test')), '')
+})
+
+test('proxy moves an issued token into an httpOnly cookie and out of the JSON', async () => {
+  const result = await proxy(() =>
+    Promise.resolve(Response.json({ ok: true, token: 'secret-token', role: 'admin' })),
+  )
+  assert.deepEqual(result.data, { ok: true, role: 'admin' })
+  const cookie = result.response.headers.get('set-cookie') ?? ''
+  assert.match(cookie, /^neoteam_admin_session=secret-token;/)
+  for (const flag of [
+    'HttpOnly',
+    'Secure',
+    'SameSite=Strict',
+    'Path=/api/admin',
+    'Max-Age=2592000',
+  ])
+    assert.ok(cookie.includes(flag), flag)
+})
+
+test('proxy sends the cookie token upstream and ignores a token from the body', async () => {
+  const withCookie = await proxy(
+    ok,
+    '{"action":"checkin","token":"forged"}',
+    {},
+    {
+      cookie: 'neoteam_admin_session=real',
+    },
+  )
+  assert.deepEqual(withCookie.sent, [{ action: 'checkin', token: 'real' }])
+  const without = await proxy(ok, '{"action":"checkin","token":"forged"}')
+  assert.deepEqual(without.sent, [{ action: 'checkin' }])
+})
+
+test('proxy clears the cookie on logout and on an invalid session', async () => {
+  const logout = await proxy(ok, '{"action":"logout"}')
+  assert.match(logout.response.headers.get('set-cookie') ?? '', /Max-Age=0/)
+  const invalid = await proxy(() => Promise.resolve(Response.json({ valid: false })))
+  assert.match(invalid.response.headers.get('set-cookie') ?? '', /Max-Age=0/)
+  const valid = await proxy(() => Promise.resolve(Response.json({ valid: true })))
+  assert.equal(valid.response.headers.get('set-cookie'), null)
 })

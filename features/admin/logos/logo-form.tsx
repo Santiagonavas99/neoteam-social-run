@@ -6,13 +6,11 @@ import { ImageUploadField, useImageUpload } from '../ui/image-upload-field'
 
 export function LogoForm({
   row,
-  token,
   busy: listBusy,
   onSave,
   onCancel,
 }: {
   row: LogoItem
-  token: string
   busy: boolean
   onSave: (row: LogoItem) => Promise<void>
   onCancel: () => void
@@ -21,7 +19,6 @@ export function LogoForm({
     logo.logo_url ? null : 'Sube una imagen antes de guardar el logo.',
   )
   const { uploading, upload } = useImageUpload({
-    token,
     successText: 'Imagen subida. Guarda el logo para publicarlo.',
     onUploaded: (url) => update('logo_url', url),
     setFeedback,

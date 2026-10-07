@@ -3,13 +3,13 @@ import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
 import type { StaffRole } from '../types'
 
-const SESSION_KEY = 'neoteam_admin_pin_session'
-
 export type AdminSession = ReturnType<typeof useAdminSession>
 
+// The session token lives in an httpOnly cookie set by /api/admin; this hook only knows
+// whether it is valid and which role it carries.
 export function useAdminSession() {
   const [ready, setReady] = useState(false)
-  const [token, setToken] = useState<string | null>(null)
+  const [signedIn, setSignedIn] = useState(false)
   const [role, setRole] = useState<StaffRole>('checkin')
   const [name, setName] = useState('')
   const [bootError, setBootError] = useState('')
@@ -19,16 +19,12 @@ export function useAdminSession() {
 
     async function bootstrap() {
       try {
-        const storedToken = window.localStorage.getItem(SESSION_KEY)
-        if (!storedToken) return
-
-        const validation = await callAdmin('validate', { token: storedToken })
+        const validation = await callAdmin('validate')
         if (!active) return
-        if (validation.valid) {
-          setRole(validation.role ?? 'checkin')
-          setName(validation.name ?? '')
-          setToken(storedToken)
-        } else window.localStorage.removeItem(SESSION_KEY)
+        if (!validation.valid) return
+        setRole(validation.role ?? 'checkin')
+        setName(validation.name ?? '')
+        setSignedIn(true)
       } catch (error) {
         if (active) setBootError(errorMessage(error, 'No pudimos cargar el acceso administrativo.'))
       } finally {
@@ -43,25 +39,21 @@ export function useAdminSession() {
   }, [])
 
   // Role and name only pick which sections to show; the edge function enforces access.
-  function remember(next: string, profile: { role?: StaffRole; name?: string }) {
-    window.localStorage.setItem(SESSION_KEY, next)
+  function remember(profile: { role?: StaffRole; name?: string }) {
     setRole(profile.role ?? 'checkin')
     setName(profile.name ?? '')
-    setToken(next)
+    setSignedIn(true)
   }
 
   async function signOut() {
-    const current = token
-    window.localStorage.removeItem(SESSION_KEY)
-    setToken(null)
+    setSignedIn(false)
     setBootError('')
-    if (!current) return
     try {
-      await callAdmin('logout', { token: current })
+      await callAdmin('logout')
     } catch {
-      // The local session is already closed even if remote revocation fails.
+      // The cookie expires on its own; the panel is already closed on this device.
     }
   }
 
-  return { ready, token, role, name, bootError, remember, signOut }
+  return { ready, signedIn, role, name, bootError, remember, signOut }
 }

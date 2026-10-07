@@ -9,21 +9,18 @@ import { LabelOptions } from '../ui/label-options'
 export function CommunityForm({
   row,
   resource,
-  token,
   onSave,
   onCancel,
   onDelete,
 }: {
   row: CommunityRecord
   resource: 'groups' | 'brands'
-  token: string
   onSave: (row: CommunityRecord) => Promise<void>
   onCancel: () => void
   onDelete?: () => void
 }) {
   const { values, update, busy, feedback, setFeedback, submit } = useEditor(row, onSave)
   const { uploading, upload } = useImageUpload({
-    token,
     successText: 'Imagen subida. Guarda los cambios para publicarla.',
     onUploaded: (url) => update('logo_url', url),
     setFeedback,

@@ -13,7 +13,7 @@ import { RefreshButton } from '../ui/refresh-button'
 import { useAdminData } from '../ui/use-admin-data'
 import { LogoForm } from './logo-form'
 
-export function LogosView({ token }: { token: string }) {
+export function LogosView() {
   const [editor, setEditor] = useState<LogoItem | null>(null)
   const [busy, setBusy] = useState(false)
   const [feedback, setFeedback] = useState<FeedbackValue>(null)
@@ -27,10 +27,7 @@ export function LogosView({ token }: { token: string }) {
     (error: unknown) => fail(error, 'No pudimos cargar los logos.'),
     [fail],
   )
-  const load = useCallback(
-    async () => (await callLogos<LogoItem>('list', { token })).rows ?? [],
-    [token],
-  )
+  const load = useCallback(async () => (await callLogos<LogoItem>('list')).rows ?? [], [])
   const { data: rows, loading, reload } = useAdminData(load, [], onLoadError)
 
   function addLogo() {
@@ -51,7 +48,6 @@ export function LogosView({ token }: { token: string }) {
     setFeedback(null)
     try {
       await callLogos('save', {
-        token,
         values: {
           name: values.name,
           logo_url: values.logo_url,
@@ -82,7 +78,7 @@ export function LogosView({ token }: { token: string }) {
     setBusy(true)
     setFeedback(null)
     try {
-      await callLogos('delete', { token, id: row.id })
+      await callLogos('delete', { id: row.id })
       setConfirmingId(null)
       if (editor?.id === row.id) setEditor(null)
       setFeedback({ kind: 'success', text: `${row.name} eliminado del carrusel.` })
@@ -95,14 +91,7 @@ export function LogosView({ token }: { token: string }) {
   }
 
   const form = (row: LogoItem) => (
-    <LogoForm
-      key={row.id}
-      row={row}
-      token={token}
-      busy={busy}
-      onSave={save}
-      onCancel={() => setEditor(null)}
-    />
+    <LogoForm key={row.id} row={row} busy={busy} onSave={save} onCancel={() => setEditor(null)} />
   )
 
   return (

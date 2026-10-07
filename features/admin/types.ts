@@ -106,7 +106,6 @@ export type AdminResponse<Row = unknown> = {
   role?: StaffRole
   name?: string
   valid?: boolean
-  token?: string
   expiresAt?: string
   rows?: Row[]
   metrics?: Metrics

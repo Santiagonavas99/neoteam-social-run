@@ -17,8 +17,7 @@ export function AdminApp() {
   const session = useAdminSession()
   const [picked, setSection] = useState<AdminSection | null>(null)
 
-  if (!session.ready || !session.token) return <AuthScreen session={session} />
-  const token = session.token
+  if (!session.ready || !session.signedIn) return <AuthScreen session={session} />
   const allowed = sectionsFor(session.role)
   const section = allowed.find((item) => item.id === picked)?.id ?? allowed[0]?.id ?? 'checkin'
 
@@ -30,19 +29,19 @@ export function AdminApp() {
       onSignOut={() => void session.signOut()}
     >
       {section === 'checkin' ? (
-        <CheckinView token={token} />
+        <CheckinView />
       ) : section === 'logos' ? (
-        <LogosView token={token} />
+        <LogosView />
       ) : section === 'team' ? (
-        <TeamView token={token} />
+        <TeamView />
       ) : section === 'participants' ? (
-        <ParticipantsView token={token} />
+        <ParticipantsView />
       ) : section === 'groups' || section === 'brands' ? (
-        <CommunityView key={section} resource={section} token={token} />
+        <CommunityView key={section} resource={section} />
       ) : section === 'dynamics' ? (
-        <DynamicsView token={token} />
+        <DynamicsView />
       ) : (
-        <OverviewView token={token} navigate={setSection} />
+        <OverviewView navigate={setSection} />
       )}
     </AdminShell>
   )

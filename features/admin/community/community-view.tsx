@@ -14,14 +14,8 @@ import { EditButton, RecordCard } from '../ui/record-card'
 import { useRecords } from '../use-records'
 import { CommunityForm } from './community-form'
 
-export function CommunityView({
-  resource,
-  token,
-}: {
-  resource: 'groups' | 'brands'
-  token: string
-}) {
-  const records = useRecords<CommunityRecord>(resource, token)
+export function CommunityView({ resource }: { resource: 'groups' | 'brands' }) {
+  const records = useRecords<CommunityRecord>(resource)
   const { rows, loading, busy, feedback, editor, confirmation } = records
   const [query, setQuery] = useState('')
   const brand = resource === 'brands'
@@ -82,7 +76,6 @@ export function CommunityView({
           key={editor.id}
           row={editor}
           resource={resource}
-          token={token}
           onSave={records.save}
           onCancel={() => records.setEditor(null)}
         />
@@ -144,7 +137,6 @@ export function CommunityView({
                 <CommunityForm
                   row={editor}
                   resource={resource}
-                  token={token}
                   onSave={records.save}
                   onCancel={() => records.setEditor(null)}
                   onDelete={() => records.setConfirmation({ row, action: 'delete' })}

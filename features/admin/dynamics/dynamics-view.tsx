@@ -21,19 +21,18 @@ import { useDynamics } from './use-dynamics'
 
 const plural = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`
 
-export function DynamicsView({ token }: { token: string }) {
-  const dynamics = useDynamics(token)
+export function DynamicsView() {
+  const dynamics = useDynamics()
   const { rows, busy, feedback, editor, confirmation, winners } = dynamics
   const loadBrands = useCallback(
     async () =>
       (
         await callAdmin<CommunityRecord>('adminData', {
-          token,
           resource: 'brands',
           operation: 'list',
         })
       ).rows ?? [],
-    [token],
+    [],
   )
   const sponsors = useAdminData<CommunityRecord[]>(loadBrands, [], dynamics.onError)
   const brands = sponsors.data
@@ -236,9 +235,7 @@ export function DynamicsView({ token }: { token: string }) {
                   onDelete={() => dynamics.setConfirmation({ row, action: 'delete' })}
                 />
               )}
-              {scanning === row.id && (
-                <ParticipationPanel token={token} dynamic={row} onClose={closeScanner} />
-              )}
+              {scanning === row.id && <ParticipationPanel dynamic={row} onClose={closeScanner} />}
             </RecordCard>
           ))}
         </div>

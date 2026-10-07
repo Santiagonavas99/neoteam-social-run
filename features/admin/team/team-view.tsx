@@ -107,7 +107,7 @@ function TeamForm({
   )
 }
 
-export function TeamView({ token }: { token: string }) {
+export function TeamView() {
   const [feedback, setFeedback] = useState<FeedbackValue>(null)
   const [editor, setEditor] = useState<StaffUser | null>(null)
   const onError = useCallback(
@@ -115,8 +115,8 @@ export function TeamView({ token }: { token: string }) {
     [],
   )
   const load = useCallback(
-    async () => (await callAdmin<StaffUser>('users', { token, operation: 'list' })).rows ?? [],
-    [token],
+    async () => (await callAdmin<StaffUser>('users', { operation: 'list' })).rows ?? [],
+    [],
   )
   const { data: rows, loading, reload } = useAdminData(load, [], onError)
 
@@ -128,7 +128,6 @@ export function TeamView({ token }: { token: string }) {
   async function save(user: StaffUser) {
     const { id: _id, email, ...rest } = user
     await callAdmin('users', {
-      token,
       operation: 'save',
       values: isNew(user) ? { ...rest, email: normalizeEmail(email) } : user,
     })

@@ -16,8 +16,8 @@ import { useRecords } from '../use-records'
 
 const fullName = (row: Participant) => `${row.first_name ?? ''} ${row.last_name ?? ''}`.trim()
 
-export function ParticipantsView({ token }: { token: string }) {
-  const records = useRecords<Participant>('participants', token)
+export function ParticipantsView() {
+  const records = useRecords<Participant>('participants')
   const { rows, loading, busy, feedback, confirmation } = records
   const [query, setQuery] = useState('')
   const [status, setStatus] = useState('')
@@ -27,7 +27,6 @@ export function ParticipantsView({ token }: { token: string }) {
     records.setFeedback(null)
     try {
       await callAdmin('adminData', {
-        token,
         resource: 'participants',
         operation: 'save',
         values: { id: row.id, status: next },

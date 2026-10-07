@@ -61,8 +61,8 @@ export function AuthScreen({ session }: { session: AdminSession }) {
     setFeedback(null)
     try {
       const data = await callAdmin('verifyCode', { email: normalizeEmail(email), code })
-      if (!data.token) throw new Error('No pudimos crear la sesión administrativa.')
-      session.remember(data.token, data)
+      if (!data.ok) throw new Error('No pudimos crear la sesión administrativa.')
+      session.remember(data)
     } catch (caught) {
       setFeedback({ kind: 'error', text: errorMessage(caught, 'No pudimos iniciar sesión.') })
       setBusy(false)
