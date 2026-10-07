@@ -13,7 +13,17 @@ export const RUNNING_GROUP_OPTIONS = [
 ] as const
 
 export const RUNNING_GROUP_VALUES = [
-  ...RUNNING_GROUP_OPTIONS.map((group) => group.value),
+  'byrunners',
+  'el-cartel-running-club',
+  'run-365',
+  'neoteam',
+  'pacific-runners',
+  'beer-runners',
+  'integral-fit',
+  'running-social',
+  'united-runner-club',
+  'guabinas-run-club',
+  'pace-running',
   'independiente',
   'otro',
 ] as const
