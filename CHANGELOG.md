@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.1] - 2026-10-07
+
+### Fixed
+
+- **A connection hiccup no longer signs staff out of the admin.** The 30-day session stays, and the sign-in screen offers "Reintentar", which reopens the panel without a new code. Only an expired session, a deactivated user or "Cerrar sesión" ends it.
+- **The logo strips keep moving after a card is clicked.** They pause only on hover or keyboard focus.
+- **The numbers band is centered** on phone and desktop.
+
 ## [0.23.0] - 2026-10-07
 
 ### Added
