@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-10-07
+
+### Fixed
+
+- **Signing in to the panel failed with a server error** where the database still had the PIN-based staff table. A migration converts it to email accounts.
+
 ## [0.9.0] - 2026-10-06
 
 ### Added
