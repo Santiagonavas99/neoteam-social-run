@@ -5,17 +5,30 @@ import { type FormEvent, useRef, useState } from 'react'
 import { errorMessage } from '../errors'
 import type { ScannedParticipant } from '../types'
 import { QrScanner } from './qr-scanner'
+import { playScanFeedback, type ScanFeedback, unlockScanSound } from './scan-feedback'
 
 export type ScanOutcome = {
-  tone: 'success' | 'neutral' | 'danger'
+  tone: 'success' | 'neutral' | 'warning' | 'danger'
   headline: string
+  detail?: string
   icon?: LucideIcon
   participant?: ScannedParticipant
+}
+
+const feedbackFor: Record<ScanOutcome['tone'], ScanFeedback> = {
+  success: 'success',
+  neutral: 'success',
+  warning: 'repeat',
+  danger: 'error',
 }
 
 const tones: Record<ScanOutcome['tone'], { icon: LucideIcon; className: string }> = {
   success: { icon: CircleCheck, className: 'bg-neo-success-bg text-neo-accent-text' },
   neutral: { icon: Clock, className: 'bg-neo-surface text-neo-text' },
+  warning: {
+    icon: Clock,
+    className: 'border-2 border-neo-warning bg-neo-warning-bg text-neo-warning',
+  },
   danger: { icon: CircleAlert, className: 'bg-neo-danger-bg text-neo-danger' },
 }
 
@@ -27,7 +40,12 @@ function ResultCard({ outcome }: { outcome: ScanOutcome }) {
     <div className={`flex items-start gap-3 rounded-card p-4 ${tone.className}`}>
       <Icon aria-hidden className="mt-1 size-6 shrink-0" />
       <div className="min-w-0">
-        <p className="m-0 text-base font-bold">{outcome.headline}</p>
+        <p
+          className={`m-0 font-bold ${outcome.tone === 'warning' ? 'text-xl tracking-[0.04em] uppercase' : 'text-base'}`}
+        >
+          {outcome.headline}
+        </p>
+        {outcome.detail ? <p className="m-0 text-sm font-bold">{outcome.detail}</p> : null}
         {participant ? (
           <>
             <p className="m-0 text-2xl font-bold break-words text-neo-text">
@@ -62,10 +80,11 @@ export function ScanStation({
     try {
       const next = await onCode(code)
       setOutcome(next)
-      if (next.tone === 'success') navigator.vibrate?.(80)
+      playScanFeedback(feedbackFor[next.tone])
       return true
     } catch (error) {
       setOutcome({ tone: 'danger', headline: errorMessage(error) })
+      playScanFeedback('error')
       return false
     } finally {
       busyRef.current = false
@@ -81,7 +100,7 @@ export function ScanStation({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4" onPointerDown={unlockScanSound}>
       <QrScanner onScan={(text) => void run(text)} />
       <div aria-live="polite" className="min-h-24">
         {busy ? (

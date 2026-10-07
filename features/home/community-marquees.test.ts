@@ -89,15 +89,17 @@ test('a native record wins duplicate names and logo URLs', () => {
       sort_order: 3,
     },
   ]
+  const ally = allies[0]
+  assert.ok(ally)
   const byName = {
-    ...allies[0]!,
+    ...ally,
     id: 'same-name',
     name: 'club rio',
     show_in_running_crews: true,
     sort_order: 0,
   }
   const byLogo = {
-    ...allies[0]!,
+    ...ally,
     id: 'same-logo',
     name: 'Other name',
     logo_url: 'https://example.com/native.png?width=300',

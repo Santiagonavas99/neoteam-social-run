@@ -125,3 +125,15 @@ Measured on the public legacy CSS (the admin is clear of all of it); each item i
 - **14 font sizes**, including 9–11 px labels, which are hard to read on phones.
 - **Only 3 `:focus-visible` rules**: most controls rely on the browser default focus ring.
 - **14 specificity inversions** caused by the override layering. Biome's `noDescendingSpecificity` is switched off for `home-v2.css` only (`biome.json`); remove that override when the file is deleted.
+
+## Scan feedback
+
+Check-in and the dynamics stands share `ScanStation` (`features/admin/ui/`). Every result gets a card, a vibration and a short Web Audio tone (`scan-feedback.ts`, no audio files). Sound unlocks on the first tap on the station; iPhones get sound only (no vibration API) and none with the silent switch on.
+
+| Result | Card | Vibration | Sound |
+|--------|------|-----------|-------|
+| Done (check-in, participation, no prize) | `success` / `neutral` | 80 ms | two rising notes, 880 → 1320 Hz |
+| Already done ("Ya hizo check-in", "Ya participó", "Ya había ganado") | `warning`: amber `--neo-warning` / `--neo-warning-bg`, 2 px border, uppercase heading, `Clock`, time underneath | 60-80-60 ms | two 440 Hz beeps |
+| Error (not found, cancelled, network) | `danger` | 250 ms | one 220 Hz buzz |
+
+The scanner ignores the same QR for 1.5 s only (`REPEAT_WINDOW_MS`), so a deliberate second scan reaches the server and shows the amber card.

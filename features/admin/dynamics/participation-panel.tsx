@@ -15,7 +15,7 @@ async function complete(dynamic: DynamicRow, code: string): Promise<ScanOutcome>
   const { participant } = result
   if (result.alreadyCompleted)
     return {
-      tone: 'neutral',
+      tone: 'warning',
       headline: result.won ? 'Ya había ganado' : 'Ya participó en esta dinámica',
       participant,
     }

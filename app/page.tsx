@@ -17,7 +17,8 @@ import { Numbers } from '@/features/home/sections/numbers'
 import { Raffle } from '@/features/home/sections/raffle'
 import { Story } from '@/features/home/sections/story'
 
-export const dynamic = 'force-dynamic'
+// Served from the CDN and rebuilt in the background at most once a minute; counter and logos may lag 60 s.
+export const revalidate = 60
 
 export default async function Home() {
   const [logoItems, community, registered] = await Promise.all([
