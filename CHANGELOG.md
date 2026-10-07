@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-10-07
+
+### Added
+
+- **Streamers when a runner registers:** a short burst in the palette's cyan shades and black over the "Estás dentro." screen. It never blocks taps, and it does not appear when the phone asks for reduced motion.
+
 ## [0.15.2] - 2026-10-07
 
 ### Fixed
