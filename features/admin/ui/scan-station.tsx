@@ -8,8 +8,9 @@ import { QrScanner } from './qr-scanner'
 import { playScanFeedback, type ScanFeedback, unlockScanSound } from './scan-feedback'
 
 export type ScanOutcome = {
-  tone: 'success' | 'neutral' | 'danger'
+  tone: 'success' | 'neutral' | 'warning' | 'danger'
   headline: string
+  detail?: string
   icon?: LucideIcon
   participant?: ScannedParticipant
 }
@@ -17,12 +18,17 @@ export type ScanOutcome = {
 const feedbackFor: Record<ScanOutcome['tone'], ScanFeedback> = {
   success: 'success',
   neutral: 'success',
+  warning: 'repeat',
   danger: 'error',
 }
 
 const tones: Record<ScanOutcome['tone'], { icon: LucideIcon; className: string }> = {
   success: { icon: CircleCheck, className: 'bg-neo-success-bg text-neo-accent-text' },
   neutral: { icon: Clock, className: 'bg-neo-surface text-neo-text' },
+  warning: {
+    icon: Clock,
+    className: 'border-2 border-neo-warning bg-neo-warning-bg text-neo-warning',
+  },
   danger: { icon: CircleAlert, className: 'bg-neo-danger-bg text-neo-danger' },
 }
 
@@ -34,7 +40,12 @@ function ResultCard({ outcome }: { outcome: ScanOutcome }) {
     <div className={`flex items-start gap-3 rounded-card p-4 ${tone.className}`}>
       <Icon aria-hidden className="mt-1 size-6 shrink-0" />
       <div className="min-w-0">
-        <p className="m-0 text-base font-bold">{outcome.headline}</p>
+        <p
+          className={`m-0 font-bold ${outcome.tone === 'warning' ? 'text-xl tracking-[0.04em] uppercase' : 'text-base'}`}
+        >
+          {outcome.headline}
+        </p>
+        {outcome.detail ? <p className="m-0 text-sm font-bold">{outcome.detail}</p> : null}
         {participant ? (
           <>
             <p className="m-0 text-2xl font-bold break-words text-neo-text">

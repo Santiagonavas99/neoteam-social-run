@@ -13,8 +13,9 @@ async function checkIn(code: string): Promise<ScanOutcome> {
     return { tone: 'danger', icon: CircleX, headline: 'Inscripción cancelada', participant }
   const at = participant.checkedInAt
   return {
-    tone: 'neutral',
-    headline: at ? `Ya hizo check-in a las ${formatTime(at)}` : 'Ya hizo check-in',
+    tone: 'warning',
+    headline: 'Ya hizo check-in',
+    detail: at ? `a las ${formatTime(at)}` : undefined,
     participant,
   }
 }

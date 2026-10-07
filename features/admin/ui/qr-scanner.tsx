@@ -3,7 +3,8 @@
 import { CircleAlert } from 'lucide-react'
 import { useEffect, useId, useRef, useState } from 'react'
 
-const REPEAT_WINDOW_MS = 5000
+// The camera reads the same QR several times a second; a deliberate second scan still gets through.
+const REPEAT_WINDOW_MS = 1500
 
 // Shared by check-in and the dynamics stands. html5-qrcode is loaded on mount so it
 // never reaches public pages, and the camera is released whenever the view unmounts.
