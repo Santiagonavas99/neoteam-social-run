@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-10-07
+
+### Added
+
+- **Registration asks for the category, Mujer or Hombre.** It is required, and the admin shows it in Participantes.
+- **Raffles by category.** A raffle can be for everyone, only women or only men, so two prizes can go one to each.
+- **"No repetir ganadores",** on by default: whoever already won another raffle or instant prize is left out.
+- **The draw confirmation says how many people take part** and which rules apply; it cannot be confirmed when nobody qualifies.
+- **Winners are revealed one at a time** with "Siguiente ganador", and completed raffles have **"Ver ganadores"**.
+- **"No está · sortear otro"** replaces an absent winner in the same place, without touching the other winners.
+- **Points ranking:** the top 10 runners by points from stands, checkpoints and challenges, at the top of Dinámicas.
+- **An "Activar" button on every draft dynamic.** Before, the only way was Editar → Estado.
+
 ## [0.14.1] - 2026-10-07
 
 ### Fixed
