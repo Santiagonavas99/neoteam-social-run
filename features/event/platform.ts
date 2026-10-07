@@ -6,5 +6,4 @@ export const isAndroidPlatform = (userAgent: string) => /Android/i.test(userAgen
 
 // iPadOS in desktop mode reports itself as Mac Safari, so the Safari rule covers it too.
 export const isApplePlatform = (userAgent: string) =>
-  isIOSPlatform(userAgent) ||
-  (/Safari/i.test(userAgent) && !OTHER_ENGINES.test(userAgent))
+  isIOSPlatform(userAgent) || (/Safari/i.test(userAgent) && !OTHER_ENGINES.test(userAgent))
