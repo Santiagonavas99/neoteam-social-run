@@ -1,4 +1,4 @@
-import type { DynamicStatus, DynamicType } from './types'
+import type { DynamicStatus, DynamicType, StaffRole } from './types'
 
 export const participantStates: Record<string, string> = {
   registered: 'Inscrito',
@@ -42,3 +42,8 @@ export const dynamicFormTypes: DynamicType[] = [
   'challenge',
   'instant_win',
 ]
+
+export const staffRoles: Record<StaffRole, string> = {
+  admin: 'Administrador',
+  checkin: 'Check-in',
+}

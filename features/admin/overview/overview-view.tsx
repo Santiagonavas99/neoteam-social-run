@@ -14,13 +14,7 @@ import { useAdminData } from '../ui/use-admin-data'
 
 type Overview = { metrics: Metrics | null; active: DynamicRow[] }
 
-export function OverviewView({
-  token,
-  navigate,
-}: {
-  token: string
-  navigate: (section: AdminSection) => void
-}) {
+export function OverviewView({ navigate }: { navigate: (section: AdminSection) => void }) {
   const [feedback, setFeedback] = useState<FeedbackValue>(null)
   const onError = useCallback(
     (error: unknown) => setFeedback({ kind: 'error', text: errorMessage(error) }),
@@ -28,14 +22,14 @@ export function OverviewView({
   )
   const load = useCallback(async (): Promise<Overview> => {
     const [summary, dynamics] = await Promise.all([
-      callAdmin('adminData', { token, resource: 'metrics', operation: 'list' }),
-      callAdmin('dynamicData', { token, operation: 'list' }),
+      callAdmin('adminData', { resource: 'metrics', operation: 'list' }),
+      callAdmin('dynamicData', { operation: 'list' }),
     ])
     return {
       metrics: summary.metrics ?? null,
       active: (dynamics.dynamicRows ?? []).filter((row) => row.status === 'open'),
     }
-  }, [token])
+  }, [])
   const { data, loading, reload } = useAdminData<Overview>(
     load,
     { metrics: null, active: [] },

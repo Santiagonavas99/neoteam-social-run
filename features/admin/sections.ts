@@ -3,12 +3,13 @@ import {
   GalleryHorizontal,
   LayoutDashboard,
   type LucideIcon,
-  ShieldCheck,
   Tag,
   UserCheck,
+  UserCog,
   Users,
   Zap,
 } from 'lucide-react'
+import type { StaffRole } from './types'
 
 export type AdminSection =
   | 'checkin'
@@ -18,7 +19,7 @@ export type AdminSection =
   | 'groups'
   | 'brands'
   | 'dynamics'
-  | 'security'
+  | 'team'
 
 export type AdminSectionGroup = 'event' | 'content' | 'account'
 
@@ -29,6 +30,8 @@ export type AdminSectionInfo = {
   icon: LucideIcon
   group: AdminSectionGroup
   primary?: true
+  /** Also open to check-in staff; every other section is admin only. */
+  staff?: true
 }
 
 export const sectionGroups: { id: AdminSectionGroup; label: string }[] = [
@@ -52,6 +55,7 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     icon: UserCheck,
     group: 'event',
     primary: true,
+    staff: true,
   },
   {
     id: 'participants',
@@ -91,13 +95,17 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     group: 'content',
   },
   {
-    id: 'security',
-    label: 'Seguridad',
-    description: 'Administra el acceso al panel del evento.',
-    icon: ShieldCheck,
+    id: 'team',
+    label: 'Equipo',
+    description: 'Quién entra al panel y qué puede hacer.',
+    icon: UserCog,
     group: 'account',
   },
 ]
+
+export function sectionsFor(role: StaffRole) {
+  return adminSections.filter((section) => role === 'admin' || section.staff)
+}
 
 export function sectionInfo(id: AdminSection) {
   return adminSections.find((section) => section.id === id) ?? adminSections[0]

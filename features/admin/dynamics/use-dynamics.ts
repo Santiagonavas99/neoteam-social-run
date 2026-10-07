@@ -11,7 +11,7 @@ export type DynamicConfirmation =
 const draftsDeleted = (count: number) =>
   count === 1 ? '1 borrador eliminado.' : `${count} borradores eliminados.`
 
-export function useDynamics(token: string) {
+export function useDynamics() {
   const [feedback, setFeedback] = useState<FeedbackValue>(null)
   const [busy, setBusy] = useState(false)
   const [editor, setEditor] = useState<DynamicRow | null>(null)
@@ -22,8 +22,8 @@ export function useDynamics(token: string) {
     [],
   )
   const load = useCallback(
-    async () => (await callAdmin('dynamicData', { token, operation: 'list' })).dynamicRows ?? [],
-    [token],
+    async () => (await callAdmin('dynamicData', { operation: 'list' })).dynamicRows ?? [],
+    [],
   )
   const { data: rows, loading, reload } = useAdminData(load, [], onError)
 
@@ -35,7 +35,7 @@ export function useDynamics(token: string) {
 
   async function save(row: DynamicRow) {
     const { id: _id, ...created } = row
-    await callAdmin('dynamicData', { token, operation: 'save', values: isNew(row) ? created : row })
+    await callAdmin('dynamicData', { operation: 'save', values: isNew(row) ? created : row })
     setEditor(null)
     setFeedback({ kind: 'success', text: 'Dinámica guardada.' })
     await reload()
@@ -47,11 +47,11 @@ export function useDynamics(token: string) {
     setFeedback(null)
     try {
       if (confirmation.action === 'deleteDrafts') {
-        const result = await callAdmin('dynamicData', { token, operation: 'deleteDrafts' })
+        const result = await callAdmin('dynamicData', { operation: 'deleteDrafts' })
         setFeedback({ kind: 'success', text: draftsDeleted(result.deleted ?? 0) })
       } else {
         const { row, action } = confirmation
-        const result = await callAdmin('dynamicData', { token, operation: action, id: row.id })
+        const result = await callAdmin('dynamicData', { operation: action, id: row.id })
         if (action === 'draw') setWinners({ name: row.name, list: result.winnerDetails ?? [] })
         else setFeedback({ kind: 'success', text: 'Dinámica eliminada.' })
       }

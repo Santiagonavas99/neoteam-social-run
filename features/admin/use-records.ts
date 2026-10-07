@@ -6,7 +6,7 @@ import { useAdminData } from './ui/use-admin-data'
 
 export type Confirmation<Row> = { row: Row; action: 'delete' }
 
-export function useRecords<Row extends { id: string }>(resource: Resource, token: string) {
+export function useRecords<Row extends { id: string }>(resource: Resource) {
   const [feedback, setFeedback] = useState<FeedbackValue>(null)
   const [busy, setBusy] = useState<string | null>(null)
   const [editor, setEditor] = useState<Row | null>(null)
@@ -16,9 +16,8 @@ export function useRecords<Row extends { id: string }>(resource: Resource, token
     [],
   )
   const load = useCallback(
-    async () =>
-      (await callAdmin<Row>('adminData', { token, resource, operation: 'list' })).rows ?? [],
-    [token, resource],
+    async () => (await callAdmin<Row>('adminData', { resource, operation: 'list' })).rows ?? [],
+    [resource],
   )
   const { data: rows, setData: setRows, loading, reload } = useAdminData(load, [], onError)
 
@@ -30,7 +29,6 @@ export function useRecords<Row extends { id: string }>(resource: Resource, token
   async function save(row: Row) {
     const { id: _id, ...created } = row
     await callAdmin('adminData', {
-      token,
       resource,
       operation: 'save',
       values: isNew(row) ? created : row,
@@ -46,7 +44,6 @@ export function useRecords<Row extends { id: string }>(resource: Resource, token
     setFeedback(null)
     try {
       await callAdmin('adminData', {
-        token,
         resource,
         operation: confirmation.action,
         id: confirmation.row.id,

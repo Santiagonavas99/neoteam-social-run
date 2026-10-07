@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-06
+
+### Added
+
+- **Staff accounts with roles.** Admins see the whole panel; check-in staff see only the scanner.
+- **Sign in with a code sent by email.** Enter your email, type the 6-digit code that arrives (valid for 10 minutes), and the device stays signed in for 30 days.
+- **Equipo screen** for admins to add staff by email, change their role or turn off their access. Each change signs that person out.
+- **Light, dark and system theme on the public site,** from the button next to "Registrarme".
+- **Sections fade in as you scroll** on the home page, unless the device asks for reduced motion.
+- **"Creado por Landak Studio"** credit in the footer.
+
+### Changed
+
+- **The shared PIN is gone.** Everyone signs in again with their own email after the update.
+- **Logo strip:** bigger white tiles, logos in their own colours, and it pauses when touched or hovered.
+- **The agenda is a timeline** and takes less than half the height on phones.
+- **Community section:** groups and brands sit side by side when there are few.
+- **Footer** gains links to Registro, Mi pase and Agenda.
+
+### Removed
+
+- **The PIN, the first-access setup screen and the Seguridad section** of the panel.
+
+### Security
+
+- **The panel session lives in an httpOnly cookie,** out of reach of page scripts, instead of the browser's local storage.
+
+### Fixed
+
+- **The home's community section** (running groups and brands) shows again.
+- **Spelling and capitalization fixes** across the home page.
+
 ## [0.8.0] - 2026-10-06
 
 ### Added

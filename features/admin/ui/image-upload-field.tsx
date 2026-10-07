@@ -18,12 +18,10 @@ function readFileAsBase64(file: File) {
 }
 
 export function useImageUpload({
-  token,
   successText,
   onUploaded,
   setFeedback,
 }: {
-  token: string
   successText: string
   onUploaded: (url: string) => void
   setFeedback: (value: FeedbackValue) => void
@@ -43,7 +41,7 @@ export function useImageUpload({
     setFeedback(null)
     try {
       const content = await readFileAsBase64(file)
-      const result = await callAdmin('uploadAdminImage', { token, mime: file.type, content })
+      const result = await callAdmin('uploadAdminImage', { mime: file.type, content })
       if (!result.url) throw new Error('No pudimos obtener la imagen subida.')
       onUploaded(result.url)
       setFeedback({ kind: 'success', text: successText })

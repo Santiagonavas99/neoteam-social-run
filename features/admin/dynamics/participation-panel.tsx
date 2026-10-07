@@ -6,9 +6,8 @@ import type { DynamicRow } from '../types'
 import { type ScanOutcome, ScanStation } from '../ui/scan-station'
 import { useReveal } from '../ui/use-reveal'
 
-async function complete(token: string, dynamic: DynamicRow, code: string): Promise<ScanOutcome> {
+async function complete(dynamic: DynamicRow, code: string): Promise<ScanOutcome> {
   const result = await callAdmin('dynamicData', {
-    token,
     operation: 'complete',
     id: dynamic.id,
     code,
@@ -39,11 +38,9 @@ async function complete(token: string, dynamic: DynamicRow, code: string): Promi
 }
 
 export function ParticipationPanel({
-  token,
   dynamic,
   onClose,
 }: {
-  token: string
   dynamic: DynamicRow
   onClose: () => void
 }) {
@@ -56,7 +53,7 @@ export function ParticipationPanel({
     >
       <ScanStation
         inputId={`participation-code-${dynamic.id}`}
-        onCode={(code) => complete(token, dynamic, code)}
+        onCode={(code) => complete(dynamic, code)}
       />
       <button
         type="button"

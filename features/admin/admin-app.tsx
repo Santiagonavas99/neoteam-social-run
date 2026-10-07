@@ -9,33 +9,39 @@ import { DynamicsView } from './dynamics/dynamics-view'
 import { LogosView } from './logos/logos-view'
 import { OverviewView } from './overview/overview-view'
 import { ParticipantsView } from './participants/participants-view'
-import type { AdminSection } from './sections'
-import { ChangePinForm } from './security/change-pin-form'
+import { type AdminSection, sectionsFor } from './sections'
 import { AdminShell } from './shell/admin-shell'
+import { TeamView } from './team/team-view'
 
 export function AdminApp() {
   const session = useAdminSession()
-  const [section, setSection] = useState<AdminSection>('metrics')
+  const [picked, setSection] = useState<AdminSection | null>(null)
 
-  if (!session.ready || !session.token) return <AuthScreen session={session} />
-  const token = session.token
+  if (!session.ready || !session.signedIn) return <AuthScreen session={session} />
+  const allowed = sectionsFor(session.role)
+  const section = allowed.find((item) => item.id === picked)?.id ?? allowed[0]?.id ?? 'checkin'
 
   return (
-    <AdminShell section={section} onNavigate={setSection} onSignOut={() => void session.signOut()}>
+    <AdminShell
+      sections={allowed}
+      section={section}
+      onNavigate={setSection}
+      onSignOut={() => void session.signOut()}
+    >
       {section === 'checkin' ? (
-        <CheckinView token={token} />
+        <CheckinView />
       ) : section === 'logos' ? (
-        <LogosView token={token} />
-      ) : section === 'security' ? (
-        <ChangePinForm token={token} onToken={session.remember} />
+        <LogosView />
+      ) : section === 'team' ? (
+        <TeamView />
       ) : section === 'participants' ? (
-        <ParticipantsView token={token} />
+        <ParticipantsView />
       ) : section === 'groups' || section === 'brands' ? (
-        <CommunityView key={section} resource={section} token={token} />
+        <CommunityView key={section} resource={section} />
       ) : section === 'dynamics' ? (
-        <DynamicsView token={token} />
+        <DynamicsView />
       ) : (
-        <OverviewView token={token} navigate={setSection} />
+        <OverviewView navigate={setSection} />
       )}
     </AdminShell>
   )

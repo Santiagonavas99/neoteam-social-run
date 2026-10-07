@@ -91,12 +91,21 @@ export type ScannedParticipant = {
 
 export type CheckinResult = 'checkedIn' | 'alreadyCheckedIn' | 'cancelled'
 
+export type StaffRole = 'admin' | 'checkin'
+
+export type StaffUser = {
+  id: string
+  name: string
+  email: string
+  role: StaffRole
+  active: boolean
+}
+
 export type AdminResponse<Row = unknown> = {
   ok?: boolean
-  configured?: boolean
-  setupSecretReady?: boolean
+  role?: StaffRole
+  name?: string
   valid?: boolean
-  token?: string
   expiresAt?: string
   rows?: Row[]
   metrics?: Metrics

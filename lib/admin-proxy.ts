@@ -51,6 +51,22 @@ export async function parseAdminBody(request: Request): Promise<Record<string, u
 
 const noStore = { 'Cache-Control': 'no-store' }
 
+export const SESSION_COOKIE = 'neoteam_admin_session'
+const SESSION_MAX_AGE = 30 * 24 * 60 * 60
+
+// httpOnly keeps the token away from page scripts; Path limits it to the admin API routes.
+export function sessionCookie(token: string | null) {
+  return `${SESSION_COOKIE}=${token ?? ''}; HttpOnly; Secure; SameSite=Strict; Path=/api/admin; Max-Age=${token ? SESSION_MAX_AGE : 0}`
+}
+
+export function readSessionCookie(request: Pick<Request, 'headers'>) {
+  for (const part of (request.headers.get('cookie') ?? '').split(';')) {
+    const [name, ...value] = part.trim().split('=')
+    if (name === SESSION_COOKIE) return value.join('=')
+  }
+  return ''
+}
+
 export function supabaseEndpoint(env: ProxyEnv) {
   return {
     url: (env.SUPABASE_URL?.trim() || env.NEXT_PUBLIC_SUPABASE_URL?.trim())?.replace(/\/$/, ''),
@@ -87,6 +103,11 @@ export async function proxyToEdgeFunction(
     )
   }
 
+  // The browser never holds the token: whatever it sent is replaced by the cookie's value.
+  const token = readSessionCookie(request)
+  if (token) body.token = token
+  else delete body.token
+
   try {
     const response = await fetch(`${url}/functions/v1/${functionName}`, {
       method: 'POST',
@@ -101,7 +122,16 @@ export async function proxyToEdgeFunction(
       return Response.json({ error: connectionError }, { status: 502, headers: noStore })
     }
     const data: unknown = await response.json()
-    return Response.json(data, { status: response.status, headers: noStore })
+    const headers = new Headers(noStore)
+    let payload = data
+    if (isRecord(data) && typeof data.token === 'string') {
+      const { token: issued, ...rest } = data
+      payload = rest
+      headers.append('Set-Cookie', sessionCookie(issued))
+    } else if (body.action === 'logout' || (isRecord(data) && data.valid === false)) {
+      headers.append('Set-Cookie', sessionCookie(null))
+    }
+    return Response.json(payload, { status: response.status, headers })
   } catch {
     console.error(`${log} upstream request failed`)
     return Response.json({ error: connectionError }, { status: 502, headers: noStore })

@@ -1,0 +1,17 @@
+export function normalizeCode(value: string) {
+  return value.replace(/\D/g, '').slice(0, 6)
+}
+
+export function isCode(value: string) {
+  return /^\d{6}$/.test(value)
+}
+
+// Keep in sync with cleanEmail in supabase/functions/_shared/otp.ts and the admin_users check.
+export function normalizeEmail(value: string) {
+  return value.trim().toLowerCase()
+}
+
+export function isEmail(value: string) {
+  const email = normalizeEmail(value)
+  return email.length <= 160 && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)
+}
