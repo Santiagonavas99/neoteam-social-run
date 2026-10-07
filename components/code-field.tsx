@@ -5,11 +5,13 @@ const SLOTS = [0, 1, 2, 3, 4, 5]
 // One real input under six painted boxes: paste, SMS/email autofill and screen readers see a single field.
 export function CodeField({
   label,
+  name,
   value,
   onChange,
   autoFocus = false,
 }: {
   label: string
+  name?: string
   value: string
   onChange: (value: string) => void
   autoFocus?: boolean
@@ -22,6 +24,7 @@ export function CodeField({
         <input
           className="absolute inset-0 z-10 size-full! cursor-text opacity-0"
           type="text"
+          name={name}
           value={value}
           onChange={(e) => onChange(normalizeCode(e.target.value))}
           inputMode="numeric"
@@ -30,6 +33,7 @@ export function CodeField({
           maxLength={6}
           pattern="[0-9]{6}"
           required
+          // biome-ignore lint/a11y/noAutofocus: opt-in for the admin sign-in, where the code is the next and only field
           autoFocus={autoFocus}
         />
         <span aria-hidden className="grid grid-cols-6 gap-2">

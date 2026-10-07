@@ -1,7 +1,7 @@
 'use server'
 
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { claimPass, type Pass } from './pass'
+import { type Pass, registeredPass } from './pass'
 import { registrationSchema } from './schema'
 
 export type RegistrationState = {
@@ -68,8 +68,8 @@ export async function registerParticipant(
     }
 
     const code = data as string
-    // The registration is already saved; a failed claim only hides the QR, recoverable at /pase.
-    const pass = await claimPass({
+    // The registration is already saved; a failed lookup only hides the QR, recoverable at /pase.
+    const pass = await registeredPass({
       code,
       documentNumber: parsed.data.documentNumber,
       email: parsed.data.email.toLowerCase(),
