@@ -254,7 +254,9 @@
 }
 .v2-number {
   display: grid;
+  justify-items: center;
   gap: var(--space-2);
+  text-align: center;
 }
 .v2-number strong {
   font-size: 96px;

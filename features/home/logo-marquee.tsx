@@ -123,7 +123,7 @@ export function LogoMarquee({
         <div
           className={
             shouldAnimate
-              ? 'flex w-max animate-marquee group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-reduce:animate-none'
+              ? 'flex w-max animate-marquee group-has-[:focus-visible]:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-reduce:animate-none'
               : 'flex w-full justify-center'
           }
           style={{ animationDuration: `${repeatedItems.length * 5}s` }}
