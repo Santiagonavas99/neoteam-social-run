@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-10-07
+
+### Added
+
+- **Hide or show individual Home sections from the admin panel.** Hidden sections keep their saved position, so they can be restored later without reorganizing the page.
+
 ## [0.21.0] - 2026-10-07
 
 ### Added
