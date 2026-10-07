@@ -504,6 +504,22 @@
   .v2-raffle-side {
     min-height: 360px;
   }
+  .v2-final-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .v2-final-main {
+    width: 100%;
+  }
+  .v2-final-main h2 {
+    width: 100%;
+    margin-inline: auto;
+    text-align: center;
+  }
+  .v2-meeting {
+    grid-column: 1;
+    width: 100%;
+  }
 }
 @media (max-width: 760px) {
   .home-v2 .shell,
