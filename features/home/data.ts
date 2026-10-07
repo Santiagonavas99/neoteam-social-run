@@ -9,7 +9,10 @@ export type HomeLogoCarouselItem = {
   name: string
   logo_url: string
   link_url: string | null
+  active: boolean
   sort_order: number
+  show_in_running_crews: boolean
+  show_in_organizations: boolean
 }
 
 export async function getHomeLogoCarouselItems(): Promise<HomeLogoCarouselItem[]> {
@@ -17,7 +20,9 @@ export async function getHomeLogoCarouselItems(): Promise<HomeLogoCarouselItem[]
     const supabase = createServerSupabaseClient()
     const { data, error } = await supabase
       .from('home_logo_carousel_items')
-      .select('id,name,logo_url,link_url,sort_order')
+      .select(
+        'id,name,logo_url,link_url,active,sort_order,show_in_running_crews,show_in_organizations',
+      )
       .eq('event_code', 'SR26')
       .eq('active', true)
       .order('sort_order', { ascending: true })
@@ -38,6 +43,7 @@ export type CommunityLogo = {
   type?: string
   instagram?: string | null
   website?: string | null
+  sort_order?: number
 }
 
 export async function getHomeCommunity() {

@@ -34,8 +34,8 @@ export default async function Home() {
       <Story />
       <Numbers registered={registered} brands={logoItems.length} />
       <LogoMarquee items={logoItems} />
-      <LogoMarquee items={runningCrewMarqueeItems(community.groups)} title="Running crews" />
-      <LogoMarquee items={organizationMarqueeItems(community.brands)} title="Organizaciones" />
+      <LogoMarquee items={runningCrewMarqueeItems(community.groups, logoItems)} title="Running crews" />
+      <LogoMarquee items={organizationMarqueeItems(community.brands, logoItems)} title="Organizaciones" />
       <Agenda />
       <Community brands={otherBrands} />
       <Raffle />
