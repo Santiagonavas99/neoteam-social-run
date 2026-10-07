@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { RUNNING_GROUP_VALUES } from './running-groups'
+import { RUNNING_GROUP_VALUES } from './running-groups.ts'
 
 // Phone autofill on iOS and Android fills "+57 300 123 4567"; keep the 10 national digits.
 const phoneSchema = z
