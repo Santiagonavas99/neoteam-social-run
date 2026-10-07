@@ -405,6 +405,46 @@
 .v2-final-main .button {
   min-width: 200px;
 }
+.v2-final-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.v2-meeting {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-12);
+}
+.v2-meeting .section-label {
+  color: var(--neo-accent-text);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+.v2-meeting h3 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.v2-meeting iframe {
+  width: 100%;
+  height: 240px;
+  border: 1px solid var(--neo-border);
+  border-radius: var(--radius-card);
+  background: var(--neo-surface);
+}
+@media (min-width: 768px) {
+  .v2-final-actions {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .v2-meeting {
+    grid-column: 2;
+  }
+  .v2-meeting iframe {
+    height: 320px;
+  }
+}
 .home-v2 .footer {
   background: var(--neo-bg);
 }
