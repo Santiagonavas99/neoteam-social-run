@@ -45,9 +45,7 @@ export default async function Home() {
       case 'story':
         return <Story key={section_key} index={index} />
       case 'numbers':
-        return (
-          <Numbers key={section_key} registered={registered} brands={logoItems.length} />
-        )
+        return <Numbers key={section_key} registered={registered} brands={logoItems.length} />
       case 'allies':
         return <LogoMarquee key={section_key} items={logoItems} />
       case 'running_crews':
@@ -74,6 +72,8 @@ export default async function Home() {
         return <Raffle key={section_key} index={index} />
       case 'final':
         return <Final key={section_key} index={index} />
+      default:
+        return null
     }
   })
 
