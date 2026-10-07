@@ -1,8 +1,9 @@
 import { headers } from 'next/headers'
+import { isApplePlatform } from '@/features/event/platform'
 import { callEdgeFunction } from '@/lib/edge-function'
 import { googleWalletConfig } from './google-wallet'
 import { passQrDataUrl } from './qr'
-import { googleWalletPath, isAppleMobile } from './wallet'
+import { googleWalletPath } from './wallet'
 
 export type Pass = {
   code: string
@@ -43,7 +44,7 @@ async function toPass(data: PassData | null): Promise<Pass | null> {
     emailed: data.emailed,
   }
   const userAgent = (await headers()).get('user-agent') ?? ''
-  if (googleWalletConfig(process.env) && !isAppleMobile(userAgent)) {
+  if (googleWalletConfig(process.env) && !isApplePlatform(userAgent)) {
     pass.googleWalletUrl = googleWalletPath(data.checkinToken)
   }
   return pass

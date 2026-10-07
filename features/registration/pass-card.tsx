@@ -1,4 +1,5 @@
-import { Wallet } from 'lucide-react'
+import Image from 'next/image'
+import googleWalletButton from './google-wallet-button.svg'
 import type { Pass } from './pass'
 
 export function PassCard({ pass }: { pass: Pass }) {
@@ -17,13 +18,9 @@ export function PassCard({ pass }: { pass: Pass }) {
         {pass.code}
       </p>
       {pass.googleWalletUrl ? (
-        <a
-          href={pass.googleWalletUrl}
-          className="mt-2 inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-control border border-neo-text bg-neo-text px-5 py-3 transition-colors hover:border-neo-accent-dark hover:bg-neo-accent-dark md:max-w-80"
-        >
-          {/* Global `a { color: inherit }` beats utilities on the link itself. */}
-          <Wallet aria-hidden className="size-4 shrink-0 text-neo-surface" />
-          <span className="text-[13px] font-bold text-neo-surface">Añadir a Google Wallet</span>
+        <a href={pass.googleWalletUrl} className="mt-2 inline-flex rounded-full">
+          {/* Google's official badge, unchanged, per the Wallet brand guidelines. */}
+          <Image src={googleWalletButton} alt="Agregar a la Billetera de Google" unoptimized />
         </a>
       ) : null}
       <p className="m-0 text-sm leading-normal text-neo-text-secondary">
