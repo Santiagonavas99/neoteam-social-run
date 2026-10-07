@@ -13,7 +13,7 @@ The public Home has a dedicated logo marquee for allied brands. Running crews an
 1. Keep the three separate strips: “Marcas aliadas”, “Running crews”, and “Organizaciones”, with the same card treatment, marquee motion, pause behavior, links, and reduced-motion fallback.
 2. Native crews continue to come from `running_groups`; native organizations continue to come from `brands` where `type = 'organizer'`. Their existing active, home visibility, ordering, and logo controls remain available.
 3. Add two independent inclusion flags to existing allied logo carousel items. From “Marcas aliadas” admin, an entry can be included in the Running crews strip, Organizations strip, both, or neither.
-4. Reuse the allied entry's existing logo, name, and link details. Require its existing active and show-on-home settings as well as the relevant inclusion flag for it to appear in a community strip.
+4. Reuse the allied entry's existing logo, name, and link details. Its existing `active` control and the relevant inclusion flag determine whether it appears in a community strip.
 5. Extra crew-only entries remain creatable in “Running crews”; extra organization-only entries remain creatable in “Marcas” with type “Organizador”. Those records do not become allied brands.
 6. Merge sources server-side, preserve deterministic ordering, and deduplicate a reused ally against a matching native record within each strip, preferring the native record's tile when matched.
 7. Keep sponsors and partners in the lower community content; crews and organizers are removed from those lower panels to avoid repeating the same presentation.
