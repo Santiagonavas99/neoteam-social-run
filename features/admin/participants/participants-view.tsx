@@ -188,7 +188,7 @@ export function ParticipantsView() {
                         <dd className="m-0 text-neo-text">{row.phone}</dd>
                         <dt className="text-neo-text-secondary">Talla</dt>
                         <dd className="m-0 text-neo-text">{row.shirt_size || '—'}</dd>
-                        <dt className="text-neo-text-secondary">Categoría</dt>
+                        <dt className="text-neo-text-secondary">Género</dt>
                         <dd className="m-0 text-neo-text">
                           {(row.gender && genderLabels[row.gender]) || '—'}
                         </dd>

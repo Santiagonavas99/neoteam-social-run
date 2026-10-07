@@ -18,7 +18,7 @@ export const registrationSchema = z
     email: z.email('Escribe un correo válido.').max(160),
     phone: phoneSchema,
     birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Selecciona tu fecha de nacimiento.'),
-    gender: z.enum(['female', 'male'], { error: 'Selecciona tu categoría.' }),
+    gender: z.enum(['female', 'male'], { error: 'Selecciona tu género.' }),
     runningGroup: z.enum(['neoteam', 'independiente', 'otro']),
     otherRunningGroup: z.string().trim().max(120).optional(),
     emergencyName: z.string().trim().min(2, 'Escribe el contacto de emergencia.').max(120),
