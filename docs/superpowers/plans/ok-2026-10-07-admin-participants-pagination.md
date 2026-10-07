@@ -6,7 +6,7 @@ Branch: `feat/admin-participants-pagination`
 
 Status: **approved 2026-10-07**.
 
-Release: next available minor version because this adds new admin behavior. Determine the final version from `main` immediately before implementation/rebase.
+Release: `0.27.0` based on the current `0.26.3` main baseline. Rebase/version again only if another minor release lands first.
 
 ## 1. Server-side participant paging
 
@@ -16,7 +16,7 @@ Files:
 
 Changes:
 - special-case `participants / list`;
-- accept page, query and status;
+- accept page, query and status only when the client opts in with `paginated: true`, preserving the current production client;
 - fixed page size 25;
 - query only the requested range;
 - return exact filtered count plus global SR26 status counts;
