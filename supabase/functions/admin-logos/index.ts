@@ -64,7 +64,9 @@ Deno.serve(async (req: Request) => {
     if (action === 'list') {
       const { data, error } = await supabase
         .from('home_logo_carousel_items')
-        .select('id,event_code,name,logo_url,link_url,active,sort_order,created_at,updated_at')
+        .select(
+          'id,event_code,name,logo_url,link_url,active,sort_order,show_in_running_crews,show_in_organizations,created_at,updated_at',
+        )
         .eq('event_code', 'SR26')
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: true })
@@ -92,6 +94,8 @@ Deno.serve(async (req: Request) => {
         link_url: linkUrl || null,
         active: values.active !== false,
         sort_order: Number.isFinite(Number(values.sort_order)) ? Number(values.sort_order) : 0,
+        show_in_running_crews: values.show_in_running_crews === true,
+        show_in_organizations: values.show_in_organizations === true,
         updated_at: new Date().toISOString(),
       }
 

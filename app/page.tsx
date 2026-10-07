@@ -1,5 +1,9 @@
 import { Footer } from '@/components/footer'
 import {
+  organizationMarqueeItems,
+  runningCrewMarqueeItems,
+} from '@/features/home/community-marquees'
+import {
   getHomeCommunity,
   getHomeLogoCarouselItems,
   getRegisteredCount,
@@ -22,14 +26,24 @@ export default async function Home() {
     getRegisteredCount(),
   ])
 
+  const otherBrands = community.brands.filter((brand) => brand.type !== 'organizer')
+
   return (
     <main className="home-v2">
       <Hero />
       <Story />
       <Numbers registered={registered} brands={logoItems.length} />
       <LogoMarquee items={logoItems} />
+      <LogoMarquee
+        items={runningCrewMarqueeItems(community.groups, logoItems)}
+        title="Running crews"
+      />
+      <LogoMarquee
+        items={organizationMarqueeItems(community.brands, logoItems)}
+        title="Organizaciones"
+      />
       <Agenda />
-      <Community community={community} />
+      <Community brands={otherBrands} />
       <Raffle />
       <Final />
       <Footer />

@@ -9,22 +9,44 @@ export type HomeLogoCarouselItem = {
   name: string
   logo_url: string
   link_url: string | null
+  active: boolean
   sort_order: number
+  show_in_running_crews: boolean
+  show_in_organizations: boolean
 }
 
 export async function getHomeLogoCarouselItems(): Promise<HomeLogoCarouselItem[]> {
   try {
     const supabase = createServerSupabaseClient()
-    const { data, error } = await supabase
-      .from('home_logo_carousel_items')
-      .select('id,name,logo_url,link_url,sort_order')
-      .eq('event_code', 'SR26')
-      .eq('active', true)
-      .order('sort_order', { ascending: true })
-      .order('created_at', { ascending: true })
+    const baseColumns = 'id,name,logo_url,link_url,active,sort_order'
+    const query = (columns: string) =>
+      supabase
+        .from('home_logo_carousel_items')
+        .select(columns)
+        .eq('event_code', 'SR26')
+        .eq('active', true)
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: true })
+
+    let { data, error } = await query(`${baseColumns},show_in_running_crews,show_in_organizations`)
+
+    // Keep existing allies visible while the optional reuse migration is pending.
+    if (
+      error &&
+      ['42703', 'PGRST204'].includes(error.code) &&
+      /show_in_running_crews|show_in_organizations/.test(error.message)
+    ) {
+      const fallback = await query(baseColumns)
+      data = fallback.data
+      error = fallback.error
+    }
 
     if (error) throw error
-    return (data ?? []) as HomeLogoCarouselItem[]
+    return ((data ?? []) as unknown as HomeLogoCarouselItem[]).map((item) => ({
+      ...item,
+      show_in_running_crews: item.show_in_running_crews === true,
+      show_in_organizations: item.show_in_organizations === true,
+    }))
   } catch (error) {
     console.error('Home logo carousel fallback', errorText(error))
     return []
@@ -38,6 +60,7 @@ export type CommunityLogo = {
   type?: string
   instagram?: string | null
   website?: string | null
+  sort_order?: number
 }
 
 export async function getHomeCommunity() {
@@ -46,13 +69,13 @@ export async function getHomeCommunity() {
     const [groups, brands] = await Promise.all([
       supabase
         .from('running_groups')
-        .select('id,name,logo_url,instagram')
+        .select('id,name,logo_url,instagram,sort_order')
         .eq('active', true)
         .eq('show_on_home', true)
         .order('sort_order', { ascending: true }),
       supabase
         .from('brands')
-        .select('id,name,logo_url,type,instagram,website')
+        .select('id,name,logo_url,type,instagram,website,sort_order')
         .eq('active', true)
         .eq('show_on_home', true)
         .order('sort_order', { ascending: true }),

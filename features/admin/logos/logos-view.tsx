@@ -40,6 +40,8 @@ export function LogosView() {
       link_url: '',
       active: true,
       sort_order: rows.length,
+      show_in_running_crews: false,
+      show_in_organizations: false,
     })
   }
 
@@ -54,6 +56,8 @@ export function LogosView() {
           link_url: values.link_url || null,
           active: values.active,
           sort_order: values.sort_order,
+          show_in_running_crews: values.show_in_running_crews,
+          show_in_organizations: values.show_in_organizations,
           ...(isNew(values) ? {} : { id: values.id }),
         },
       })

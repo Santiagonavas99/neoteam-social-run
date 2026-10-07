@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-10-07
+
+### Fixed
+
+- Keep Marcas aliadas visible when the optional community reuse columns have not been migrated yet.
+
+### Added
+
+- **Reuse allied logos across the Home community marquees.** Choose from “Marcas aliadas” whether each logo also appears in Running crews, Organizaciones, or both; extra crews and organizations remain managed in their own sections.
+
+## [0.17.0] - 2026-10-07
+
+### Added
+
+- **Dedicated Home logo marquees for running crews and organizations.** Active records marked “Mostrar en página” now appear in their own strips. Crews are managed in Running crews; organizations use the Organizador type in Marcas.
+- **Name tiles for records without a logo.** Community strips remain visible and usable while a logo is added.
+
+
 ## [0.16.0] - 2026-10-07
 
 ### Added

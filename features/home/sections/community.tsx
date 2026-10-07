@@ -1,19 +1,13 @@
 import { CommunityCarousel } from '../community-carousel'
 import type { CommunityLogo } from '../data'
 
-export function Community({
-  community,
-}: {
-  community: { groups: CommunityLogo[]; brands: CommunityLogo[] }
-}) {
-  const organizers = community.brands.filter((brand) => brand.type === 'organizer')
-  const sponsors = community.brands.filter((brand) => brand.type === 'sponsor')
-  const partners = community.brands.filter(
+export function Community({ brands }: { brands: CommunityLogo[] }) {
+  const sponsors = brands.filter((brand) => brand.type === 'sponsor')
+  const partners = brands.filter(
     (brand) => brand.type === 'main_partner' || brand.type === 'invited',
   )
 
-  if (!community.groups.length && !organizers.length && !sponsors.length && !partners.length)
-    return null
+  if (!sponsors.length && !partners.length) return null
 
   return (
     <section className="v2-community" id="invitados">
@@ -26,22 +20,11 @@ export function Community({
             ACOMPAÑADOS.
           </h2>
           <p>
-            Crews, marcas y aliados que hacen que el encuentro sea más grande que solo cinco
-            kilómetros.
+            Marcas y aliados que hacen que el encuentro sea más grande que solo cinco kilómetros.
           </p>
         </header>
 
         <div className="logo-panels reveal">
-          <CommunityCarousel
-            items={community.groups}
-            title="RUNNING CREWS"
-            description="Comunidades que se suman"
-          />
-          <CommunityCarousel
-            items={organizers}
-            title="ORGANIZACIÓN"
-            description="Quienes hacen posible este encuentro"
-          />
           <CommunityCarousel
             items={sponsors}
             title="MARCAS"

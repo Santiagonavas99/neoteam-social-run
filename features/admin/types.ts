@@ -40,6 +40,8 @@ export type LogoItem = {
   link_url?: string | null
   active: boolean
   sort_order: number
+  show_in_running_crews: boolean
+  show_in_organizations: boolean
 }
 
 export type Metrics = {
