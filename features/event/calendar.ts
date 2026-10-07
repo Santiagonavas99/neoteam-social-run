@@ -1,4 +1,5 @@
 import { eventConfig } from './event.ts'
+import { isApplePlatform } from './platform.ts'
 
 const TITLE = `NeoTeam ${eventConfig.name}`
 const DETAILS = `${eventConfig.reason}. ${eventConfig.route}. Tu pase: ${eventConfig.url}/pase`
@@ -56,3 +57,7 @@ export function eventIcs(now = new Date()) {
     .join('\r\n')
     .concat('\r\n')
 }
+
+// Apple opens the same-site .ics in Calendar; everyone else gets Google Calendar.
+export const calendarUrlFor = (userAgent: string) =>
+  isApplePlatform(userAgent) ? '/evento.ics' : googleCalendarUrl()

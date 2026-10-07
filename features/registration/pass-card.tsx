@@ -2,6 +2,7 @@ import { CalendarDays, Clock, ImageDown, MapPin } from 'lucide-react'
 import Image from 'next/image'
 import { NeoTeamLogo } from '@/components/neoteam-logo'
 import { passFacts } from '@/features/event/pass-facts'
+import { CalendarButton } from './calendar-button'
 import googleWalletButton from './google-wallet-button.svg'
 import type { Pass } from './pass'
 
@@ -13,6 +14,7 @@ const notch = 'absolute top-1/2 size-5 -translate-y-1/2 rounded-full bg-neo-surf
 export function PassCard({ pass }: { pass: Pass }) {
   return (
     <div className="mt-6 flex flex-col items-center gap-3 text-center">
+      <CalendarButton href={pass.calendarUrl} />
       <article
         aria-label={`Pase ${pass.code}`}
         className="relative w-full max-w-90 overflow-clip rounded-card bg-neo-black text-neo-white [--neo-brand-cyan:var(--neo-accent)]"
