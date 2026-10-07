@@ -206,6 +206,10 @@ fieldset {
 .site-header {
   --neo-brand-cyan: var(--neo-accent);
 }
+/* The header is black in both themes. */
+.site-header .brand {
+  color: var(--neo-white);
+}
 .button {
   min-height: 48px;
   display: inline-flex;
