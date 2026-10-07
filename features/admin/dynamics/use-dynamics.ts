@@ -1,7 +1,13 @@
 import { useCallback, useState } from 'react'
 import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
-import { type DynamicRow, type FeedbackValue, isNew, type ScannedParticipant } from '../types'
+import {
+  type DynamicRow,
+  type FeedbackValue,
+  isNew,
+  type RankedRunner,
+  type ScannedParticipant,
+} from '../types'
 import { useAdminData } from '../ui/use-admin-data'
 
 export type DynamicConfirmation =
@@ -25,10 +31,12 @@ export function useDynamics() {
     (error: unknown) => setFeedback({ kind: 'error', text: errorMessage(error) }),
     [],
   )
-  const load = useCallback(
-    async () => (await callAdmin('dynamicData', { operation: 'list' })).dynamicRows ?? [],
-    [],
-  )
+  const [ranking, setRanking] = useState<RankedRunner[]>([])
+  const load = useCallback(async () => {
+    const result = await callAdmin('dynamicData', { operation: 'list' })
+    setRanking(result.ranking ?? [])
+    return result.dynamicRows ?? []
+  }, [])
   const { data: rows, loading, reload } = useAdminData(load, [], onError)
 
   function edit(row: DynamicRow | null) {
@@ -122,6 +130,7 @@ export function useDynamics() {
 
   return {
     rows,
+    ranking,
     loading,
     reload,
     feedback,

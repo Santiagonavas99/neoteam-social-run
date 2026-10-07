@@ -90,6 +90,8 @@ export type ScannedParticipant = {
   checkedInAt: string | null
 }
 
+export type RankedRunner = ScannedParticipant & { points: number }
+
 export type CheckinResult = 'checkedIn' | 'alreadyCheckedIn' | 'cancelled'
 
 export type StaffRole = 'admin' | 'checkin'
@@ -119,6 +121,7 @@ export type AdminResponse<Row = unknown> = {
   participant?: ScannedParticipant
   dynamicRows?: DynamicRow[]
   winnerDetails?: ScannedParticipant[]
+  ranking?: RankedRunner[]
   alreadyCompleted?: boolean
   won?: boolean
   prize?: string | null

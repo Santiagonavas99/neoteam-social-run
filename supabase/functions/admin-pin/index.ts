@@ -369,12 +369,38 @@ Deno.serve(async (req: Request) => {
             counts.set(participation.dynamic_id, current)
           }
 
+          const { data: scores, error: rankingError } = await supabase.rpc(
+            'dynamic_points_ranking',
+            { p_event_id: event.id },
+          )
+          if (rankingError) throw rankingError
+          const scoreIds = (scores ?? []).map(
+            (score: { registration_id: string }) => score.registration_id,
+          )
+          let runners: Array<Record<string, unknown> & { id: string }> = []
+          if (scoreIds.length) {
+            const result = await supabase
+              .from('registrations')
+              .select(
+                'id,registration_code,first_name,last_name,status,other_running_group,running_groups(name)',
+              )
+              .in('id', scoreIds)
+            if (result.error) throw result.error
+            runners = result.data ?? []
+          }
+
           return json({
             dynamicRows: (rows ?? []).map((row: IdRow & Record<string, unknown>) => ({
               ...row,
               participations_count: counts.get(row.id)?.total ?? 0,
               winners_count: counts.get(row.id)?.winners ?? 0,
             })),
+            ranking: (scores ?? []).flatMap(
+              (score: { registration_id: string; points: number }) => {
+                const runner = runners.find((item) => item.id === score.registration_id)
+                return runner ? [{ ...participantPayload(runner), points: score.points }] : []
+              },
+            ),
           })
         }
 

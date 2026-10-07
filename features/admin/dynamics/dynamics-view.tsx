@@ -17,6 +17,7 @@ import { useAdminData } from '../ui/use-admin-data'
 import { DrawResult } from './draw-result'
 import { DynamicForm } from './dynamic-form'
 import { ParticipationPanel } from './participation-panel'
+import { Ranking } from './ranking'
 import { useDynamics } from './use-dynamics'
 
 const plural = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`
@@ -120,6 +121,7 @@ export function DynamicsView() {
         action={createButton}
       />
       <Feedback value={feedback} />
+      {!loading && !query && !type && <Ranking runners={dynamics.ranking} />}
       {winners && (
         <DrawResult
           key={`${winners.row.id}-${winners.reveal}-${winners.list.map((w) => w.id).join()}`}
