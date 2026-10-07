@@ -436,7 +436,7 @@
   align-items: end;
 }
 .v2-landak .section-label {
-  color: var(--neo-accent);
+  color: var(--neo-landak-on-dark);
   font-weight: 700;
   letter-spacing: 0.12em;
 }
@@ -450,7 +450,7 @@
 }
 .v2-landak-wordmark span:last-child {
   margin-left: 12%;
-  color: var(--neo-accent);
+  color: var(--neo-landak-on-dark);
 }
 .v2-landak-services {
   margin: 0;

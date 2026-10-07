@@ -81,7 +81,8 @@ Every shade is derived in OKLCH from the brand cyan `#03f8f6` (hue 193.7°); neu
 | `--neo-on-dark-secondary` | `#c2cdcd` | same | Secondary text on black · 12.5 |
 | `--neo-on-dark-border` / `-hover` | `#27302f` / `#192121` | same | Dividers and hover on black |
 | `--neo-brand-cyan` | `#007a78` | `#02f2f8` | Logo accent only |
-| `--neo-landak` | `#5b3fff` | `#7c5cff` | "Landak Studio" in the footer credit only (Landak's brand purple) · 5.4 on bg / 4.5 on bg |
+| `--neo-landak` | `#5b3fff` | `#7c5cff` | "Landak Studio" in the footer credit (Landak's brand purple) · 5.4 on bg / 4.5 on bg |
+| `--neo-landak-on-dark` | `#7c5cff` | same | "CREATIVE PARTNER" and "STUDIO" in the always-black Landak section · 4.7 on `--neo-black` |
 
 The dark values apply under `[data-theme="dark"]` on `<html>`, set before paint by `lib/theme.ts` (`app/layout.tsx`) for the whole site. The choice is one key, `neoteam_theme`; the switches are the light/dark switch in the home header (`components/theme-toggle.tsx`: follows the device until the first tap, `role="switch"`) and the admin's segmented switch ("Claro · Oscuro · Sistema"), both through `components/use-theme-choice.ts`. Flipping the header switch reveals the new theme as a circle growing from the switch, with a 2 px `--neo-accent` ring on its edge, so the change also shows over the always-black hero (View Transitions, about 450 ms; instant without the API or with reduced motion). The hero, header and community band stay black in both themes on purpose.
 
