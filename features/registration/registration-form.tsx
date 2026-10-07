@@ -18,6 +18,7 @@ import {
   TextField,
 } from './form-ui'
 import { PassCard } from './pass-card'
+import { Streamers } from './streamers'
 
 const initialState: RegistrationState = { ok: false, message: '' }
 
@@ -61,6 +62,7 @@ export function RegistrationForm() {
           </span>
         }
       >
+        <Streamers />
         <p className="m-0">Nos vemos el 18 de octubre en el Social Run del aniversario NeoTeam.</p>
         {state.pass ? (
           <>
