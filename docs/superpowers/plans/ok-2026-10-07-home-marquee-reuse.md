@@ -8,7 +8,7 @@ Spec: [home marquees spec](../specs/2026-10-07-home-crews-organizations-marquees
 - Add independent admin switches to include each allied-logo entry in the “Running crews” strip, the “Organizaciones” strip, both, or neither.
 - Reuse the saved logo, name, and link data; do not upload or configure a second copy.
 - Extra crew-only entries remain in “Running crews”; extra organization-only entries remain in “Marcas” with type “Organizador”.
-- A reused allied entry needs its switch, active, and show-on-home values enabled to appear in a community strip.
+- A reused allied entry needs its include switch and existing `active` visibility control enabled to appear in a community strip.
 - Deduplicate cross-source representations within each strip by normalized name, falling back to normalized logo URL; if matched, preserve the native crew/organization tile.
 - Keep server-only Supabase reads and admin writes through the existing `/api/admin` → Edge Function path.
 
@@ -17,7 +17,7 @@ Spec: [home marquees spec](../specs/2026-10-07-home-crews-organizations-marquees
 ### 1. `feat(admin): configure allied logo reuse`
 
 Files:
-- `supabase/migrations/20261007140000_home_logo_carousel_community_flags.sql`
+- `supabase/migrations/20261007050000_home_logo_carousel_community_flags.sql`
 - `features/admin/types.ts`
 - `features/admin/logos/logo-form.tsx`
 - `features/admin/logos/logos-view.tsx`
@@ -30,7 +30,7 @@ Changes:
 - Keep public writes unavailable; the admin Edge Function is the only write path.
 
 Checks:
-- Test form payload/defaults and verify both switches can be saved independently.
+- Verify both switches serialize and can be saved independently.
 - Review the migration's RLS/grants; do not apply it to remote Supabase.
 
 ### 2. `feat(home): merge selected allies into community marquees`
@@ -43,12 +43,12 @@ Files:
 
 Changes:
 - Load active allied logo items with both flags server-side.
-- Merge selected entries into native crew and organizer items, honoring active/show-on-home and the relevant flag.
+- Merge selected entries into native crew and organizer items only when active and the relevant include switch are true.
 - Preserve native crews and `brands.type = 'organizer'`; extra native records remain exclusive to their section.
 - Deduplicate by normalized name, then logo URL, preserving native details and stable sort order.
 
 Checks:
-- Cover independent flags, active/visibility filters, ordering, deduplication, and exclusion of non-organizer brands.
+- Cover independent flags, active filters, ordering, deduplication, and exclusion of non-organizer brands.
 - Verify at 390 px before desktop; check logo/name fallback and links.
 
 ### 3. `chore(release): 0.18.0`
