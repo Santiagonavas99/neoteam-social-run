@@ -8,6 +8,7 @@ export type HomeSectionKey =
   | 'community'
   | 'raffle'
   | 'final'
+  | 'landak_studio'
 
 export type HomeSectionOrder = {
   section_key: HomeSectionKey
@@ -25,6 +26,7 @@ export const defaultHomeSectionOrder: HomeSectionOrder[] = [
   { section_key: 'community', sort_order: 7, visible: true },
   { section_key: 'raffle', sort_order: 8, visible: true },
   { section_key: 'final', sort_order: 9, visible: true },
+  { section_key: 'landak_studio', sort_order: 10, visible: true },
 ]
 
 export const homeSectionMeta: Record<HomeSectionKey, { label: string; description: string }> = {
@@ -63,6 +65,10 @@ export const homeSectionMeta: Record<HomeSectionKey, { label: string; descriptio
   final: {
     label: 'Nos vemos',
     description: 'Cierre, registro y punto de encuentro.',
+  },
+  landak_studio: {
+    label: 'Landak Studio',
+    description: 'Crédito creativo y enlace al estudio detrás de la experiencia digital.',
   },
 }
 
