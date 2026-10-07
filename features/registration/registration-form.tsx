@@ -5,7 +5,6 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { useActionState, useState } from 'react'
 import { type RegistrationState, registerParticipant } from './actions'
-import { RUNNING_GROUP_OPTIONS } from './running-groups'
 import { CalendarButton } from './calendar-button'
 import {
   CheckboxField,
@@ -19,6 +18,7 @@ import {
   TextField,
 } from './form-ui'
 import { PassCard } from './pass-card'
+import { RUNNING_GROUP_OPTIONS } from './running-groups'
 import { Streamers } from './streamers'
 
 const initialState: RegistrationState = { ok: false, message: '' }
