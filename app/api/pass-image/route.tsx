@@ -68,7 +68,6 @@ export async function GET(request: Request) {
 
   return new ImageResponse(
     <div style={page}>
-      {/* biome-ignore lint/a11y/noSvgWithoutTitle: Satori paints <title> as visible text; this is a PNG */}
       <svg width="380" height="120" viewBox="0 0 1207 380" aria-hidden>
         {letterPaths.map((d) => (
           <path key={d} d={d} fill={color.white} />
