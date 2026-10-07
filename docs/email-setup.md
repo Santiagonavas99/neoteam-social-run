@@ -15,7 +15,7 @@ Nunca pegues la API key en el chat, en el repo ni en una variable `NEXT_PUBLIC_*
 
 ## 2. Dominio: `socialrun.site` (comprado en Vercel)
 
-El dominio y sus DNS están en Vercel. Los correos salen desde el subdominio `mail.socialrun.site`, para que la reputación del dominio principal no se vea afectada.
+El dominio y sus DNS están en Vercel. Los correos salen desde el dominio principal, `socialrun.site` (así quedó verificado en Resend, región `sa-east-1`).
 
 ### 2a. Conectar la web al dominio
 
@@ -24,11 +24,11 @@ El dominio y sus DNS están en Vercel. Los correos salen desde el subdominio `ma
 
 Vercel crea solo los registros de la web, porque también es el proveedor de DNS.
 
-### 2b. Verificar el subdominio de envío en Resend
+### 2b. Verificar el dominio de envío en Resend
 
 Sin un dominio verificado, Resend solo entrega correos a la dirección del dueño de la cuenta.
 
-1. **Resend → Domains → Add domain:** `mail.socialrun.site`. Región: `us-east-1` (la que viene por defecto).
+1. **Resend → Domains → Add domain:** `socialrun.site`. Región: `sa-east-1` (São Paulo).
 2. Resend muestra tres registros. Agrega cada uno en **Vercel → Domains → `socialrun.site` → DNS Records → Add**:
    - en el campo **Name** de Vercel va solo la parte que está antes de `socialrun.site`, como en la tabla de abajo;
    - el **Value** lo copias de Resend; es largo y distinto para cada cuenta;
@@ -36,25 +36,25 @@ Sin un dominio verificado, Resend solo entrega correos a la dirección del dueñ
 
    | Tipo | Name (en Vercel) | Value | Para qué sirve |
    |------|------------------|-------|----------------|
-   | `TXT` | `resend._domainkey.mail` | `p=MIGf…` (de Resend) | DKIM: firma cada correo |
-   | `MX` | `send.mail` | `feedback-smtp.us-east-1.amazonses.com` (de Resend), prioridad `10` | Recibir los rebotes |
-   | `TXT` | `send.mail` | `v=spf1 include:amazonses.com ~all` (de Resend) | SPF: autoriza a Resend a enviar |
+   | `TXT` | `resend._domainkey` | `p=MIGf…` (de Resend) | DKIM: firma cada correo |
+   | `MX` | `send` | `feedback-smtp.sa-east-1.amazonses.com` (de Resend), prioridad `10` | Recibir los rebotes |
+   | `TXT` | `send` | `v=spf1 include:amazonses.com ~all` (de Resend) | SPF: autoriza a Resend a enviar |
 
 3. Agrega también DMARC, que Gmail y Yahoo exigen para entregar bien. Cambia la dirección por un correo que revises:
 
    | Tipo | Name (en Vercel) | Value |
    |------|------------------|-------|
-   | `TXT` | `_dmarc.mail` | `v=DMARC1; p=none; rua=mailto:tu-correo@example.com` |
+   | `TXT` | `_dmarc` | `v=DMARC1; p=none; rua=mailto:tu-correo@example.com` |
 
 4. **Resend → Verify DNS records.** Con los DNS de Vercel suele tardar unos minutos. Espera a que todos los registros digan **Verified**.
 
 **Comprobación desde la terminal** (cada comando debe responder con el valor que pegaste):
 
 ```bash
-dig +short TXT resend._domainkey.mail.socialrun.site
-dig +short MX send.mail.socialrun.site
-dig +short TXT send.mail.socialrun.site
-dig +short TXT _dmarc.mail.socialrun.site
+dig +short TXT resend._domainkey.socialrun.site @ns1.vercel-dns.com
+dig +short MX send.socialrun.site @ns1.vercel-dns.com
+dig +short TXT send.socialrun.site @ns1.vercel-dns.com
+dig +short TXT _dmarc.socialrun.site @ns1.vercel-dns.com
 ```
 
 ## 3. API key
@@ -62,7 +62,7 @@ dig +short TXT _dmarc.mail.socialrun.site
 1. **API Keys → Create API key.**
    - Name: `neoteam-social-run-supabase`.
    - Permission: **Sending access** (no Full access).
-   - Domain: solo `mail.socialrun.site`.
+   - Domain: solo `socialrun.site`.
 2. Cópiala. Resend la muestra una sola vez; empieza por `re_`.
 
 ## 4. Secretos en Supabase
@@ -70,7 +70,7 @@ dig +short TXT _dmarc.mail.socialrun.site
 | Secreto | Valor | Ejemplo |
 |---------|-------|---------|
 | `RESEND_API_KEY` | La key del paso 3 | `re_…` |
-| `EMAIL_FROM` | Nombre y dirección del remitente, en el subdominio verificado | `NeoTeam Social Run <pase@mail.socialrun.site>` |
+| `EMAIL_FROM` | Nombre y dirección del remitente, **en el dominio verificado** (si no coinciden, Resend rechaza el envío y la función responde 503) | `NeoTeam Social Run <pase@socialrun.site>` |
 | `SITE_URL` | Dirección pública del sitio, sin barra final; se usa en el enlace a `/pase` | `https://socialrun.site` |
 
 **Opción A: desde el panel.** Supabase → proyecto → Edge Functions → **Secrets** → agrega los tres.
@@ -80,7 +80,7 @@ dig +short TXT _dmarc.mail.socialrun.site
 ```bash
 cat > ~/neoteam-email.env <<'EOF'
 RESEND_API_KEY=re_xxxxxxxx
-EMAIL_FROM=NeoTeam Social Run <pase@mail.socialrun.site>
+EMAIL_FROM=NeoTeam Social Run <pase@socialrun.site>
 SITE_URL=https://socialrun.site
 EOF
 supabase secrets set --env-file ~/neoteam-email.env --project-ref ohatsnkgaeccltqwhkbv
