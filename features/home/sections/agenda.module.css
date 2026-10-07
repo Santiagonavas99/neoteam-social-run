@@ -317,7 +317,7 @@
   align-items: center;
   gap: 7px;
   padding: 8px 10px;
-  border: 1px solid rgba(5, 5, 5, 0.16);
+  border: 1px solid var(--neo-accent-border);
   border-radius: 99px;
   color: var(--neo-accent-text);
   font-size: 10px;
@@ -360,7 +360,7 @@
 }
 
 .featuredCard .more summary {
-  color: var(--neo-text);
+  color: var(--neo-black);
 }
 
 .more summary:hover {
