@@ -46,13 +46,13 @@ export async function getHomeCommunity() {
     const [groups, brands] = await Promise.all([
       supabase
         .from('running_groups')
-        .select('id,name,logo_url,instagram')
+        .select('id,name,logo_url,instagram,sort_order')
         .eq('active', true)
         .eq('show_on_home', true)
         .order('sort_order', { ascending: true }),
       supabase
         .from('brands')
-        .select('id,name,logo_url,type,instagram,website')
+        .select('id,name,logo_url,type,instagram,website,sort_order')
         .eq('active', true)
         .eq('show_on_home', true)
         .order('sort_order', { ascending: true }),

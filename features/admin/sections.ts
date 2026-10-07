@@ -82,15 +82,15 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
   },
   {
     id: 'groups',
-    label: 'Grupos',
-    description: 'Las comunidades que corren con nosotros.',
+    label: 'Running crews',
+    description: 'Configura los crews de la cinta de la página principal.',
     icon: Flag,
     group: 'content',
   },
   {
     id: 'brands',
     label: 'Marcas',
-    description: 'Los aliados que hacen parte del encuentro.',
+    description: 'Configura marcas y organizaciones para la página principal.',
     icon: Tag,
     group: 'content',
   },

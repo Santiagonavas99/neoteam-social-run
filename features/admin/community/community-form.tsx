@@ -29,7 +29,7 @@ export function CommunityForm({
 
   return (
     <EditorForm
-      title={isNew(row) ? (brand ? 'Nueva marca' : 'Nuevo grupo') : `Editar ${row.name}`}
+      title={isNew(row) ? (brand ? 'Nueva marca u organización' : 'Nuevo running crew') : `Editar ${row.name}`}
       hint="Los cambios se publican al guardar."
       legend="Datos del registro"
       submitLabel="Guardar cambios"
@@ -57,7 +57,7 @@ export function CommunityForm({
             <LabelOptions labels={brandTypes} />
           </select>
           <small>
-            Organizador → Organización. Patrocinador → Marcas. Aliado principal e Invitado →
+            Organizador → cinta de Organizaciones. Patrocinador → Marcas. Aliado principal e Invitado →
             Partners / Marcas invitadas.
           </small>
         </label>
@@ -107,6 +107,13 @@ export function CommunityForm({
         />
         Mostrar en página
       </label>
+      <small>
+        {!brand
+          ? 'Los running crews activos y visibles aparecen en la cinta de la página principal.'
+          : values.type === 'organizer'
+            ? 'Las organizaciones activas y visibles aparecen en su cinta de la página principal.'
+            : 'Las marcas activas y visibles aparecen en sus secciones de la página principal.'}
+      </small>
       <label className="check-label">
         <input
           type="checkbox"

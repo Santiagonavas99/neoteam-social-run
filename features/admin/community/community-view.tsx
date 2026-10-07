@@ -19,7 +19,7 @@ export function CommunityView({ resource }: { resource: 'groups' | 'brands' }) {
   const { rows, loading, busy, feedback, editor, confirmation } = records
   const [query, setQuery] = useState('')
   const brand = resource === 'brands'
-  const newLabel = brand ? 'Añadir marca' : 'Añadir grupo'
+  const newLabel = brand ? 'Añadir marca' : 'Añadir running crew'
 
   function addRecord() {
     records.edit({
@@ -89,7 +89,7 @@ export function CommunityView({ resource }: { resource: 'groups' | 'brands' }) {
           <EmptyState
             icon={brand ? Tag : Flag}
             title="Todo listo para empezar"
-            text={`Añade ${brand ? 'tu primera marca' : 'tu primer grupo'} para preparar el evento.`}
+            text={brand ? 'Añade una marca u organización para preparar el evento.' : 'Añade un running crew para preparar el evento.'}
             action={
               !editor && (
                 <button type="button" className="button" onClick={addRecord}>
@@ -111,7 +111,7 @@ export function CommunityView({ resource }: { resource: 'groups' | 'brands' }) {
                 brand
                   ? brandTypes[row.type ?? 'invited']
                   : row.invited
-                    ? 'Grupo invitado'
+                    ? 'Running crew invitado'
                     : 'Running crew'
               }
               meta={

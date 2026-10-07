@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import type { HomeLogoCarouselItem } from '@/features/home/data'
 
 function externalUrl(value?: string | null) {
   if (!value?.trim()) return undefined
@@ -13,8 +12,30 @@ function externalUrl(value?: string | null) {
   }
 }
 
-function logoImage(item: HomeLogoCarouselItem, hidden: boolean) {
-  return (
+export type LogoMarqueeItem = {
+  id: string
+  name: string
+  logo_url: string | null
+  link_url?: string | null
+  website?: string | null
+  instagram?: string | null
+}
+
+function instagramUrl(value?: string | null) {
+  const instagram = value?.trim()
+  if (!instagram) return undefined
+  if (/^(https?:\\/\\/)?(www\\.)?instagram\\.com\\//i.test(instagram))
+    return externalUrl(instagram)
+  const handle = instagram.replace(/^@/, '')
+  return /^[\\w.]+$/.test(handle) ? `https://www.instagram.com/${handle}/` : undefined
+}
+
+function itemUrl(item: LogoMarqueeItem) {
+  return itemUrl(item) || externalUrl(item.website) || instagramUrl(item.instagram)
+}
+
+function logoContent(item: LogoMarqueeItem, hidden: boolean) {
+  return item.logo_url?.trim() ? (
     <Image
       unoptimized
       src={item.logo_url}
@@ -23,6 +44,10 @@ function logoImage(item: HomeLogoCarouselItem, hidden: boolean) {
       alt={hidden ? '' : item.name}
       className="size-full object-contain"
     />
+  ) : (
+    <span className="px-2 text-center text-sm font-bold leading-tight text-neo-black md:text-base">
+      {item.name}
+    </span>
   )
 }
 
@@ -30,9 +55,17 @@ function logoImage(item: HomeLogoCarouselItem, hidden: boolean) {
 const tileClass =
   'flex h-22 w-37 shrink-0 items-center justify-center overflow-hidden rounded-[14px] border border-neo-border bg-neo-white p-2 transition-transform duration-300 hover:-translate-y-0.5 md:h-28 md:w-50 md:p-3'
 
-export function LogoMarquee({ items }: { items: HomeLogoCarouselItem[] }) {
-  const visibleItems = items.filter((item) => item.logo_url?.trim())
+export function LogoMarquee({
+  items,
+  title = 'Marcas aliadas',
+}: {
+  items: LogoMarqueeItem[]
+  title?: string
+}) {
+  const visibleItems = items.filter((item) => item.name.trim())
   if (!visibleItems.length) return null
+
+  const titleId = `logo-strip-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-title`
 
   const repeatCount = Math.max(1, Math.ceil(8 / visibleItems.length))
   const repeatedItems = Array.from({ length: repeatCount }, () => visibleItems).flat()
@@ -43,7 +76,7 @@ export function LogoMarquee({ items }: { items: HomeLogoCarouselItem[] }) {
       <div className="flex shrink-0 gap-3 pr-3 md:gap-4 md:pr-4" aria-hidden={hidden || undefined}>
         {repeatedItems.map((item, index) => {
           const href = externalUrl(item.link_url)
-          const image = logoImage(item, hidden)
+          const image = logoContent(item, hidden)
 
           return href ? (
             <a
@@ -70,17 +103,17 @@ export function LogoMarquee({ items }: { items: HomeLogoCarouselItem[] }) {
   }
 
   return (
-    <section aria-labelledby="brand-strip-title" className="bg-neo-bg py-8 md:py-12">
+    <section aria-labelledby={titleId} className="bg-neo-bg py-8 md:py-12">
       <div className="shell reveal mb-4 flex items-baseline justify-between gap-3">
         <h2
-          id="brand-strip-title"
+          id={titleId}
           className="m-0 text-xs font-bold uppercase tracking-[0.14em] text-neo-accent-text"
         >
-          Marcas aliadas
+          {title}
         </h2>
         {linked && (
           <p className="m-0 text-[13px] text-neo-text-secondary">
-            Toca un logo para visitar la marca
+            Toca un logo para conocer más
           </p>
         )}
       </div>
