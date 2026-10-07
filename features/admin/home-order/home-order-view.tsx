@@ -3,9 +3,9 @@
 import { ArrowDown, ArrowUp, Eye, EyeOff, LockKeyhole, Save } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import {
+  type HomeSectionOrder,
   homeSectionMeta,
   normalizeHomeSectionOrder,
-  type HomeSectionOrder,
 } from '@/features/home/section-order'
 import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
@@ -93,9 +93,7 @@ export function HomeOrderView() {
     <section aria-busy={loading || busy}>
       <div className="mb-5 flex flex-col gap-3 md:mb-6 md:flex-row md:items-start md:justify-between">
         <div>
-          <h2 className="m-0 mb-1 text-[21px] font-bold tracking-[-0.035em]">
-            Orden de la página
-          </h2>
+          <h2 className="m-0 mb-1 text-[21px] font-bold tracking-[-0.035em]">Orden de la página</h2>
           <p className="m-0 max-w-[62ch] text-sm text-neo-text-secondary">
             Sube o baja cada sección y oculta temporalmente las que no necesites. Al volver a
             mostrarlas conservan su posición.
