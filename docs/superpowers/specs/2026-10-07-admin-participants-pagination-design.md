@@ -202,3 +202,13 @@ Search strings are passed as filter values only; table/column identifiers remain
 - URL-synced admin page/query state.
 - Infinite scrolling.
 - Pagination of Groups, Brands, Logos or Dynamics.
+
+
+## Deployment compatibility
+
+The new paginated list is explicitly opt-in with `paginated: true`.
+
+This keeps the current production admin compatible while the updated Edge Function is deployed for preview testing:
+- old production client without the flag continues receiving the legacy full participant list;
+- new preview client receives paginated data;
+- once the frontend release is merged, the legacy path remains harmless backward compatibility.
