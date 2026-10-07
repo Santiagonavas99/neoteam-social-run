@@ -85,3 +85,15 @@ No auth, data, Supabase or API changes.
 - Hiding/revealing the header based on scroll direction.
 - Changing nav labels or destinations.
 - Redesigning the mobile header.
+
+
+## Motion refinement
+
+Approved by Santiago after the sticky preview.
+
+The sticky bar gets a restrained motion layer:
+- the inner navigation enters from 12 px above with a short fade/slide on first load;
+- a thin cyan rule reveals from the center across the bottom edge;
+- desktop nav links reveal a cyan underline on hover/focus;
+- the sticky behavior itself remains CSS-only and does not animate on every scroll event;
+- all motion is disabled by the existing reduced-motion policy.
