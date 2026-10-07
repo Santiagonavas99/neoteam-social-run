@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
+import { listedExternalRunningGroupName, RUNNING_GROUP_OPTIONS } from './running-groups.ts'
 import { registrationSchema } from './schema.ts'
 
 const valid = {
@@ -29,6 +30,23 @@ test('accepts a complete registration', () => {
 
 test('trims names before checking their length', () => {
   assert.deepEqual(errorPaths({ ...valid, firstName: '  A  ' }), ['firstName'])
+})
+
+test('accepts every listed running crew', () => {
+  for (const group of RUNNING_GROUP_OPTIONS) {
+    assert.equal(
+      registrationSchema.safeParse({ ...valid, runningGroup: group.value }).success,
+      true,
+      group.label,
+    )
+  }
+})
+
+test('maps listed external crews to the exact stored name', () => {
+  assert.equal(listedExternalRunningGroupName('byrunners'), 'ByRunners')
+  assert.equal(listedExternalRunningGroupName('guabinas-run-club'), 'Guabinas Run Club')
+  assert.equal(listedExternalRunningGroupName('neoteam'), null)
+  assert.equal(listedExternalRunningGroupName('otro'), null)
 })
 
 test('requires the group name when the group is "otro"', () => {

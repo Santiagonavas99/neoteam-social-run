@@ -18,6 +18,7 @@ import {
   TextField,
 } from './form-ui'
 import { PassCard } from './pass-card'
+import { RUNNING_GROUP_OPTIONS } from './running-groups'
 import { Streamers } from './streamers'
 
 const initialState: RegistrationState = { ok: false, message: '' }
@@ -198,7 +199,11 @@ export function RegistrationForm() {
           onChange={(event) => setRunningGroup(event.target.value)}
           errors={errors?.runningGroup}
         >
-          <option value="neoteam">NeoTeam</option>
+          {RUNNING_GROUP_OPTIONS.map((group) => (
+            <option key={group.value} value={group.value}>
+              {group.label}
+            </option>
+          ))}
           <option value="independiente">Independiente</option>
           <option value="otro">Otro grupo / crew</option>
         </SelectField>

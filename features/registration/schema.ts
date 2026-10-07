@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { RUNNING_GROUP_VALUES } from './running-groups.ts'
 
 // Phone autofill on iOS and Android fills "+57 300 123 4567"; keep the 10 national digits.
 const phoneSchema = z
@@ -19,7 +20,7 @@ export const registrationSchema = z
     phone: phoneSchema,
     birthDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Selecciona tu fecha de nacimiento.'),
     gender: z.enum(['female', 'male'], { error: 'Selecciona tu género.' }),
-    runningGroup: z.enum(['neoteam', 'independiente', 'otro']),
+    runningGroup: z.enum(RUNNING_GROUP_VALUES),
     otherRunningGroup: z.string().trim().max(120).optional(),
     emergencyName: z.string().trim().min(2, 'Escribe el contacto de emergencia.').max(120),
     emergencyPhone: phoneSchema,
