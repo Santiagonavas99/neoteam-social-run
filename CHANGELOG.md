@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.1] - 2026-10-07
+
+### Fixed
+
+- Mobile hero alignment and countdown spacing were corrected for phone widths.
+
 ## [0.23.0] - 2026-10-07
 
 ### Added
