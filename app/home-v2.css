@@ -1,4 +1,5 @@
 .home-v2 {
+  --site-header-height: 84px;
   background: var(--neo-bg);
   color: var(--neo-text);
   overflow: clip;
@@ -7,9 +8,10 @@
   width: min(1280px, calc(100% - 72px));
 }
 .home-v2 .site-header {
+  --site-header-height: inherit;
+}
+.home-v2 .site-header-inner {
   width: min(1280px, calc(100% - 72px));
-  height: 84px;
-  border-bottom: 1px solid var(--neo-on-dark-border);
 }
 .home-v2 .site-header nav > a:not(.button) {
   color: var(--neo-on-dark-secondary);
@@ -36,18 +38,25 @@
   border-color: var(--neo-accent);
   color: var(--neo-black);
 }
+
+#evento,
+#agenda,
+#invitados {
+  scroll-margin-top: calc(var(--site-header-height) + var(--space-4));
+}
+
 .v2-hero {
   position: relative;
   background: var(--neo-black);
   color: var(--neo-white);
-  min-height: 100svh;
+  min-height: calc(100svh - var(--site-header-height));
   display: flex;
   flex-direction: column;
 }
 .v2-hero::before {
   content: "";
   position: absolute;
-  inset: 84px 0 0;
+  inset: 0;
   background:
     linear-gradient(
       90deg,
@@ -595,7 +604,7 @@
 }
 @media (max-width: 1100px) {
   .home-v2 .shell,
-  .home-v2 .site-header {
+  .home-v2 .site-header-inner {
     width: min(100% - 48px, 1280px);
   }
   .v2-hero-grid {
@@ -641,8 +650,11 @@
   }
 }
 @media (max-width: 760px) {
+  .home-v2 {
+    --site-header-height: 72px;
+  }
   .home-v2 .shell,
-  .home-v2 .site-header {
+  .home-v2 .site-header-inner {
     width: calc(100% - 32px);
   }
   .home-v2 .site-header nav > a:not(.button) {

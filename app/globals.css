@@ -356,16 +356,36 @@ fieldset {
 
 /* Public site */
 .site-header {
-  height: 80px;
+  --site-header-height: 80px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  height: var(--site-header-height);
+  background: color-mix(in oklab, var(--neo-black) 94%, transparent);
+  border-bottom: 1px solid var(--neo-on-dark-border);
+  backdrop-filter: blur(var(--space-3));
+  -webkit-backdrop-filter: blur(var(--space-3));
+}
+.site-header::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--neo-accent), transparent);
+  opacity: 0.72;
+  pointer-events: none;
+}
+.site-header-inner {
+  width: min(1240px, calc(100% - 96px));
+  height: 100%;
+  margin: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-}
-.site-header {
-  width: min(1240px, calc(100% - 96px));
-  margin: auto;
-  border-bottom: 1px solid var(--neo-on-dark-border);
+  gap: var(--space-6);
 }
 .site-header nav {
   display: flex;
@@ -374,13 +394,31 @@ fieldset {
   font-size: 13px;
 }
 .site-header nav > a:not(.button) {
+  position: relative;
   display: flex;
   align-items: center;
   min-height: 44px;
   color: var(--neo-on-dark-secondary);
+  transition: color 180ms ease;
 }
-.site-header nav > a:hover {
+.site-header nav > a:not(.button)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 7px;
+  left: 0;
+  height: 1px;
+  background: var(--neo-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 220ms ease;
+}
+.site-header nav > a:hover,
+.site-header nav > a:focus-visible {
   color: var(--neo-white);
+}
+.site-header nav > a:not(.button):is(:hover, :focus-visible)::after {
+  transform: scaleX(1);
 }
 .site-header .button {
   background: var(--neo-white);
@@ -739,7 +777,7 @@ fieldset {
 
 @media (max-width: 1100px) {
   .shell,
-  .site-header {
+  .site-header-inner {
     width: calc(100% - 64px);
   }
   .hero-grid {
@@ -827,12 +865,14 @@ fieldset {
 }
 @media (max-width: 560px) {
   .shell,
-  .site-header {
+  .site-header-inner {
     width: calc(100% - 40px);
   }
   .site-header {
-    height: 72px;
-    gap: 12px;
+    --site-header-height: 72px;
+  }
+  .site-header-inner {
+    gap: var(--space-3);
   }
   .site-header .button {
     min-height: 44px;
@@ -1009,6 +1049,36 @@ fieldset {
     position: static;
   }
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-header-inner {
+    animation: site-header-enter 480ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .site-header::after {
+    animation: site-header-rule 720ms cubic-bezier(0.2, 0.7, 0.2, 1) 120ms both;
+  }
+}
+@keyframes site-header-enter {
+  from {
+    opacity: 0;
+    translate: 0 -12px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes site-header-rule {
+  from {
+    opacity: 0;
+    scale: 0 1;
+  }
+  to {
+    opacity: 0.72;
+    scale: 1 1;
+  }
+}
+
 /* Arrows lean toward where they lead; buttons press in. Lucide tags each icon with its name. */
 @media (prefers-reduced-motion: no-preference) {
   :is(.button, .text-link) svg {

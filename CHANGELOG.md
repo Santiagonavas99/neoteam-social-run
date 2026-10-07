@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-10-07
+
+### Added
+
+- **Sticky public navigation.** The NeoTeam header now stays visible throughout the Home scroll, with a subtle entrance animation, cyan rule/hover motion, and anchor offsets so Evento, Agenda and Invitados are not covered.
+
 ## [0.25.0] - 2026-10-07
 
 ### Added

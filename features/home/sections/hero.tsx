@@ -1,14 +1,11 @@
 import { ArrowDown, ArrowRight, CalendarDays, Clock, MapPin, QrCode, Route } from 'lucide-react'
 import Link from 'next/link'
-import { SiteHeader } from '@/components/site-header'
 import { eventConfig } from '@/features/event/event'
 import { EventCountdown } from '@/features/event/event-countdown'
 
 export function Hero() {
   return (
     <section className="v2-hero">
-      <SiteHeader />
-
       <div className="v2-hero-meta shell">
         <span className="v2-meta-pill accent gap-1.5">
           <CalendarDays aria-hidden className="size-3.5 shrink-0 max-sm:hidden" />
