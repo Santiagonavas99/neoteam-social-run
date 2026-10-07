@@ -44,6 +44,13 @@ export type LogoItem = {
   show_in_organizations: boolean
 }
 
+export type ParticipantStatusCounts = {
+  registered: number
+  checked_in: number
+  no_show: number
+  cancelled: number
+}
+
 export type Metrics = {
   registered: number
   checkedIn: number
@@ -118,6 +125,9 @@ export type AdminResponse<Row = unknown> = {
   error?: string
   winners?: number
   count?: number
+  page?: number
+  pageSize?: number
+  statusCounts?: ParticipantStatusCounts
   deleted?: number
   result?: CheckinResult
   participant?: ScannedParticipant
