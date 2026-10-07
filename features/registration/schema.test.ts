@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { RUNNING_GROUP_OPTIONS, listedExternalRunningGroupName } from './running-groups.ts'
+import { listedExternalRunningGroupName, RUNNING_GROUP_OPTIONS } from './running-groups.ts'
 import { registrationSchema } from './schema.ts'
 
 const valid = {
