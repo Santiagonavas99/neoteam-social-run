@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **"Descargar lista" in Participantes:** a backup list of every registration for the gate if the network fails. It is a CSV that opens in Excel or Google Sheets, sorted by last name, with code, names, document, group, size, state, check-in time and an empty "Llegó" column to tick by hand. It has no email, phone or emergency contact, and a name can never run as a spreadsheet formula.
 - **Event-day checklist** (`docs/event-day.md`): sign in the day before, download and print the list, what to do without network, and deleting the copies afterwards.
 
+## [0.23.2] - 2026-10-07
+
+### Fixed
+
+- **Centered the mobile hero composition.** Event pills, SOCIAL/RUN, supporting copy, actions and the countdown now share a centered phone layout while desktop remains unchanged.
+
 ## [0.23.1] - 2026-10-07
 
 ### Fixed
