@@ -1006,6 +1006,24 @@ fieldset {
     position: static;
   }
 }
+/* Arrows lean toward where they lead; buttons press in. Lucide tags each icon with its name. */
+@media (prefers-reduced-motion: no-preference) {
+  :is(.button, .text-link) svg {
+    transition: translate 0.2s ease;
+  }
+  :is(.button, .text-link):is(:hover, :focus-visible) .lucide-arrow-right {
+    translate: 4px 0;
+  }
+  :is(.button, .text-link):is(:hover, :focus-visible) .lucide-arrow-up-right {
+    translate: 3px -3px;
+  }
+  :is(.button, .text-link):is(:hover, :focus-visible) .lucide-arrow-down {
+    translate: 0 4px;
+  }
+  .button:active:not(:disabled) {
+    translate: 0 1px;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
