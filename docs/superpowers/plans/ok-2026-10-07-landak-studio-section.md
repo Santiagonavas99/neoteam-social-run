@@ -6,7 +6,7 @@ Branch: `feat/landak-studio-section`
 
 Status: **approved by user request on 2026-10-07**.
 
-Release: `0.24.0`.
+Release: `0.25.0`.
 
 ## 1. Database section key
 
@@ -54,7 +54,7 @@ Files:
 - `CHANGELOG.md`
 
 Changes:
-- bump to `0.24.0`;
+- bump to `0.25.0`;
 - document the new configurable Landak Studio section.
 
 ## Final checks
