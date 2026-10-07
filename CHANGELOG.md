@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-10-07
+
+### Added
+
+- **Vibration and a sound on every scan** at Check-in and the dynamics stands: a rising "check" when it works, two beeps when the runner already did it, a low buzz on errors. iPhones get the sound only.
+
+### Changed
+
+- **The home page opens much faster.** It is served from Vercel's cache and rebuilt at most once a minute, instead of querying Supabase on every visit. The counter and logos may lag up to a minute. Same design and animations.
+- **Logos weigh about 80 % less:** images from the project's Storage are resized and served as WebP.
+- **Server functions run in São Paulo,** next to the database, which also speeds up registration and the admin.
+- **A repeated check-in is impossible to miss:** an amber "YA HIZO CHECK-IN" card with the time. A second scan of the same QR is read again after 1.5 s instead of being ignored for 5 s.
+
 ## [0.18.0] - 2026-10-07
 
 ### Fixed
