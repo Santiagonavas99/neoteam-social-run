@@ -52,14 +52,14 @@ export function EventCountdown({
       : `${plural(time.hours, 'hora', 'horas')} y ${plural(time.minutes, 'minuto', 'minutos')}`
 
   return (
-    <div className="mb-7">
+    <div className="mb-7 text-center md:text-left">
       <p className="mb-3 text-xs font-bold tracking-[0.14em] text-neo-accent" aria-hidden>
         FALTAN
       </p>
       <p className="sr-only">Faltan {summary} para el encuentro.</p>
       <div aria-hidden className="grid grid-cols-4 gap-3 md:flex md:gap-7">
         {units.map(([key, label]) => (
-          <div key={key} className="grid gap-1.5">
+          <div key={key} className="grid justify-items-center gap-1.5 md:justify-items-start">
             <span
               suppressHydrationWarning
               className={`text-[34px] leading-none font-extrabold tracking-[-0.04em] tabular-nums md:text-5xl ${
