@@ -10,6 +10,7 @@ export type Pass = {
   name: string
   qr: string
   googleWalletUrl?: string
+  imageUrl?: string
   emailed?: boolean
 }
 
@@ -44,7 +45,9 @@ async function toPass(data: PassData | null): Promise<Pass | null> {
     emailed: data.emailed,
   }
   const userAgent = (await headers()).get('user-agent') ?? ''
-  if (googleWalletConfig(process.env) && !isApplePlatform(userAgent)) {
+  if (isApplePlatform(userAgent)) {
+    pass.imageUrl = `/api/pass-image?token=${encodeURIComponent(data.checkinToken)}`
+  } else if (googleWalletConfig(process.env)) {
     pass.googleWalletUrl = googleWalletPath(data.checkinToken)
   }
   return pass

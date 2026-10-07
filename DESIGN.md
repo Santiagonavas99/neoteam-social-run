@@ -40,6 +40,7 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 | `UserCheck` | Check-in |
 | `QrCode` | The runner's check-in pass ("Mi pase") |
 | `Mail` | Send the pass by email |
+| `ImageDown` | Save the pass as an image (iPhone, "Guardar pase en Fotos") |
 | `CalendarPlus` | Add the event to the runner's calendar ("Agregar a mi agenda") |
 | `Ellipsis` | "Más": the phone sheet with the remaining admin sections |
 | `Sun` / `Moon` / `Monitor` | Theme: light / dark / system |

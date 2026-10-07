@@ -1,4 +1,4 @@
-import { CalendarDays, Clock, MapPin } from 'lucide-react'
+import { CalendarDays, Clock, ImageDown, MapPin } from 'lucide-react'
 import Image from 'next/image'
 import { NeoTeamLogo } from '@/components/neoteam-logo'
 import { passFacts } from '@/features/event/pass-facts'
@@ -70,6 +70,17 @@ export function PassCard({ pass }: { pass: Pass }) {
         <a href={pass.googleWalletUrl} className="mt-2 inline-flex rounded-full">
           {/* Google's official badge, unchanged, per the Wallet brand guidelines. */}
           <Image src={googleWalletButton} alt="Agregar a la Billetera de Google" unoptimized />
+        </a>
+      ) : null}
+      {pass.imageUrl ? (
+        <a
+          href={pass.imageUrl}
+          target="_blank"
+          rel="noopener"
+          className="button mt-2 w-full md:max-w-80"
+        >
+          <ImageDown aria-hidden className="size-4 shrink-0" />
+          Guardar pase en Fotos
         </a>
       ) : null}
       <p className="m-0 text-sm leading-normal text-neo-text-secondary">
