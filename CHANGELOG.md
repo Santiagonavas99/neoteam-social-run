@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.27.0] - 2026-10-07
+
+### Added
+
+- **Participants now use server-side pagination.** The admin loads 25 runners at a time, with global search/status filters, Previous/Next navigation, and a full-list backup export that remains independent of the current page.
+
 ## [0.26.3] - 2026-10-07
 
 ### Fixed

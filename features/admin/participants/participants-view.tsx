@@ -1,21 +1,43 @@
 'use client'
 
 import { FileDown, Mail, Trash2, UserCheck, Users } from 'lucide-react'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { callAdmin } from '../api'
-import { matchesQuery } from '../filter'
+import { errorMessage } from '../errors'
 import { genderLabels, participantStates } from '../labels'
-import type { Participant } from '../types'
+import type { FeedbackValue, Participant, ParticipantStatusCounts } from '../types'
 import { Feedback, StatusBadge } from '../ui/admin-ui'
 import { ConfirmPanel } from '../ui/confirm-panel'
 import { EmptyState, NoMatches } from '../ui/empty-state'
 import { LabelOptions } from '../ui/label-options'
 import { ListToolbar } from '../ui/list-toolbar'
 import { LoadingState } from '../ui/loading-state'
-import { useRecords } from '../use-records'
+import { useAdminData } from '../ui/use-admin-data'
 import { backupListCsv, backupListFileName } from './backup-list'
 
-// Always every registration, whatever the screen filters: it is the gate's offline backup.
+const EMPTY_COUNTS: ParticipantStatusCounts = {
+  registered: 0,
+  checked_in: 0,
+  no_show: 0,
+  cancelled: 0,
+}
+
+type ParticipantPage = {
+  rows: Participant[]
+  count: number
+  page: number
+  pageSize: number
+  statusCounts: ParticipantStatusCounts
+}
+
+const EMPTY_PAGE: ParticipantPage = {
+  rows: [],
+  count: 0,
+  page: 1,
+  pageSize: 25,
+  statusCounts: EMPTY_COUNTS,
+}
+
 function downloadBackupList(rows: Participant[]) {
   const url = URL.createObjectURL(
     new Blob([backupListCsv(rows)], { type: 'text/csv;charset=utf-8' }),
@@ -30,74 +52,148 @@ function downloadBackupList(rows: Participant[]) {
 const fullName = (row: Participant) => `${row.first_name ?? ''} ${row.last_name ?? ''}`.trim()
 
 export function ParticipantsView() {
-  const records = useRecords<Participant>('participants')
-  const { rows, loading, busy, feedback, confirmation } = records
+  const [page, setPage] = useState(1)
   const [query, setQuery] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
   const [status, setStatus] = useState('')
+  const [busy, setBusy] = useState<string | null>(null)
+  const [feedback, setFeedback] = useState<FeedbackValue>(null)
+  const [confirmation, setConfirmation] = useState<Participant | null>(null)
+  const [downloading, setDownloading] = useState(false)
+
+  const onError = useCallback(
+    (error: unknown) =>
+      setFeedback({
+        kind: 'error',
+        text: errorMessage(error),
+      }),
+    [],
+  )
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedQuery(query.trim()), 250)
+    return () => window.clearTimeout(timer)
+  }, [query])
+
+  const load = useCallback(async (): Promise<ParticipantPage> => {
+    const response = await callAdmin<Participant>('adminData', {
+      resource: 'participants',
+      operation: 'list',
+      paginated: true,
+      page,
+      query: debouncedQuery,
+      status,
+    })
+    return {
+      rows: response.rows ?? [],
+      count: response.count ?? 0,
+      page: response.page ?? page,
+      pageSize: response.pageSize ?? 25,
+      statusCounts: response.statusCounts ?? EMPTY_COUNTS,
+    }
+  }, [debouncedQuery, page, status])
+
+  const { data, loading, reload } = useAdminData(load, EMPTY_PAGE, onError)
+
+  useEffect(() => {
+    if (data.page !== page) setPage(data.page)
+  }, [data.page, page])
+
+  function updateQuery(next: string) {
+    setQuery(next)
+    setPage(1)
+  }
+
+  function updateStatus(next: string) {
+    setStatus(next)
+    setPage(1)
+  }
 
   async function changeAttendance(row: Participant, next: string) {
-    records.setBusy(row.id)
-    records.setFeedback(null)
+    setBusy(row.id)
+    setFeedback(null)
     try {
       await callAdmin('adminData', {
         resource: 'participants',
         operation: 'save',
         values: { id: row.id, status: next },
       })
-      records.setRows((current) =>
-        current.map((item) => (item.id === row.id ? { ...item, status: next } : item)),
-      )
-      records.setFeedback({
+      setFeedback({
         kind: 'success',
         text: `${row.first_name}: ${participantStates[next]}.`,
       })
+      await reload()
     } catch (error) {
-      records.onError(error)
+      onError(error)
     } finally {
-      records.setBusy(null)
+      setBusy(null)
     }
   }
 
   async function resendPass(row: Participant) {
-    records.setBusy(`mail-${row.id}`)
-    records.setFeedback(null)
+    setBusy(`mail-${row.id}`)
+    setFeedback(null)
     try {
       await callAdmin('resendPass', { participantId: row.id })
-      records.setFeedback({ kind: 'success', text: `Pase enviado a ${row.email}.` })
+      setFeedback({ kind: 'success', text: `Pase enviado a ${row.email}.` })
     } catch (error) {
-      records.onError(error)
+      onError(error)
     } finally {
-      records.setBusy(null)
+      setBusy(null)
     }
   }
 
-  const visible = rows.filter(
-    (row) =>
-      matchesQuery(
-        [
-          row.first_name,
-          row.last_name,
-          row.email,
-          row.phone,
-          row.document_number,
-          row.registration_code,
-          row.running_groups?.name,
-          row.other_running_group,
-        ],
-        query,
-      ) &&
-      (!status || row.status === status),
-  )
+  async function confirmDelete() {
+    if (!confirmation) return
+    setBusy(confirmation.id)
+    setFeedback(null)
+    try {
+      await callAdmin('adminData', {
+        resource: 'participants',
+        operation: 'delete',
+        id: confirmation.id,
+      })
+      setFeedback({ kind: 'success', text: 'Registro eliminado.' })
+      setConfirmation(null)
+      await reload()
+    } catch (error) {
+      onError(error)
+    } finally {
+      setBusy(null)
+    }
+  }
 
-  const counts = rows.reduce<Record<string, number>>((acc, row) => {
-    const key = row.status ?? 'registered'
-    acc[key] = (acc[key] ?? 0) + 1
-    return acc
-  }, {})
+  async function downloadAllParticipants() {
+    setDownloading(true)
+    setFeedback(null)
+    try {
+      const response = await callAdmin<Participant>('adminData', {
+        resource: 'participants',
+        operation: 'backup',
+      })
+      downloadBackupList(response.rows ?? [])
+    } catch (error) {
+      onError(error)
+    } finally {
+      setDownloading(false)
+    }
+  }
+
+  const totalParticipants = Object.values(data.statusCounts).reduce(
+    (total, count) => total + count,
+    0,
+  )
   const chips = [
-    ['', `Todos ${rows.length}`],
-    ...Object.entries(participantStates).map(([id, label]) => [id, `${label} ${counts[id] ?? 0}`]),
+    ['', `Todos ${totalParticipants}`],
+    ...Object.entries(participantStates).map(([id, label]) => [
+      id,
+      `${label} ${data.statusCounts[id as keyof ParticipantStatusCounts] ?? 0}`,
+    ]),
   ]
+
+  const pageCount = Math.max(1, Math.ceil(data.count / data.pageSize))
+  const rangeStart = data.count ? (data.page - 1) * data.pageSize + 1 : 0
+  const rangeEnd = data.count ? Math.min(rangeStart + data.rows.length - 1, data.count) : 0
 
   return (
     <section aria-busy={loading}>
@@ -105,26 +201,26 @@ export function ParticipantsView() {
         searchLabel="Buscar participantes"
         placeholder="Nombre, código, contacto…"
         query={query}
-        onQuery={setQuery}
+        onQuery={updateQuery}
         loading={loading}
-        refreshDisabled={loading || !!busy}
+        refreshDisabled={loading || !!busy || downloading}
         onRefresh={() => {
-          records.setFeedback(null)
-          void records.reload()
+          setFeedback(null)
+          void reload()
         }}
         action={
           <button
             type="button"
             className="button button-secondary"
-            onClick={() => downloadBackupList(rows)}
-            disabled={loading || !rows.length}
+            onClick={() => void downloadAllParticipants()}
+            disabled={loading || downloading || totalParticipants === 0}
           >
             <FileDown aria-hidden className="size-4 shrink-0" />
-            Descargar lista
+            {downloading ? 'Preparando lista…' : 'Descargar lista'}
           </button>
         }
       />
-      {!loading && rows.length > 0 && (
+      {!loading && totalParticipants > 0 && (
         <fieldset>
           <legend className="sr-only">Filtrar por estado</legend>
           <div className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:px-0">
@@ -133,7 +229,7 @@ export function ParticipantsView() {
                 key={id}
                 type="button"
                 aria-pressed={status === id}
-                onClick={() => setStatus(id ?? '')}
+                onClick={() => updateStatus(id ?? '')}
                 className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 ${
                   status === id
                     ? 'border-neo-text bg-neo-text text-neo-bg'
@@ -150,22 +246,24 @@ export function ParticipantsView() {
       {confirmation && (
         <ConfirmPanel
           kind="delete"
-          title={`¿Eliminar ${fullName(confirmation.row)}?`}
+          title={`¿Eliminar ${fullName(confirmation)}?`}
           text="Se eliminará permanentemente este participante de la base de datos, junto con sus participaciones en dinámicas y entradas de rifas asociadas. Esta acción no se puede deshacer."
           confirmLabel="Sí, eliminar"
           busy={!!busy}
-          onCancel={() => records.setConfirmation(null)}
-          onConfirm={() => void records.confirm()}
+          onCancel={() => setConfirmation(null)}
+          onConfirm={() => void confirmDelete()}
         />
       )}
       {loading ? (
         <LoadingState>Cargando registros…</LoadingState>
-      ) : !visible.length ? (
-        query || status ? (
+      ) : !data.rows.length ? (
+        debouncedQuery || status ? (
           <NoMatches
             onClear={() => {
               setQuery('')
+              setDebouncedQuery('')
               setStatus('')
+              setPage(1)
             }}
           />
         ) : (
@@ -178,10 +276,10 @@ export function ParticipantsView() {
       ) : (
         <>
           <p className="m-0 mb-2 text-xs text-neo-text-secondary">
-            {visible.length} de {rows.length} participantes
+            Mostrando {rangeStart}–{rangeEnd} de {data.count} participantes
           </p>
           <ul className="m-0 list-none overflow-hidden rounded-card border border-neo-border bg-neo-surface p-0">
-            {visible.map((row) => {
+            {data.rows.map((row) => {
               const state = row.status ?? 'registered'
               const name = fullName(row)
               return (
@@ -243,7 +341,7 @@ export function ParticipantsView() {
                         <select
                           aria-label={`Estado de ${name}`}
                           value={state}
-                          onChange={(e) => void changeAttendance(row, e.target.value)}
+                          onChange={(event) => void changeAttendance(row, event.target.value)}
                           disabled={!!busy}
                           className="min-h-11 w-auto!"
                         >
@@ -252,7 +350,7 @@ export function ParticipantsView() {
                         <button
                           type="button"
                           className="text-link danger-text"
-                          onClick={() => records.setConfirmation({ row, action: 'delete' })}
+                          onClick={() => setConfirmation(row)}
                           disabled={!!busy}
                         >
                           <Trash2 aria-hidden className="size-4 shrink-0" />
@@ -265,6 +363,33 @@ export function ParticipantsView() {
               )
             })}
           </ul>
+
+          {pageCount > 1 && (
+            <nav
+              aria-label="Paginación de participantes"
+              className="mt-4 grid grid-cols-[1fr_auto_1fr] items-center gap-3"
+            >
+              <button
+                type="button"
+                className="button button-secondary min-h-11 justify-self-start"
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+                disabled={loading || data.page <= 1}
+              >
+                Anterior
+              </button>
+              <span className="text-center text-xs font-bold text-neo-text-secondary">
+                Página {data.page} de {pageCount}
+              </span>
+              <button
+                type="button"
+                className="button button-secondary min-h-11 justify-self-end"
+                onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
+                disabled={loading || data.page >= pageCount}
+              >
+                Siguiente
+              </button>
+            </nav>
+          )}
         </>
       )}
     </section>
