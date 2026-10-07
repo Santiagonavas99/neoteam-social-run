@@ -132,3 +132,13 @@ No backend, auth, Supabase, token or QR payload changes. Check-in continues thro
 - Full-screen native camera mode.
 - Flash/torch controls.
 - Zoom controls.
+
+
+## Mobile refinement after real preview
+
+The first mobile preview exposed two issues that were not visible in the static hierarchy:
+
+- `html5-qrcode` was drawing its own `qrbox` guide while NeoTeam also drew cyan corners, producing two competing frames;
+- the `4:5` camera surface consumed too much vertical space and pushed the manual fallback below the useful first viewport.
+
+The scanner therefore uses the full video frame for detection (no library `qrbox`) and NeoTeam owns the only visible scan guide. On mobile the camera surface is square; from `md` upward it returns to `4:3`. The cyan guide is reduced to 62% of the camera width so it reads as a target instead of another container.
