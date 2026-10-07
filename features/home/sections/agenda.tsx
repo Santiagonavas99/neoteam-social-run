@@ -1,61 +1,193 @@
-import { agenda } from '@/features/event/event'
+'use client'
 
-// The rail sits on the centre of the 16 px dot column: time column + gap + 8 px.
+import { useEffect, useState } from 'react'
+import { agenda, eventConfig } from '@/features/event/event'
+import styles from './agenda.module.css'
+
+type LiveAgenda = {
+  current: number
+  next: number
+  ended: boolean
+}
+
+const eventDate = eventConfig.startsAt.slice(0, 10)
+const eventEndMinutes = 11 * 60
+
+function minutesFromTime(time: string) {
+  const [hour, minute] = time.split(':').map(Number)
+  return hour * 60 + minute
+}
+
+// The status is based on the published schedule in the event's time zone, not on the
+// visitor's computer time zone. It intentionally does not claim to track live activities.
+function getLiveAgenda(now: Date): LiveAgenda | null {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Bogota',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(now)
+
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]))
+  const date = [values.year, values.month, values.day].join('-')
+  if (date !== eventDate) return null
+
+  const minutes = Number(values.hour) * 60 + Number(values.minute)
+  let current = -1
+
+  for (const [index, item] of agenda.entries()) {
+    if (minutes >= minutesFromTime(item.time)) current = index
+  }
+
+  return {
+    current,
+    next: current + 1 < agenda.length ? current + 1 : -1,
+    ended: minutes >= eventEndMinutes,
+  }
+}
+
 export function Agenda({ index = '02' }: { index?: string }) {
+  const [live, setLive] = useState<LiveAgenda | null>(null)
+
+  useEffect(() => {
+    const update = () => setLive(getLiveAgenda(new Date()))
+    update()
+    const interval = window.setInterval(update, 30_000)
+    return () => window.clearInterval(interval)
+  }, [])
+
+  const featuredIndex = live && !live.ended ? Math.max(0, live.current) : 2
+
   return (
-    <section className="bg-neo-bg py-12 md:py-24" id="agenda">
-      <div className="shell grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
-        <header className="reveal lg:sticky lg:top-10 lg:self-start">
+    <section className={styles.section} id="agenda">
+      <div className={['shell', styles.grid].join(' ')}>
+        <header className={styles.heading}>
           <span className="v2-index">{index} / AGENDA</span>
-          <h2 className="m-0 mt-3 text-[clamp(40px,11vw,76px)] font-extrabold leading-[0.92] tracking-[-0.06em]">
-            UNA MAÑANA
-            <br />
-            CON RITMO.
+          <span className={styles.eyebrow}>EL DÍA QUE NOS ENCONTRAMOS</span>
+          <h2 className={styles.title}>
+            <span>UN DÍA.</span>
+            <span>MUCHAS</span>
+            <span>
+              <em>HISTORIAS.</em>
+            </span>
           </h2>
-          <p className="m-0 mt-4 max-w-[40ch] text-[15px] text-neo-text-secondary">
-            Desde la llegada hasta la foto final: correr, recuperar, compartir y celebrar el
-            aniversario juntos.
+          <p className={styles.description}>
+            Una mañana para correr, conectar y celebrar juntos. Sigue cada momento del
+            aniversario, desde la primera bienvenida hasta la última foto.
           </p>
+          <div className={styles.eventMark} aria-label="Domingo 18 de octubre de 2026">
+            <span className={styles.eventDay}>18</span>
+            <div className={styles.eventMeta}>
+              <span>OCT / DOMINGO</span>
+              <span>2026 · CALI, COLOMBIA</span>
+            </div>
+          </div>
         </header>
 
-        <ol className="relative m-0 list-none p-0 before:absolute before:top-3 before:bottom-3 before:left-[71px] before:w-0.5 before:bg-neo-border md:before:left-[95px]">
-          {agenda.map((item) => {
-            const highlight = 'highlight' in item
-            return (
-              <li
-                key={`${item.time}-${item.title}`}
-                className="reveal grid grid-cols-[56px_16px_minmax(0,1fr)] gap-x-2 py-3 md:grid-cols-[72px_16px_minmax(0,1fr)] md:gap-x-4"
-              >
-                <p className="m-0 text-right text-lg font-extrabold leading-tight tracking-[-0.03em] tabular-nums md:text-2xl">
-                  {item.time}
-                  <small className="block text-xs font-medium tracking-normal text-neo-text-secondary">
-                    {item.meridiem}
-                  </small>
-                </p>
-                <span
-                  aria-hidden
-                  className={`relative z-10 mt-1.5 size-4 justify-self-center rounded-full border-2 ${
-                    highlight
-                      ? 'border-neo-accent bg-neo-accent shadow-[0_0_0_4px_color-mix(in_srgb,var(--neo-accent)_25%,transparent)]'
-                      : 'border-neo-border-strong bg-neo-bg'
-                  }`}
-                />
-                <div className="min-w-0">
-                  <h3
-                    className={`m-0 text-base font-bold tracking-[-0.02em] md:text-lg ${
-                      highlight ? 'text-neo-accent-text' : ''
-                    }`}
+        <div className={styles.board}>
+          <div className={styles.boardTop}>
+            <div className={styles.boardDate}>
+              <strong>DOM 18</strong>
+              <span>OCTUBRE</span>
+            </div>
+            <span className={styles.boardCount}>
+              {String(agenda.length).padStart(2, '0')} ACTIVIDADES
+              <br />
+              07:30 — 11:00
+            </span>
+          </div>
+
+          <div className={styles.timeline}>
+            <ol className={styles.list}>
+              {agenda.map((item, itemIndex) => {
+                const isFeatured = itemIndex === featuredIndex
+                const isCurrent = Boolean(live && !live.ended && live.current === itemIndex)
+                const isNext = Boolean(live && !live.ended && live.next === itemIndex)
+                const isPast = Boolean(
+                  live && (live.ended || (live.current >= 0 && itemIndex < live.current)),
+                )
+                const isKeyMoment = 'highlight' in item
+                const extraDetails = item.details.slice(1)
+                const status = isCurrent
+                  ? 'AHORA · SEGÚN AGENDA'
+                  : isNext
+                    ? 'SIGUE'
+                    : isPast
+                      ? 'FINALIZADO'
+                      : isFeatured
+                        ? 'MOMENTO CLAVE'
+                        : isKeyMoment
+                          ? 'ESPECIAL'
+                          : null
+
+                return (
+                  <li
+                    key={[item.time, item.title].join('-')}
+                    className={styles.step}
+                    aria-current={isCurrent ? 'step' : undefined}
                   >
-                    {item.title}
-                  </h3>
-                  <p className="m-0 mt-1 text-sm leading-snug text-neo-text-secondary">
-                    {item.details.join(' ')}
-                  </p>
-                </div>
-              </li>
-            )
-          })}
-        </ol>
+                    <span
+                      className={[
+                        styles.marker,
+                        isFeatured ? styles.featuredMarker : '',
+                        isPast ? styles.finishedMarker : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                      aria-hidden="true"
+                    />
+                    <article
+                      className={[
+                        styles.card,
+                        isFeatured ? styles.featuredCard : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                    >
+                      <div className={styles.cardHeader}>
+                        <div className={styles.cardTitleGroup}>
+                          <span className={styles.sequence}>
+                            {String(itemIndex + 1).padStart(2, '0')} / ACTIVIDAD
+                          </span>
+                          <h3 className={styles.cardTitle}>{item.title}</h3>
+                        </div>
+                        <time className={styles.time} dateTime={item.time}>
+                          <strong>{item.time}</strong>
+                          <small>{item.meridiem.includes('aprox.') ? 'AM · APROX.' : 'AM'}</small>
+                        </time>
+                      </div>
+
+                      <p className={styles.summary}>{item.details[0]}</p>
+
+                      {status ? (
+                        <div className={styles.badgeRow}>
+                          <span className={styles.status}>{status}</span>
+                        </div>
+                      ) : null}
+
+                      {extraDetails.length > 0 ? (
+                        <details className={styles.more}>
+                          <summary>Ver detalles</summary>
+                          <ul>
+                            {extraDetails.map((detail) => (
+                              <li key={detail}>{detail}</li>
+                            ))}
+                          </ul>
+                        </details>
+                      ) : null}
+                    </article>
+                  </li>
+                )
+              })}
+            </ol>
+          </div>
+          <p className={styles.footerNote}>
+            {eventConfig.location} · Los estados del día siguen los horarios programados.
+          </p>
+        </div>
       </div>
     </section>
   )
