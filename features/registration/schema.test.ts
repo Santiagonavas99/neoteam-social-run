@@ -43,11 +43,22 @@ test('accepts every listed running crew', () => {
 })
 
 test('uses the canonical database slugs for listed crews', () => {
-  const values = RUNNING_GROUP_OPTIONS.map((group) => group.value)
-  assert.equal(values.includes('run-365'), true)
-  assert.equal(values.includes('pacific-runners'), true)
-  assert.equal(values.includes('365-run-club' as never), false)
-  assert.equal(values.includes('pacifik-runners' as never), false)
+  assert.deepEqual(
+    RUNNING_GROUP_OPTIONS.map((group) => group.value),
+    [
+      'byrunners',
+      'el-cartel-running-club',
+      'run-365',
+      'neoteam',
+      'pacific-runners',
+      'beer-runners',
+      'integral-fit',
+      'running-social',
+      'united-runner-club',
+      'guabinas-run-club',
+      'pace-running',
+    ],
+  )
 })
 
 test('requires the group name when the group is "otro"', () => {
