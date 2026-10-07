@@ -36,6 +36,8 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 | `CircleCheck` / `CircleAlert` / `TriangleAlert` | Success / error / destructive confirmation |
 | `LoaderCircle` | Work in progress |
 | `Dices` | Draw winners |
+| `UserX` | A raffle winner is not there: draw a replacement ("No está · sortear otro") |
+| `ListOrdered` | The points ranking of the dynamics |
 | `Play` | Activate a draft dynamic |
 | `ScanLine` | Register a runner in a dynamic |
 | `UserCheck` | Check-in |

@@ -22,6 +22,8 @@ The rest works as intended: activating (0.15.0), scans, the instant-win cap unde
 
 ### 1. Category on registration
 
+> **Changed during implementation (Iván, 2026-10-07):** only Mujer (`female`) and Hombre (`male`), required, and `registrations.gender` is `not null`. Iván deleted the earlier registrations, so Participantes only shows the category and does not edit it.
+
 - **New required field** in step 01 of `/registro`, next to the birth date: **Categoría**, with Femenina (`female`), Masculina (`male`) and Prefiero no decir (`prefer_not_to_say`).
   - Hint: "Para los premios por categoría."
 - **Database:** a migration replaces `register_social_run_participant` with the same body plus `p_gender text default null`, keeping its grants. It is copied from the remote definition, so nothing else changes.
