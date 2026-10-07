@@ -204,7 +204,10 @@
   border-radius: 18px;
   background: #fff;
   box-shadow: 0 6px 28px rgba(8, 32, 29, 0.025);
-  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    background 220ms ease;
 }
 
 .card:hover {
