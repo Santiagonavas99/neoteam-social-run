@@ -1,18 +1,7 @@
 // @ts-nocheck
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { codeEmail, sendEmail } from '../_shared/email.ts'
-import {
-  CODE_MAX_ATTEMPTS,
-  CODE_MINUTES,
-  CODE_WINDOW_MINUTES,
-  CODES_PER_WINDOW,
-  cleanEmail,
-  codeMatches,
-  hashCode,
-  randomCode,
-  validCode,
-} from '../_shared/otp.ts'
+import { cleanEmail } from '../_shared/otp.ts'
 import { sendPassEmail } from '../_shared/pass-email.ts'
 import { fromProxy } from '../_shared/proxy.ts'
 
@@ -49,8 +38,6 @@ type PassRow = {
 }
 
 const notFound = () => json({ error: 'No encontramos una inscripción con esos datos.' }, 404)
-const wrongCode = () =>
-  json({ error: 'El código no es correcto o ya venció. Pide uno nuevo.' }, 401)
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const passFields =
@@ -143,67 +130,12 @@ Deno.serve(async (req: Request) => {
       return json(passBody(row, { emailed: delivery.ok }))
     }
 
-    if (action === 'requestCode') {
-      // Same answer whether or not the data match, so the form cannot tell who registered.
-      const sent = json({ ok: true })
-      const row = await findRegistration(event.id, body)
-      if (!row) return sent
+    // ponytail: stub so the pre-0.13.0 web (data, code, claim) keeps working during the deploy;
+    // remove it with the pass_email_codes cleanup.
+    if (action === 'requestCode') return json({ ok: true })
 
-      const since = new Date(Date.now() - CODE_WINDOW_MINUTES * 60_000).toISOString()
-      const { count, error: countError } = await supabase
-        .from('pass_email_codes')
-        .select('id', { count: 'exact', head: true })
-        .eq('registration_id', row.id)
-        .gt('created_at', since)
-      if (countError) throw countError
-      if ((count ?? 0) >= CODES_PER_WINDOW) return sent
-
-      const code = randomCode()
-      const { error: insertError } = await supabase.from('pass_email_codes').insert({
-        registration_id: row.id,
-        code_hash: await hashCode(row.id, code),
-        expires_at: new Date(Date.now() + CODE_MINUTES * 60_000).toISOString(),
-      })
-      if (insertError) throw insertError
-      const delivery = await sendEmail({ to: row.email, ...codeEmail(code, 'pass') })
-      if (!delivery.ok)
-        return json(
-          { error: 'No pudimos enviar el código. Intenta de nuevo en unos minutos.' },
-          424,
-        )
-      return sent
-    }
-
-    const otp = body?.otp
-    if (!validCode(otp)) return json({ error: 'Escribe el código de 6 dígitos.' }, 400)
     const row = await findRegistration(event.id, body)
-    if (!row) return wrongCode()
-    const { data: pending, error: codeError } = await supabase
-      .from('pass_email_codes')
-      .select('id,code_hash,attempts')
-      .eq('registration_id', row.id)
-      .is('used_at', null)
-      .gt('expires_at', new Date().toISOString())
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-    if (codeError) throw codeError
-    if (!pending || pending.attempts >= CODE_MAX_ATTEMPTS) return wrongCode()
-    if (!(await codeMatches(row.id, otp, pending.code_hash))) {
-      await supabase
-        .from('pass_email_codes')
-        .update({ attempts: pending.attempts + 1 })
-        .eq('id', pending.id)
-      return wrongCode()
-    }
-    const { data: used, error: useError } = await supabase
-      .from('pass_email_codes')
-      .update({ used_at: new Date().toISOString() })
-      .eq('id', pending.id)
-      .is('used_at', null)
-      .select('id')
-    if (useError) throw useError
-    if (!used?.length) return wrongCode()
+    if (!row) return notFound()
     return json(passBody(row))
   } catch (error) {
     console.error('registration-pass', { message: error?.message })

@@ -1,7 +1,7 @@
 'use server'
 
 import { z } from 'zod'
-import { claimPass, type Pass, requestPassCode } from './pass'
+import { claimPass, type Pass } from './pass'
 
 const identitySchema = z.object({
   documentNumber: z.string().trim().min(5, 'Revisa el número de documento.').max(30),
@@ -9,17 +9,14 @@ const identitySchema = z.object({
 })
 
 export type ClaimState = {
-  step: 'identity' | 'code'
   message: string
   pass?: Pass
   errors?: Record<string, string[] | undefined>
   values?: Record<string, string>
-  /** Changes on every code sent, so the form restarts its resend countdown. */
-  sentAt?: number
 }
 
 export async function claimPassAction(
-  previous: ClaimState,
+  _previous: ClaimState,
   formData: FormData,
 ): Promise<ClaimState> {
   const values = {
@@ -29,36 +26,18 @@ export async function claimPassAction(
   const parsed = identitySchema.safeParse({ ...values, email: values.email.trim() })
   if (!parsed.success) {
     return {
-      step: 'identity',
       message: 'Revisa los datos e intenta de nuevo.',
       errors: parsed.error.flatten().fieldErrors,
       values,
     }
   }
-  const identity = {
+
+  const pass = await claimPass({
     documentNumber: parsed.data.documentNumber,
     email: parsed.data.email.toLowerCase(),
-  }
-
-  const intent = formData.get('intent')
-  if (previous.step === 'identity' || intent === 'resend') {
-    if (!(await requestPassCode(identity))) {
-      return {
-        ...previous,
-        values,
-        message: 'No pudimos enviar el código. Intenta de nuevo en unos minutos.',
-      }
-    }
-    return { step: 'code', message: '', values, sentAt: Date.now() }
-  }
-
-  const pass = await claimPass({ ...identity, otp: String(formData.get('otp') ?? '') })
+  })
   if (!pass) {
-    return {
-      ...previous,
-      values,
-      message: 'El código no es correcto o ya venció. Pide uno nuevo.',
-    }
+    return { message: 'No encontramos una inscripción con ese documento y correo.', values }
   }
-  return { step: 'code', message: '', pass }
+  return { message: '', pass }
 }

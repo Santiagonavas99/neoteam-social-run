@@ -1,6 +1,6 @@
 # Configuración del correo (Resend)
 
-Paso a paso para el correo del pase y el código de un solo uso en `/pase` (spec: [`2026-10-06-pass-email-design.md`](superpowers/specs/2026-10-06-pass-email-design.md)).
+Paso a paso para el correo del pase y los códigos de entrada al panel (spec: [`2026-10-06-pass-email-design.md`](superpowers/specs/2026-10-06-pass-email-design.md)).
 
 **Desde la 0.9.0 el panel se abre con un código que llega por correo, así que los pasos 1 a 4 tienen que estar hechos antes de desplegarlo.** El orden de despliegue está al final, en [Despliegue del panel (0.9.0)](#despliegue-del-panel-090).
 
@@ -120,10 +120,7 @@ En un celular:
    - llega el correo "Tu pase para el NeoTeam Social Run";
    - el QR se ve en Gmail;
    - se puede escanear en el Check-in del admin.
-2. En `/pase`, escribe documento y correo:
-   - llega el código de 6 dígitos;
-   - el teclado lo ofrece desde el correo;
-   - se abre el pase.
+2. En `/pase`, escribe documento y correo: el pase se abre de una vez (desde la 0.13.0 no hay código).
 3. En el admin, en Participantes → **Reenviar pase**, el correo vuelve a llegar.
 4. En Resend → **Logs**, cada envío aparece como `delivered`. Si alguno cayó en spam, revisa que exista DMARC y que el dominio esté Verified.
 
@@ -150,9 +147,19 @@ El nombre del evento, el logo y la imagen del pase de Wallet se configuran en la
 
 El código ya agrega a cada pase la fecha, la hora de llegada, el lugar y el recorrido.
 
+## 9. `/pase` sin código (0.13.0)
+
+`/pase` vuelve a abrir el pase solo con documento y correo. Despliega la función y mergea el PR:
+
+```bash
+supabase functions deploy registration-pass --project-ref ohatsnkgaeccltqwhkbv
+```
+
+La función nueva sigue aceptando el flujo viejo con código (responde sin enviar nada), así que el orden no rompe `/pase`.
+
 ## Límites y errores
 
-- **100 correos al día en el plan gratuito.** Cada inscripción gasta uno, cada código de `/pase` otro y cada entrada al panel otro. Si se esperan más de unas 80 inscripciones en un día, pasa a Resend Pro antes de ese día.
+- **100 correos al día en el plan gratuito.** Cada inscripción gasta uno y cada entrada al panel otro (desde la 0.13.0, `/pase` ya no envía código). Si se esperan más de unas 80 inscripciones en un día, pasa a Resend Pro antes de ese día.
 - **Si se pasa el límite:** Resend responde 429. La función registra `email 429`, y quien lo pidió ve "No pudimos enviar el correo, intenta más tarde". La inscripción se completa igual y el pase se sigue viendo en pantalla.
 - **Logs:** el log de la función solo muestra `email <status>`; la respuesta de Resend nunca llega al navegador.
 - **Si la key se filtra:** revócala en Resend → API Keys, crea una nueva y repite el paso 4.
