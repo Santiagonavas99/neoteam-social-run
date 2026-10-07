@@ -1,8 +1,8 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import {
   defaultHomeSectionOrder,
-  normalizeHomeSectionOrder,
   type HomeSectionOrder,
+  normalizeHomeSectionOrder,
 } from './section-order'
 
 // Supabase errors are plain objects, so logging them whole prints "{}".
