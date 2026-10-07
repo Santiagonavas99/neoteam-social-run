@@ -75,10 +75,10 @@ export function Agenda({ index = '02' }: { index?: string }) {
             </span>
           </h2>
           <p className={styles.description}>
-            Una mañana para correr, conectar y celebrar juntos. Sigue cada momento del
-            aniversario, desde la primera bienvenida hasta la última foto.
+            Una mañana para correr, conectar y celebrar juntos. Sigue cada momento del aniversario,
+            desde la primera bienvenida hasta la última foto.
           </p>
-          <div className={styles.eventMark} aria-label="Domingo 18 de octubre de 2026">
+          <div className={styles.eventMark}>
             <span className={styles.eventDay}>18</span>
             <div className={styles.eventMeta}>
               <span>OCT / DOMINGO</span>
@@ -140,10 +140,7 @@ export function Agenda({ index = '02' }: { index?: string }) {
                       aria-hidden="true"
                     />
                     <article
-                      className={[
-                        styles.card,
-                        isFeatured ? styles.featuredCard : '',
-                      ]
+                      className={[styles.card, isFeatured ? styles.featuredCard : '']
                         .filter(Boolean)
                         .join(' ')}
                     >
