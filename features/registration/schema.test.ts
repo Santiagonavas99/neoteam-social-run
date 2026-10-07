@@ -10,6 +10,7 @@ const valid = {
   email: 'ana@example.com',
   phone: '3001234567',
   birthDate: '1995-04-12',
+  gender: 'female',
   runningGroup: 'neoteam',
   emergencyName: 'Luis Pérez',
   emergencyPhone: '3007654321',
@@ -73,4 +74,10 @@ test('rejects phones that are not 10 digits', () => {
     assert.deepEqual(errorPaths({ ...valid, phone }), ['phone'], phone)
     assert.deepEqual(errorPaths({ ...valid, emergencyPhone: phone }), ['emergencyPhone'], phone)
   }
+})
+
+test('requires the category to be female or male', () => {
+  assert.deepEqual(errorPaths({ ...valid, gender: undefined }), ['gender'])
+  assert.deepEqual(errorPaths({ ...valid, gender: 'other' }), ['gender'])
+  assert.deepEqual(errorPaths({ ...valid, gender: 'male' }), [])
 })

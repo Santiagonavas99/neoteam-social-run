@@ -1,11 +1,11 @@
 'use client'
 
-import { Dices, Plus, ScanLine, Trash2, Zap } from 'lucide-react'
+import { Dices, Play, Plus, ScanLine, Trash2, Trophy, Zap } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { callAdmin } from '../api'
 import { matchesQuery } from '../filter'
-import { dynamicStates, dynamicTypes } from '../labels'
-import type { CommunityRecord } from '../types'
+import { dynamicStates, dynamicTypes, raffleGenders } from '../labels'
+import type { CommunityRecord, DynamicRow } from '../types'
 import { Feedback, StatusBadge } from '../ui/admin-ui'
 import { ConfirmPanel } from '../ui/confirm-panel'
 import { EmptyState, NoMatches } from '../ui/empty-state'
@@ -17,9 +17,28 @@ import { useAdminData } from '../ui/use-admin-data'
 import { DrawResult } from './draw-result'
 import { DynamicForm } from './dynamic-form'
 import { ParticipationPanel } from './participation-panel'
+import { Ranking } from './ranking'
 import { useDynamics } from './use-dynamics'
 
 const plural = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`
+
+function drawText(row: DynamicRow, eligible: number | null) {
+  if (eligible === null) return 'Contando participantes…'
+  if (eligible === 0)
+    return 'Nadie cumple todavía las condiciones de este sorteo. Revisa el check-in, la categoría o la dinámica vinculada.'
+  const rules = [
+    row.requires_checkin ? 'con check-in' : '',
+    row.config?.gender ? (raffleGenders[String(row.config.gender)]?.toLowerCase() ?? '') : '',
+    row.eligibility_dynamic_id ? 'que completaron la dinámica vinculada' : '',
+    row.config?.exclude_winners === true ? 'sin ganadores previos' : '',
+  ].filter(Boolean)
+  const pool = `Participan ${plural(eligible, 'persona', 'personas')}${rules.length ? ` (${rules.join(', ')})` : ''}.`
+  const shortfall =
+    eligible < row.winner_count
+      ? ` Solo saldrán ${plural(eligible, 'ganador', 'ganadores')} de ${row.winner_count}.`
+      : ` Se sortearán ${plural(row.winner_count, 'ganador', 'ganadores')}.`
+  return `${pool}${shortfall} Los resultados se guardarán al confirmar.`
+}
 
 export function DynamicsView() {
   const dynamics = useDynamics()
@@ -54,7 +73,7 @@ export function DynamicsView() {
       requires_checkin: true,
       prize: '',
       winner_count: 1,
-      config: { win_probability: 0.1 },
+      config: { win_probability: 0.1, exclude_winners: true },
     })
   }
 
@@ -102,19 +121,38 @@ export function DynamicsView() {
         action={createButton}
       />
       <Feedback value={feedback} />
+      {!loading && !query && !type && <Ranking runners={dynamics.ranking} />}
       {winners && (
         <DrawResult
-          name={winners.name}
+          key={`${winners.row.id}-${winners.reveal}-${winners.list.map((w) => w.id).join()}`}
+          name={winners.row.name}
           winners={winners.list}
+          reveal={winners.reveal}
+          busy={busy || !!confirmation}
+          onAbsent={(winner, place) =>
+            dynamics.setConfirmation({ row: winners.row, winner, place, action: 'redraw' })
+          }
           onClose={() => dynamics.setWinners(null)}
         />
       )}
       {confirmation?.action === 'draw' && (
         <ConfirmPanel
           kind="draw"
-          title="¿Todo listo para el sorteo?"
-          text={`Se sortearán ${plural(confirmation.row.winner_count, 'ganador', 'ganadores')} para “${confirmation.row.name}”. ${confirmation.row.eligibility_dynamic_id ? 'Participan quienes completaron la dinámica vinculada.' : confirmation.row.requires_checkin ? 'Participan quienes hayan hecho check-in.' : 'Participan los inscritos elegibles.'} Los resultados se guardarán al confirmar.`}
+          title={`¿Todo listo para “${confirmation.row.name}”?`}
+          text={drawText(confirmation.row, dynamics.eligible)}
           confirmLabel="Confirmar y sortear"
+          busy={busy}
+          confirmDisabled={!dynamics.eligible}
+          onCancel={() => dynamics.setConfirmation(null)}
+          onConfirm={() => void dynamics.confirm()}
+        />
+      )}
+      {confirmation?.action === 'redraw' && (
+        <ConfirmPanel
+          kind="draw"
+          title={`¿${confirmation.winner.firstName} no está?`}
+          text={`Se marcará como ausente en “${confirmation.row.name}” y se sorteará a otra persona para el puesto ${confirmation.place}. Los demás ganadores no cambian.`}
+          confirmLabel="Sortear otro ganador"
           busy={busy}
           onCancel={() => dynamics.setConfirmation(null)}
           onConfirm={() => void dynamics.confirm()}
@@ -199,15 +237,37 @@ export function DynamicsView() {
                     onClick={() => dynamics.edit(editor?.id === row.id ? null : row)}
                     disabled={busy || !!scanning || (!!editor && editor.id !== row.id)}
                   />
+                  {row.status === 'draft' && (
+                    <button
+                      type="button"
+                      className="button"
+                      onClick={() => void dynamics.activate(row)}
+                      disabled={locked}
+                    >
+                      <Play aria-hidden className="size-4 shrink-0" />
+                      Activar
+                    </button>
+                  )}
                   {row.status === 'open' && row.type === 'raffle' && (
                     <button
                       type="button"
                       className="button"
-                      onClick={() => dynamics.setConfirmation({ row, action: 'draw' })}
+                      onClick={() => void dynamics.askDraw(row)}
                       disabled={locked}
                     >
                       <Dices aria-hidden className="size-4 shrink-0" />
                       Sortear
+                    </button>
+                  )}
+                  {row.status === 'completed' && row.type === 'raffle' && (
+                    <button
+                      type="button"
+                      className="button button-secondary"
+                      onClick={() => void dynamics.showWinners(row)}
+                      disabled={locked}
+                    >
+                      <Trophy aria-hidden className="size-4 shrink-0" />
+                      Ver ganadores
                     </button>
                   )}
                   {row.status === 'open' && row.type !== 'raffle' && (

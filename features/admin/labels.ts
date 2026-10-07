@@ -7,6 +7,17 @@ export const participantStates: Record<string, string> = {
   cancelled: 'Cancelado',
 }
 
+export const genderLabels: Record<string, string> = {
+  female: 'Mujer',
+  male: 'Hombre',
+}
+
+export const raffleGenders: Record<string, string> = {
+  '': 'Todas las categorías',
+  female: 'Solo mujeres',
+  male: 'Solo hombres',
+}
+
 export const brandTypes: Record<string, string> = {
   organizer: 'Organizador',
   main_partner: 'Aliado principal',

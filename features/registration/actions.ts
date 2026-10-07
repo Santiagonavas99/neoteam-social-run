@@ -48,6 +48,7 @@ export async function registerParticipant(
       p_email: parsed.data.email.toLowerCase(),
       p_phone: parsed.data.phone,
       p_birth_date: parsed.data.birthDate,
+      p_gender: parsed.data.gender,
       p_running_group_slug: parsed.data.runningGroup,
       p_other_running_group:
         parsed.data.runningGroup === 'otro' ? (parsed.data.otherRunningGroup ?? null) : null,

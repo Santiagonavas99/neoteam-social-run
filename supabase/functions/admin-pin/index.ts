@@ -323,6 +323,23 @@ Deno.serve(async (req: Request) => {
           .single()
         if (eventError) throw eventError
 
+        const rankedWinners = async (dynamicId: string) => {
+          const { data: entries, error } = await supabase
+            .from('dynamic_participations')
+            .select(
+              'metadata,registrations(id,registration_code,first_name,last_name,status,other_running_group,running_groups(name))',
+            )
+            .eq('dynamic_id', dynamicId)
+            .eq('status', 'winner')
+          if (error) throw error
+          return (entries ?? [])
+            .sort(
+              (a: { metadata?: { rank?: number } }, b: { metadata?: { rank?: number } }) =>
+                (a.metadata?.rank ?? 0) - (b.metadata?.rank ?? 0),
+            )
+            .map((entry: { registrations: unknown }) => participantPayload(entry.registrations))
+        }
+
         if (operation === 'list') {
           const { data: rows, error } = await supabase
             .from('dynamics')
@@ -352,12 +369,38 @@ Deno.serve(async (req: Request) => {
             counts.set(participation.dynamic_id, current)
           }
 
+          const { data: scores, error: rankingError } = await supabase.rpc(
+            'dynamic_points_ranking',
+            { p_event_id: event.id },
+          )
+          if (rankingError) throw rankingError
+          const scoreIds = (scores ?? []).map(
+            (score: { registration_id: string }) => score.registration_id,
+          )
+          let runners: Array<Record<string, unknown> & { id: string }> = []
+          if (scoreIds.length) {
+            const result = await supabase
+              .from('registrations')
+              .select(
+                'id,registration_code,first_name,last_name,status,other_running_group,running_groups(name)',
+              )
+              .in('id', scoreIds)
+            if (result.error) throw result.error
+            runners = result.data ?? []
+          }
+
           return json({
             dynamicRows: (rows ?? []).map((row: IdRow & Record<string, unknown>) => ({
               ...row,
               participations_count: counts.get(row.id)?.total ?? 0,
               winners_count: counts.get(row.id)?.winners ?? 0,
             })),
+            ranking: (scores ?? []).flatMap(
+              (score: { registration_id: string; points: number }) => {
+                const runner = runners.find((item) => item.id === score.registration_id)
+                return runner ? [{ ...participantPayload(runner), points: score.points }] : []
+              },
+            ),
           })
         }
 
@@ -396,6 +439,10 @@ Deno.serve(async (req: Request) => {
             config.win_probability = Number.isFinite(probability)
               ? Math.max(0, Math.min(1, probability))
               : 0.1
+          }
+          if (values.type === 'raffle') {
+            if (!['female', 'male'].includes(String(config.gender))) delete config.gender
+            config.exclude_winners = config.exclude_winners === true
           }
 
           const safeValues = {
@@ -550,6 +597,17 @@ Deno.serve(async (req: Request) => {
           })
         }
 
+        if (operation === 'eligibleCount') {
+          if (typeof body?.id !== 'string' || !body.id)
+            return json({ error: 'Dinámica no válida.' }, 400)
+          const { data: count, error } = await supabase.rpc('dynamic_eligible_count', {
+            p_dynamic_id: body.id,
+            p_event_id: event.id,
+          })
+          if (error) throw error
+          return json({ ok: true, count: count ?? 0 })
+        }
+
         if (operation === 'draw') {
           if (typeof body?.id !== 'string' || !body.id)
             return json({ error: 'Dinámica no válida.' }, 400)
@@ -570,22 +628,38 @@ Deno.serve(async (req: Request) => {
           if (known) return known
           if (drawError) throw drawError
 
-          const winnerIds = (drawn ?? []).map(
-            (row: { registration_id: string }) => row.registration_id,
-          )
-          const { data: winners, error: winnersError } = await supabase
-            .from('registrations')
-            .select(
-              'id,registration_code,first_name,last_name,status,other_running_group,running_groups(name)',
-            )
-            .in('id', winnerIds)
-          if (winnersError) throw winnersError
+          const winnerDetails = await rankedWinners(body.id)
+          return json({ ok: true, winners: (drawn ?? []).length, winnerDetails })
+        }
 
-          return json({
-            ok: true,
-            winners: winnerIds.length,
-            winnerDetails: (winners ?? []).map(participantPayload),
+        if (operation === 'winners') {
+          if (typeof body?.id !== 'string' || !body.id)
+            return json({ error: 'Dinámica no válida.' }, 400)
+          return json({ ok: true, winnerDetails: await rankedWinners(body.id) })
+        }
+
+        if (operation === 'redraw') {
+          if (
+            typeof body?.id !== 'string' ||
+            !body.id ||
+            typeof body?.registrationId !== 'string' ||
+            !body.registrationId
+          )
+            return json({ error: 'Datos incompletos.' }, 400)
+          const { error: redrawError } = await supabase.rpc('redraw_dynamic_winner', {
+            p_dynamic_id: body.id,
+            p_event_id: event.id,
+            p_registration_id: body.registrationId,
           })
+          const known = rpcErrorResponse(redrawError, {
+            dynamic_not_found: ['Dinámica no válida.', 404],
+            dynamic_not_raffle: ['Esta dinámica no es un sorteo.', 400],
+            winner_not_found: ['Esa persona ya no es ganadora de este sorteo.', 409],
+            no_eligible_participants: ['No queda nadie más para sortear en su lugar.', 409],
+          })
+          if (known) return known
+          if (redrawError) throw redrawError
+          return json({ ok: true, winnerDetails: await rankedWinners(body.id) })
         }
 
         return json({ error: 'Operación de dinámica no válida.' }, 400)
@@ -626,7 +700,7 @@ Deno.serve(async (req: Request) => {
         participants: {
           table: 'registrations',
           fields:
-            'id,registration_number,registration_code,first_name,last_name,document_type,document_number,email,phone,running_group_id,other_running_group,shirt_size,status,checked_in_at,created_at,running_groups(name)',
+            'id,registration_number,registration_code,first_name,last_name,document_type,document_number,email,phone,gender,running_group_id,other_running_group,shirt_size,status,checked_in_at,created_at,running_groups(name)',
           writable: ['status', 'checked_in_at'],
         },
         raffles: {

@@ -13,6 +13,7 @@ export type Participant = {
   running_groups?: { name: string } | null
   other_running_group?: string | null
   shirt_size?: string | null
+  gender?: string | null
   status: string
   checked_in_at?: string | null
 }
@@ -89,6 +90,8 @@ export type ScannedParticipant = {
   checkedInAt: string | null
 }
 
+export type RankedRunner = ScannedParticipant & { points: number }
+
 export type CheckinResult = 'checkedIn' | 'alreadyCheckedIn' | 'cancelled'
 
 export type StaffRole = 'admin' | 'checkin'
@@ -112,11 +115,13 @@ export type AdminResponse<Row = unknown> = {
   url?: string
   error?: string
   winners?: number
+  count?: number
   deleted?: number
   result?: CheckinResult
   participant?: ScannedParticipant
   dynamicRows?: DynamicRow[]
   winnerDetails?: ScannedParticipant[]
+  ranking?: RankedRunner[]
   alreadyCompleted?: boolean
   won?: boolean
   prize?: string | null

@@ -4,7 +4,7 @@ import { Mail, Trash2, UserCheck, Users } from 'lucide-react'
 import { useState } from 'react'
 import { callAdmin } from '../api'
 import { matchesQuery } from '../filter'
-import { participantStates } from '../labels'
+import { genderLabels, participantStates } from '../labels'
 import type { Participant } from '../types'
 import { Feedback, StatusBadge } from '../ui/admin-ui'
 import { ConfirmPanel } from '../ui/confirm-panel'
@@ -188,6 +188,10 @@ export function ParticipantsView() {
                         <dd className="m-0 text-neo-text">{row.phone}</dd>
                         <dt className="text-neo-text-secondary">Talla</dt>
                         <dd className="m-0 text-neo-text">{row.shirt_size || '—'}</dd>
+                        <dt className="text-neo-text-secondary">Categoría</dt>
+                        <dd className="m-0 text-neo-text">
+                          {(row.gender && genderLabels[row.gender]) || '—'}
+                        </dd>
                       </dl>
                       <div className="flex flex-wrap items-center gap-3">
                         {state === 'registered' && (

@@ -13,7 +13,7 @@ services:
       - neoteam_db:/var/lib/postgresql/data
       - ./supabase:/work/supabase:ro
     healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      test: ['CMD', 'pg_isready', '-U', 'postgres', '-h', 'localhost']
       interval: 2s
       retries: 30
 

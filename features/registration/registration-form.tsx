@@ -161,15 +161,30 @@ export function RegistrationForm() {
             errors={errors?.phone}
           />
         </div>
-        <TextField
-          name="birthDate"
-          label="Fecha de nacimiento"
-          type="date"
-          defaultValue={values?.birthDate}
-          required
-          autoComplete="bday"
-          errors={errors?.birthDate}
-        />
+        <div className="grid gap-5 sm:grid-cols-2">
+          <TextField
+            name="birthDate"
+            label="Fecha de nacimiento"
+            type="date"
+            defaultValue={values?.birthDate}
+            required
+            autoComplete="bday"
+            errors={errors?.birthDate}
+          />
+          <SelectField
+            name="gender"
+            label="Categoría"
+            defaultValue={values?.gender ?? ''}
+            required
+            errors={errors?.gender}
+          >
+            <option value="" disabled>
+              Selecciona
+            </option>
+            <option value="female">Mujer</option>
+            <option value="male">Hombre</option>
+          </SelectField>
+        </div>
       </div>
 
       <FormSection step="02" title="Tu comunidad" hint="Queremos saber con quién corres." />
