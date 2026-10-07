@@ -6,6 +6,7 @@ import {
 import {
   getHomeCommunity,
   getHomeLogoCarouselItems,
+  getHomeSectionOrder,
   getRegisteredCount,
 } from '@/features/home/data'
 import { LogoMarquee } from '@/features/home/logo-marquee'
@@ -17,36 +18,68 @@ import { Numbers } from '@/features/home/sections/numbers'
 import { Raffle } from '@/features/home/sections/raffle'
 import { Story } from '@/features/home/sections/story'
 
-// Served from the CDN and rebuilt in the background at most once a minute; counter and logos may lag 60 s.
+// Served from the CDN and rebuilt in the background at most once a minute; counter, logos and
+// section ordering may lag 60 s.
 export const revalidate = 60
 
+const numberedSections = new Set(['story', 'agenda', 'community', 'raffle', 'final'])
+
 export default async function Home() {
-  const [logoItems, community, registered] = await Promise.all([
+  const [logoItems, community, registered, sectionOrder] = await Promise.all([
     getHomeLogoCarouselItems(),
     getHomeCommunity(),
     getRegisteredCount(),
+    getHomeSectionOrder(),
   ])
 
   const otherBrands = community.brands.filter((brand) => brand.type !== 'organizer')
+  let editorialIndex = 0
+
+  const sections = sectionOrder.map(({ section_key }) => {
+    const index = numberedSections.has(section_key)
+      ? String(++editorialIndex).padStart(2, '0')
+      : undefined
+
+    switch (section_key) {
+      case 'story':
+        return <Story key={section_key} index={index} />
+      case 'numbers':
+        return (
+          <Numbers key={section_key} registered={registered} brands={logoItems.length} />
+        )
+      case 'allies':
+        return <LogoMarquee key={section_key} items={logoItems} />
+      case 'running_crews':
+        return (
+          <LogoMarquee
+            key={section_key}
+            items={runningCrewMarqueeItems(community.groups, logoItems)}
+            title="Running crews"
+          />
+        )
+      case 'organizations':
+        return (
+          <LogoMarquee
+            key={section_key}
+            items={organizationMarqueeItems(community.brands, logoItems)}
+            title="Organizaciones"
+          />
+        )
+      case 'agenda':
+        return <Agenda key={section_key} index={index} />
+      case 'community':
+        return <Community key={section_key} brands={otherBrands} index={index} />
+      case 'raffle':
+        return <Raffle key={section_key} index={index} />
+      case 'final':
+        return <Final key={section_key} index={index} />
+    }
+  })
 
   return (
     <main className="home-v2">
       <Hero />
-      <Story />
-      <Numbers registered={registered} brands={logoItems.length} />
-      <LogoMarquee items={logoItems} />
-      <LogoMarquee
-        items={runningCrewMarqueeItems(community.groups, logoItems)}
-        title="Running crews"
-      />
-      <LogoMarquee
-        items={organizationMarqueeItems(community.brands, logoItems)}
-        title="Organizaciones"
-      />
-      <Agenda />
-      <Community brands={otherBrands} />
-      <Raffle />
-      <Final />
+      {sections}
       <Footer />
     </main>
   )
