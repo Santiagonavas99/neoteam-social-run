@@ -1,4 +1,5 @@
 import { headers } from 'next/headers'
+import { calendarUrlFor } from '@/features/event/calendar'
 import { isApplePlatform } from '@/features/event/platform'
 import { callEdgeFunction } from '@/lib/edge-function'
 import { googleWalletConfig } from './google-wallet'
@@ -11,6 +12,7 @@ export type Pass = {
   qr: string
   googleWalletUrl?: string
   imageUrl?: string
+  calendarUrl: string
   emailed?: boolean
 }
 
@@ -38,13 +40,14 @@ async function lookup(body: Record<string, unknown>): Promise<PassData | null> {
 
 async function toPass(data: PassData | null): Promise<Pass | null> {
   if (!data) return null
+  const userAgent = (await headers()).get('user-agent') ?? ''
   const pass: Pass = {
     code: data.code,
     name: data.name,
     qr: passQrDataUrl(data.checkinToken),
     emailed: data.emailed,
+    calendarUrl: calendarUrlFor(userAgent),
   }
-  const userAgent = (await headers()).get('user-agent') ?? ''
   if (isApplePlatform(userAgent)) {
     pass.imageUrl = `/api/pass-image?token=${encodeURIComponent(data.checkinToken)}`
   } else if (googleWalletConfig(process.env)) {

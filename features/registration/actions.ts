@@ -1,8 +1,7 @@
 'use server'
 
 import { headers } from 'next/headers'
-import { googleCalendarUrl } from '@/features/event/calendar'
-import { isApplePlatform } from '@/features/event/platform'
+import { calendarUrlFor } from '@/features/event/calendar'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { type Pass, registeredPass } from './pass'
 import { registrationSchema } from './schema'
@@ -78,8 +77,7 @@ export async function registerParticipant(
       documentNumber: parsed.data.documentNumber,
       email: parsed.data.email.toLowerCase(),
     })
-    const userAgent = (await headers()).get('user-agent') ?? ''
-    const calendarUrl = isApplePlatform(userAgent) ? '/evento.ics' : googleCalendarUrl()
+    const calendarUrl = calendarUrlFor((await headers()).get('user-agent') ?? '')
     return { ok: true, message: '¡Registro completado!', code, pass, calendarUrl }
   } catch (error) {
     const isMissingConfig = error instanceof Error && error.message.includes('no está configurado')

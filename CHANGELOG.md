@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.1] - 2026-10-07
+
+### Fixed
+
+- **"Agregar a mi agenda" also appears when a runner opens their pass on `/pase`,** not only right after registering.
+
 ## [0.14.0] - 2026-10-07
 
 ### Added
