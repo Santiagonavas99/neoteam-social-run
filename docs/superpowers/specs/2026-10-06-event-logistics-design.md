@@ -54,7 +54,7 @@ Today:
    - The Spanish (es-419) "Agregar a Google Wallet" SVG from Google's Wallet brand guidelines, unchanged, saved as `features/registration/google-wallet-button.svg`.
    - Rendered with a static import, so it needs no new `public/` folder.
    - At least 48 px tall.
-   - Its `alt` text is "Agregar a Google Wallet".
+   - Its `alt` text matches the badge: "Agregar a la Billetera de Google".
    - It replaces today's black button with the `Wallet` icon. `Wallet` leaves the icon vocabulary.
 
 ## Alternatives rejected

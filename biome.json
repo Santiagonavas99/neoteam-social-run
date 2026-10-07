@@ -13,7 +13,8 @@
       "lib/**",
       "supabase/functions/**",
       "*.json",
-      "!next-env.d.ts"
+      "!next-env.d.ts",
+      "!features/registration/google-wallet-button.svg"
     ]
   },
   "formatter": {

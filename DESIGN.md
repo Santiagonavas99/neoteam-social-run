@@ -16,7 +16,7 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 3. **Keyboard and focus.** Every interactive element is reachable by keyboard and shows a visible `:focus-visible` style. A scrollable region is focusable (`tabIndex={0}`).
 4. **Motion respects `prefers-reduced-motion`.** Animations (the logo marquee, scroll reveals, smooth scrolling) stop or become instant. Scroll reveals use the `reveal` utility (`app/tailwind.css`): CSS scroll-driven animation, no JavaScript, only inside `@supports (animation-timeline: view())`, so unsupported browsers show the element at rest. Never on the first screen. An ancestor with `overflow: hidden` becomes the scroll container and freezes the reveal; clip with `overflow: clip` instead.
 5. **Text ≥ 12 px** on any new UI (16 px for inputs, which avoids iOS zoom on focus).
-6. **Icons** come from `lucide-react` only: no Unicode glyphs (`← → ↗ ✓`), no inline SVG. One icon, one meaning, everywhere (table below). Decorative icons get `aria-hidden`; icon-only buttons have an `aria-label` and a 44 px target. Sizes: `size-4` inline with text, `size-5` in navigation and metric cards, `size-8` in empty states. Icons replace numbering that encodes nothing (admin nav, metrics, empty states); real sequences keep their numbers (form steps, agenda, home section index). Status never relies on color alone. Spinners use `motion-safe:animate-spin`.
+6. **Icons** come from `lucide-react` only: no Unicode glyphs (`← → ↗ ✓`), no inline SVG. One icon, one meaning, everywhere (table below). Decorative icons get `aria-hidden`; icon-only buttons have an `aria-label` and a 44 px target. Sizes: `size-4` inline with text, `size-5` in navigation and metric cards, `size-8` in empty states. Icons replace numbering that encodes nothing (admin nav, metrics, empty states); real sequences keep their numbers (form steps, agenda, home section index). Status never relies on color alone. Spinners use `motion-safe:animate-spin`. **Exception:** official third-party badges are kept as their original files and never redrawn. The only one is Google Wallet's "Agregar a la Billetera de Google" (`features/registration/google-wallet-button.svg`, es-419, from Google's Wallet brand guidelines).
 7. **Copy** is Spanish, sentence case, and says what happens ("Guardar cambios", not "Enviar"). Errors say what failed and how to fix it.
 8. **Logo** is `NeoTeamLogo` (`components/neoteam-logo.tsx`), usually through `BrandLink`: letters in `currentColor`, accent in `--neo-brand-cyan`, so it reads on light and dark surfaces. Never an `<img>` of the white file in `design/brand/`. Favicon: `app/icon.svg`.
 9. **New home styles go in `app/home-v2.css`**; new admin styles go next to the component that uses them. No new global stylesheet.
@@ -40,7 +40,6 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 | `UserCheck` | Check-in |
 | `QrCode` | The runner's check-in pass ("Mi pase") |
 | `Mail` | Send the pass by email |
-| `Wallet` | Add the pass to Google Wallet |
 | `Ellipsis` | "Más": the phone sheet with the remaining admin sections |
 | `Sun` / `Moon` / `Monitor` | Theme: light / dark / system |
 | `Eye` / `EyeOff` | Visible / hidden |

@@ -22,7 +22,7 @@ Status: **approved** (Iván, 2026-10-06), with "Agregar a mi agenda" on the home
 ## 2. `feat(pass): official Google Wallet button`
 
 - **`features/registration/google-wallet-button.svg`:** Google's es-419 "Agregar a Google Wallet" asset, unchanged. The commit message names its source URL.
-- **`features/registration/pass-card.tsx`:** a static import rendered with `next/image` and `unoptimized`. The link gets a 48 px height, a visible `focus-visible` style and the `alt` "Agregar a Google Wallet". The `Wallet` import goes.
+- **`features/registration/pass-card.tsx`:** a static import rendered with `next/image` and `unoptimized`. The link gets a 48 px height, a visible `focus-visible` style and the `alt` "Agregar a la Billetera de Google" (the text of the official es-419 badge). The `Wallet` import goes.
 - **`DESIGN.md`:**
   - an exception in rule 6 for official third-party badges;
   - vocabulary: `Wallet` removed.
