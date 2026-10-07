@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-10-07
+
+### Changed
+
+- **The home header has a light/dark switch instead of the theme menu.** It follows the phone's theme until the first tap, then remembers the choice. The old menu could open stuck at the left edge on large screens.
+- **Changing the theme is animated:** the new theme grows as a circle from the switch, with a cyan ring on its edge so it also shows over the black hero. It is instant with reduced motion or in browsers without View Transitions.
+
 ## [0.19.0] - 2026-10-07
 
 ### Added
