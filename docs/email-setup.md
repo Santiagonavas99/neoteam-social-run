@@ -11,36 +11,56 @@ Never paste the API key in chat, in the repo or in a `NEXT_PUBLIC_*` variable.
 1. Sign up at [resend.com](https://resend.com). The free plan allows 3,000 emails a month, **at most 100 a day**.
 2. Turn on two-factor authentication (Settings → Account). Whoever gets into this account can send email as the event.
 
-## 2. Verify the sending domain
+## 2. Domain: `socialrun.site` (bought on Vercel)
+
+The domain and its DNS live in Vercel. Emails go out from the subdomain `mail.socialrun.site`, which keeps the reputation of the main domain apart.
+
+### 2a. Point the site at the domain
+
+1. **Vercel → project → Settings → Domains → Add:** `socialrun.site`.
+2. Accept adding `www.socialrun.site` as well, redirecting to `socialrun.site`.
+
+Vercel creates the web records itself, because it is also the DNS host.
+
+### 2b. Verify the sending subdomain in Resend
 
 Without a verified domain, Resend only delivers to the account owner's own address.
 
-1. **Domains → Add domain.**
-   - Use a subdomain, e.g. `mail.yourdomain.com`, so the main domain's reputation stays apart.
-   - Region: `us-east-1` (the default) is fine.
-2. Resend shows the DNS records. Add them at your DNS host (Cloudflare, Vercel, GoDaddy, wherever the domain lives), exactly as shown:
+1. **Resend → Domains → Add domain:** `mail.socialrun.site`. Region: `us-east-1` (the default).
+2. Resend lists three records. Add each one in **Vercel → Domains → `socialrun.site` → DNS Records → Add**.
+   - Vercel's **Name** field takes only the part before `socialrun.site`, the same as the table below.
+   - Copy the **Value** from Resend; it is long and unique to the account.
+   - For the MX record, set the priority Resend shows (usually `10`).
 
-   | Type | Name | Purpose |
-   |------|------|---------|
-   | `TXT` | `resend._domainkey.mail` | DKIM: signs each email |
-   | `MX` | `send.mail` | Bounce handling |
-   | `TXT` | `send.mail` | SPF: authorizes Resend to send |
+   | Type | Name (in Vercel) | Value | Purpose |
+   |------|------------------|-------|---------|
+   | `TXT` | `resend._domainkey.mail` | `p=MIGf…` (from Resend) | DKIM: signs each email |
+   | `MX` | `send.mail` | `feedback-smtp.us-east-1.amazonses.com` (from Resend), priority `10` | Bounce handling |
+   | `TXT` | `send.mail` | `v=spf1 include:amazonses.com ~all` (from Resend) | SPF: authorizes Resend to send |
 
-   On Cloudflare, set the records to **DNS only** (grey cloud), not proxied.
-3. Add DMARC, which Gmail and Yahoo require for good delivery:
+3. Add DMARC (Gmail and Yahoo require it for good delivery), replacing the address with an inbox you read:
 
-   | Type | Name | Value |
-   |------|------|-------|
-   | `TXT` | `_dmarc.mail` | `v=DMARC1; p=none; rua=mailto:you@yourdomain.com` |
+   | Type | Name (in Vercel) | Value |
+   |------|------------------|-------|
+   | `TXT` | `_dmarc.mail` | `v=DMARC1; p=none; rua=mailto:your-inbox@example.com` |
 
-4. Back in Resend, click **Verify DNS records**. It can take from minutes up to a few hours. Wait for the status **Verified**.
+4. **Resend → Verify DNS records.** On Vercel DNS it usually takes minutes; wait for **Verified** on all records.
+
+**Check from a terminal** (each command must answer with the value you pasted):
+
+```bash
+dig +short TXT resend._domainkey.mail.socialrun.site
+dig +short MX send.mail.socialrun.site
+dig +short TXT send.mail.socialrun.site
+dig +short TXT _dmarc.mail.socialrun.site
+```
 
 ## 3. API key
 
 1. **API Keys → Create API key.**
    - Name: `neoteam-social-run-supabase`.
    - Permission: **Sending access** (not Full access).
-   - Domain: only the domain from step 2.
+   - Domain: only `mail.socialrun.site`.
 2. Copy it. Resend shows it only once; it starts with `re_`.
 
 ## 4. Supabase secrets
@@ -48,8 +68,8 @@ Without a verified domain, Resend only delivers to the account owner's own addre
 | Secret | Value | Example |
 |--------|-------|---------|
 | `RESEND_API_KEY` | The key from step 3 | `re_…` |
-| `EMAIL_FROM` | Sender name and address on the verified domain | `NeoTeam Social Run <pase@mail.yourdomain.com>` |
-| `SITE_URL` | Public URL of the site, with no trailing slash, used in the `/pase` link | `https://neoteam-social-run.vercel.app` |
+| `EMAIL_FROM` | Sender name and address on the verified subdomain | `NeoTeam Social Run <pase@mail.socialrun.site>` |
+| `SITE_URL` | Public URL of the site, with no trailing slash, used in the `/pase` link | `https://socialrun.site` |
 
 **Option A: the dashboard.** Supabase → project → Edge Functions → **Secrets** → add the three.
 
@@ -58,8 +78,8 @@ Without a verified domain, Resend only delivers to the account owner's own addre
 ```bash
 cat > ~/neoteam-email.env <<'EOF'
 RESEND_API_KEY=re_xxxxxxxx
-EMAIL_FROM=NeoTeam Social Run <pase@mail.yourdomain.com>
-SITE_URL=https://neoteam-social-run.vercel.app
+EMAIL_FROM=NeoTeam Social Run <pase@mail.socialrun.site>
+SITE_URL=https://socialrun.site
 EOF
 supabase secrets set --env-file ~/neoteam-email.env --project-ref ohatsnkgaeccltqwhkbv
 rm ~/neoteam-email.env
