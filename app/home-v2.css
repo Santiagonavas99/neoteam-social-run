@@ -547,18 +547,24 @@
   .v2-hero-meta {
     display: grid;
     grid-template-columns: max-content max-content;
-    justify-content: start;
+    justify-content: center;
     gap: 8px;
     padding-top: 20px;
   }
   .v2-hero-meta .v2-meta-pill:nth-child(3) {
-    grid-column: 1;
+    grid-column: 1 / -1;
+    justify-self: center;
   }
   .v2-hero-grid {
     padding-top: 36px;
     padding-bottom: 38px;
+    text-align: center;
+  }
+  .v2-hero-title .kicker {
+    text-align: center;
   }
   .v2-hero-title h1 {
+    justify-items: center;
     font-size: clamp(76px, 25vw, 124px);
     line-height: 0.78;
   }
@@ -566,10 +572,18 @@
     margin-left: 0;
   }
   .v2-hero-side > p {
+    max-width: 34ch;
+    margin-inline: auto;
     font-size: 20px;
   }
+  .v2-hero-actions {
+    justify-content: center;
+  }
   .v2-route-card {
+    width: min(100%, 320px);
+    margin-inline: auto;
     grid-template-columns: 84px 1fr;
+    text-align: left;
   }
   .v2-route-card strong {
     font-size: 60px;
