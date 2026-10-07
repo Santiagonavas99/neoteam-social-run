@@ -128,12 +128,16 @@ Measured on the public legacy CSS (the admin is clear of all of it); each item i
 
 ## Scan feedback
 
-Check-in and the dynamics stands share `ScanStation` (`features/admin/ui/`). Every result gets a card, a vibration and a short Web Audio tone (`scan-feedback.ts`, no audio files). Sound unlocks on the first tap on the station; iPhones get sound only (no vibration API) and none with the silent switch on.
+Check-in and the dynamics stands share `ScanStation` (`features/admin/ui/`). The camera is the primary surface: it uses four cyan corner guides and shows the current state directly over the live image, so staff never need to look below the scanner to know what happened.
 
-| Result | Card | Vibration | Sound |
-|--------|------|-----------|-------|
-| Done (check-in, participation, no prize) | `success` / `neutral` | 80 ms | two rising notes, 880 → 1320 Hz |
-| Already done ("Ya hizo check-in", "Ya participó", "Ya había ganado") | `warning`: amber `--neo-warning` / `--neo-warning-bg`, 2 px border, uppercase heading, `Clock`, time underneath | 60-80-60 ms | two 440 Hz beeps |
-| Error (not found, cancelled, network) | `danger` | 250 ms | one 220 Hz buzz |
+The lifecycle is explicit: **Iniciando cámara → Listo para escanear → Validando / Registrando → Resultado → Listo para escanear**. Camera-denied replaces the live image with a readable recovery state and a retry action. Manual entry is a deliberate fallback collapsed below the camera, not permanent form chrome.
 
-The scanner ignores the same QR for 1.5 s only (`REPEAT_WINDOW_MS`), so a deliberate second scan reaches the server and shows the amber card.
+Every result also gets vibration and a short Web Audio tone (`scan-feedback.ts`, no audio files). Sound unlocks on the first tap on the station; iPhones get sound only (no vibration API) and none with the silent switch on.
+
+| Result | Camera feedback | Vibration | Sound |
+|--------|-----------------|-----------|-------|
+| Done (check-in, participation, no prize) | `success`: `CircleCheck`, headline and runner data centered over a dark camera veil | 80 ms | two rising notes, 880 → 1320 Hz |
+| Already done ("Ya hizo check-in", "Ya participó", "Ya había ganado") | `warning`: `Clock`, uppercase headline, time and runner data over the camera | 60-80-60 ms | two 440 Hz beeps |
+| Error (not found, cancelled, network) | `danger`: explicit icon + readable error over the camera | 250 ms | one 220 Hz buzz |
+
+Results remain visible briefly and then return to the ready frame without stopping the camera. The scanner ignores the same QR for 1.5 s only (`REPEAT_WINDOW_MS`), so a deliberate second scan still reaches the server and can show "Ya hizo check-in".
