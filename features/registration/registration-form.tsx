@@ -173,7 +173,7 @@ export function RegistrationForm() {
           />
           <SelectField
             name="gender"
-            label="Categoría"
+            label="Género"
             defaultValue={values?.gender ?? ''}
             required
             errors={errors?.gender}
