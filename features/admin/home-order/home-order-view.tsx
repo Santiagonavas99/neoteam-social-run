@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowDown, ArrowUp, LockKeyhole, Save } from 'lucide-react'
+import { ArrowDown, ArrowUp, Eye, EyeOff, LockKeyhole, Save } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import {
   homeSectionMeta,
@@ -24,7 +24,7 @@ export function HomeOrderView() {
     (error: unknown) =>
       setFeedback({
         kind: 'error',
-        text: errorMessage(error, 'No pudimos cargar el orden de la Home.'),
+        text: errorMessage(error, 'No pudimos cargar la configuración de la Home.'),
       }),
     [],
   )
@@ -56,6 +56,15 @@ export function HomeOrderView() {
     })
   }
 
+  function toggleVisibility(sectionKey: HomeSectionOrder['section_key']) {
+    setFeedback(null)
+    setDraft((current) =>
+      current.map((row) =>
+        row.section_key === sectionKey ? { ...row, visible: !row.visible } : row,
+      ),
+    )
+  }
+
   async function save() {
     setBusy(true)
     setFeedback(null)
@@ -67,13 +76,13 @@ export function HomeOrderView() {
       await callAdmin('saveHomeSections', { sections })
       setFeedback({
         kind: 'success',
-        text: 'Orden guardado. La Home puede tardar hasta un minuto en reflejarlo.',
+        text: 'Cambios guardados. La Home puede tardar hasta un minuto en reflejarlos.',
       })
       await reload()
     } catch (error) {
       setFeedback({
         kind: 'error',
-        text: errorMessage(error, 'No pudimos guardar el orden de la Home.'),
+        text: errorMessage(error, 'No pudimos guardar la configuración de la Home.'),
       })
     } finally {
       setBusy(false)
@@ -88,8 +97,8 @@ export function HomeOrderView() {
             Orden de la página
           </h2>
           <p className="m-0 max-w-[62ch] text-sm text-neo-text-secondary">
-            Usa las flechas para subir o bajar cada sección hasta dejar la página en el orden que
-            quieras.
+            Sube o baja cada sección y oculta temporalmente las que no necesites. Al volver a
+            mostrarlas conservan su posición.
           </p>
         </div>
         <div className="flex items-center gap-2 md:shrink-0">
@@ -105,7 +114,7 @@ export function HomeOrderView() {
             disabled={loading || busy || !draft.length}
           >
             <Save aria-hidden className="size-4 shrink-0" />
-            {busy ? 'Guardando…' : 'Guardar orden'}
+            {busy ? 'Guardando…' : 'Guardar cambios'}
           </button>
         </div>
       </div>
@@ -116,40 +125,58 @@ export function HomeOrderView() {
         <div className="flex items-center gap-2">
           <LockKeyhole aria-hidden className="size-4 shrink-0 text-neo-text-secondary" />
           <span>
-            <strong>Hero</strong> · fijo arriba
+            <strong>Hero</strong> · fijo y siempre visible
           </span>
         </div>
         <div className="flex items-center gap-2">
           <LockKeyhole aria-hidden className="size-4 shrink-0 text-neo-text-secondary" />
           <span>
-            <strong>Footer</strong> · fijo abajo
+            <strong>Footer</strong> · fijo y siempre visible
           </span>
         </div>
       </div>
 
       {loading ? (
-        <LoadingState>Cargando orden de la página…</LoadingState>
+        <LoadingState>Cargando configuración de la página…</LoadingState>
       ) : (
         <div className="grid gap-3">
           {draft.map((row, position) => {
             const meta = homeSectionMeta[row.section_key]
             const first = position === 0
             const last = position === draft.length - 1
+            const VisibilityIcon = row.visible ? Eye : EyeOff
 
             return (
               <div
                 key={row.section_key}
-                className="grid gap-3 rounded-control border border-neo-border bg-neo-surface p-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+                className={`grid gap-3 rounded-control border border-neo-border bg-neo-surface p-4 transition md:grid-cols-[minmax(0,1fr)_auto] md:items-center ${
+                  row.visible ? '' : 'opacity-60'
+                }`}
               >
                 <div className="min-w-0">
-                  <strong className="block">{meta.label}</strong>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <strong>{meta.label}</strong>
+                    <span className="rounded-full bg-neo-muted-bg px-2 py-1 text-xs font-semibold text-neo-text-secondary">
+                      {row.visible ? 'Visible' : 'Oculta'}
+                    </span>
+                  </div>
                   <p className="m-0 mt-1 text-sm text-neo-text-secondary">{meta.description}</p>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
-                    className="grid size-10 place-items-center rounded-control border border-neo-border bg-neo-bg text-neo-text transition hover:bg-neo-muted-bg disabled:cursor-not-allowed disabled:opacity-35"
+                    className="inline-flex min-h-11 items-center gap-2 rounded-control border border-neo-border bg-neo-bg px-3 text-sm font-semibold text-neo-text transition hover:bg-neo-muted-bg"
+                    aria-pressed={!row.visible}
+                    onClick={() => toggleVisibility(row.section_key)}
+                    disabled={busy}
+                  >
+                    <VisibilityIcon aria-hidden className="size-4" />
+                    {row.visible ? 'Ocultar' : 'Mostrar'}
+                  </button>
+                  <button
+                    type="button"
+                    className="grid size-11 place-items-center rounded-control border border-neo-border bg-neo-bg text-neo-text transition hover:bg-neo-muted-bg disabled:cursor-not-allowed disabled:opacity-35"
                     aria-label={`Subir ${meta.label}`}
                     title="Subir"
                     disabled={busy || first}
@@ -159,7 +186,7 @@ export function HomeOrderView() {
                   </button>
                   <button
                     type="button"
-                    className="grid size-10 place-items-center rounded-control border border-neo-border bg-neo-bg text-neo-text transition hover:bg-neo-muted-bg disabled:cursor-not-allowed disabled:opacity-35"
+                    className="grid size-11 place-items-center rounded-control border border-neo-border bg-neo-bg text-neo-text transition hover:bg-neo-muted-bg disabled:cursor-not-allowed disabled:opacity-35"
                     aria-label={`Bajar ${meta.label}`}
                     title="Bajar"
                     disabled={busy || last}
