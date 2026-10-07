@@ -118,9 +118,7 @@ export function organizationMarqueeItems(
   allies: HomeLogoCarouselItem[] = [],
 ): CommunityMarqueeItem[] {
   return mergeItems(
-    brands
-      .filter((brand) => brand.type === 'organizer')
-      .map(nativeSource),
+    brands.filter((brand) => brand.type === 'organizer').map(nativeSource),
     allies,
     'show_in_organizations',
   )

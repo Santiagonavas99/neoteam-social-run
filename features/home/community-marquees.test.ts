@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import type { CommunityLogo, HomeLogoCarouselItem } from './data.ts'
 import { organizationMarqueeItems, runningCrewMarqueeItems } from './community-marquees.ts'
+import type { CommunityLogo, HomeLogoCarouselItem } from './data.ts'
 
 const logos: CommunityLogo[] = [
   {
@@ -64,19 +64,30 @@ const allies: HomeLogoCarouselItem[] = [
 
 test('running crews includes only allies enabled for its strip and preserves ordering', () => {
   const items = runningCrewMarqueeItems(logos.slice(0, 1), allies)
-  assert.deepEqual(items.map(({ id }) => id), ['ally-ally-crew', 'crew-1'])
+  assert.deepEqual(
+    items.map(({ id }) => id),
+    ['ally-ally-crew', 'crew-1'],
+  )
   assert.equal(items[0]?.website, 'https://crew.example')
 })
 
 test('organizations includes organizers and its selected allies, excluding sponsors', () => {
   const items = organizationMarqueeItems(logos, allies)
-  assert.deepEqual(items.map(({ id }) => id), ['ally-ally-org', 'org-1'])
+  assert.deepEqual(
+    items.map(({ id }) => id),
+    ['ally-ally-org', 'org-1'],
+  )
   assert.equal(items[0]?.website, 'https://organizer.example')
 })
 
 test('a native record wins duplicate names and logo URLs', () => {
   const native = [
-    { id: 'crew-2', name: '  Club Río ', logo_url: 'https://example.com/native.png', sort_order: 3 },
+    {
+      id: 'crew-2',
+      name: '  Club Río ',
+      logo_url: 'https://example.com/native.png',
+      sort_order: 3,
+    },
   ]
   const byName = {
     ...allies[0]!,
@@ -101,6 +112,12 @@ test('a native record wins duplicate names and logo URLs', () => {
 })
 
 test('each inclusion flag is independent and inactive allies stay hidden', () => {
-  assert.deepEqual(runningCrewMarqueeItems([], allies).map(({ id }) => id), ['ally-ally-crew'])
-  assert.deepEqual(organizationMarqueeItems([], allies).map(({ id }) => id), ['ally-ally-org'])
+  assert.deepEqual(
+    runningCrewMarqueeItems([], allies).map(({ id }) => id),
+    ['ally-ally-crew'],
+  )
+  assert.deepEqual(
+    organizationMarqueeItems([], allies).map(({ id }) => id),
+    ['ally-ally-org'],
+  )
 })

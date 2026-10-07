@@ -18,18 +18,35 @@ export type HomeLogoCarouselItem = {
 export async function getHomeLogoCarouselItems(): Promise<HomeLogoCarouselItem[]> {
   try {
     const supabase = createServerSupabaseClient()
-    const { data, error } = await supabase
-      .from('home_logo_carousel_items')
-      .select(
-        'id,name,logo_url,link_url,active,sort_order,show_in_running_crews,show_in_organizations',
-      )
-      .eq('event_code', 'SR26')
-      .eq('active', true)
-      .order('sort_order', { ascending: true })
-      .order('created_at', { ascending: true })
+    const baseColumns = 'id,name,logo_url,link_url,active,sort_order'
+    const query = (columns: string) =>
+      supabase
+        .from('home_logo_carousel_items')
+        .select(columns)
+        .eq('event_code', 'SR26')
+        .eq('active', true)
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: true })
+
+    let { data, error } = await query(`${baseColumns},show_in_running_crews,show_in_organizations`)
+
+    // Keep existing allies visible while the optional reuse migration is pending.
+    if (
+      error &&
+      ['42703', 'PGRST204'].includes(error.code) &&
+      /show_in_running_crews|show_in_organizations/.test(error.message)
+    ) {
+      const fallback = await query(baseColumns)
+      data = fallback.data
+      error = fallback.error
+    }
 
     if (error) throw error
-    return (data ?? []) as HomeLogoCarouselItem[]
+    return ((data ?? []) as unknown as HomeLogoCarouselItem[]).map((item) => ({
+      ...item,
+      show_in_running_crews: item.show_in_running_crews === true,
+      show_in_organizations: item.show_in_organizations === true,
+    }))
   } catch (error) {
     console.error('Home logo carousel fallback', errorText(error))
     return []

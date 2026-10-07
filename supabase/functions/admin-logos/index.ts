@@ -64,7 +64,9 @@ Deno.serve(async (req: Request) => {
     if (action === 'list') {
       const { data, error } = await supabase
         .from('home_logo_carousel_items')
-        .select('id,event_code,name,logo_url,link_url,active,sort_order,show_in_running_crews,show_in_organizations,created_at,updated_at')
+        .select(
+          'id,event_code,name,logo_url,link_url,active,sort_order,show_in_running_crews,show_in_organizations,created_at,updated_at',
+        )
         .eq('event_code', 'SR26')
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: true })

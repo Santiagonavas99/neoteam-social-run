@@ -1,13 +1,13 @@
 import { Footer } from '@/components/footer'
 import {
+  organizationMarqueeItems,
+  runningCrewMarqueeItems,
+} from '@/features/home/community-marquees'
+import {
   getHomeCommunity,
   getHomeLogoCarouselItems,
   getRegisteredCount,
 } from '@/features/home/data'
-import {
-  organizationMarqueeItems,
-  runningCrewMarqueeItems,
-} from '@/features/home/community-marquees'
 import { LogoMarquee } from '@/features/home/logo-marquee'
 import { Agenda } from '@/features/home/sections/agenda'
 import { Community } from '@/features/home/sections/community'
@@ -34,8 +34,14 @@ export default async function Home() {
       <Story />
       <Numbers registered={registered} brands={logoItems.length} />
       <LogoMarquee items={logoItems} />
-      <LogoMarquee items={runningCrewMarqueeItems(community.groups, logoItems)} title="Running crews" />
-      <LogoMarquee items={organizationMarqueeItems(community.brands, logoItems)} title="Organizaciones" />
+      <LogoMarquee
+        items={runningCrewMarqueeItems(community.groups, logoItems)}
+        title="Running crews"
+      />
+      <LogoMarquee
+        items={organizationMarqueeItems(community.brands, logoItems)}
+        title="Organizaciones"
+      />
       <Agenda />
       <Community brands={otherBrands} />
       <Raffle />

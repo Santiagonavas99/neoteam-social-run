@@ -69,3 +69,10 @@ Checks:
 - Changing the existing “Running crews” or “Marcas” data models.
 - Copying logos or adding duplicate records just to reuse an ally.
 - New admin sections, auth changes, or direct Supabase access from the browser.
+
+## Corrective follow-up — 2026-10-07
+
+User explicitly requested restoring Marcas aliadas without another approval gate.
+
+- Fix `features/home/data.ts` to retry the existing columns only when the optional reuse columns are absent; default inclusion flags to false. Preserve active/event/order filters and all three strips.
+- Verify migrated and unmigrated responses, unrelated errors, existing selector tests, and the preview build. No schema or UI changes.

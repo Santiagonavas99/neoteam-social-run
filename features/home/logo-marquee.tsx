@@ -24,8 +24,7 @@ export type LogoMarqueeItem = {
 function instagramUrl(value?: string | null) {
   const instagram = value?.trim()
   if (!instagram) return undefined
-  if (/^(https?:\/\/)?(www\.)?instagram\.com\//i.test(instagram))
-    return externalUrl(instagram)
+  if (/^(https?:\/\/)?(www\.)?instagram\.com\//i.test(instagram)) return externalUrl(instagram)
   const handle = instagram.replace(/^@/, '')
   return /^[\w.]+$/.test(handle) ? 'https://www.instagram.com/' + handle + '/' : undefined
 }
