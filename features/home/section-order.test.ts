@@ -33,6 +33,14 @@ test('defaults stored rows without visibility to visible', () => {
   assert.equal(agenda?.visible, true)
 })
 
+test('includes Landak Studio as a visible configurable section by default', () => {
+  const landak = normalizeHomeSectionOrder([]).find(
+    (section) => section.section_key === 'landak_studio',
+  )
+  assert.equal(landak?.visible, true)
+  assert.equal(landak?.sort_order, 10)
+})
+
 test('ignores unknown keys and invalid order values', () => {
   const ordered = normalizeHomeSectionOrder([
     { section_key: 'unknown', sort_order: 1, visible: false },
