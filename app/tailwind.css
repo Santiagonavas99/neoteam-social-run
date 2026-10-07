@@ -68,3 +68,31 @@
     translate: 0 24px;
   }
 }
+
+/* Streamers on a new registration (features/registration/streamers.tsx). Each ribbon sets
+   --x, --delay, --spin and --drift; the parent only renders with motion allowed. */
+.streamer {
+  position: absolute;
+  top: -32px;
+  left: var(--x);
+  border-radius: 2px;
+  animation: streamer-fall 2.4s cubic-bezier(0.25, 0.6, 0.45, 1) var(--delay) both;
+}
+
+@keyframes streamer-fall {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  30% {
+    transform: translate3d(calc(var(--drift) * -1), 32vh, 0) rotate(calc(var(--spin) * 0.35));
+  }
+  65% {
+    transform: translate3d(var(--drift), 70vh, 0) rotate(calc(var(--spin) * 0.7));
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(calc(var(--drift) * -0.5), 105vh, 0) rotate(var(--spin));
+    opacity: 0;
+  }
+}
