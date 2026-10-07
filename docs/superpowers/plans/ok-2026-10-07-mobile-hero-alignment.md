@@ -56,3 +56,13 @@ Final checks:
 - SQL tests;
 - Vercel preview `READY`;
 - no production deploy until explicitly requested.
+
+
+### Final centering refinement
+
+Approved in chat on 2026-10-07:
+- center the mobile meta group;
+- center kicker/title/copy/actions;
+- center the countdown and each unit;
+- center the route card as a block;
+- keep desktop behavior unchanged.
