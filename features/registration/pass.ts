@@ -62,11 +62,6 @@ export async function registeredPass(input: Identity & { code: string }) {
   return toPass(await lookup({ action: 'registered', ...input }))
 }
 
-export async function requestPassCode(input: Identity): Promise<boolean> {
-  const result = await callEdgeFunction('registration-pass', { action: 'requestCode', ...input })
-  return result?.status === 200
-}
-
-export async function claimPass(input: Identity & { otp: string }): Promise<Pass | null> {
+export async function claimPass(input: Identity): Promise<Pass | null> {
   return toPass(await lookup({ action: 'claim', ...input }))
 }
