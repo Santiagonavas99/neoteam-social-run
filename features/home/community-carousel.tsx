@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { HorizontalCarousel } from '@/components/horizontal-carousel'
 import type { CommunityLogo } from '@/features/home/data'
+import { isOptimizable } from './logo-image'
 
 function externalUrl(value?: string | null) {
   if (!value?.trim()) return undefined
@@ -27,7 +28,13 @@ function logoLink(item: CommunityLogo) {
 // Only absolute URLs: a relative path like '/neoteam-logo.png' points at a file this app does not ship.
 function logoContent(item: CommunityLogo) {
   return /^https?:\/\//i.test(item.logo_url ?? '') && item.logo_url ? (
-    <Image unoptimized src={item.logo_url} width={180} height={80} alt={item.name} />
+    <Image
+      unoptimized={!isOptimizable(item.logo_url)}
+      src={item.logo_url}
+      width={180}
+      height={80}
+      alt={item.name}
+    />
   ) : (
     <strong>{item.name}</strong>
   )

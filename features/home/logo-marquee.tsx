@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { isOptimizable } from './logo-image'
 
 function externalUrl(value?: string | null) {
   if (!value?.trim()) return undefined
@@ -37,7 +38,7 @@ function logoContent(item: LogoMarqueeItem, hidden: boolean) {
   const logoUrl = item.logo_url?.trim()
   return logoUrl && /^https?:\/\//i.test(logoUrl) ? (
     <Image
-      unoptimized
+      unoptimized={!isOptimizable(logoUrl)}
       src={logoUrl}
       width={200}
       height={112}
