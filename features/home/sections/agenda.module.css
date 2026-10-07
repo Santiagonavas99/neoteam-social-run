@@ -141,7 +141,13 @@
   bottom: 40px;
   left: 15px;
   width: 2px;
-  background: linear-gradient(180deg, var(--neo-accent-text), var(--neo-accent-border) 40%, var(--neo-accent-border) 90%, transparent);
+  background: linear-gradient(
+    180deg,
+    var(--neo-accent-text),
+    var(--neo-accent-border) 40%,
+    var(--neo-accent-border) 90%,
+    transparent
+  );
   content: "";
 }
 
