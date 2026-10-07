@@ -44,7 +44,7 @@ function ScanFrame() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute top-1/2 left-1/2 z-10 aspect-square w-[68%] max-w-72 -translate-x-1/2 -translate-y-1/2"
+      className="pointer-events-none absolute top-1/2 left-1/2 z-10 aspect-square w-[62%] max-w-64 -translate-x-1/2 -translate-y-1/2"
     >
       <span className={`${corner} top-0 left-0 rounded-tl-control border-t-4 border-l-4`} />
       <span className={`${corner} top-0 right-0 rounded-tr-control border-t-4 border-r-4`} />
@@ -201,13 +201,13 @@ export function ScanStation({
   }
 
   return (
-    <div className="flex flex-col gap-4" onPointerDown={unlockScanSound}>
+    <div className="flex flex-col gap-3 md:gap-4" onPointerDown={unlockScanSound}>
       <header>
-        <h2 className="m-0 text-2xl font-bold tracking-[-0.035em]">{title}</h2>
+        <h2 className="m-0 text-[22px] font-bold tracking-[-0.035em] md:text-2xl">{title}</h2>
         <p className="m-0 mt-1 text-sm leading-relaxed text-neo-text-secondary">{helper}</p>
       </header>
 
-      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-card border border-neo-border bg-neo-black md:aspect-[4/3]">
+      <div className="relative aspect-square w-full overflow-hidden rounded-card border border-neo-border bg-neo-black md:aspect-[4/3]">
         <QrScanner
           onScan={(text) => void run(text)}
           onStateChange={setCameraState}
@@ -264,7 +264,7 @@ export function ScanStation({
               </div>
             </div>
           ) : (
-            <p className="absolute right-4 bottom-4 left-4 z-20 m-0 rounded-control bg-neo-black/70 px-3 py-2 text-center text-sm font-bold text-neo-white">
+            <p className="absolute right-3 bottom-3 left-3 z-20 m-0 rounded-control bg-neo-black/70 px-3 py-2 text-center text-sm font-bold text-neo-white md:right-4 md:bottom-4 md:left-4">
               Coloca el QR dentro del marco
             </p>
           )}
