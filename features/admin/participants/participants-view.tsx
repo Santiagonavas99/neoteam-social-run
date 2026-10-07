@@ -1,6 +1,6 @@
 'use client'
 
-import { Mail, Trash2, UserCheck, Users } from 'lucide-react'
+import { FileDown, Mail, Trash2, UserCheck, Users } from 'lucide-react'
 import { useState } from 'react'
 import { callAdmin } from '../api'
 import { matchesQuery } from '../filter'
@@ -13,6 +13,19 @@ import { LabelOptions } from '../ui/label-options'
 import { ListToolbar } from '../ui/list-toolbar'
 import { LoadingState } from '../ui/loading-state'
 import { useRecords } from '../use-records'
+import { backupListCsv, backupListFileName } from './backup-list'
+
+// Always every registration, whatever the screen filters: it is the gate's offline backup.
+function downloadBackupList(rows: Participant[]) {
+  const url = URL.createObjectURL(
+    new Blob([backupListCsv(rows)], { type: 'text/csv;charset=utf-8' }),
+  )
+  const link = document.createElement('a')
+  link.href = url
+  link.download = backupListFileName(new Date())
+  link.click()
+  URL.revokeObjectURL(url)
+}
 
 const fullName = (row: Participant) => `${row.first_name ?? ''} ${row.last_name ?? ''}`.trim()
 
@@ -99,6 +112,17 @@ export function ParticipantsView() {
           records.setFeedback(null)
           void records.reload()
         }}
+        action={
+          <button
+            type="button"
+            className="button button-secondary"
+            onClick={() => downloadBackupList(rows)}
+            disabled={loading || !rows.length}
+          >
+            <FileDown aria-hidden className="size-4 shrink-0" />
+            Descargar lista
+          </button>
+        }
       />
       {!loading && rows.length > 0 && (
         <fieldset>
