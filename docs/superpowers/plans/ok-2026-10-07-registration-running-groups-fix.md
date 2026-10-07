@@ -6,7 +6,7 @@ Branch: `fix/registration-running-groups`
 
 Status: **approved 2026-10-07**.
 
-Release: `0.26.1` — bug fix.
+Release: `0.26.4` — bug fix on top of the current `0.26.3` baseline.
 
 ## 1. Normalize crew rows and existing registrations
 
@@ -61,7 +61,7 @@ Cases:
 
 Verify participant display and metrics use relational groups.
 
-## 5. Release 0.26.1
+## 5. Release 0.26.4
 
 - bump `package.json`;
 - add `Fixed` entry to `CHANGELOG.md`;
