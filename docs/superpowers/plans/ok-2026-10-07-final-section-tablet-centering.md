@@ -1,18 +1,20 @@
-# Plan — Final section tablet centering
+# Plan — Final section centering
 
 Spec: `docs/superpowers/specs/2026-10-07-final-section-tablet-centering-design.md`
 
 Branch: `fix/final-section-tablet-centering`
 
-Approved by the user's request on 2026-10-07 to fix the date and map alignment on smaller screens.
+Approved by the user's follow-up on 2026-10-07 after the first breakpoint-only fix still showed the date and map shifted right.
 
-1. **Fix intermediate responsive layout**
+1. **Remove the structural horizontal bias**
    - Update `app/home-v2.css`.
-   - At `max-width: 1100px`, collapse `.v2-final-grid` to one column and reset `.v2-meeting` to the first column.
-   - Keep `.v2-final-main` centered and full width.
-   - Verify 390 px, 768 px, 1024 px, and desktop >1100 px behavior.
+   - Make the final grid symmetric at desktop widths.
+   - Keep the index in the left editorial zone while making the date/CTA span the full shell.
+   - Make the meeting/map span the full shell.
+   - At `max-width: 1100px`, return all three blocks to one-column document flow.
+   - Verify 390 px, 768 px, 1024 px and laptop/desktop widths.
 
 2. **Release 0.22.1**
-   - Add the fix under `Fixed` in `CHANGELOG.md`.
-   - Bump `package.json` to `0.22.1`.
+   - Keep the existing `0.22.1` patch release entry in `CHANGELOG.md`.
+   - Keep `package.json` at `0.22.1`.
    - Run CI and Vercel preview checks before merge.
