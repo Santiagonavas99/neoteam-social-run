@@ -113,6 +113,7 @@ export type AdminResponse<Row = unknown> = {
   url?: string
   error?: string
   winners?: number
+  count?: number
   deleted?: number
   result?: CheckinResult
   participant?: ScannedParticipant

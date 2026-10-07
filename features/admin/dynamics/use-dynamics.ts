@@ -16,6 +16,7 @@ export function useDynamics() {
   const [busy, setBusy] = useState(false)
   const [editor, setEditor] = useState<DynamicRow | null>(null)
   const [confirmation, setConfirmation] = useState<DynamicConfirmation | null>(null)
+  const [eligible, setEligible] = useState<number | null>(null)
   const [winners, setWinners] = useState<{ name: string; list: ScannedParticipant[] } | null>(null)
   const onError = useCallback(
     (error: unknown) => setFeedback({ kind: 'error', text: errorMessage(error) }),
@@ -39,6 +40,21 @@ export function useDynamics() {
     setEditor(null)
     setFeedback({ kind: 'success', text: 'Dinámica guardada.' })
     await reload()
+  }
+
+  async function askDraw(row: DynamicRow) {
+    setFeedback(null)
+    setWinners(null)
+    setEligible(null)
+    setConfirmation({ row, action: 'draw' })
+    try {
+      setEligible(
+        (await callAdmin('dynamicData', { operation: 'eligibleCount', id: row.id })).count ?? 0,
+      )
+    } catch (error) {
+      setConfirmation(null)
+      onError(error)
+    }
   }
 
   async function activate(row: DynamicRow) {
@@ -96,6 +112,8 @@ export function useDynamics() {
     setWinners,
     save,
     activate,
+    askDraw,
+    eligible,
     confirm,
     onError,
   }

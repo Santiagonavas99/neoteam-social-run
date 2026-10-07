@@ -4,8 +4,8 @@ import { Dices, Play, Plus, ScanLine, Trash2, Zap } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { callAdmin } from '../api'
 import { matchesQuery } from '../filter'
-import { dynamicStates, dynamicTypes } from '../labels'
-import type { CommunityRecord } from '../types'
+import { dynamicStates, dynamicTypes, raffleGenders } from '../labels'
+import type { CommunityRecord, DynamicRow } from '../types'
 import { Feedback, StatusBadge } from '../ui/admin-ui'
 import { ConfirmPanel } from '../ui/confirm-panel'
 import { EmptyState, NoMatches } from '../ui/empty-state'
@@ -20,6 +20,24 @@ import { ParticipationPanel } from './participation-panel'
 import { useDynamics } from './use-dynamics'
 
 const plural = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`
+
+function drawText(row: DynamicRow, eligible: number | null) {
+  if (eligible === null) return 'Contando participantes…'
+  if (eligible === 0)
+    return 'Nadie cumple todavía las condiciones de este sorteo. Revisa el check-in, la categoría o la dinámica vinculada.'
+  const rules = [
+    row.requires_checkin ? 'con check-in' : '',
+    row.config?.gender ? (raffleGenders[String(row.config.gender)]?.toLowerCase() ?? '') : '',
+    row.eligibility_dynamic_id ? 'que completaron la dinámica vinculada' : '',
+    row.config?.exclude_winners === true ? 'sin ganadores previos' : '',
+  ].filter(Boolean)
+  const pool = `Participan ${plural(eligible, 'persona', 'personas')}${rules.length ? ` (${rules.join(', ')})` : ''}.`
+  const shortfall =
+    eligible < row.winner_count
+      ? ` Solo saldrán ${plural(eligible, 'ganador', 'ganadores')} de ${row.winner_count}.`
+      : ` Se sortearán ${plural(row.winner_count, 'ganador', 'ganadores')}.`
+  return `${pool}${shortfall} Los resultados se guardarán al confirmar.`
+}
 
 export function DynamicsView() {
   const dynamics = useDynamics()
@@ -54,7 +72,7 @@ export function DynamicsView() {
       requires_checkin: true,
       prize: '',
       winner_count: 1,
-      config: { win_probability: 0.1 },
+      config: { win_probability: 0.1, exclude_winners: true },
     })
   }
 
@@ -112,10 +130,11 @@ export function DynamicsView() {
       {confirmation?.action === 'draw' && (
         <ConfirmPanel
           kind="draw"
-          title="¿Todo listo para el sorteo?"
-          text={`Se sortearán ${plural(confirmation.row.winner_count, 'ganador', 'ganadores')} para “${confirmation.row.name}”. ${confirmation.row.eligibility_dynamic_id ? 'Participan quienes completaron la dinámica vinculada.' : confirmation.row.requires_checkin ? 'Participan quienes hayan hecho check-in.' : 'Participan los inscritos elegibles.'} Los resultados se guardarán al confirmar.`}
+          title={`¿Todo listo para “${confirmation.row.name}”?`}
+          text={drawText(confirmation.row, dynamics.eligible)}
           confirmLabel="Confirmar y sortear"
           busy={busy}
+          confirmDisabled={!dynamics.eligible}
           onCancel={() => dynamics.setConfirmation(null)}
           onConfirm={() => void dynamics.confirm()}
         />
@@ -214,7 +233,7 @@ export function DynamicsView() {
                     <button
                       type="button"
                       className="button"
-                      onClick={() => dynamics.setConfirmation({ row, action: 'draw' })}
+                      onClick={() => void dynamics.askDraw(row)}
                       disabled={locked}
                     >
                       <Dices aria-hidden className="size-4 shrink-0" />

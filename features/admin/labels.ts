@@ -12,6 +12,12 @@ export const genderLabels: Record<string, string> = {
   male: 'Hombre',
 }
 
+export const raffleGenders: Record<string, string> = {
+  '': 'Todas las categorías',
+  female: 'Solo mujeres',
+  male: 'Solo hombres',
+}
+
 export const brandTypes: Record<string, string> = {
   organizer: 'Organizador',
   main_partner: 'Aliado principal',

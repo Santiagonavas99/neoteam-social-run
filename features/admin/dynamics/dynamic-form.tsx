@@ -1,6 +1,6 @@
 'use client'
 
-import { dynamicFormTypes, dynamicStates, dynamicTypes } from '../labels'
+import { dynamicFormTypes, dynamicStates, dynamicTypes, raffleGenders } from '../labels'
 import { type CommunityRecord, type DynamicRow, type DynamicType, isNew } from '../types'
 import { EditorForm, useEditor } from '../ui/editor-form'
 import { LabelOptions } from '../ui/label-options'
@@ -135,6 +135,29 @@ export function DynamicForm({
             }
           />
         </label>
+      )}
+      {raffle && (
+        <>
+          <label>
+            Categoría
+            <select
+              value={typeof values.config?.gender === 'string' ? values.config.gender : ''}
+              onChange={(e) => update('config', { ...values.config, gender: e.target.value })}
+            >
+              <LabelOptions labels={raffleGenders} />
+            </select>
+          </label>
+          <label className="check-label col-span-full">
+            <input
+              type="checkbox"
+              checked={values.config?.exclude_winners === true}
+              onChange={(e) =>
+                update('config', { ...values.config, exclude_winners: e.target.checked })
+              }
+            />
+            No repetir ganadores: deja fuera a quien ya ganó otro sorteo o premio
+          </label>
+        </>
       )}
       {raffle && (
         <label className="col-span-full">

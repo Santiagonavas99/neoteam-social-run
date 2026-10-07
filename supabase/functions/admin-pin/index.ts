@@ -397,6 +397,10 @@ Deno.serve(async (req: Request) => {
               ? Math.max(0, Math.min(1, probability))
               : 0.1
           }
+          if (values.type === 'raffle') {
+            if (!['female', 'male'].includes(String(config.gender))) delete config.gender
+            config.exclude_winners = config.exclude_winners === true
+          }
 
           const safeValues = {
             name,
@@ -548,6 +552,17 @@ Deno.serve(async (req: Request) => {
             prize: dynamic.prize,
             participant: participantPayload(participant),
           })
+        }
+
+        if (operation === 'eligibleCount') {
+          if (typeof body?.id !== 'string' || !body.id)
+            return json({ error: 'Dinámica no válida.' }, 400)
+          const { data: count, error } = await supabase.rpc('dynamic_eligible_count', {
+            p_dynamic_id: body.id,
+            p_event_id: event.id,
+          })
+          if (error) throw error
+          return json({ ok: true, count: count ?? 0 })
         }
 
         if (operation === 'draw') {

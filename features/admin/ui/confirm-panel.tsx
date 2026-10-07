@@ -7,6 +7,7 @@ export function ConfirmPanel({
   text,
   confirmLabel,
   busy,
+  confirmDisabled = false,
   onCancel,
   onConfirm,
 }: {
@@ -15,6 +16,7 @@ export function ConfirmPanel({
   text: string
   confirmLabel: string
   busy: boolean
+  confirmDisabled?: boolean
   onCancel: () => void
   onConfirm: () => void
 }) {
@@ -49,7 +51,7 @@ export function ConfirmPanel({
           type="button"
           className={draw ? 'button' : 'button button-danger'}
           onClick={onConfirm}
-          disabled={busy}
+          disabled={busy || confirmDisabled}
         >
           {draw ? (
             <Dices aria-hidden className="size-4 shrink-0" />
