@@ -1,6 +1,6 @@
 import { headers } from 'next/headers'
 import { calendarUrlFor } from '@/features/event/calendar'
-import { isApplePlatform } from '@/features/event/platform'
+import { isAndroidPlatform, isIOSPlatform } from '@/features/event/platform'
 import { callEdgeFunction } from '@/lib/edge-function'
 import { googleWalletConfig } from './google-wallet'
 import { passQrDataUrl } from './qr'
@@ -48,9 +48,9 @@ async function toPass(data: PassData | null): Promise<Pass | null> {
     emailed: data.emailed,
     calendarUrl: calendarUrlFor(userAgent),
   }
-  if (isApplePlatform(userAgent)) {
+  if (isIOSPlatform(userAgent)) {
     pass.imageUrl = `/api/pass-image?token=${encodeURIComponent(data.checkinToken)}`
-  } else if (googleWalletConfig(process.env)) {
+  } else if (isAndroidPlatform(userAgent) && googleWalletConfig(process.env)) {
     pass.googleWalletUrl = googleWalletPath(data.checkinToken)
   }
   return pass

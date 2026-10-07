@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-10-07
+
 ### Fixed
 
 - Keep Marcas aliadas visible when the optional community reuse columns have not been migrated yet.
