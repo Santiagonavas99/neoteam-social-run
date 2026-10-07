@@ -4,6 +4,7 @@ insert into public.admin_pin_sessions (token_hash, expires_at) values ('legacy',
 
 \ir ../migrations/20261006150000_admin_users.sql
 \ir ../migrations/20261006150000_admin_users.sql
+\ir ../migrations/20261007003000_admin_users_email.sql
 
 insert into public.admin_users (name, email, role) values ('Ana', 'ana@example.com', 'admin');
 insert into public.admin_login_codes (user_id, code_hash, expires_at)

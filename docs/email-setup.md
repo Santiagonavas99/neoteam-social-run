@@ -136,7 +136,7 @@ En un celular:
 
 Haz primero los pasos 1 a 4. Después, en este orden:
 
-1. **Migración:** `supabase/migrations/20261006150000_admin_users.sql` en el SQL editor.
+1. **Migración:** `supabase/migrations/20261006150000_admin_users.sql` en el SQL editor. Si ya habías corrido su primera versión (con usuario y PIN), corre en su lugar `20261007003000_admin_users_email.sql`, que la convierte al formato con correo.
    - **Pruébala primero:** `begin;`, luego el contenido del archivo, luego el insert del primer admin (paso 2) y `select name, email, role from public.admin_users;`, y al final `rollback;`.
    - **Luego córrela de verdad.** Cierra las sesiones abiertas del panel actual.
 2. **Primer admin**, en el SQL editor, con el correo en minúsculas:
