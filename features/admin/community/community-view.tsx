@@ -89,7 +89,11 @@ export function CommunityView({ resource }: { resource: 'groups' | 'brands' }) {
           <EmptyState
             icon={brand ? Tag : Flag}
             title="Todo listo para empezar"
-            text={brand ? 'Añade una marca u organización para preparar el evento.' : 'Añade un running crew para preparar el evento.'}
+            text={
+              brand
+                ? 'Añade una marca u organización para preparar el evento.'
+                : 'Añade un running crew para preparar el evento.'
+            }
             action={
               !editor && (
                 <button type="button" className="button" onClick={addRecord}>

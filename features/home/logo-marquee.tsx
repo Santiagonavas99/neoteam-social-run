@@ -24,14 +24,14 @@ export type LogoMarqueeItem = {
 function instagramUrl(value?: string | null) {
   const instagram = value?.trim()
   if (!instagram) return undefined
-  if (/^(https?:\\/\\/)?(www\\.)?instagram\\.com\\//i.test(instagram))
+  if (/^(https?:\/\/)?(www\.)?instagram\.com\//i.test(instagram))
     return externalUrl(instagram)
   const handle = instagram.replace(/^@/, '')
-  return /^[\\w.]+$/.test(handle) ? `https://www.instagram.com/${handle}/` : undefined
+  return /^[\w.]+$/.test(handle) ? \`https://www.instagram.com/\${handle}/\` : undefined
 }
 
 function itemUrl(item: LogoMarqueeItem) {
-  return itemUrl(item) || externalUrl(item.website) || instagramUrl(item.instagram)
+  return externalUrl(item.link_url) || externalUrl(item.website) || instagramUrl(item.instagram)
 }
 
 function logoContent(item: LogoMarqueeItem, hidden: boolean) {
@@ -69,13 +69,13 @@ export function LogoMarquee({
 
   const repeatCount = Math.max(1, Math.ceil(8 / visibleItems.length))
   const repeatedItems = Array.from({ length: repeatCount }, () => visibleItems).flat()
-  const linked = visibleItems.some((item) => externalUrl(item.link_url))
+  const linked = visibleItems.some((item) => itemUrl(item))
 
   function group(hidden = false) {
     return (
       <div className="flex shrink-0 gap-3 pr-3 md:gap-4 md:pr-4" aria-hidden={hidden || undefined}>
         {repeatedItems.map((item, index) => {
-          const href = externalUrl(item.link_url)
+          const href = itemUrl(item)
           const image = logoContent(item, hidden)
 
           return href ? (

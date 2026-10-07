@@ -5,6 +5,7 @@ import {
   getRegisteredCount,
 } from '@/features/home/data'
 import { LogoMarquee } from '@/features/home/logo-marquee'
+import { organizationMarqueeItems, runningCrewMarqueeItems } from '@/features/home/community-marquees'
 import { Agenda } from '@/features/home/sections/agenda'
 import { Community } from '@/features/home/sections/community'
 import { Final } from '@/features/home/sections/final'
@@ -31,8 +32,8 @@ export default async function Home() {
       <Story />
       <Numbers registered={registered} brands={logoItems.length} />
       <LogoMarquee items={logoItems} />
-      <LogoMarquee items={community.groups} title="Running crews" />
-      <LogoMarquee items={organizers} title="Organizaciones" />
+      <LogoMarquee items={runningCrewMarqueeItems(community.groups)} title="Running crews" />
+      <LogoMarquee items={organizationMarqueeItems(community.brands)} title="Organizaciones" />
       <Agenda />
       <Community brands={otherBrands} />
       <Raffle />
