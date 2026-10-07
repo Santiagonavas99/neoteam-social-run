@@ -44,5 +44,5 @@ test('organization marquee includes organizers and excludes other brands', () =>
     organizationMarqueeItems(logos).map(({ id }) => id),
     ['org-1'],
   )
-  assert.equal(organizationMarqueeItems(logos)[0].website, 'https://org.example')
+  assert.equal(organizationMarqueeItems(logos)[0]?.website, 'https://org.example')
 })
