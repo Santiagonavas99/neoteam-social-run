@@ -1,6 +1,8 @@
--- Adds the runner's category (registrations.gender) to the public registration RPC.
--- The body is the remote definition of 2026-10-07 plus p_gender; the new parameter
--- defaults to null, so callers that do not send it keep working.
+-- Makes the runner's category (registrations.gender: female or male) required and adds
+-- it to the public registration RPC. The body is the remote definition of 2026-10-07 plus
+-- p_gender. Iván removes the earlier registrations first, so set not null succeeds.
+alter table public.registrations alter column gender set not null;
+
 drop function public.register_social_run_participant(
   text, text, text, text, text, text, date, text, text, text, text, boolean, boolean, boolean
 );
@@ -44,7 +46,7 @@ begin
   if char_length(trim(coalesce(p_emergency_phone, ''))) < 7 or char_length(trim(p_emergency_phone)) > 30 then
     raise exception 'Teléfono de emergencia inválido';
   end if;
-  if p_gender is not null and p_gender not in ('female','male') then
+  if p_gender is null or p_gender not in ('female','male') then
     raise exception 'Categoría inválida';
   end if;
   if p_terms_accepted is not true or p_privacy_accepted is not true then
