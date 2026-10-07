@@ -53,6 +53,9 @@ export function ParticipationPanel({
     >
       <ScanStation
         inputId={`participation-code-${dynamic.id}`}
+        title="Escanea el pase"
+        helper={`Apunta la cámara al QR del corredor para registrar “${dynamic.name}”.`}
+        busyLabel="Registrando participación…"
         onCode={(code) => complete(dynamic, code)}
       />
       <button
