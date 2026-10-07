@@ -1,5 +1,6 @@
 import { CalendarDays, Clock, Route } from 'lucide-react'
 import { eventConfig } from '@/features/event/event'
+import { stagger } from '../stagger'
 
 const facts = [
   { value: '18 OCT', label: 'Fecha', icon: CalendarDays },
@@ -22,8 +23,8 @@ export function Story() {
       <div className="v2-story-aside reveal">
         <p>{eventConfig.description}</p>
         <div className="v2-fact-list">
-          {facts.map(({ value, label, icon: Icon }) => (
-            <div className="v2-fact" key={label}>
+          {facts.map(({ value, label, icon: Icon }, i) => (
+            <div className="v2-fact reveal" key={label} style={stagger(i)}>
               <strong>{value}</strong>
               <span className="inline-flex items-center gap-1.5">
                 <Icon aria-hidden className="size-3.5 shrink-0" />
