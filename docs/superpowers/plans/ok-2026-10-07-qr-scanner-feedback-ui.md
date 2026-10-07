@@ -96,3 +96,12 @@ Final checks:
 - CI fully green;
 - Vercel preview `READY`;
 - no production deploy until explicitly requested.
+
+
+### Mobile refinement from preview review
+
+After Santiago reviewed the first mobile preview:
+- remove `html5-qrcode`'s `qrbox` so only the cyan NeoTeam guide is visible;
+- change the phone camera surface from `4:5` to square;
+- reduce the visual guide to 62% width;
+- slightly tighten mobile spacing so the manual fallback remains discoverable above the bottom navigation.
