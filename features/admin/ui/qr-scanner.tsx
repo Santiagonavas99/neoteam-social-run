@@ -28,6 +28,8 @@ export function QrScanner({
   })
 
   useEffect(() => {
+    // Changing retryToken intentionally restarts the camera lifecycle.
+    void retryToken
     let cancelled = false
     let stop: (() => Promise<void>) | null = null
     const last = { text: '', at: 0 }
