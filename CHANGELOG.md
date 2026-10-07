@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-10-07
+
+### Added
+
+- **Clear live states in the admin QR scanner.** Starting, ready, validating, success, repeated scans and camera errors now appear directly over the camera, with manual code entry available as a deliberate fallback.
+
 ## [0.22.1] - 2026-10-07
 
 ### Fixed
