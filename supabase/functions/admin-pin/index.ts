@@ -323,6 +323,23 @@ Deno.serve(async (req: Request) => {
           .single()
         if (eventError) throw eventError
 
+        const rankedWinners = async (dynamicId: string) => {
+          const { data: entries, error } = await supabase
+            .from('dynamic_participations')
+            .select(
+              'metadata,registrations(id,registration_code,first_name,last_name,status,other_running_group,running_groups(name))',
+            )
+            .eq('dynamic_id', dynamicId)
+            .eq('status', 'winner')
+          if (error) throw error
+          return (entries ?? [])
+            .sort(
+              (a: { metadata?: { rank?: number } }, b: { metadata?: { rank?: number } }) =>
+                (a.metadata?.rank ?? 0) - (b.metadata?.rank ?? 0),
+            )
+            .map((entry: { registrations: unknown }) => participantPayload(entry.registrations))
+        }
+
         if (operation === 'list') {
           const { data: rows, error } = await supabase
             .from('dynamics')
@@ -585,22 +602,38 @@ Deno.serve(async (req: Request) => {
           if (known) return known
           if (drawError) throw drawError
 
-          const winnerIds = (drawn ?? []).map(
-            (row: { registration_id: string }) => row.registration_id,
-          )
-          const { data: winners, error: winnersError } = await supabase
-            .from('registrations')
-            .select(
-              'id,registration_code,first_name,last_name,status,other_running_group,running_groups(name)',
-            )
-            .in('id', winnerIds)
-          if (winnersError) throw winnersError
+          const winnerDetails = await rankedWinners(body.id)
+          return json({ ok: true, winners: (drawn ?? []).length, winnerDetails })
+        }
 
-          return json({
-            ok: true,
-            winners: winnerIds.length,
-            winnerDetails: (winners ?? []).map(participantPayload),
+        if (operation === 'winners') {
+          if (typeof body?.id !== 'string' || !body.id)
+            return json({ error: 'Dinámica no válida.' }, 400)
+          return json({ ok: true, winnerDetails: await rankedWinners(body.id) })
+        }
+
+        if (operation === 'redraw') {
+          if (
+            typeof body?.id !== 'string' ||
+            !body.id ||
+            typeof body?.registrationId !== 'string' ||
+            !body.registrationId
+          )
+            return json({ error: 'Datos incompletos.' }, 400)
+          const { error: redrawError } = await supabase.rpc('redraw_dynamic_winner', {
+            p_dynamic_id: body.id,
+            p_event_id: event.id,
+            p_registration_id: body.registrationId,
           })
+          const known = rpcErrorResponse(redrawError, {
+            dynamic_not_found: ['Dinámica no válida.', 404],
+            dynamic_not_raffle: ['Esta dinámica no es un sorteo.', 400],
+            winner_not_found: ['Esa persona ya no es ganadora de este sorteo.', 409],
+            no_eligible_participants: ['No queda nadie más para sortear en su lugar.', 409],
+          })
+          if (known) return known
+          if (redrawError) throw redrawError
+          return json({ ok: true, winnerDetails: await rankedWinners(body.id) })
         }
 
         return json({ error: 'Operación de dinámica no válida.' }, 400)

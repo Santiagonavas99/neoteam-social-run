@@ -1,6 +1,6 @@
 'use client'
 
-import { Dices, Play, Plus, ScanLine, Trash2, Zap } from 'lucide-react'
+import { Dices, Play, Plus, ScanLine, Trash2, Trophy, Zap } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { callAdmin } from '../api'
 import { matchesQuery } from '../filter'
@@ -122,8 +122,14 @@ export function DynamicsView() {
       <Feedback value={feedback} />
       {winners && (
         <DrawResult
-          name={winners.name}
+          key={`${winners.row.id}-${winners.reveal}-${winners.list.map((w) => w.id).join()}`}
+          name={winners.row.name}
           winners={winners.list}
+          reveal={winners.reveal}
+          busy={busy || !!confirmation}
+          onAbsent={(winner, place) =>
+            dynamics.setConfirmation({ row: winners.row, winner, place, action: 'redraw' })
+          }
           onClose={() => dynamics.setWinners(null)}
         />
       )}
@@ -135,6 +141,17 @@ export function DynamicsView() {
           confirmLabel="Confirmar y sortear"
           busy={busy}
           confirmDisabled={!dynamics.eligible}
+          onCancel={() => dynamics.setConfirmation(null)}
+          onConfirm={() => void dynamics.confirm()}
+        />
+      )}
+      {confirmation?.action === 'redraw' && (
+        <ConfirmPanel
+          kind="draw"
+          title={`¿${confirmation.winner.firstName} no está?`}
+          text={`Se marcará como ausente en “${confirmation.row.name}” y se sorteará a otra persona para el puesto ${confirmation.place}. Los demás ganadores no cambian.`}
+          confirmLabel="Sortear otro ganador"
+          busy={busy}
           onCancel={() => dynamics.setConfirmation(null)}
           onConfirm={() => void dynamics.confirm()}
         />
@@ -238,6 +255,17 @@ export function DynamicsView() {
                     >
                       <Dices aria-hidden className="size-4 shrink-0" />
                       Sortear
+                    </button>
+                  )}
+                  {row.status === 'completed' && row.type === 'raffle' && (
+                    <button
+                      type="button"
+                      className="button button-secondary"
+                      onClick={() => void dynamics.showWinners(row)}
+                      disabled={locked}
+                    >
+                      <Trophy aria-hidden className="size-4 shrink-0" />
+                      Ver ganadores
                     </button>
                   )}
                   {row.status === 'open' && row.type !== 'raffle' && (
