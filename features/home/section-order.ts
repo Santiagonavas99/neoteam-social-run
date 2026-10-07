@@ -27,10 +27,7 @@ export const defaultHomeSectionOrder: HomeSectionOrder[] = [
   { section_key: 'final', sort_order: 9, visible: true },
 ]
 
-export const homeSectionMeta: Record<
-  HomeSectionKey,
-  { label: string; description: string }
-> = {
+export const homeSectionMeta: Record<HomeSectionKey, { label: string; description: string }> = {
   story: {
     label: 'El plan',
     description: 'Presentación del encuentro, fecha, hora y ruta.',
