@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-07
+
+### Added
+
+- **Your pass by email.** After registering, runners get "Tu pase para el NeoTeam Social Run" with their check-in QR, code, date and route.
+- **"Reenviar pase"** on each participant in the admin.
+
+### Changed
+
+- **Mi pase asks for a code.** After document and email, a 6-digit code arrives by email; the pass opens only with it.
+
+### Fixed
+
+- **When an email cannot be sent,** the panel now says so instead of "No pudimos conectar".
+
 ## [0.9.1] - 2026-10-07
 
 ### Fixed
