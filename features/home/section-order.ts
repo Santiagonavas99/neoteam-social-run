@@ -12,18 +12,19 @@ export type HomeSectionKey =
 export type HomeSectionOrder = {
   section_key: HomeSectionKey
   sort_order: number
+  visible: boolean
 }
 
 export const defaultHomeSectionOrder: HomeSectionOrder[] = [
-  { section_key: 'story', sort_order: 1 },
-  { section_key: 'numbers', sort_order: 2 },
-  { section_key: 'allies', sort_order: 3 },
-  { section_key: 'running_crews', sort_order: 4 },
-  { section_key: 'organizations', sort_order: 5 },
-  { section_key: 'agenda', sort_order: 6 },
-  { section_key: 'community', sort_order: 7 },
-  { section_key: 'raffle', sort_order: 8 },
-  { section_key: 'final', sort_order: 9 },
+  { section_key: 'story', sort_order: 1, visible: true },
+  { section_key: 'numbers', sort_order: 2, visible: true },
+  { section_key: 'allies', sort_order: 3, visible: true },
+  { section_key: 'running_crews', sort_order: 4, visible: true },
+  { section_key: 'organizations', sort_order: 5, visible: true },
+  { section_key: 'agenda', sort_order: 6, visible: true },
+  { section_key: 'community', sort_order: 7, visible: true },
+  { section_key: 'raffle', sort_order: 8, visible: true },
+  { section_key: 'final', sort_order: 9, visible: true },
 ]
 
 export const homeSectionMeta: Record<
@@ -73,23 +74,28 @@ const defaultIndex = new Map(
 )
 
 export function normalizeHomeSectionOrder(
-  rows: Array<{ section_key?: string; sort_order?: number }> = [],
+  rows: Array<{ section_key?: string; sort_order?: number; visible?: boolean }> = [],
 ): HomeSectionOrder[] {
-  const byKey = new Map<HomeSectionKey, number>()
+  const byKey = new Map<HomeSectionKey, { sort_order: number; visible: boolean }>()
 
   for (const row of rows) {
     const key = row.section_key as HomeSectionKey
     if (!Object.hasOwn(homeSectionMeta, key)) continue
     const order = Number(row.sort_order)
     if (!Number.isFinite(order)) continue
-    byKey.set(key, Math.min(999, Math.max(1, Math.floor(order))))
+    byKey.set(key, {
+      sort_order: Math.min(999, Math.max(1, Math.floor(order))),
+      visible: row.visible !== false,
+    })
   }
 
   return defaultHomeSectionOrder
-    .map((section) => ({
-      ...section,
-      sort_order: byKey.get(section.section_key) ?? section.sort_order,
-    }))
+    .map((section) => {
+      const saved = byKey.get(section.section_key)
+      return saved
+        ? { ...section, sort_order: saved.sort_order, visible: saved.visible }
+        : { ...section }
+    })
     .sort(
       (a, b) =>
         a.sort_order - b.sort_order ||
