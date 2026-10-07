@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.22.1] - 2026-10-07
+
+### Fixed
+
+- **Centered the final date and meeting map on tablet and smaller desktop widths.** The final section now uses the full content shell instead of staying offset by the desktop index column.
+
 ## [0.22.0] - 2026-10-07
 
 ### Added
