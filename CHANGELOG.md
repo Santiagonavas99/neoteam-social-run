@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.1] - 2026-10-07
+
+### Changed
+
+- **The Landak Studio section uses Landak's purple,** like the footer credit: "CREATIVE PARTNER" and "STUDIO" are purple instead of cyan, readable on the black band in both themes.
+
 ## [0.26.0] - 2026-10-07
 
 ### Added

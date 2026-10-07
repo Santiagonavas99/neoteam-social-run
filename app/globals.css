@@ -37,6 +37,8 @@
   --radius-card: 12px;
   --neo-brand-cyan: #007a78;
   --neo-landak: #5b3fff;
+  /* Same in both themes: Landak's purple on the always-black Landak section. */
+  --neo-landak-on-dark: #7c5cff;
 }
 
 /* Inert until a surface sets data-theme (admin theme switch, plan Task 4b).
