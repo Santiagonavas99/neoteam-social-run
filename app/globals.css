@@ -356,16 +356,25 @@ fieldset {
 
 /* Public site */
 .site-header {
-  height: 80px;
+  --site-header-height: 80px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  width: 100%;
+  height: var(--site-header-height);
+  background: color-mix(in oklab, var(--neo-black) 94%, transparent);
+  border-bottom: 1px solid var(--neo-on-dark-border);
+  backdrop-filter: blur(var(--space-3));
+  -webkit-backdrop-filter: blur(var(--space-3));
+}
+.site-header-inner {
+  width: min(1240px, calc(100% - 96px));
+  height: 100%;
+  margin: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-}
-.site-header {
-  width: min(1240px, calc(100% - 96px));
-  margin: auto;
-  border-bottom: 1px solid var(--neo-on-dark-border);
+  gap: var(--space-6);
 }
 .site-header nav {
   display: flex;
@@ -739,7 +748,7 @@ fieldset {
 
 @media (max-width: 1100px) {
   .shell,
-  .site-header {
+  .site-header-inner {
     width: calc(100% - 64px);
   }
   .hero-grid {
@@ -827,12 +836,14 @@ fieldset {
 }
 @media (max-width: 560px) {
   .shell,
-  .site-header {
+  .site-header-inner {
     width: calc(100% - 40px);
   }
   .site-header {
-    height: 72px;
-    gap: 12px;
+    --site-header-height: 72px;
+  }
+  .site-header-inner {
+    gap: var(--space-3);
   }
   .site-header .button {
     min-height: 44px;
