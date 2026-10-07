@@ -82,6 +82,26 @@ export function LogoForm({
         />
         Mostrar en el carrusel
       </label>
+      <fieldset className="col-span-full grid gap-3 rounded-xl border border-neo-border p-4">
+        <legend className="px-1 text-sm font-semibold">Reutilizar en otras cintas</legend>
+        <label className="check-label">
+          <input
+            type="checkbox"
+            checked={values.show_in_running_crews}
+            onChange={(event) => update('show_in_running_crews', event.target.checked)}
+          />
+          También en Running crews
+        </label>
+        <label className="check-label">
+          <input
+            type="checkbox"
+            checked={values.show_in_organizations}
+            onChange={(event) => update('show_in_organizations', event.target.checked)}
+          />
+          También en Organizaciones
+        </label>
+        <small>Usa este mismo logo y enlace; no crea otro registro.</small>
+      </fieldset>
     </EditorForm>
   )
 }
