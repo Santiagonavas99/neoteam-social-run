@@ -74,3 +74,12 @@ Final checks:
 - SQL tests;
 - Vercel preview `READY`;
 - no production deploy until explicitly requested.
+
+
+### Motion refinement — approved 2026-10-07
+
+- Add a short fade/slide entrance to the sticky navigation.
+- Reveal a cyan bottom rule on load.
+- Add cyan underline motion to desktop nav links on hover/focus.
+- Keep scroll behavior JS-free.
+- Preserve reduced-motion behavior.
