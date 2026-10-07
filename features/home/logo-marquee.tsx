@@ -35,10 +35,11 @@ function itemUrl(item: LogoMarqueeItem) {
 }
 
 function logoContent(item: LogoMarqueeItem, hidden: boolean) {
-  return item.logo_url?.trim() ? (
+  const logoUrl = item.logo_url?.trim()
+  return logoUrl && /^https?:\/\//i.test(logoUrl) ? (
     <Image
       unoptimized
-      src={item.logo_url}
+      src={logoUrl}
       width={200}
       height={112}
       alt={hidden ? '' : item.name}
@@ -67,7 +68,8 @@ export function LogoMarquee({
 
   const titleId = `logo-strip-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-title`
 
-  const repeatCount = Math.max(1, Math.ceil(8 / visibleItems.length))
+  const shouldAnimate = visibleItems.length > 1
+  const repeatCount = shouldAnimate ? Math.max(1, Math.ceil(8 / visibleItems.length)) : 1
   const repeatedItems = Array.from({ length: repeatCount }, () => visibleItems).flat()
   const linked = visibleItems.some((item) => itemUrl(item))
 
@@ -113,17 +115,21 @@ export function LogoMarquee({
         </h2>
         {linked && (
           <p className="m-0 text-[13px] text-neo-text-secondary">
-            Toca un logo para conocer más
+            Toca una tarjeta para conocer más
           </p>
         )}
       </div>
       <div className="group reveal overflow-hidden py-2 [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)] motion-reduce:overflow-x-auto">
         <div
-          className="flex w-max animate-marquee group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-reduce:animate-none"
+          className={
+            shouldAnimate
+              ? 'flex w-max animate-marquee group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-reduce:animate-none'
+              : 'flex w-full justify-center'
+          }
           style={{ animationDuration: `${repeatedItems.length * 5}s` }}
         >
           {group(false)}
-          {group(true)}
+          {shouldAnimate && group(true)}
         </div>
       </div>
     </section>
