@@ -1,9 +1,9 @@
 export const RUNNING_GROUP_OPTIONS = [
   { value: 'byrunners', label: 'ByRunners' },
   { value: 'el-cartel-running-club', label: 'El Cartel Running Club' },
-  { value: '365-run-club', label: '365 Run Club' },
+  { value: 'run-365', label: '365 Run Club' },
   { value: 'neoteam', label: 'Neo Team' },
-  { value: 'pacifik-runners', label: 'Pacifik Runners' },
+  { value: 'pacific-runners', label: 'Pacifik Runners' },
   { value: 'beer-runners', label: 'Beer Runners' },
   { value: 'integral-fit', label: 'Integral Fit' },
   { value: 'running-social', label: 'Running Social' },
@@ -13,22 +13,7 @@ export const RUNNING_GROUP_OPTIONS = [
 ] as const
 
 export const RUNNING_GROUP_VALUES = [
-  'byrunners',
-  'el-cartel-running-club',
-  '365-run-club',
-  'neoteam',
-  'pacifik-runners',
-  'beer-runners',
-  'integral-fit',
-  'running-social',
-  'united-runner-club',
-  'guabinas-run-club',
-  'pace-running',
+  ...RUNNING_GROUP_OPTIONS.map((group) => group.value),
   'independiente',
   'otro',
 ] as const
-
-export function listedExternalRunningGroupName(value: string): string | null {
-  const group = RUNNING_GROUP_OPTIONS.find((option) => option.value === value)
-  return group && group.value !== 'neoteam' ? group.label : null
-}
