@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { BrandLink } from './brand-link'
-import { ThemeMenu } from './theme-menu'
+import { ThemeToggle } from './theme-toggle'
 
 export function SiteHeader() {
   return (
@@ -11,7 +11,7 @@ export function SiteHeader() {
         <a href="/#agenda">Agenda</a>
         <a href="/#invitados">Invitados</a>
         <Link href="/pase">Mi pase</Link>
-        <ThemeMenu />
+        <ThemeToggle />
         <Link className="button button-small" href="/registro">
           Registrarme
         </Link>
