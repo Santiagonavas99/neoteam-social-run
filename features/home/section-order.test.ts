@@ -1,9 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import {
-  defaultHomeSectionOrder,
-  normalizeHomeSectionOrder,
-} from './section-order.ts'
+import { defaultHomeSectionOrder, normalizeHomeSectionOrder } from './section-order.ts'
 
 test('uses the editorial default order when no rows are stored', () => {
   assert.deepEqual(normalizeHomeSectionOrder([]), defaultHomeSectionOrder)
