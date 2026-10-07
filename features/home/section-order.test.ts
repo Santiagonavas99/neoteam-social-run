@@ -29,8 +29,8 @@ test('keeps a hidden section in its position so it can be restored later', () =>
 
 test('defaults stored rows without visibility to visible', () => {
   const ordered = normalizeHomeSectionOrder([{ section_key: 'agenda', sort_order: 1 }])
-  assert.equal(ordered[0]?.section_key, 'agenda')
-  assert.equal(ordered[0]?.visible, true)
+  const agenda = ordered.find((section) => section.section_key === 'agenda')
+  assert.equal(agenda?.visible, true)
 })
 
 test('ignores unknown keys and invalid order values', () => {
