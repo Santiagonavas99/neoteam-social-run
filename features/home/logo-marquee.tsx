@@ -27,7 +27,7 @@ function instagramUrl(value?: string | null) {
   if (/^(https?:\/\/)?(www\.)?instagram\.com\//i.test(instagram))
     return externalUrl(instagram)
   const handle = instagram.replace(/^@/, '')
-  return /^[\w.]+$/.test(handle) ? \`https://www.instagram.com/\${handle}/\` : undefined
+  return /^[\w.]+$/.test(handle) ? 'https://www.instagram.com/' + handle + '/' : undefined
 }
 
 function itemUrl(item: LogoMarqueeItem) {

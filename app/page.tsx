@@ -4,8 +4,11 @@ import {
   getHomeLogoCarouselItems,
   getRegisteredCount,
 } from '@/features/home/data'
+import {
+  organizationMarqueeItems,
+  runningCrewMarqueeItems,
+} from '@/features/home/community-marquees'
 import { LogoMarquee } from '@/features/home/logo-marquee'
-import { organizationMarqueeItems, runningCrewMarqueeItems } from '@/features/home/community-marquees'
 import { Agenda } from '@/features/home/sections/agenda'
 import { Community } from '@/features/home/sections/community'
 import { Final } from '@/features/home/sections/final'
@@ -23,7 +26,6 @@ export default async function Home() {
     getRegisteredCount(),
   ])
 
-  const organizers = community.brands.filter((brand) => brand.type === 'organizer')
   const otherBrands = community.brands.filter((brand) => brand.type !== 'organizer')
 
   return (

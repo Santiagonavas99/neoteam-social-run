@@ -28,7 +28,7 @@ const logos: CommunityLogo[] = [
 ]
 
 test('running crew marquee preserves names, logos, and social links', () => {
-  assert.deepEqual(runningCrewMarqueeItems([logos[0]]), [
+  assert.deepEqual(runningCrewMarqueeItems(logos.slice(0, 1)), [
     {
       id: 'crew-1',
       name: 'Neo Runners',
@@ -41,8 +41,8 @@ test('running crew marquee preserves names, logos, and social links', () => {
 
 test('organization marquee includes organizers and excludes other brands', () => {
   assert.deepEqual(
-    organizationMarqueeItems(logos).map(({ id, type }) => ({ id, type })),
-    [{ id: 'org-1', type: undefined }],
+    organizationMarqueeItems(logos).map(({ id }) => id),
+    ['org-1'],
   )
   assert.equal(organizationMarqueeItems(logos)[0].website, 'https://org.example')
 })

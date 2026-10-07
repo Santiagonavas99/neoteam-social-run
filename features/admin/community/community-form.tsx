@@ -63,7 +63,8 @@ export function CommunityForm({
             <LabelOptions labels={brandTypes} />
           </select>
           <small>
-            Organizador → cinta de Organizaciones. Patrocinador → Marcas. Aliado principal e Invitado → Partners / Marcas invitadas.
+            Organizador → cinta de Organizaciones. Patrocinador → Marcas. Aliado principal e
+            Invitado → Partners / Marcas invitadas.
           </small>
         </label>
       )}
