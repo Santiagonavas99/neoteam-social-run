@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-10-07
+
+### Added
+
+- **Reorder the Home from the admin panel** with simple up/down arrows. Hero stays fixed at the top and Footer stays fixed at the bottom.
+
+### Changed
+
+- **The Home renders its configurable sections in the saved order**, and the editorial section numbers follow that order automatically.
+
 ## [0.20.0] - 2026-10-07
 
 ### Changed

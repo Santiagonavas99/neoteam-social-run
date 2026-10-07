@@ -1,4 +1,9 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import {
+  defaultHomeSectionOrder,
+  normalizeHomeSectionOrder,
+  type HomeSectionOrder,
+} from './section-order'
 
 // Supabase errors are plain objects, so logging them whole prints "{}".
 const errorText = (error: unknown) =>
@@ -89,6 +94,24 @@ export async function getHomeCommunity() {
   } catch (error) {
     console.error('Home community fallback', errorText(error))
     return { groups: [] as CommunityLogo[], brands: [] as CommunityLogo[] }
+  }
+}
+
+export async function getHomeSectionOrder(): Promise<HomeSectionOrder[]> {
+  try {
+    const supabase = createServerSupabaseClient()
+    const { data, error } = await supabase
+      .from('home_section_order')
+      .select('section_key,sort_order')
+      .eq('event_code', 'SR26')
+      .order('sort_order', { ascending: true })
+      .order('section_key', { ascending: true })
+
+    if (error) throw error
+    return normalizeHomeSectionOrder(data ?? [])
+  } catch (error) {
+    console.error('Home section order fallback', errorText(error))
+    return defaultHomeSectionOrder.map((section) => ({ ...section }))
   }
 }
 

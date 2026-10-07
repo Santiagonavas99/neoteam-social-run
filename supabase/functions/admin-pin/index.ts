@@ -52,6 +52,18 @@ function cleanName(value: unknown) {
 const PUBLIC_ACTIONS = new Set(['requestCode', 'verifyCode', 'validate', 'logout'])
 const STAFF_ACTIONS = new Set(['checkin'])
 
+const HOME_SECTION_KEYS = new Set([
+  'story',
+  'numbers',
+  'allies',
+  'running_crews',
+  'organizations',
+  'agenda',
+  'community',
+  'raffle',
+  'final',
+])
+
 type IdRow = { id: string }
 type ParticipationRow = { dynamic_id: string; status: string }
 
@@ -237,6 +249,50 @@ Deno.serve(async (req: Request) => {
       return json({ ok: true })
     }
 
+    if (action === 'listHomeSections') {
+      const { data, error } = await supabase
+        .from('home_section_order')
+        .select('section_key,sort_order')
+        .eq('event_code', 'SR26')
+        .order('sort_order', { ascending: true })
+        .order('section_key', { ascending: true })
+      if (error) throw error
+      return json({ rows: data ?? [] })
+    }
+
+    if (action === 'saveHomeSections') {
+      const sections = Array.isArray(body?.sections) ? body.sections : []
+      if (!sections.length) return json({ error: 'No hay secciones para guardar.' }, 400)
+
+      const seen = new Set<string>()
+      const updates = []
+      for (const section of sections) {
+        const key = typeof section?.section_key === 'string' ? section.section_key : ''
+        const sortOrder = Number(section?.sort_order)
+        if (
+          !HOME_SECTION_KEYS.has(key) ||
+          seen.has(key) ||
+          !Number.isInteger(sortOrder) ||
+          sortOrder < 1 ||
+          sortOrder > 999
+        ) {
+          return json({ error: 'El orden de las secciones no es válido.' }, 400)
+        }
+        seen.add(key)
+        updates.push({
+          event_code: 'SR26',
+          section_key: key,
+          sort_order: sortOrder,
+          updated_at: new Date().toISOString(),
+        })
+      }
+
+      const { error } = await supabase
+        .from('home_section_order')
+        .upsert(updates, { onConflict: 'event_code,section_key' })
+      if (error) throw error
+      return json({ ok: true })
+    }
     if (action === 'listCards') {
       const { data, error } = await supabase
         .from('home_feature_cards')

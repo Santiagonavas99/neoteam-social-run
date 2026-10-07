@@ -1,12 +1,12 @@
 import { ArrowRight, Gift } from 'lucide-react'
 import Link from 'next/link'
 
-export function Raffle() {
+export function Raffle({ index = '04' }: { index?: string }) {
   return (
     <section className="v2-raffle" aria-labelledby="raffle-title">
       <div className="v2-raffle-copy reveal">
         <div>
-          <p className="section-label">04 / RIFAS</p>
+          <p className="section-label">{index} / RIFAS</p>
           <h2 id="raffle-title">
             CORRES.
             <br />

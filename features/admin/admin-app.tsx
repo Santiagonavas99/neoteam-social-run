@@ -6,6 +6,7 @@ import { useAdminSession } from './auth/use-admin-session'
 import { CheckinView } from './checkin/checkin-view'
 import { CommunityView } from './community/community-view'
 import { DynamicsView } from './dynamics/dynamics-view'
+import { HomeOrderView } from './home-order/home-order-view'
 import { LogosView } from './logos/logos-view'
 import { OverviewView } from './overview/overview-view'
 import { ParticipantsView } from './participants/participants-view'
@@ -30,6 +31,8 @@ export function AdminApp() {
     >
       {section === 'checkin' ? (
         <CheckinView />
+      ) : section === 'home-order' ? (
+        <HomeOrderView />
       ) : section === 'logos' ? (
         <LogosView />
       ) : section === 'team' ? (

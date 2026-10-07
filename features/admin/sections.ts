@@ -2,6 +2,7 @@ import {
   Flag,
   GalleryHorizontal,
   LayoutDashboard,
+  ListOrdered,
   type LucideIcon,
   Tag,
   UserCheck,
@@ -14,6 +15,7 @@ import type { StaffRole } from './types'
 export type AdminSection =
   | 'checkin'
   | 'metrics'
+  | 'home-order'
   | 'logos'
   | 'participants'
   | 'groups'
@@ -72,6 +74,13 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     icon: Zap,
     group: 'event',
     primary: true,
+  },
+  {
+    id: 'home-order',
+    label: 'Orden de la Home',
+    description: 'Sube o baja las secciones para definir el orden de la página.',
+    icon: ListOrdered,
+    group: 'content',
   },
   {
     id: 'logos',

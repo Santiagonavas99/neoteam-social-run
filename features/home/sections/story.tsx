@@ -8,10 +8,10 @@ const facts = [
   { value: '5K', label: 'Ruta social', icon: Route },
 ]
 
-export function Story() {
+export function Story({ index = '01' }: { index?: string }) {
   return (
     <section className="v2-story shell" id="evento">
-      <span className="v2-index">01 / EL PLAN</span>
+      <span className="v2-index">{index} / EL PLAN</span>
       <div className="v2-story-copy reveal">
         <p className="section-label">UN PUNTO DE ENCUENTRO</p>
         <h2>

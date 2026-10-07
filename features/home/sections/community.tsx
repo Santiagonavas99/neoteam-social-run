@@ -1,7 +1,13 @@
 import { CommunityCarousel } from '../community-carousel'
 import type { CommunityLogo } from '../data'
 
-export function Community({ brands }: { brands: CommunityLogo[] }) {
+export function Community({
+  brands,
+  index = '03',
+}: {
+  brands: CommunityLogo[]
+  index?: string
+}) {
   const sponsors = brands.filter((brand) => brand.type === 'sponsor')
   const partners = brands.filter(
     (brand) => brand.type === 'main_partner' || brand.type === 'invited',
@@ -13,7 +19,7 @@ export function Community({ brands }: { brands: CommunityLogo[] }) {
     <section className="v2-community" id="invitados">
       <div className="shell">
         <header className="v2-community-head reveal">
-          <span className="v2-index">03 / COMUNIDAD</span>
+          <span className="v2-index">{index} / COMUNIDAD</span>
           <h2>
             CORREMOS
             <br />

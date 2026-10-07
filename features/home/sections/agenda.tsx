@@ -1,12 +1,12 @@
 import { agenda } from '@/features/event/event'
 
 // The rail sits on the centre of the 16 px dot column: time column + gap + 8 px.
-export function Agenda() {
+export function Agenda({ index = '02' }: { index?: string }) {
   return (
     <section className="bg-neo-bg py-12 md:py-24" id="agenda">
       <div className="shell grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
         <header className="reveal lg:sticky lg:top-10 lg:self-start">
-          <span className="v2-index">02 / AGENDA</span>
+          <span className="v2-index">{index} / AGENDA</span>
           <h2 className="m-0 mt-3 text-[clamp(40px,11vw,76px)] font-extrabold leading-[0.92] tracking-[-0.06em]">
             UNA MAÑANA
             <br />
