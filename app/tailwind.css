@@ -96,3 +96,11 @@
     opacity: 0;
   }
 }
+
+/* Theme switch (components/theme-toggle.tsx): the new theme is revealed by a growing circle
+   animated from JavaScript, so the default cross-fade is turned off. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}

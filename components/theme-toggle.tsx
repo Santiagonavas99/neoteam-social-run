@@ -1,6 +1,7 @@
 'use client'
 
 import { Moon, Sun } from 'lucide-react'
+import type { MouseEvent } from 'react'
 import { useThemeChoice } from './use-theme-choice'
 
 // Thumb and icons follow data-theme through the `dark:` variant, so the first paint is already
@@ -8,10 +9,33 @@ import { useThemeChoice } from './use-theme-choice'
 export function ThemeToggle() {
   const [, select, resolved] = useThemeChoice()
 
-  function toggle() {
-    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'
-    document.documentElement.setAttribute('data-theme', next)
-    select(next)
+  function toggle(event: MouseEvent<HTMLButtonElement>) {
+    const root = document.documentElement
+    const next = root.dataset.theme === 'dark' ? 'light' : 'dark'
+    // React state changes inside the swap, after the browser captured the old screen.
+    const swap = () => {
+      root.setAttribute('data-theme', next)
+      select(next)
+    }
+    if (!document.startViewTransition || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      swap()
+      return
+    }
+    // The new theme grows as a circle from the switch until it covers the farthest corner.
+    const rect = event.currentTarget.getBoundingClientRect()
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
+    document.startViewTransition(swap).ready.then(() =>
+      root.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+        {
+          duration: 450,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          pseudoElement: '::view-transition-new(root)',
+        },
+      ),
+    )
   }
 
   return (
