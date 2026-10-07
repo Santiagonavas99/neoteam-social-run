@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { createVerify, generateKeyPairSync } from 'node:crypto'
 import test from 'node:test'
-import { googleSaveUrl, googleWalletConfig, signJwt } from './google-wallet.ts'
+import { googleSaveUrl, googleWalletConfig, signJwt, walletObject } from './google-wallet.ts'
 
 const { privateKey, publicKey } = generateKeyPairSync('rsa', {
   modulusLength: 2048,
@@ -84,4 +84,15 @@ test('reports only the stage and status when Google fails', async () => {
   await assert.rejects(googleSaveUrl(pass, config, fetcher as typeof fetch), {
     message: 'google-wallet object-get 403',
   })
+})
+
+test('the Wallet object shows the date, arrival and place', () => {
+  const config = googleWalletConfig(env)
+  assert.ok(config)
+  const modules = walletObject(pass, config).textModulesData
+  assert.deepEqual(
+    modules.map(({ header }) => header),
+    ['RECORRIDO', 'FECHA', 'LLEGADA', 'LUGAR'],
+  )
+  assert.equal(modules.at(-1)?.body, 'Parque del Ingenio, Cali')
 })

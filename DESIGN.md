@@ -40,6 +40,7 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 | `UserCheck` | Check-in |
 | `QrCode` | The runner's check-in pass ("Mi pase") |
 | `Mail` | Send the pass by email |
+| `ImageDown` | Save the pass as an image (iPhone, "Guardar pase en Fotos") |
 | `CalendarPlus` | Add the event to the runner's calendar ("Agregar a mi agenda") |
 | `Ellipsis` | "Más": the phone sheet with the remaining admin sections |
 | `Sun` / `Moon` / `Monitor` | Theme: light / dark / system |
@@ -52,7 +53,7 @@ Source of truth for the visual language. Read it before any UI work (see `AGENTS
 
 ### Color
 
-Every shade is derived in OKLCH from the brand cyan `#03f8f6` (hue 193.7°); neutrals carry a trace of it (chroma 0.006–0.012). Study: `design/2026-10-05-cyan-palette.html`. **Rules:** accent used as text is always `--neo-accent-text` (`--neo-accent` and `--neo-accent-dark` are fills; the countdown on black is the only exception), and no raw hex or rgba appears outside the two token blocks in `app/globals.css`.
+Every shade is derived in OKLCH from the brand cyan `#03f8f6` (hue 193.7°); neutrals carry a trace of it (chroma 0.006–0.012). Study: `design/2026-10-05-cyan-palette.html`. **Rules:** accent used as text is always `--neo-accent-text` (`--neo-accent` and `--neo-accent-dark` are fills; the countdown on black and the pass bib are the only exceptions), and no raw hex or rgba appears outside the two token blocks in `app/globals.css`.
 
 | Token | Light | Dark | Use · contrast (light / dark) |
 |-------|-------|------|-------------------------------|

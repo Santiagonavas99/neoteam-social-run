@@ -405,11 +405,6 @@
 .v2-final-main .button {
   min-width: 200px;
 }
-.v2-final-actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
 .v2-meeting {
   display: grid;
   gap: var(--space-3);
@@ -434,10 +429,6 @@
   background: var(--neo-surface);
 }
 @media (min-width: 768px) {
-  .v2-final-actions {
-    flex-direction: row;
-    justify-content: center;
-  }
   .v2-meeting {
     grid-column: 2;
   }

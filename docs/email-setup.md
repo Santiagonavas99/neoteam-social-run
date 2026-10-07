@@ -127,6 +127,29 @@ En un celular:
 3. En el admin, en Participantes → **Reenviar pase**, el correo vuelve a llegar.
 4. En Resend → **Logs**, cada envío aparece como `delivered`. Si alguno cayó en spam, revisa que exista DMARC y que el dominio esté Verified.
 
+## 8. Pase como dorsal (0.12.0)
+
+El correo del pase cambia de diseño: es un dorsal negro con el logo, el lugar y el botón "Cómo llegar". Despliega las funciones y después mergea el PR:
+
+```bash
+supabase functions deploy registration-pass admin-pin --project-ref ohatsnkgaeccltqwhkbv
+```
+
+No hay migraciones ni secretos nuevos. Prueba: inscríbete con tu correo y revisa en Gmail, desde el celular, que se vean el logo y el QR y que el QR se pueda escanear en el Check-in.
+
+### Pase de Google Wallet: lista para Santiago
+
+El nombre del evento, el logo y la imagen del pase de Wallet se configuran en la clase, no en el código. En **Google Pay & Wallet Console → Google Wallet API → la clase del evento** (`<issuer>.neoteam_social_run_2026`):
+
+1. **Logo:** el de NeoTeam, cuadrado y con fondo, de al menos 660 × 660 px.
+2. **Hero image** (opcional): una franja de 1032 × 336 px con la marca del aniversario.
+3. **Event name:** `NeoTeam Social Run · Aniversario`.
+4. **Venue:** nombre `Parque del Ingenio`, dirección `Cali, Valle del Cauca`.
+5. **Date and time:** inicio el 18 de octubre de 2026 a las 7:30 a. m. y fin a las 11:00 a. m. (hora de Colombia).
+6. **Background color:** `#050505`, el mismo negro del dorsal.
+
+El código ya agrega a cada pase la fecha, la hora de llegada, el lugar y el recorrido.
+
 ## Límites y errores
 
 - **100 correos al día en el plan gratuito.** Cada inscripción gasta uno, cada código de `/pase` otro y cada entrada al panel otro. Si se esperan más de unas 80 inscripciones en un día, pasa a Resend Pro antes de ese día.

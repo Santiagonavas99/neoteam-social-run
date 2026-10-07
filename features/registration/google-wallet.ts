@@ -1,5 +1,6 @@
 import { createSign } from 'node:crypto'
-import { agenda, eventConfig } from '../event/event.ts'
+import { eventConfig } from '../event/event.ts'
+import { passFacts } from '../event/pass-facts.ts'
 import type { PassData } from './pass'
 import { QR_PREFIX } from './qr.ts'
 
@@ -38,9 +39,6 @@ export function signJwt(payload: Record<string, unknown>, privateKey: string) {
   return `${input}.${signature}`
 }
 
-const arrival = agenda[0]
-const meetingTime = `${eventConfig.dateShort} · ${arrival.time} ${arrival.meridiem}`
-
 export function walletObject(pass: PassData, config: GoogleWalletConfig) {
   const classId = `${config.issuerId}.${config.classSuffix}`
   return {
@@ -58,7 +56,11 @@ export function walletObject(pass: PassData, config: GoogleWalletConfig) {
     hexBackgroundColor: '#050505',
     textModulesData: [
       { id: 'route', header: 'RECORRIDO', body: eventConfig.route },
-      { id: 'time', header: 'ENCUENTRO', body: meetingTime },
+      ...passFacts.map(({ id, label, value }) => ({
+        id,
+        header: label.toUpperCase(),
+        body: value,
+      })),
     ],
   }
 }

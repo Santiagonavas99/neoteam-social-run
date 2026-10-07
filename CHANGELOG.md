@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-10-07
+
+### Added
+
+- **"Agregar a mi agenda" right after registering:** a large button above the pass. On iPhone, iPad and Safari it opens the Calendar; elsewhere it opens Google Calendar with the event filled in.
+- **"Guardar pase en Fotos" on iPhone:** an image of the pass, with a large QR, that a long press saves to Photos. It replaces the Google Wallet button, which does not work there.
+
+### Changed
+
+- **The pass looks like a race bib,** on screen and in the email: the logo, "Aniversario NeoTeam · Social Run", the code as the bib number, the name, a large QR, and the date, arrival time and place. The email adds a "Cómo llegar" link.
+- **Google Wallet** shows the date, arrival time and place.
+- The QR has a wider white margin, so it scans reliably on the black bib.
+
+### Removed
+
+- "Agregar a mi agenda" on the home page; it now appears after registering.
+
 ## [0.11.0] - 2026-10-07
 
 ### Added
