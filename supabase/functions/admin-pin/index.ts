@@ -62,6 +62,7 @@ const HOME_SECTION_KEYS = new Set([
   'community',
   'raffle',
   'final',
+  'landak_studio',
 ])
 
 type IdRow = { id: string }
