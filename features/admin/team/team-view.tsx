@@ -3,10 +3,7 @@
 import { Eye, EyeOff, Plus, UserCog } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import { callAdmin } from '../api'
-import { isPin } from '../auth/pin'
-import { PinField } from '../auth/pin-field'
-import { isUsername, normalizeUsername } from '../auth/username'
-import { UsernameField } from '../auth/username-field'
+import { isEmail, normalizeEmail } from '../auth/code'
 import { errorMessage } from '../errors'
 import { staffRoles } from '../labels'
 import { type FeedbackValue, isNew, type StaffUser } from '../types'
@@ -20,10 +17,7 @@ import { useAdminData } from '../ui/use-admin-data'
 
 function validate(user: StaffUser) {
   if (user.name.trim().length < 2) return 'Escribe un nombre de 2 a 80 caracteres.'
-  if (isNew(user) && !isUsername(user.username))
-    return 'El usuario usa de 3 a 32 letras minúsculas, números, punto o guion.'
-  if (isNew(user) && !isPin(user.pin ?? '')) return 'Asigna un PIN de 6 dígitos.'
-  if (user.pin && !isPin(user.pin)) return 'El PIN debe tener exactamente 6 dígitos.'
+  if (isNew(user) && !isEmail(user.email)) return 'Escribe un correo válido.'
   return null
 }
 
@@ -44,8 +38,8 @@ function TeamForm({
       title={created ? 'Nuevo usuario' : `Editar ${row.name}`}
       hint={
         created
-          ? 'Comparte el usuario y el PIN en persona; luego puede cambiar su PIN en Seguridad.'
-          : 'Cambiar el rol, desactivar o poner un PIN nuevo cierra su sesión.'
+          ? 'Entrará con un código que le llegará a este correo.'
+          : 'Cambiar el rol o quitarle el acceso cierra su sesión.'
       }
       legend="Datos del usuario"
       submitLabel={created ? 'Crear usuario' : 'Guardar cambios'}
@@ -66,15 +60,23 @@ function TeamForm({
         />
       </label>
       {created ? (
-        <UsernameField
-          label="Usuario"
-          value={values.username}
-          onChange={(value) => update('username', value)}
-        />
+        <label>
+          Correo
+          <input
+            type="email"
+            value={values.email}
+            required
+            maxLength={160}
+            autoComplete="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            onChange={(e) => update('email', e.target.value)}
+          />
+        </label>
       ) : (
         <label>
-          Usuario
-          <input value={`@${row.username}`} readOnly />
+          Correo
+          <input value={row.email} readOnly />
         </label>
       )}
       <label>
@@ -88,7 +90,7 @@ function TeamForm({
         <small>
           {values.role === 'admin'
             ? 'Ve todo el panel y gestiona el equipo.'
-            : 'Solo escanea el check-in y cambia su propio PIN.'}
+            : 'Solo escanea el check-in.'}
         </small>
       </label>
       {!created && (
@@ -101,11 +103,6 @@ function TeamForm({
           Puede entrar al panel
         </label>
       )}
-      <PinField
-        label={created ? 'PIN inicial' : 'PIN nuevo (opcional)'}
-        value={values.pin ?? ''}
-        onChange={(pin) => update('pin', pin)}
-      />
     </EditorForm>
   )
 }
@@ -129,13 +126,11 @@ export function TeamView({ token }: { token: string }) {
   }
 
   async function save(user: StaffUser) {
-    const { id, username, ...rest } = user
+    const { id: _id, email, ...rest } = user
     await callAdmin('users', {
       token,
       operation: 'save',
-      values: isNew(user)
-        ? { ...rest, username: normalizeUsername(username) }
-        : { ...rest, id, pin: user.pin || undefined },
+      values: isNew(user) ? { ...rest, email: normalizeEmail(email) } : user,
     })
     setEditor(null)
     setFeedback({ kind: 'success', text: 'Cambios guardados.' })
@@ -148,7 +143,7 @@ export function TeamView({ token }: { token: string }) {
       className="button"
       disabled={!!editor}
       onClick={() =>
-        edit({ id: `new-${Date.now()}`, name: '', username: '', role: 'checkin', active: true })
+        edit({ id: `new-${Date.now()}`, name: '', email: '', role: 'checkin', active: true })
       }
     >
       <Plus aria-hidden className="size-4 shrink-0" />
@@ -174,7 +169,7 @@ export function TeamView({ token }: { token: string }) {
         <EmptyState
           icon={UserCog}
           title="Aún no hay usuarios"
-          text="Crea un usuario para cada persona del staff."
+          text="Añade a cada persona del staff con su correo."
           action={!editor && addButton}
         />
       ) : (
@@ -183,7 +178,7 @@ export function TeamView({ token }: { token: string }) {
             <RecordCard
               key={row.id}
               title={row.name}
-              subtitle={`@${row.username}`}
+              subtitle={row.email}
               meta={
                 <>
                   <StatusBadge
@@ -197,7 +192,7 @@ export function TeamView({ token }: { token: string }) {
               actions={
                 <EditButton
                   open={editor?.id === row.id}
-                  onClick={() => edit(editor?.id === row.id ? null : { ...row, pin: '' })}
+                  onClick={() => edit(editor?.id === row.id ? null : row)}
                   disabled={!!editor && editor.id !== row.id}
                 />
               }

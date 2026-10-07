@@ -101,13 +101,11 @@ export function AdminShell({
                       onSelect={() => onNavigate(item.id)}
                     />
                   ))}
-                {group.id === 'account' && (
-                  <div className="px-1 pt-2">
-                    <ThemeSwitch tone="onDark" choice={theme} onSelect={setTheme} />
-                  </div>
-                )}
               </div>
             ))}
+          <div className="px-1">
+            <ThemeSwitch tone="onDark" choice={theme} onSelect={setTheme} />
+          </div>
         </nav>
         <div className="mt-auto flex flex-col gap-1 border-t border-neo-on-dark-border pt-4">
           <Link

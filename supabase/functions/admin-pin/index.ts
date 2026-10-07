@@ -1,6 +1,18 @@
 // @ts-nocheck
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { codeEmail, sendEmail } from '../_shared/email.ts'
+import {
+  CODE_MAX_ATTEMPTS,
+  CODE_MINUTES,
+  CODE_WINDOW_MINUTES,
+  CODES_PER_WINDOW,
+  cleanEmail,
+  codeMatches,
+  hashCode,
+  randomCode,
+  validCode,
+} from '../_shared/otp.ts'
 import {
   checkInParticipant,
   normalizeParticipantCode,
@@ -8,7 +20,7 @@ import {
   participantLookup,
   participantPayload,
 } from '../_shared/participants.ts'
-import { fromProxy, secretsMatch, sha256 } from '../_shared/proxy.ts'
+import { fromProxy, sha256 } from '../_shared/proxy.ts'
 import { requireSession } from '../_shared/session.ts'
 
 function requireEnv(name: string) {
@@ -24,8 +36,6 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
 })
 
 const SESSION_DAYS = 30
-const PBKDF2_ITERATIONS = 180_000
-const ADMIN_SETUP_SECRET = Deno.env.get('ADMIN_SETUP_SECRET')?.trim() ?? ''
 
 const responseHeaders = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }
 
@@ -33,82 +43,13 @@ function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: responseHeaders })
 }
 
-function base64(bytes: Uint8Array) {
-  let binary = ''
-  for (const byte of bytes) binary += String.fromCharCode(byte)
-  return btoa(binary)
-}
-
-function fromBase64(value: string) {
-  const binary = atob(value)
-  const bytes = new Uint8Array(binary.length)
-  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
-  return bytes
-}
-
-async function hashPin(pin: string) {
-  const salt = crypto.getRandomValues(new Uint8Array(16))
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(pin),
-    { name: 'PBKDF2' },
-    false,
-    ['deriveBits'],
-  )
-  const bits = await crypto.subtle.deriveBits(
-    { name: 'PBKDF2', salt, iterations: PBKDF2_ITERATIONS, hash: 'SHA-256' },
-    key,
-    256,
-  )
-  return `pbkdf2$${PBKDF2_ITERATIONS}$${base64(salt)}$${base64(new Uint8Array(bits))}`
-}
-
-async function verifyPin(pin: string, encoded: string) {
-  const [kind, iterationText, saltText, expectedText] = encoded.split('$')
-  if (kind !== 'pbkdf2' || !iterationText || !saltText || !expectedText) return false
-  const iterations = Number(iterationText)
-  if (!Number.isFinite(iterations) || iterations < 100_000) return false
-
-  const key = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(pin),
-    { name: 'PBKDF2' },
-    false,
-    ['deriveBits'],
-  )
-  const bits = await crypto.subtle.deriveBits(
-    { name: 'PBKDF2', salt: fromBase64(saltText), iterations, hash: 'SHA-256' },
-    key,
-    256,
-  )
-  const actual = new Uint8Array(bits)
-  const expected = fromBase64(expectedText)
-  if (actual.length !== expected.length) return false
-  let diff = 0
-  for (let i = 0; i < actual.length; i++) diff |= actual[i] ^ expected[i]
-  return diff === 0
-}
-
-function validPin(pin: unknown): pin is string {
-  return typeof pin === 'string' && /^\d{6}$/.test(pin)
-}
-
-// Keep in sync with features/admin/auth/username.ts and the admin_users check.
-function cleanUsername(value: unknown) {
-  const username = typeof value === 'string' ? value.trim().toLowerCase() : ''
-  return /^[a-z0-9._-]{3,32}$/.test(username) ? username : null
-}
-
 function cleanName(value: unknown) {
   const name = typeof value === 'string' ? value.trim().replace(/\s+/g, ' ') : ''
   return name.length >= 2 && name.length <= 80 ? name : null
 }
 
-// Verified when the username does not exist, so a wrong user and a wrong PIN take the same time.
-const DUMMY_PIN_HASH = `pbkdf2$${PBKDF2_ITERATIONS}$${'A'.repeat(22)}==$${'A'.repeat(43)}=`
-
-const PUBLIC_ACTIONS = new Set(['status', 'setup', 'login', 'validate', 'logout'])
-const STAFF_ACTIONS = new Set(['checkin', 'changePin'])
+const PUBLIC_ACTIONS = new Set(['requestCode', 'verifyCode', 'validate', 'logout'])
+const STAFF_ACTIONS = new Set(['checkin'])
 
 type IdRow = { id: string }
 type ParticipationRow = { dynamic_id: string; status: string }
@@ -117,12 +58,6 @@ function randomUnit() {
   const value = new Uint32Array(1)
   crypto.getRandomValues(value)
   return value[0] / 0x100000000
-}
-
-async function verifySetupSecret(candidate: unknown) {
-  if (typeof candidate !== 'string' || ADMIN_SETUP_SECRET.length < 12 || candidate.length > 1024)
-    return false
-  return secretsMatch(await sha256(candidate.trim()), await sha256(ADMIN_SETUP_SECRET))
 }
 
 function getClientIp(req: Request) {
@@ -141,16 +76,6 @@ async function createSession(userId: string) {
   })
   if (error) throw error
   return { token, expiresAt }
-}
-
-async function hasActiveAdmin() {
-  const { count, error } = await supabase
-    .from('admin_users')
-    .select('id', { count: 'exact', head: true })
-    .eq('role', 'admin')
-    .eq('active', true)
-  if (error) throw error
-  return (count ?? 0) > 0
 }
 
 async function revokeSessions(userId: string) {
@@ -206,71 +131,91 @@ Deno.serve(async (req: Request) => {
         return json({ error: 'Tu usuario no tiene acceso a esta sección.' }, 403)
     }
 
-    if (action === 'status') {
-      const configured = await hasActiveAdmin()
-      return json({
-        configured,
-        setupRequiresSecret: !configured,
-        setupSecretReady: configured || ADMIN_SETUP_SECRET.length >= 12,
-      })
-    }
-
-    if (action === 'setup') {
-      const pin = body?.pin
-      const name = cleanName(body?.name)
-      const username = cleanUsername(body?.username)
-      if (!name) return json({ error: 'Escribe tu nombre (2 a 80 caracteres).' }, 400)
-      if (!username)
-        return json(
-          { error: 'El usuario usa de 3 a 32 letras minúsculas, números, punto o guion.' },
-          400,
-        )
-      if (!validPin(pin)) return json({ error: 'El PIN debe tener exactamente 6 dígitos.' }, 400)
-      if (await hasActiveAdmin()) return json({ error: 'El acceso ya fue configurado.' }, 409)
-
-      if (ADMIN_SETUP_SECRET.length < 12) {
-        return json({ error: 'Falta configurar la clave privada de setup en Supabase.' }, 503)
-      }
-      const attempt = await reserveAttempt(ip)
-      if (attempt instanceof Response) return attempt
-      const setupAuthorized = await verifySetupSecret(body?.setupSecret)
-      if (setupAuthorized) await markAttemptSuccess(attempt)
-      if (!setupAuthorized) return json({ error: 'La clave privada de setup no es correcta.' }, 401)
-
+    if (action === 'requestCode') {
+      const email = cleanEmail(body?.email)
+      if (!email) return json({ error: 'Escribe un correo válido.' }, 400)
+      // Same answer for unknown, inactive and throttled emails, so the form cannot list the staff.
+      const sent = json({ ok: true })
       const { data: user, error } = await supabase
         .from('admin_users')
-        .insert({ name, username, role: 'admin', pin_hash: await hashPin(pin) })
-        .select('id,name,role')
-        .single()
-      if (error) {
-        if ((error as { code?: string }).code === '23505')
-          return json({ error: 'Ese usuario ya existe.' }, 409)
-        throw error
-      }
-
-      const created = await createSession(user.id)
-      return json({ ok: true, ...created, role: user.role, name: user.name })
-    }
-
-    if (action === 'login') {
-      const pin = body?.pin
-      const username = cleanUsername(body?.username)
-      if (!username) return json({ error: 'Escribe tu usuario.' }, 400)
-      if (!validPin(pin)) return json({ error: 'Escribe un PIN de 6 dígitos.' }, 400)
-      const attempt = await reserveAttempt(ip)
-      if (attempt instanceof Response) return attempt
-
-      const { data: user, error } = await supabase
-        .from('admin_users')
-        .select('id,name,role,pin_hash')
-        .eq('username', username)
+        .select('id')
+        .eq('email', email)
         .eq('active', true)
         .maybeSingle()
       if (error) throw error
+      if (!user) return sent
 
-      const ok = (await verifyPin(pin, user?.pin_hash ?? DUMMY_PIN_HASH)) && Boolean(user)
-      if (ok) await markAttemptSuccess(attempt)
-      if (!ok) return json({ error: 'Usuario o PIN incorrecto.' }, 401)
+      const since = new Date(Date.now() - CODE_WINDOW_MINUTES * 60_000).toISOString()
+      const { count, error: countError } = await supabase
+        .from('admin_login_codes')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .gt('created_at', since)
+      if (countError) throw countError
+      if ((count ?? 0) >= CODES_PER_WINDOW) return sent
+
+      const code = randomCode()
+      const { error: insertError } = await supabase.from('admin_login_codes').insert({
+        user_id: user.id,
+        code_hash: await hashCode(user.id, code),
+        expires_at: new Date(Date.now() + CODE_MINUTES * 60_000).toISOString(),
+      })
+      if (insertError) throw insertError
+      const delivery = await sendEmail({ to: email, ...codeEmail(code, 'admin') })
+      if (!delivery.ok)
+        return json({ error: 'No pudimos enviar el correo. Inténtalo en unos minutos.' }, 503)
+      return sent
+    }
+
+    if (action === 'verifyCode') {
+      const email = cleanEmail(body?.email)
+      const code = body?.code
+      if (!email || !validCode(code))
+        return json({ error: 'Escribe el código de 6 dígitos que te enviamos.' }, 400)
+      const attempt = await reserveAttempt(ip)
+      if (attempt instanceof Response) return attempt
+
+      const { data: user, error } = await supabase
+        .from('admin_users')
+        .select('id,name,role')
+        .eq('email', email)
+        .eq('active', true)
+        .maybeSingle()
+      if (error) throw error
+      const { data: pending, error: codeError } = user
+        ? await supabase
+            .from('admin_login_codes')
+            .select('id,code_hash,attempts')
+            .eq('user_id', user.id)
+            .is('used_at', null)
+            .gt('expires_at', new Date().toISOString())
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+        : { data: null, error: null }
+      if (codeError) throw codeError
+
+      const rejected = json({ error: 'El código no es correcto o ya venció. Pide uno nuevo.' }, 401)
+      const usable = pending && pending.attempts < CODE_MAX_ATTEMPTS
+      if (!usable) return rejected
+      if (!(await codeMatches(user.id, code, pending.code_hash))) {
+        await supabase
+          .from('admin_login_codes')
+          .update({ attempts: pending.attempts + 1 })
+          .eq('id', pending.id)
+        return rejected
+      }
+
+      // Only the first request to mark the code wins, so one code opens one session.
+      const { data: claimed, error: claimError } = await supabase
+        .from('admin_login_codes')
+        .update({ used_at: new Date().toISOString() })
+        .eq('id', pending.id)
+        .is('used_at', null)
+        .select('id')
+      if (claimError) throw claimError
+      if (!claimed?.length) return rejected
+      await markAttemptSuccess(attempt)
 
       const created = await createSession(user.id)
       return json({ ok: true, ...created, role: user.role, name: user.name })
@@ -906,7 +851,7 @@ Deno.serve(async (req: Request) => {
       if (operation === 'list') {
         const { data, error } = await supabase
           .from('admin_users')
-          .select('id,name,username,role,active')
+          .select('id,name,email,role,active')
           .order('created_at', { ascending: true })
         if (error) throw error
         return json({ rows: data ?? [] })
@@ -918,26 +863,16 @@ Deno.serve(async (req: Request) => {
         const name = cleanName(values.name)
         const role = values.role === 'admin' || values.role === 'checkin' ? values.role : null
         const active = values.active !== false
-        const pin = values.pin ? values.pin : null
         if (!name) return json({ error: 'Escribe un nombre de 2 a 80 caracteres.' }, 400)
         if (!role) return json({ error: 'Elige un rol.' }, 400)
-        if (pin !== null && !validPin(pin))
-          return json({ error: 'El PIN debe tener exactamente 6 dígitos.' }, 400)
 
         if (!id) {
-          const username = cleanUsername(values.username)
-          if (!username)
-            return json(
-              { error: 'El usuario usa de 3 a 32 letras minúsculas, números, punto o guion.' },
-              400,
-            )
-          if (!pin) return json({ error: 'Asigna un PIN de 6 dígitos.' }, 400)
-          const { error } = await supabase
-            .from('admin_users')
-            .insert({ name, username, role, active, pin_hash: await hashPin(pin) })
+          const email = cleanEmail(values.email)
+          if (!email) return json({ error: 'Escribe un correo válido.' }, 400)
+          const { error } = await supabase.from('admin_users').insert({ name, email, role, active })
           if (error) {
             if ((error as { code?: string }).code === '23505')
-              return json({ error: 'Ese usuario ya existe.' }, 409)
+              return json({ error: 'Ese correo ya tiene acceso.' }, 409)
             throw error
           }
           return json({ ok: true })
@@ -945,8 +880,6 @@ Deno.serve(async (req: Request) => {
 
         if (id === session.userId && (role !== 'admin' || !active))
           return json({ error: 'No puedes quitarte tu propio acceso de administrador.' }, 400)
-        if (id === session.userId && pin)
-          return json({ error: 'Cambia tu propio PIN en Seguridad.' }, 400)
 
         const { data: before, error: beforeError } = await supabase
           .from('admin_users')
@@ -956,45 +889,17 @@ Deno.serve(async (req: Request) => {
         if (beforeError) throw beforeError
         if (!before) return json({ error: 'Ese usuario ya no existe.' }, 404)
 
-        const changes = { name, role, active, updated_at: new Date().toISOString() }
-        if (pin) changes.pin_hash = await hashPin(pin)
-        const { error } = await supabase.from('admin_users').update(changes).eq('id', id)
+        const { error } = await supabase
+          .from('admin_users')
+          .update({ name, role, active, updated_at: new Date().toISOString() })
+          .eq('id', id)
         if (error) throw error
         // Access changed: the person signs in again under the new rules.
-        if (pin || before.role !== role || before.active !== active) await revokeSessions(id)
+        if (before.role !== role || before.active !== active) await revokeSessions(id)
         return json({ ok: true })
       }
 
       return json({ error: 'Operación no válida.' }, 400)
-    }
-
-    if (action === 'changePin') {
-      const currentPin = body?.currentPin
-      const newPin = body?.newPin
-      if (!validPin(currentPin)) return json({ error: 'Escribe tu PIN actual de 6 dígitos.' }, 400)
-      if (!validPin(newPin))
-        return json({ error: 'El nuevo PIN debe tener exactamente 6 dígitos.' }, 400)
-      const attempt = await reserveAttempt(ip)
-      if (attempt instanceof Response) return attempt
-      const { data: user, error: userError } = await supabase
-        .from('admin_users')
-        .select('pin_hash')
-        .eq('id', session.userId)
-        .single()
-      if (userError) throw userError
-      const currentPinIsValid = await verifyPin(currentPin, user.pin_hash)
-      if (currentPinIsValid) await markAttemptSuccess(attempt)
-      if (!currentPinIsValid) {
-        return json({ error: 'El PIN actual no es correcto.' }, 401)
-      }
-      const { error } = await supabase
-        .from('admin_users')
-        .update({ pin_hash: await hashPin(newPin), updated_at: new Date().toISOString() })
-        .eq('id', session.userId)
-      if (error) throw error
-      await revokeSessions(session.userId)
-      const fresh = await createSession(session.userId)
-      return json({ ok: true, ...fresh })
     }
 
     return json({ error: 'Acción no válida.' }, 400)

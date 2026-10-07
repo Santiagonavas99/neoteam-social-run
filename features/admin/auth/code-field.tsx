@@ -1,19 +1,17 @@
-import { normalizePin } from './pin'
+import { normalizeCode } from './code'
 
 const SLOTS = [0, 1, 2, 3, 4, 5]
 
-// One real input under six painted boxes: paste, autofill and screen readers see a single field.
-export function PinField({
+// One real input under six painted boxes: paste, SMS/email autofill and screen readers see a single field.
+export function CodeField({
   label,
   value,
   onChange,
-  current = false,
   autoFocus = false,
 }: {
   label: string
   value: string
   onChange: (value: string) => void
-  current?: boolean
   autoFocus?: boolean
 }) {
   const active = Math.min(value.length, SLOTS.length - 1)
@@ -23,12 +21,13 @@ export function PinField({
       <span className="group relative block">
         <input
           className="absolute inset-0 z-10 size-full! cursor-text opacity-0"
-          type="password"
+          type="text"
           value={value}
-          onChange={(e) => onChange(normalizePin(e.target.value))}
+          onChange={(e) => onChange(normalizeCode(e.target.value))}
           inputMode="numeric"
-          autoComplete={current ? 'current-password' : 'new-password'}
+          autoComplete="one-time-code"
           minLength={6}
+          maxLength={6}
           pattern="[0-9]{6}"
           required
           autoFocus={autoFocus}
@@ -37,7 +36,7 @@ export function PinField({
           {SLOTS.map((slot) => (
             <span
               key={slot}
-              className={`grid h-14 place-items-center rounded-control border bg-neo-surface transition-colors ${
+              className={`grid h-14 place-items-center rounded-control border bg-neo-surface text-2xl font-bold transition-colors ${
                 slot === active
                   ? 'border-neo-border-strong group-focus-within:border-neo-accent-text group-focus-within:ring-2 group-focus-within:ring-neo-accent-text/30'
                   : slot < value.length
@@ -45,7 +44,7 @@ export function PinField({
                     : 'border-neo-border-strong'
               }`}
             >
-              {slot < value.length && <span className="size-3 rounded-full bg-neo-text" />}
+              {value[slot] ?? ''}
             </span>
           ))}
         </span>

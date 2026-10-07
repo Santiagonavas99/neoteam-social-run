@@ -9,8 +9,6 @@ export type AdminSession = ReturnType<typeof useAdminSession>
 
 export function useAdminSession() {
   const [ready, setReady] = useState(false)
-  const [configured, setConfigured] = useState<boolean | null>(null)
-  const [setupSecretReady, setSetupSecretReady] = useState<boolean | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [role, setRole] = useState<StaffRole>('checkin')
   const [name, setName] = useState('')
@@ -21,11 +19,6 @@ export function useAdminSession() {
 
     async function bootstrap() {
       try {
-        const status = await callAdmin('status')
-        if (!active) return
-        setConfigured(Boolean(status.configured))
-        setSetupSecretReady(status.setupSecretReady ?? null)
-
         const storedToken = window.localStorage.getItem(SESSION_KEY)
         if (!storedToken) return
 
@@ -50,10 +43,10 @@ export function useAdminSession() {
   }, [])
 
   // Role and name only pick which sections to show; the edge function enforces access.
-  function remember(next: string, profile?: { role?: StaffRole; name?: string }) {
+  function remember(next: string, profile: { role?: StaffRole; name?: string }) {
     window.localStorage.setItem(SESSION_KEY, next)
-    if (profile?.role) setRole(profile.role)
-    if (profile?.name) setName(profile.name)
+    setRole(profile.role ?? 'checkin')
+    setName(profile.name ?? '')
     setToken(next)
   }
 
@@ -70,16 +63,5 @@ export function useAdminSession() {
     }
   }
 
-  return {
-    ready,
-    configured,
-    setupSecretReady,
-    token,
-    role,
-    name,
-    bootError,
-    remember,
-    markConfigured: () => setConfigured(true),
-    signOut,
-  }
+  return { ready, token, role, name, bootError, remember, signOut }
 }

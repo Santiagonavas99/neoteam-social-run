@@ -3,7 +3,6 @@ import {
   GalleryHorizontal,
   LayoutDashboard,
   type LucideIcon,
-  ShieldCheck,
   Tag,
   UserCheck,
   UserCog,
@@ -21,7 +20,6 @@ export type AdminSection =
   | 'brands'
   | 'dynamics'
   | 'team'
-  | 'security'
 
 export type AdminSectionGroup = 'event' | 'content' | 'account'
 
@@ -102,14 +100,6 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     description: 'Quién entra al panel y qué puede hacer.',
     icon: UserCog,
     group: 'account',
-  },
-  {
-    id: 'security',
-    label: 'Seguridad',
-    description: 'Administra el acceso al panel del evento.',
-    icon: ShieldCheck,
-    group: 'account',
-    staff: true,
   },
 ]
 

@@ -96,19 +96,15 @@ export type StaffRole = 'admin' | 'checkin'
 export type StaffUser = {
   id: string
   name: string
-  username: string
+  email: string
   role: StaffRole
   active: boolean
-  /** Only sent when creating a user or resetting their PIN; never returned. */
-  pin?: string
 }
 
 export type AdminResponse<Row = unknown> = {
   ok?: boolean
   role?: StaffRole
   name?: string
-  configured?: boolean
-  setupSecretReady?: boolean
   valid?: boolean
   token?: string
   expiresAt?: string

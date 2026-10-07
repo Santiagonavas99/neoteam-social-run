@@ -10,7 +10,6 @@ import { LogosView } from './logos/logos-view'
 import { OverviewView } from './overview/overview-view'
 import { ParticipantsView } from './participants/participants-view'
 import { type AdminSection, sectionsFor } from './sections'
-import { ChangePinForm } from './security/change-pin-form'
 import { AdminShell } from './shell/admin-shell'
 import { TeamView } from './team/team-view'
 
@@ -36,8 +35,6 @@ export function AdminApp() {
         <LogosView token={token} />
       ) : section === 'team' ? (
         <TeamView token={token} />
-      ) : section === 'security' ? (
-        <ChangePinForm token={token} onToken={session.remember} />
       ) : section === 'participants' ? (
         <ParticipantsView token={token} />
       ) : section === 'groups' || section === 'brands' ? (

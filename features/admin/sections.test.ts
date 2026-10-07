@@ -6,9 +6,9 @@ test('admins see every section', () => {
   assert.equal(sectionsFor('admin').length, adminSections.length)
 })
 
-test('check-in staff see only check-in and security, check-in first', () => {
+test('check-in staff see only check-in', () => {
   assert.deepEqual(
     sectionsFor('checkin').map((section) => section.id),
-    ['checkin', 'security'],
+    ['checkin'],
   )
 })
