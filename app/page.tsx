@@ -14,6 +14,7 @@ import { Agenda } from '@/features/home/sections/agenda'
 import { Community } from '@/features/home/sections/community'
 import { Final } from '@/features/home/sections/final'
 import { Hero } from '@/features/home/sections/hero'
+import { LandakStudio } from '@/features/home/sections/landak-studio'
 import { Numbers } from '@/features/home/sections/numbers'
 import { Raffle } from '@/features/home/sections/raffle'
 import { Story } from '@/features/home/sections/story'
@@ -72,6 +73,8 @@ export default async function Home() {
         return <Raffle key={section_key} index={index} />
       case 'final':
         return <Final key={section_key} index={index} />
+      case 'landak_studio':
+        return <LandakStudio key={section_key} />
       default:
         return null
     }
