@@ -1,54 +1,54 @@
-# Email setup (Resend)
+# Configuración del correo (Resend)
 
-Step by step for the pass email and the one-time code on `/pase` (spec: [`2026-10-06-pass-email-design.md`](superpowers/specs/2026-10-06-pass-email-design.md)).
+Paso a paso para el correo del pase y el código de un solo uso en `/pase` (spec: [`2026-10-06-pass-email-design.md`](superpowers/specs/2026-10-06-pass-email-design.md)).
 
-**The admin panel signs in by emailed code (0.9.0), so steps 1–4 must be done before deploying it.** Its rollout is in [Panel sign-in rollout](#panel-sign-in-rollout-090) at the end.
+**Desde la 0.9.0 el panel se abre con un código que llega por correo, así que los pasos 1 a 4 tienen que estar hechos antes de desplegarlo.** El orden de despliegue está al final, en [Despliegue del panel (0.9.0)](#despliegue-del-panel-090).
 
-The emails are sent by the Supabase edge functions (`registration-pass` and `admin-pin`), never by Vercel or the browser. That is why **every variable here is a Supabase secret, and Vercel gets nothing new.**
+Los correos los envían las funciones de Supabase (`registration-pass` y `admin-pin`), nunca Vercel ni el navegador. Por eso **todas las variables de esta guía son secretos de Supabase, y en Vercel no se agrega nada.**
 
-Never paste the API key in chat, in the repo or in a `NEXT_PUBLIC_*` variable.
+Nunca pegues la API key en el chat, en el repo ni en una variable `NEXT_PUBLIC_*`.
 
-## 1. Resend account
+## 1. Cuenta de Resend
 
-1. Sign up at [resend.com](https://resend.com). The free plan allows 3,000 emails a month, **at most 100 a day**.
-2. Turn on two-factor authentication (Settings → Account). Whoever gets into this account can send email as the event.
+1. Crea la cuenta en [resend.com](https://resend.com). El plan gratuito permite 3.000 correos al mes y **como máximo 100 al día**.
+2. Activa el doble factor (Settings → Account). Quien entre a esta cuenta puede enviar correos a nombre del evento.
 
-## 2. Domain: `socialrun.site` (bought on Vercel)
+## 2. Dominio: `socialrun.site` (comprado en Vercel)
 
-The domain and its DNS live in Vercel. Emails go out from the subdomain `mail.socialrun.site`, which keeps the reputation of the main domain apart.
+El dominio y sus DNS están en Vercel. Los correos salen desde el subdominio `mail.socialrun.site`, para que la reputación del dominio principal no se vea afectada.
 
-### 2a. Point the site at the domain
+### 2a. Conectar la web al dominio
 
-1. **Vercel → project → Settings → Domains → Add:** `socialrun.site`.
-2. Accept adding `www.socialrun.site` as well, redirecting to `socialrun.site`.
+1. **Vercel → proyecto → Settings → Domains → Add:** `socialrun.site`.
+2. Acepta agregar también `www.socialrun.site`, con redirección a `socialrun.site`.
 
-Vercel creates the web records itself, because it is also the DNS host.
+Vercel crea solo los registros de la web, porque también es el proveedor de DNS.
 
-### 2b. Verify the sending subdomain in Resend
+### 2b. Verificar el subdominio de envío en Resend
 
-Without a verified domain, Resend only delivers to the account owner's own address.
+Sin un dominio verificado, Resend solo entrega correos a la dirección del dueño de la cuenta.
 
-1. **Resend → Domains → Add domain:** `mail.socialrun.site`. Region: `us-east-1` (the default).
-2. Resend lists three records. Add each one in **Vercel → Domains → `socialrun.site` → DNS Records → Add**.
-   - Vercel's **Name** field takes only the part before `socialrun.site`, the same as the table below.
-   - Copy the **Value** from Resend; it is long and unique to the account.
-   - For the MX record, set the priority Resend shows (usually `10`).
+1. **Resend → Domains → Add domain:** `mail.socialrun.site`. Región: `us-east-1` (la que viene por defecto).
+2. Resend muestra tres registros. Agrega cada uno en **Vercel → Domains → `socialrun.site` → DNS Records → Add**:
+   - en el campo **Name** de Vercel va solo la parte que está antes de `socialrun.site`, como en la tabla de abajo;
+   - el **Value** lo copias de Resend; es largo y distinto para cada cuenta;
+   - en el registro MX, pon la prioridad que indica Resend (normalmente `10`).
 
-   | Type | Name (in Vercel) | Value | Purpose |
-   |------|------------------|-------|---------|
-   | `TXT` | `resend._domainkey.mail` | `p=MIGf…` (from Resend) | DKIM: signs each email |
-   | `MX` | `send.mail` | `feedback-smtp.us-east-1.amazonses.com` (from Resend), priority `10` | Bounce handling |
-   | `TXT` | `send.mail` | `v=spf1 include:amazonses.com ~all` (from Resend) | SPF: authorizes Resend to send |
+   | Tipo | Name (en Vercel) | Value | Para qué sirve |
+   |------|------------------|-------|----------------|
+   | `TXT` | `resend._domainkey.mail` | `p=MIGf…` (de Resend) | DKIM: firma cada correo |
+   | `MX` | `send.mail` | `feedback-smtp.us-east-1.amazonses.com` (de Resend), prioridad `10` | Recibir los rebotes |
+   | `TXT` | `send.mail` | `v=spf1 include:amazonses.com ~all` (de Resend) | SPF: autoriza a Resend a enviar |
 
-3. Add DMARC (Gmail and Yahoo require it for good delivery), replacing the address with an inbox you read:
+3. Agrega también DMARC, que Gmail y Yahoo exigen para entregar bien. Cambia la dirección por un correo que revises:
 
-   | Type | Name (in Vercel) | Value |
+   | Tipo | Name (en Vercel) | Value |
    |------|------------------|-------|
-   | `TXT` | `_dmarc.mail` | `v=DMARC1; p=none; rua=mailto:your-inbox@example.com` |
+   | `TXT` | `_dmarc.mail` | `v=DMARC1; p=none; rua=mailto:tu-correo@example.com` |
 
-4. **Resend → Verify DNS records.** On Vercel DNS it usually takes minutes; wait for **Verified** on all records.
+4. **Resend → Verify DNS records.** Con los DNS de Vercel suele tardar unos minutos. Espera a que todos los registros digan **Verified**.
 
-**Check from a terminal** (each command must answer with the value you pasted):
+**Comprobación desde la terminal** (cada comando debe responder con el valor que pegaste):
 
 ```bash
 dig +short TXT resend._domainkey.mail.socialrun.site
@@ -61,21 +61,21 @@ dig +short TXT _dmarc.mail.socialrun.site
 
 1. **API Keys → Create API key.**
    - Name: `neoteam-social-run-supabase`.
-   - Permission: **Sending access** (not Full access).
-   - Domain: only `mail.socialrun.site`.
-2. Copy it. Resend shows it only once; it starts with `re_`.
+   - Permission: **Sending access** (no Full access).
+   - Domain: solo `mail.socialrun.site`.
+2. Cópiala. Resend la muestra una sola vez; empieza por `re_`.
 
-## 4. Supabase secrets
+## 4. Secretos en Supabase
 
-| Secret | Value | Example |
-|--------|-------|---------|
-| `RESEND_API_KEY` | The key from step 3 | `re_…` |
-| `EMAIL_FROM` | Sender name and address on the verified subdomain | `NeoTeam Social Run <pase@mail.socialrun.site>` |
-| `SITE_URL` | Public URL of the site, with no trailing slash, used in the `/pase` link | `https://socialrun.site` |
+| Secreto | Valor | Ejemplo |
+|---------|-------|---------|
+| `RESEND_API_KEY` | La key del paso 3 | `re_…` |
+| `EMAIL_FROM` | Nombre y dirección del remitente, en el subdominio verificado | `NeoTeam Social Run <pase@mail.socialrun.site>` |
+| `SITE_URL` | Dirección pública del sitio, sin barra final; se usa en el enlace a `/pase` | `https://socialrun.site` |
 
-**Option A: the dashboard.** Supabase → project → Edge Functions → **Secrets** → add the three.
+**Opción A: desde el panel.** Supabase → proyecto → Edge Functions → **Secrets** → agrega los tres.
 
-**Option B: the CLI, keeping the key out of your shell history.** Write a temporary file outside the repo:
+**Opción B: por CLI, sin que la key quede en el historial de la terminal.** Crea un archivo temporal fuera del repo:
 
 ```bash
 cat > ~/neoteam-email.env <<'EOF'
@@ -87,76 +87,76 @@ supabase secrets set --env-file ~/neoteam-email.env --project-ref ohatsnkgaecclt
 rm ~/neoteam-email.env
 ```
 
-Check that they exist (this lists names and digests, never values):
+Comprueba que existen (muestra nombres y huellas, nunca los valores):
 
 ```bash
 supabase secrets list --project-ref ohatsnkgaeccltqwhkbv
 ```
 
-Secrets take effect without a redeploy, but the functions need the new code (step 6).
+Los secretos se aplican sin volver a desplegar, pero las funciones sí necesitan el código nuevo.
 
-## 5. Migration (pass email, 0.10.0)
+## 5. Migración del pase por correo (0.10.0)
 
-When the email PR is ready, run its migration (`supabase/migrations/<ts>_pass_email.sql`) in the SQL editor:
-1. first inside `begin; … rollback;` to check it;
-2. then for real.
+Cuando esté listo el PR del correo, corre su migración (`supabase/migrations/<ts>_pass_email.sql`) en el SQL editor:
+1. primero dentro de `begin; … rollback;` para probarla;
+2. después de verdad.
 
-It creates `pass_email_codes` and adds `registrations.pass_emailed_at`.
+Crea la tabla `pass_email_codes` y agrega la columna `registrations.pass_emailed_at`.
 
-## 6. Deploy the functions
+## 6. Desplegar las funciones (0.10.0)
 
-Migration first, then the functions. The other order breaks the claim flow until the table exists.
+Primero la migración y después las funciones. En el orden inverso, recuperar el pase falla hasta que exista la tabla.
 
 ```bash
 supabase functions deploy registration-pass admin-pin --project-ref ohatsnkgaeccltqwhkbv
 ```
 
-## 7. Go-live check
+## 7. Prueba final (0.10.0)
 
-On a phone:
-1. Register with your own email:
-   - the email "Tu pase para el NeoTeam Social Run" arrives;
-   - the QR is visible in Gmail;
-   - it scans in the admin's Check-in.
-2. On `/pase`, enter document and email:
-   - the 6-digit code arrives;
-   - the keyboard offers it from the email;
-   - the pass opens.
-3. In the admin, under Participantes → **Reenviar pase**, it arrives again.
-4. In Resend → **Logs**, each send shows `delivered`. If one went to spam, check that DMARC exists and the domain is Verified.
+En un celular:
+1. Inscríbete con tu propio correo:
+   - llega el correo "Tu pase para el NeoTeam Social Run";
+   - el QR se ve en Gmail;
+   - se puede escanear en el Check-in del admin.
+2. En `/pase`, escribe documento y correo:
+   - llega el código de 6 dígitos;
+   - el teclado lo ofrece desde el correo;
+   - se abre el pase.
+3. En el admin, en Participantes → **Reenviar pase**, el correo vuelve a llegar.
+4. En Resend → **Logs**, cada envío aparece como `delivered`. Si alguno cayó en spam, revisa que exista DMARC y que el dominio esté Verified.
 
-## Limits and errors
+## Límites y errores
 
-- **100 emails a day on the free plan.** Each registration uses one, and each code on `/pase` another. If more than ~80 registrations a day are expected, move to Resend Pro before that day.
-- **Over the limit:** Resend answers 429. The function logs `email 429`, and the runner sees "No pudimos enviar el correo, intenta más tarde". The registration still goes through, and the pass still shows on screen.
-- **Logs:** the function log only shows `email <status>`; Resend's response body never reaches the browser.
-- **Key leak:** revoke the key in Resend → API Keys, create a new one, and repeat step 4.
+- **100 correos al día en el plan gratuito.** Cada inscripción gasta uno, cada código de `/pase` otro y cada entrada al panel otro. Si se esperan más de unas 80 inscripciones en un día, pasa a Resend Pro antes de ese día.
+- **Si se pasa el límite:** Resend responde 429. La función registra `email 429`, y quien lo pidió ve "No pudimos enviar el correo, intenta más tarde". La inscripción se completa igual y el pase se sigue viendo en pantalla.
+- **Logs:** el log de la función solo muestra `email <status>`; la respuesta de Resend nunca llega al navegador.
+- **Si la key se filtra:** revócala en Resend → API Keys, crea una nueva y repite el paso 4.
 
-## Panel sign-in rollout (0.9.0)
+## Despliegue del panel (0.9.0)
 
-Do steps 1–4 first. Then, in this order:
+Haz primero los pasos 1 a 4. Después, en este orden:
 
-1. **Migration:** `supabase/migrations/20261006150000_admin_users.sql` in the SQL editor.
-   - **Check it first:** `begin;`, then the file's contents, then the first-admin insert from step 2 and `select name, email, role from public.admin_users;`, then `rollback;`.
-   - **Then run it for real.** It signs everyone out of the current panel.
-2. **First admin**, in the SQL editor, with the email written in lowercase:
+1. **Migración:** `supabase/migrations/20261006150000_admin_users.sql` en el SQL editor.
+   - **Pruébala primero:** `begin;`, luego el contenido del archivo, luego el insert del primer admin (paso 2) y `select name, email, role from public.admin_users;`, y al final `rollback;`.
+   - **Luego córrela de verdad.** Cierra las sesiones abiertas del panel actual.
+2. **Primer admin**, en el SQL editor, con el correo en minúsculas:
 
    ```sql
    insert into public.admin_users (name, email, role)
    values ('Nombre', 'nombre@example.com', 'admin');
    ```
 
-3. **Functions:**
+3. **Funciones:**
 
    ```bash
    supabase functions deploy admin-pin admin-logos --project-ref ohatsnkgaeccltqwhkbv
    ```
 
-4. **Merge the PR right after,** so Vercel deploys the new panel. Until both sides are live, nobody can sign in.
-5. **Check on a phone:**
-   - `/admin` → your email → the code arrives → you are in;
-   - reload, and you are still in.
-   - Then add the team in **Equipo**.
-6. **Cleanup:** the `ADMIN_SETUP_SECRET` function secret is no longer used and can be deleted from Supabase.
+4. **Mergea el PR justo después,** para que Vercel despliegue el panel nuevo. Mientras uno de los dos lados no esté actualizado, nadie puede entrar.
+5. **Prueba en un celular:**
+   - `/admin` → tu correo → llega el código → entras;
+   - recargas y sigues dentro;
+   - después agregas al equipo en **Equipo**.
+6. **Limpieza:** el secreto `ADMIN_SETUP_SECRET` ya no se usa; puedes borrarlo de Supabase.
 
-If a code does not arrive, check Resend → Logs, and in Supabase the `admin-pin` function logs. Both show only `email <status>`.
+Si un código no llega, revisa Resend → Logs y, en Supabase, los logs de la función `admin-pin`. Ambos muestran solo `email <status>`.
