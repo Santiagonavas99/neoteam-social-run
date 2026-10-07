@@ -883,10 +883,7 @@ Deno.serve(async (req: Request) => {
         const countQuery = applyParticipantFilters(
           supabase.from('registrations').select('id', { count: 'exact', head: true }),
         )
-        const statusQuery = supabase
-          .from('registrations')
-          .select('status')
-          .eq('event_id', event.id)
+        const statusQuery = supabase.from('registrations').select('status').eq('event_id', event.id)
 
         const [countResult, statusResult] = await Promise.all([countQuery, statusQuery])
         if (countResult.error) throw countResult.error
