@@ -36,12 +36,14 @@
   --radius-control: 8px;
   --radius-card: 12px;
   --neo-brand-cyan: #007a78;
+  --neo-landak: #5b3fff;
 }
 
 /* Inert until a surface sets data-theme (admin theme switch, plan Task 4b).
    --neo-black and --neo-white stay absolute: the hero is black in both themes. */
 [data-theme="dark"] {
   --neo-brand-cyan: #02f2f8;
+  --neo-landak: #7c5cff;
   color-scheme: dark;
   --neo-text: #ecf4f3;
   --neo-accent-dark: #077271;
