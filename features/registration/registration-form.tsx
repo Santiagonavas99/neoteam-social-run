@@ -62,7 +62,14 @@ export function RegistrationForm() {
       >
         <p className="m-0">Nos vemos el 18 de octubre en el Social Run del aniversario NeoTeam.</p>
         {state.pass ? (
-          <PassCard pass={state.pass} />
+          <>
+            {state.pass.emailed && (
+              <p className="m-0 mt-2 text-sm text-neo-text-secondary">
+                También te lo enviamos a tu correo.
+              </p>
+            )}
+            <PassCard pass={state.pass} />
+          </>
         ) : (
           <>
             <p className="mt-7 mb-3 border border-dashed border-neo-accent bg-neo-bg p-5 text-[28px] font-bold tracking-wide break-all">

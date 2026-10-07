@@ -97,7 +97,7 @@ Los secretos se aplican sin volver a desplegar, pero las funciones sí necesitan
 
 ## 5. Migración del pase por correo (0.10.0)
 
-Cuando esté listo el PR del correo, corre su migración (`supabase/migrations/<ts>_pass_email.sql`) en el SQL editor:
+Corre la migración `supabase/migrations/20261007010000_pass_email.sql` en el SQL editor:
 1. primero dentro de `begin; … rollback;` para probarla;
 2. después de verdad.
 
@@ -110,6 +110,8 @@ Primero la migración y después las funciones. En el orden inverso, recuperar e
 ```bash
 supabase functions deploy registration-pass admin-pin --project-ref ohatsnkgaeccltqwhkbv
 ```
+
+Después mergea el PR para que Vercel despliegue la web. Mientras la web vieja conviva con la función nueva, el pase no se muestra al terminar la inscripción (se recupera en `/pase`), así que conviene hacerlo seguido.
 
 ## 7. Prueba final (0.10.0)
 

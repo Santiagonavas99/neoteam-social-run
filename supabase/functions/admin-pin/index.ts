@@ -20,6 +20,7 @@ import {
   participantLookup,
   participantPayload,
 } from '../_shared/participants.ts'
+import { sendPassEmail } from '../_shared/pass-email.ts'
 import { fromProxy, sha256 } from '../_shared/proxy.ts'
 import { requireSession } from '../_shared/session.ts'
 
@@ -163,7 +164,7 @@ Deno.serve(async (req: Request) => {
       if (insertError) throw insertError
       const delivery = await sendEmail({ to: email, ...codeEmail(code, 'admin') })
       if (!delivery.ok)
-        return json({ error: 'No pudimos enviar el correo. Inténtalo en unos minutos.' }, 503)
+        return json({ error: 'No pudimos enviar el correo. Inténtalo en unos minutos.' }, 424)
       return sent
     }
 
@@ -844,6 +845,27 @@ Deno.serve(async (req: Request) => {
         result: outcome.result,
         participant: participantPayload(outcome.participant),
       })
+    }
+
+    if (action === 'resendPass') {
+      const id = typeof body?.participantId === 'string' ? body.participantId : ''
+      if (!/^[0-9a-f-]{36}$/i.test(id)) return json({ error: 'Participante no válido.' }, 400)
+      const { data: row, error } = await supabase
+        .from('registrations')
+        .select('id,email,first_name,registration_code,checkin_token,status')
+        .eq('id', id)
+        .maybeSingle()
+      if (error) throw error
+      if (!row || row.status === 'cancelled')
+        return json({ error: 'No encontramos una inscripción activa.' }, 404)
+      const delivery = await sendPassEmail(row)
+      if (!delivery.ok)
+        return json({ error: 'No pudimos enviar el correo. Inténtalo en unos minutos.' }, 424)
+      await supabase
+        .from('registrations')
+        .update({ pass_emailed_at: new Date().toISOString() })
+        .eq('id', row.id)
+      return json({ ok: true })
     }
 
     if (action === 'users') {
