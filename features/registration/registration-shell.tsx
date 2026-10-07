@@ -1,15 +1,21 @@
-import { ArrowLeft, CalendarDays, type LucideIcon, MapPin } from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, CalendarDays, type LucideIcon, MapPin } from 'lucide-react'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { BrandLink } from '@/components/brand-link'
 import { eventConfig } from '@/features/event/event'
+import { mapsUrl } from '@/features/event/maps'
 import { linkClass } from './form-ui'
 
-type Fact = { icon: LucideIcon; label: string; value: string }
+type Fact = { icon: LucideIcon; label: string; value: string; href?: string }
 
 export const eventFacts: Fact[] = [
   { icon: CalendarDays, label: 'Fecha', value: eventConfig.dateLabel },
-  { icon: MapPin, label: 'Punto', value: eventConfig.location },
+  {
+    icon: MapPin,
+    label: 'Punto',
+    value: eventConfig.location,
+    href: mapsUrl(eventConfig.location),
+  },
 ]
 
 export function RegistrationShell({
@@ -47,7 +53,7 @@ export function RegistrationShell({
           </h1>
           <p className="mb-4 text-[15px] text-neo-text-secondary md:mb-8 md:max-w-85">{intro}</p>
           <dl className="m-0 md:max-w-85">
-            {facts.map(({ icon: Icon, label, value }) => (
+            {facts.map(({ icon: Icon, label, value, href }) => (
               <div
                 key={label}
                 className="grid grid-cols-[88px_1fr] items-baseline gap-3 border-t border-neo-border py-2.5 md:flex md:flex-col md:gap-2 md:py-4"
@@ -56,7 +62,21 @@ export function RegistrationShell({
                   <Icon aria-hidden className="size-3.5 shrink-0" />
                   {label}
                 </dt>
-                <dd className="m-0 text-sm font-medium">{value}</dd>
+                <dd className="m-0 text-sm font-medium">
+                  {href ? (
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener"
+                      className="inline-flex min-h-11 items-center gap-1.5 underline decoration-neo-accent underline-offset-4 md:min-h-0"
+                    >
+                      {value}
+                      <ArrowUpRight aria-hidden className="size-4 shrink-0" />
+                    </a>
+                  ) : (
+                    value
+                  )}
+                </dd>
               </div>
             ))}
           </dl>
