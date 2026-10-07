@@ -68,3 +68,16 @@ export async function getHomeCommunity() {
     return { groups: [] as CommunityLogo[], brands: [] as CommunityLogo[] }
   }
 }
+
+// Only the aggregate: registrations stay unreadable to the publishable key.
+export async function getRegisteredCount(): Promise<number | null> {
+  try {
+    const supabase = createServerSupabaseClient()
+    const { data, error } = await supabase.rpc('social_run_registered_count')
+    if (error) throw error
+    return typeof data === 'number' ? data : null
+  } catch (error) {
+    console.error('Registered count fallback', errorText(error))
+    return null
+  }
+}

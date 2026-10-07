@@ -26,7 +26,9 @@ export function Footer() {
         className="text-link gap-1.5"
         aria-label="Creado por Landak Studio (abre en una nueva pestaña)"
       >
-        Creado por Landak Studio
+        <span>
+          Creado por <span className="text-neo-landak">Landak Studio</span>
+        </span>
         <ArrowUpRight aria-hidden className="size-4 shrink-0" />
       </a>
     </footer>
