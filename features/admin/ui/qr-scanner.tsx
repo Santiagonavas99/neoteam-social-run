@@ -48,10 +48,6 @@ export function QrScanner({
           { facingMode: 'environment' },
           {
             fps: 10,
-            qrbox: (width, height) => {
-              const size = Math.floor(Math.min(width, height) * 0.68)
-              return { width: size, height: size }
-            },
           },
           (text) => {
             const now = Date.now()
