@@ -75,3 +75,44 @@ The camera check-in screen already exists (`features/admin/checkin`, action `che
 - Per-action audit log ("who checked in whom"). The `user_id` on sessions makes it possible later.
 - Roles for dynamics stands (scanning runners in a dynamic). That needs an `admin` today.
 - Dropping `admin_pin_settings`.
+
+## Revision — sign in with an emailed code (Iván, 2026-10-06)
+
+Iván: no fixed PINs and no PIN fallback. Each sign-in uses a random 6-digit code sent to the person's email, and the device stays signed in for a month with a cookie. This **replaces decisions 1, 4, 5, 8 and 9**; roles, the server-side guard and the Equipo screen stay.
+
+1. **Accounts are an email address.**
+   - `admin_users` keeps `id`, `name`, `role`, `active` and the timestamps;
+   - it gets `email` (unique, stored lowercase) in place of `username` and `pin_hash`.
+   - The migration `20261006150000_admin_users.sql` has not run on the remote, so it is edited in place rather than followed by a second one.
+2. **Sign-in, two steps:**
+   1. **Email.** Action `requestCode { email }`:
+      - the answer is always "Si el correo tiene acceso, te enviamos un código", so the screen cannot tell who is staff;
+      - for an active user, it stores a SHA-256 hash of a random 6-digit code in a new `admin_login_codes` table, then emails the code through Resend.
+   2. **Code.** Action `verifyCode { email, code }`. It creates the session.
+   - **Limits:**
+     - a code lasts 10 minutes and works once;
+     - 5 wrong tries burn it;
+     - at most 3 codes per user in 15 minutes;
+     - the existing per-IP attempt limiter wraps `verifyCode`.
+3. **The session lives in a cookie,** set by the Next route, not in `localStorage`:
+   - `neoteam_admin_session`, with `HttpOnly; Secure; SameSite=Strict; Path=/api/admin; Max-Age=30 days` (the same 30 days the session row already has);
+   - the route takes the token out of the edge function's answer and sets it as the cookie;
+   - on every request, the route copies the cookie into the body it forwards, so page scripts never see the token;
+   - `logout` deletes the row and clears the cookie.
+   - Because of this, `token` disappears from the admin components.
+4. **First admin:** Iván inserts one row by SQL (name, email, role `admin`), with no secret to type.
+   - Removed: the `setup` action, the setup screen, the `ADMIN_SETUP_SECRET` check, `changePin` and the Seguridad section, since none of them remain.
+   - A check-in user sees only Check-in, plus "Más" for the theme and "Cerrar sesión".
+5. **Equipo** creates a user from name, email and role, and edits name, role and active. Changing role or turning someone off deletes their sessions.
+6. **The Resend sender moves into this PR,** because signing in now depends on it.
+   - New files: `_shared/email.ts` with `sendEmail()`, plus a code email template that Part B reuses for `/pase`.
+   - **Prerequisite for deploying:** `mail.socialrun.site` is Verified, and the three secrets are set (`docs/email-setup.md`).
+
+**Mobile:**
+- the email field uses `type="email"` and `autocomplete="email"`;
+- the code field is the six-box field, with `inputmode="numeric"` and `autocomplete="one-time-code"`, so the phone offers the code from the email;
+- "Reenviar código" is enabled after 60 seconds.
+
+**Trade-offs Iván accepted:**
+- nobody can sign in if Resend is down or the 100-a-day free quota is spent. A 30-day cookie keeps that rare: one email per person per month;
+- staff need their email on their phone on event day.
