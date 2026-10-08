@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.28.2] - 2026-10-07
+
+### Fixed
+
+- **Mobile no longer has two separators between event facts and the runner/brand metrics.** Keep the facts' lower rule, omit the metrics' top rule only when those sections are adjacent, and tighten the phone spacing; desktop is unchanged.
+
 ## [0.28.1] - 2026-10-07
 
 ### Fixed
