@@ -4,9 +4,7 @@ import { stagger } from '../stagger'
 
 export function Numbers({ registered, brands }: { registered: number | null; brands: number }) {
   const items = [
-    registered === null
-      ? null
-      : { value: runnersShown(registered), prefix: '+', label: 'Corredores inscritos' },
+    { value: runnersShown(registered), prefix: '+', label: 'Corredores inscritos' },
     brands > 0 ? { value: brands, prefix: '', label: 'Marcas aliadas' } : null,
   ].filter((item) => item !== null)
   if (!items.length) return null
