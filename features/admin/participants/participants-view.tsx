@@ -2,6 +2,7 @@
 
 import { FileDown, ListFilter, Mail, Pencil, Trash2, UserCheck, Users } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
+import type { ParticipantProfile } from '@/lib/participant-profile'
 import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
 import { genderLabels, participantStates } from '../labels'
@@ -11,7 +12,6 @@ import type {
   ParticipantGroupOption,
   ParticipantStatusCounts,
 } from '../types'
-import type { ParticipantProfile } from '@/lib/participant-profile'
 import { Feedback, StatusBadge } from '../ui/admin-ui'
 import { ConfirmPanel } from '../ui/confirm-panel'
 import { EmptyState, NoMatches } from '../ui/empty-state'
@@ -146,7 +146,7 @@ export function ParticipantsView() {
   }
 
   async function saveProfile(profile: ParticipantProfile) {
-    if (!editing || !editing.updated_at) return
+    if (!editing?.updated_at) return
     setBusy(`edit-${editing.id}`)
     setFeedback(null)
     try {
