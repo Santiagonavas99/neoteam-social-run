@@ -7,7 +7,10 @@ type Email = { to: string; subject: string; html: string; text: string; attachme
 
 // Resend's answer body never leaves this function; callers only see the status. Callers answer
 // a failed delivery with 424, because the Next proxy replaces every 5xx with a generic message.
-export async function sendEmail(email: Email): Promise<{ ok: boolean; status: number }> {
+export async function sendEmail(
+  email: Email,
+  options: { idempotencyKey?: string } = {},
+): Promise<{ ok: boolean; status: number }> {
   if (!RESEND_API_KEY || !EMAIL_FROM) {
     console.error('email not configured')
     return { ok: false, status: 503 }
@@ -15,7 +18,11 @@ export async function sendEmail(email: Email): Promise<{ ok: boolean; status: nu
   try {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      headers: {
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+        ...(options.idempotencyKey ? { 'Idempotency-Key': options.idempotencyKey } : {}),
+      },
       body: JSON.stringify({ from: EMAIL_FROM, ...email, to: [email.to] }),
       signal: AbortSignal.timeout(15_000),
     })
