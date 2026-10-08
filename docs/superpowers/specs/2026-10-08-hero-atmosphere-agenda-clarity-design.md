@@ -25,3 +25,10 @@ Do not replace the existing hero photograph-free editorial typography with new p
 
 ## Out of scope
 Data collection/legal policies, registration, Wallet, Supabase, admin layout, agenda timing, event schedule, global typography and desktop navigation.
+
+## Design refinement — approved 2026-10-08
+The organizer reviewed PR #64's preview and requested the following corrections:
+- **Agenda title:** make `AGENDA` the sticky board headline, with `5K · RUTA SOCIAL` as its secondary label, without reintroducing the repeated event date. On narrow phones use a compact stacked label to avoid crowding the activity count.
+- **Restore the original hero chips:** only `18 OCT · 2026`, `07:30 A. M.` and `5K SOCIAL`. The location remains represented by the actual route card, so a redundant fourth chip is not needed. Restore the previous mobile two-then-one layout.
+- **Stronger atmosphere:** elevate cyan glows (about 23% main, 12% secondary plus 8% bottom accent) and static fractal grain (opacity about 0.13). Keep text legible, no full grid, new asset requests, or motion.
+- Keep the already-approved deletion of the unnecessary agenda footer, the separate mobile route block from main, and the larger left agenda date signature.
