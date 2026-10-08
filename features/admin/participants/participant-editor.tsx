@@ -2,7 +2,7 @@
 
 import { Check, Pencil, TriangleAlert, X } from 'lucide-react'
 import { useState } from 'react'
-import { validateParticipantProfile, type ParticipantProfile } from '@/lib/participant-profile'
+import { type ParticipantProfile, validateParticipantProfile } from '@/lib/participant-profile'
 import type { Participant, ParticipantGroupOption } from '../types'
 
 export function ParticipantEditor({
