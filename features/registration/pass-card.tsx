@@ -1,4 +1,4 @@
-import { ArrowUpRight, CalendarDays, Clock, ImageDown, Instagram, MapPin, MessageCircle } from 'lucide-react'
+import { ArrowUpRight, CalendarDays, Camera, Clock, ImageDown, MapPin, MessageCircle } from 'lucide-react'
 import Image from 'next/image'
 import { NeoTeamLogo } from '@/components/neoteam-logo'
 import { communityLinks } from '@/features/event/community-links'
@@ -120,7 +120,7 @@ export function PassCard({ pass }: { pass: Pass }) {
             rel="noopener noreferrer"
             className="inline-flex min-h-12 items-center justify-center gap-2 rounded-control border border-neo-border bg-neo-surface px-4 py-3 text-sm font-semibold text-neo-text transition-transform active:scale-[0.98]"
           >
-            <Instagram aria-hidden className="size-4 shrink-0" />
+            <Camera aria-hidden className="size-4 shrink-0" />
             Seguir @neoteam_cali
             <ArrowUpRight aria-hidden className="size-4 shrink-0" />
           </a>
