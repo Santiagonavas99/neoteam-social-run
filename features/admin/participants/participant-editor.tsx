@@ -106,16 +106,28 @@ export function ParticipantEditor({
             disabled={saving}
           >
             {['CC', 'CE', 'TI', 'PA', 'PPT', 'OTRO'].map((type) => (
-              <option key={type} value={type}>{type}</option>
+              <option key={type} value={type}>
+                {type}
+              </option>
             ))}
           </select>
         </label>
         {field('Número de documento', 'document_number', {
-          inputMode: ['CC', 'CE', 'TI', 'PPT'].includes(profile.document_type) ? 'numeric' : undefined,
+          inputMode: ['CC', 'CE', 'TI', 'PPT'].includes(profile.document_type)
+            ? 'numeric'
+            : undefined,
         })}
-        {field('Correo electrónico', 'email', { type: 'email', inputMode: 'email', autoComplete: 'email' })}
+        {field('Correo electrónico', 'email', {
+          type: 'email',
+          inputMode: 'email',
+          autoComplete: 'email',
+        })}
         {field('WhatsApp', 'phone', { type: 'tel', inputMode: 'tel', autoComplete: 'tel' })}
-        {field('Fecha de nacimiento', 'birth_date', { type: 'date', required: false, min: '1900-01-01' })}
+        {field('Fecha de nacimiento', 'birth_date', {
+          type: 'date',
+          required: false,
+          min: '1900-01-01',
+        })}
         <label className="flex flex-col gap-1.5 text-sm font-semibold">
           Género
           <select
@@ -149,7 +161,10 @@ export function ParticipantEditor({
           >
             <option value="">Independiente / sin grupo</option>
             {groups.map((group) => (
-              <option key={group.id} value={group.id}>{group.name}{group.active ? '' : ' (inactivo)'}</option>
+              <option key={group.id} value={group.id}>
+                {group.name}
+                {group.active ? '' : ' (inactivo)'}
+              </option>
             ))}
             <option value="custom">Otro running crew</option>
           </select>
@@ -163,7 +178,9 @@ export function ParticipantEditor({
             disabled={saving}
           >
             <option value="">Sin talla</option>
-            {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((size) => <option key={size}>{size}</option>)}
+            {['XS', 'S', 'M', 'L', 'XL', 'XXL'].map((size) => (
+              <option key={size}>{size}</option>
+            ))}
           </select>
         </label>
         {customCrew && field('Nombre del otro running crew', 'other_running_group')}
@@ -177,13 +194,22 @@ export function ParticipantEditor({
           «Correos pendientes» para que lo envíes manualmente al nuevo correo.
         </p>
       )}
-      {feedback && <p className="mt-4 text-sm font-medium text-neo-danger" role="alert">{feedback}</p>}
+      {feedback && (
+        <p className="mt-4 text-sm font-medium text-neo-danger" role="alert">
+          {feedback}
+        </p>
+      )}
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <button className="button" type="submit" disabled={saving}>
           <Check aria-hidden className="size-4" />
           {saving ? 'Guardando…' : 'Guardar cambios'}
         </button>
-        <button type="button" className="button button-secondary" onClick={onCancel} disabled={saving}>
+        <button
+          type="button"
+          className="button button-secondary"
+          onClick={onCancel}
+          disabled={saving}
+        >
           <X aria-hidden className="size-4" /> Cancelar
         </button>
       </div>
