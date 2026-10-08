@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { NEOTEAM_LEADERS } from '@/features/legal/leaders'
 
 export const metadata: Metadata = {
   title: 'Tratamiento de datos personales | Social Run NeoTeam',
@@ -27,13 +28,21 @@ export default function PrivacyPage() {
         Recibir noticias sobre futuros eventos es opcional; no es requisito para inscribirte.
       </div>
 
-      <h2 className={heading}>1. Responsable del tratamiento</h2>
+      <h2 className={heading}>1. Organización y responsable del tratamiento</h2>
       <p className={paragraph}>
         El evento se comunica públicamente bajo la denominación NeoTeam Social Run.
-        Para completar esta política, el equipo debe designar quién determina legalmente
-        las finalidades y medios del tratamiento de datos: persona natural, persona jurídica
-        o responsables conjuntos. Hasta esa designación, esta página es un borrador y no
-        acredita por sí sola la identificación exigida al responsable.
+        Se han identificado las siguientes personas como líderes de NeoTeam:
+      </p>
+      <ul className={items}>
+        {NEOTEAM_LEADERS.map((leader) => <li key={leader}>{leader}</li>)}
+      </ul>
+      <p className={paragraph}>
+        Ser líder de NeoTeam no implica automáticamente ser responsable individual ni
+        conjunto del tratamiento de datos personales. Antes de aprobar esta política,
+        debe formalizarse quién determina las finalidades y medios del tratamiento:
+        una persona natural, una persona jurídica o varios responsables conjuntos.
+        También deben confirmarse sus datos de contacto y un canal para ejercer
+        los derechos de los titulares. Hasta entonces este documento es un borrador.
       </p>
 
       <h2 className={heading}>2. Datos solicitados</h2>
