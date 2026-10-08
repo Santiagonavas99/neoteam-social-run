@@ -481,7 +481,9 @@ export function ParticipantsView() {
                         <dt className="text-neo-text-secondary">Nacimiento</dt>
                         <dd className="m-0 text-neo-text">{row.birth_date || '—'}</dd>
                         <dt className="text-neo-text-secondary">Contacto emergencia</dt>
-                        <dd className="m-0 text-neo-text">{row.emergency_name || '—'} · {row.emergency_phone || '—'}</dd>
+                        <dd className="m-0 text-neo-text">
+                          {row.emergency_name || '—'} · {row.emergency_phone || '—'}
+                        </dd>
                         <dt className="text-neo-text-secondary">Pase por correo</dt>
                         <dd className="m-0 text-neo-text">
                           {row.pass_emailed_at ? 'Envío registrado' : 'Pendiente'}
