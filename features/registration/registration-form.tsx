@@ -105,9 +105,7 @@ export function RegistrationForm() {
     setStep(next)
     window.requestAnimationFrame(() => {
       formRef.current?.scrollIntoView({
-        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
-          ? 'auto'
-          : 'smooth',
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
         block: 'start',
       })
       const heading = formRef.current?.querySelector<HTMLElement>(`#registration-step-${next}`)
@@ -139,7 +137,9 @@ export function RegistrationForm() {
       const panel = formRef.current?.querySelector<HTMLElement>(
         `[data-registration-step="${number}"]`,
       )
-      const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')
+      const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
+        'input, select',
+      )
       if (Array.from(controls ?? []).some((control) => !control.checkValidity())) {
         event.preventDefault()
         if (number === step) {
