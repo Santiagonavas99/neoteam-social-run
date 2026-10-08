@@ -11,6 +11,7 @@ import {
   CheckboxField,
   cardClass,
   Eyebrow,
+  FieldError,
   FormMessage,
   linkClass,
   SelectField,
@@ -22,6 +23,15 @@ import { PassCard } from './pass-card'
 import motion from './registration-motion.module.css'
 import { RUNNING_GROUP_OPTIONS } from './running-groups'
 import { Streamers } from './streamers'
+import {
+  isAllowedBirthDate,
+  isEmailDomainValid,
+  isNumericDocumentType,
+  isValidDocumentNumber,
+  maxBirthDate,
+  MIN_BIRTH_DATE,
+  normalizeColombianPhone,
+} from './validation'
 
 const initialState: RegistrationState = { ok: false, message: '' }
 
@@ -89,16 +99,31 @@ function stepForError(name: string): number {
   return 3
 }
 
-// Avoid brittle HTML pattern rules (especially with Unicode-mode pattern checks).
-// Use the same full-name parser in the browser and on the server.
-function isValidRegistrationControl(control: HTMLInputElement | HTMLSelectElement) {
-  if (control.name === 'fullName' && control instanceof HTMLInputElement) {
-    const value = control.value.trim()
-    control.setCustomValidity(
-      value && !splitFullName(value) ? 'Escribe tu nombre y al menos un apellido.' : '',
-    )
+function controlError(control: HTMLInputElement | HTMLSelectElement, documentType: string): string | null {
+  control.setCustomValidity('')
+  const value = control.value.trim()
+  if (control.name === 'fullName' && value && !splitFullName(value)) {
+    control.setCustomValidity('Escribe tu nombre y al menos un apellido.')
   }
-  return control.checkValidity()
+  if (control.name === 'documentNumber' && value && !isValidDocumentNumber(value, documentType)) {
+    control.setCustomValidity(isNumericDocumentType(documentType)
+      ? 'Escribe entre 5 y 30 dígitos, sin letras.'
+      : 'Escribe entre 5 y 30 letras o números, sin espacios.')
+  }
+  if (control.name === 'email' && value && !isEmailDomainValid(value)) {
+    control.setCustomValidity('Revisa el dominio del correo (ejemplo: nombre@dominio.com).')
+  }
+  if (control.name === 'birthDate' && value && !isAllowedBirthDate(value)) {
+    control.setCustomValidity('Selecciona una fecha real entre 1900 y hoy.')
+  }
+  if ((control.name === 'phone' || control.name === 'emergencyPhone') &&
+      value && !/^\d{10}$/.test(normalizeColombianPhone(value))) {
+    control.setCustomValidity('Escribe un teléfono de 10 dígitos.')
+  }
+  if (control.checkValidity()) return null
+  if (control.validity.valueMissing) return 'Completa este campo antes de continuar.'
+  if (control.validity.typeMismatch) return 'Escribe un correo válido.'
+  return control.validationMessage || 'Revisa este dato.'
 }
 
 export function RegistrationForm() {
@@ -107,13 +132,41 @@ export function RegistrationForm() {
   const [flow, setFlow] = useState<'forward' | 'back'>('forward')
   // No crew is assumed: selecting NeoTeam by default caused accidental affiliations.
   const [runningGroup, setRunningGroup] = useState('')
+  const [participationMode, setParticipationMode] = useState<'solo' | 'crew' | ''>('')
+  const [documentType, setDocumentType] = useState('CC')
+  const [clientErrors, setClientErrors] = useState<Record<string, string[]>>({})
+  const [editedSinceResponse, setEditedSinceResponse] = useState<string[]>([])
   const formRef = useRef<HTMLFormElement>(null)
   const values = state.values
   const errors = state.errors
+  const fieldErrors = (name: string) =>
+    clientErrors[name] ?? (editedSinceResponse.includes(name) ? undefined : errors?.[name])
+
+  function clearFieldError(name: string) {
+    setClientErrors((current) => {
+      if (!(name in current)) return current
+      const next = { ...current }
+      delete next[name]
+      return next
+    })
+    setEditedSinceResponse((current) => current.includes(name) ? current : [...current, name])
+  }
+
+  function chooseParticipation(mode: 'solo' | 'crew') {
+    setParticipationMode(mode)
+    if (mode === 'solo') setRunningGroup('independiente')
+    else if (runningGroup === 'independiente') setRunningGroup('')
+    clearFieldError('runningGroup')
+  }
 
   useEffect(() => {
     if (!state.attempt || state.ok) return
-    setRunningGroup(state.values?.runningGroup ?? '')
+    const selectedGroup = state.values?.runningGroup ?? ''
+    setRunningGroup(selectedGroup)
+    setParticipationMode(selectedGroup === 'independiente' ? 'solo' : selectedGroup ? 'crew' : '')
+    setDocumentType(state.values?.documentType ?? 'CC')
+    setClientErrors({})
+    setEditedSinceResponse([])
     const firstFieldWithError = Object.keys(state.errors ?? {})[0]
     setStep(firstFieldWithError ? stepForError(firstFieldWithError) : 3)
   }, [state.attempt, state.ok, state.errors, state.values])
@@ -131,18 +184,36 @@ export function RegistrationForm() {
     })
   }
 
-  function validStep(number: number) {
+  function validStep(number: number, focus = number === step) {
     const panel = formRef.current?.querySelector<HTMLElement>(
-      `[data-registration-step="${number}"]`,
+      '[data-registration-step="' + number + '"]',
     )
     const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')
-    const firstInvalid = Array.from(controls ?? []).find(
-      (control) => !isValidRegistrationControl(control),
-    )
-    if (!firstInvalid) return true
-    firstInvalid.focus()
-    firstInvalid.reportValidity()
-    return false
+    const nextErrors: Record<string, string[]> = {}
+    if (number === 2 && !participationMode) {
+      nextErrors.runningGroup = ['Elige si vienes por tu cuenta o con un running crew.']
+    }
+    let firstInvalid: HTMLInputElement | HTMLSelectElement | undefined
+    for (const control of Array.from(controls ?? [])) {
+      const message = controlError(control, documentType)
+      if (message) {
+        nextErrors[control.name] = [message]
+        if (!firstInvalid) firstInvalid = control
+      }
+    }
+    setClientErrors((current) => ({
+      ...Object.fromEntries(Object.entries(current).filter(([name]) => stepForError(name) !== number)),
+      ...nextErrors,
+    }))
+    if (focus) {
+      if (firstInvalid) {
+        firstInvalid.focus()
+        firstInvalid.reportValidity()
+      } else if (nextErrors.runningGroup) {
+        panel?.querySelector<HTMLButtonElement>('[data-participation-choice]')?.focus()
+      }
+    }
+    return Object.keys(nextErrors).length === 0
   }
 
   function continueToNext() {
@@ -151,22 +222,10 @@ export function RegistrationForm() {
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    // Explicit validation prevents browsers from trying to focus a required field
-    // inside a hidden wizard panel, while the server remains the final authority.
     for (let number = 1; number <= 3; number += 1) {
-      const panel = formRef.current?.querySelector<HTMLElement>(
-        `[data-registration-step="${number}"]`,
-      )
-      const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
-        'input, select',
-      )
-      if (Array.from(controls ?? []).some((control) => !isValidRegistrationControl(control))) {
+      if (!validStep(number, number === step)) {
         event.preventDefault()
-        if (number === step) {
-          validStep(number)
-        } else {
-          goToStep(number)
-        }
+        if (number !== step) goToStep(number)
         return
       }
     }
