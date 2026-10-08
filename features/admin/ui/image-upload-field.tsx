@@ -16,6 +16,13 @@ function readFileAsBase64(file: Blob) {
   })
 }
 
+export async function uploadWebpImage(blob: Blob): Promise<string> {
+  const content = await readFileAsBase64(blob)
+  const result = await callAdmin('uploadAdminImage', { mime: 'image/webp', content })
+  if (!result.url) throw new Error('No pudimos obtener la imagen subida.')
+  return result.url
+}
+
 export function useImageUpload({
   successText,
   onUploaded,
@@ -35,10 +42,8 @@ export function useImageUpload({
     setFeedback(null)
     try {
       const webp = await convertImageToWebp(file)
-      const content = await readFileAsBase64(webp)
-      const result = await callAdmin('uploadAdminImage', { mime: 'image/webp', content })
-      if (!result.url) throw new Error('No pudimos obtener la imagen subida.')
-      onUploaded(result.url)
+      const url = await uploadWebpImage(webp)
+      onUploaded(url)
       const savings = Math.round((1 - webp.size / file.size) * 100)
       setFeedback({
         kind: 'success',
