@@ -125,11 +125,15 @@ export type AdminResponse<Row = unknown> = {
   error?: string
   winners?: number
   count?: number
+  pending?: number
+  sent?: number
+  failed?: number
+  reason?: string
   page?: number
   pageSize?: number
   statusCounts?: ParticipantStatusCounts
   deleted?: number
-  result?: CheckinResult
+  result?: CheckinResult | 'sent' | 'skipped' | 'failed'
   participant?: ScannedParticipant
   dynamicRows?: DynamicRow[]
   winnerDetails?: ScannedParticipant[]
