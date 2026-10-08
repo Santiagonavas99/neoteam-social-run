@@ -12,12 +12,12 @@ export function CommunityConnect() {
       <p className="m-0 text-xs font-bold tracking-[0.14em] text-neo-accent-text uppercase">
         SIGAMOS CONECTADOS
       </p>
-      <h3
+      <h2
         id="community-connect-heading"
         className="m-0 mt-2 text-xl font-bold tracking-[-0.04em] text-neo-text"
       >
         La comunidad sigue corriendo.
-      </h3>
+      </h2>
       <p className="m-0 mt-2 text-sm leading-normal text-neo-text-secondary">
         Súmate al grupo y acompáñanos también en Instagram.
       </p>
