@@ -69,6 +69,7 @@ const registrationSteps = [
 function stepForError(name: string): number {
   if (
     [
+      'fullName',
       'firstName',
       'lastName',
       'documentType',
@@ -262,24 +263,20 @@ export function RegistrationForm() {
 
           {number === 1 && (
             <div className="grid gap-5">
-              <div className="grid gap-5 sm:grid-cols-2">
-                <TextField
-                  name="firstName"
-                  label="Nombre"
-                  defaultValue={values?.firstName}
-                  required
-                  autoComplete="given-name"
-                  errors={errors?.firstName}
-                />
-                <TextField
-                  name="lastName"
-                  label="Apellido"
-                  defaultValue={values?.lastName}
-                  required
-                  autoComplete="family-name"
-                  errors={errors?.lastName}
-                />
-              </div>
+              <TextField
+                name="fullName"
+                label="Nombre completo"
+                placeholder="Nombres y apellidos como aparecen en tu documento"
+                defaultValue={
+                  values?.fullName ??
+                  [values?.firstName, values?.lastName].filter(Boolean).join(' ')
+                }
+                required
+                autoComplete="name"
+                pattern=".*\\S+\\s+\\S+.*"
+                title="Escribe al menos un nombre y un apellido."
+                errors={errors?.fullName ?? errors?.firstName ?? errors?.lastName}
+              />
               <div className="grid grid-cols-[100px_minmax(0,1fr)] gap-5">
                 <SelectField
                   name="documentType"
@@ -318,7 +315,8 @@ export function RegistrationForm() {
                   name="phone"
                   label="WhatsApp"
                   type="tel"
-                  inputMode="tel"
+                  inputMode="numeric"
+                  enterKeyHint="next"
                   defaultValue={values?.phone}
                   required
                   autoComplete="tel"
@@ -414,7 +412,8 @@ export function RegistrationForm() {
                   name="emergencyPhone"
                   label="Celular de emergencia"
                   type="tel"
-                  inputMode="tel"
+                  inputMode="numeric"
+                  enterKeyHint="done"
                   defaultValue={values?.emergencyPhone}
                   required
                   autoComplete="off"
