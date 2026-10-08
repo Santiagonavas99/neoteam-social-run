@@ -1,5 +1,16 @@
-import { ArrowDown, ArrowRight, CalendarDays, Clock, MapPin, QrCode, Route } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowRight,
+  CalendarDays,
+  Clock,
+  MapPin,
+  MessageCircle,
+  QrCode,
+  Route,
+} from 'lucide-react'
 import Link from 'next/link'
+import { InstagramIcon } from '@/components/instagram-icon'
+import { communityLinks } from '@/features/event/community-links'
 import { eventConfig } from '@/features/event/event'
 import { EventCountdown } from '@/features/event/event-countdown'
 
@@ -59,6 +70,30 @@ export function Hero() {
             </div>
           </div>
         </div>
+
+        <nav className="v2-hero-social" aria-label="Redes y comunidad NeoTeam">
+          <span className="v2-hero-social-title" aria-hidden="true">
+            CONECTA
+          </span>
+          <a
+            href={communityLinks.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Seguir a NeoTeam en Instagram"
+            title="Instagram · @neoteam_cali"
+          >
+            <InstagramIcon aria-hidden className="size-5" />
+          </a>
+          <a
+            href={communityLinks.whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Unirme a la comunidad de WhatsApp de NeoTeam"
+            title="Comunidad de WhatsApp"
+          >
+            <MessageCircle aria-hidden className="size-5" />
+          </a>
+        </nav>
 
         <div className="v2-hero-footer shell" aria-hidden="true">
           <span>RUN · CONNECT · CELEBRATE</span>

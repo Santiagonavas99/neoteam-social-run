@@ -215,6 +215,59 @@
   line-height: 1.4;
   color: var(--neo-on-dark-secondary);
 }
+/* Social rail stays within the hero instead of floating over the rest of the page. */
+.v2-hero-social {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 14px 6px 8px;
+  border: 1px solid var(--neo-on-dark-border);
+  border-right: 0;
+  border-radius: 12px 0 0 12px;
+  background: color-mix(in srgb, var(--neo-black) 94%, transparent);
+  color: var(--neo-white);
+  transform: translateY(-50%);
+  backdrop-filter: blur(12px);
+}
+.v2-hero-social-title {
+  margin-bottom: 7px;
+  color: var(--neo-on-dark-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+.v2-hero-social a {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--neo-on-dark-secondary);
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+.v2-hero-social a:hover {
+  border-color: var(--neo-on-dark-border);
+  background: var(--neo-on-dark-hover);
+  color: var(--neo-accent);
+  transform: translateX(-2px);
+}
+.v2-hero-social a:focus-visible {
+  outline: 2px solid var(--neo-accent);
+  outline-offset: 1px;
+}
+
 .v2-hero-footer {
   position: relative;
   z-index: 1;
@@ -644,6 +697,23 @@
   color: var(--neo-text);
 }
 @media (max-width: 1100px) {
+  /* On narrow layouts, keep the buttons below hero content rather than over it. */
+  .v2-hero-grid {
+    padding-bottom: 112px;
+  }
+  .v2-hero-social {
+    top: auto;
+    right: 0;
+    bottom: 20px;
+    flex-direction: row;
+    padding: 5px 7px;
+    transform: none;
+  }
+  .v2-hero-social-title {
+    display: none;
+  }
+}
+@media (max-width: 1100px) {
   .home-v2 .shell,
   .home-v2 .site-header-inner {
     width: min(100% - 48px, 1280px);
@@ -747,7 +817,7 @@
   }
   .v2-hero-grid {
     padding-top: 36px;
-    padding-bottom: 58px;
+    padding-bottom: 94px;
     text-align: center;
   }
   .v2-hero-title .kicker {
@@ -961,6 +1031,9 @@
   .v2-hero-actions {
     animation: hero-fade 500ms ease-out 300ms both;
   }
+  .v2-hero-social {
+    animation: hero-fade 460ms ease-out 450ms both;
+  }
   .v2-route-card {
     position: relative;
   }
@@ -1002,5 +1075,14 @@
   100% {
     scale: 1 1;
     opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v2-hero-social a {
+    transition: none;
+  }
+  .v2-hero-social a:hover {
+    transform: none;
   }
 }
