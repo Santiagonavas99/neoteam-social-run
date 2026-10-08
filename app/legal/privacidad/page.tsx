@@ -145,10 +145,15 @@ export default function PrivacyPage() {
         jurídica del documento.
       </p>
       <p className={paragraph}>
-        Consulta también las <Link href="/legal/terminos" className="font-semibold underline underline-offset-4">condiciones de participación</Link>.
+        Consulta también las{' '}
+        <Link href="/legal/terminos" className="font-semibold underline underline-offset-4">
+          condiciones de participación
+        </Link>
+        .
       </p>
       <p className="mt-10 border-t border-neo-border pt-5 text-xs text-neo-text-secondary">
-        Borrador de trabajo · 8 de octubre de 2026 · Pendiente de identificación del responsable y aprobación de la organización.
+        Borrador de trabajo · 8 de octubre de 2026 · Pendiente de identificación del responsable y
+        aprobación de la organización.
       </p>
     </article>
   )
