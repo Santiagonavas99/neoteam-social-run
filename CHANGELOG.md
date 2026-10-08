@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.28.0] - 2026-10-07
+
+### Added
+
+- **New admin images are converted and compressed to WEBP automatically.** Upload compatible JPG, PNG, HEIC, AVIF and other browser-readable raster images from your phone or computer; the admin preserves transparent logos, adjusts oversized pictures and keeps the existing 4 MB upload limit on the resulting file.
+- **Clear upload feedback.** The panel shows the compression saving or a helpful message when an image cannot be decoded or converted; existing uploaded images remain unchanged.
+
 ## [0.27.0] - 2026-10-07
 
 ### Added
