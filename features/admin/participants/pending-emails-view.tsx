@@ -58,8 +58,8 @@ export function PendingEmailsView() {
             operation: 'send',
             participantId: recipient.id,
           })
-          if (response.result === 'sent') sent++
-          else if (response.result === 'skipped') skipped++
+          if (response.queueResult === 'sent') sent++
+          else if (response.queueResult === 'skipped') skipped++
           else {
             failed++
             if (response.reason === 'rate_limited') {
