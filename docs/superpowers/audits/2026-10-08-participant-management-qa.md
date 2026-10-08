@@ -9,16 +9,16 @@ Branch: `feat/admin-participants-filters-edit-20261008`
 - Email correction marks its pass as pending, without issuing email or resetting the QR.
 
 ## Verified
-- GitHub SQL tests passed on branch CI (new metadata-only audit migration re-run and transactional update test).
-- Vercel preview built successfully.
-- Frontend formatting errors have been addressed.
+- GitHub Actions run `37835438331` passed **Lint + Typecheck + Tests + Build** and **SQL tests**.
+- The mobile-friendly Vercel preview built successfully.
+- Running crews now load from the existing `adminData/groups/list` endpoint. The live database contains 11 running groups, so there is no dependency on an undeployed participant-options operation.
 - No production Supabase migration, Edge Function update or real registration mutation was performed.
 
-## Blocking validation
-- At last run, `pnpm ci:check` failed at Biome lint/format in `supabase/functions/admin-pin/index.ts`.
-- The change is formatting and import-order only; patching this sensitive server file via the available GitHub connector was blocked at the write/commit stage.
-- **Do not merge** until an authorized maintainer runs `pnpm lint:fix`, commits the resulting changes on this branch and reruns full CI.
-- Typecheck, unit tests and Next.js build cannot be counted as passed by GitHub CI while lint exits early.
+## Remaining rollout validation
+- CI formatting and import ordering issues are resolved.
+- Before enabling the edit and server-filter actions for users, apply the additive migration and deploy the corresponding authenticated Edge Function. The preview's current list works with the existing backend; its new server filters and save action need that compatible backend.
+- An authenticated end-to-end check of the new crew filters and editing workflow has **not** been performed; no test changes have been made to real participant records.
+- Do not merge or publish to production without the requested release validation.
 
 ## Release order after CI
 1. Apply `supabase/migrations/20261008194500_participant_profile_editor.sql`.
