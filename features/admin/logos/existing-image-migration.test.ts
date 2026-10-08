@@ -9,7 +9,10 @@ test('accepts only project-owned PNG and JPEG uploads, never WebP or external UR
   assert.equal(isExistingStoredImage(`${base}photo.jpg`), true)
   assert.equal(isExistingStoredImage(`${base}photo.jpeg`), true)
   assert.equal(isExistingStoredImage(`${base}photo.webp`), false)
-  assert.equal(isExistingStoredImage('https://example.com/storage/v1/object/public/admin-media/a.jpg'), false)
+  assert.equal(
+    isExistingStoredImage('https://example.com/storage/v1/object/public/admin-media/a.jpg'),
+    false,
+  )
   assert.equal(isExistingStoredImage('/neoteam-logo.png'), false)
   assert.equal(isExistingStoredImage(null), false)
 })

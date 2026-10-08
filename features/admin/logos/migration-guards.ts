@@ -30,4 +30,3 @@ export function expectedSlug(name: string): string {
 export function canPreserveSlug(record: CommunityRecord): boolean {
   return typeof record.slug === 'string' && record.slug === expectedSlug(record.name)
 }
-

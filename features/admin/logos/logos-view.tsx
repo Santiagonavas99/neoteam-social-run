@@ -11,7 +11,12 @@ import { LoadingState } from '../ui/loading-state'
 import { EditButton, RecordCard } from '../ui/record-card'
 import { RefreshButton } from '../ui/refresh-button'
 import { useAdminData } from '../ui/use-admin-data'
-import { type ExistingImageCandidate, type MigrationProgress, listExistingImageCandidates, migrateExistingImages } from './existing-image-migration'
+import {
+  type ExistingImageCandidate,
+  listExistingImageCandidates,
+  type MigrationProgress,
+  migrateExistingImages,
+} from './existing-image-migration'
 import { LogoForm } from './logo-form'
 
 export function LogosView() {
@@ -42,7 +47,10 @@ export function LogosView() {
     try {
       const candidates = await listExistingImageCandidates()
       if (!candidates.length) {
-        setFeedback({ kind: 'success', text: 'Todos los logos guardados en Supabase ya están en WEBP.' })
+        setFeedback({
+          kind: 'success',
+          text: 'Todos los logos guardados en Supabase ya están en WEBP.',
+        })
         return
       }
       setPendingMigration(candidates)
@@ -166,7 +174,11 @@ export function LogosView() {
             onClick={() => void previewExistingImages()}
             disabled={loading || busy || !!editor || migrationLocked}
           >
-            {previewingMigration ? 'Buscando imágenes…' : migrating ? 'Optimizando…' : 'Optimizar logos existentes'}
+            {previewingMigration
+              ? 'Buscando imágenes…'
+              : migrating
+                ? 'Optimizando…'
+                : 'Optimizar logos existentes'}
           </button>
           <button
             type="button"
@@ -187,11 +199,13 @@ export function LogosView() {
           aria-label="Confirmar conversión de imágenes"
           className="rounded-control border border-neo-border bg-neo-surface p-4 md:p-5"
         >
-          <h3 className="m-0 mb-2 text-base font-bold">Convertir {pendingMigration.length} logos a WEBP</h3>
+          <h3 className="m-0 mb-2 text-base font-bold">
+            Convertir {pendingMigration.length} logos a WEBP
+          </h3>
           <p className="m-0 mb-4 text-sm text-neo-text-secondary">
-            Se optimizarán los logos de marcas, running crews y organizaciones que siguen en PNG
-            o JPG. Se mantendrán los archivos originales y solo se cambiarán los enlaces después
-            de subir cada WEBP correctamente. La base de datos puede ser la misma en Preview y
+            Se optimizarán los logos de marcas, running crews y organizaciones que siguen en PNG o
+            JPG. Se mantendrán los archivos originales y solo se cambiarán los enlaces después de
+            subir cada WEBP correctamente. La base de datos puede ser la misma en Preview y
             Producción.
           </p>
           <div className="flex flex-wrap gap-2">
@@ -211,8 +225,8 @@ export function LogosView() {
 
       {migrating && migrationProgress && (
         <p role="status" aria-live="polite" className="m-0 text-sm text-neo-text-secondary">
-          Convirtiendo {migrationProgress.name} · {migrationProgress.index} de {migrationProgress.total}.
-          Mantén esta pestaña abierta.
+          Convirtiendo {migrationProgress.name} · {migrationProgress.index} de{' '}
+          {migrationProgress.total}. Mantén esta pestaña abierta.
         </p>
       )}
 

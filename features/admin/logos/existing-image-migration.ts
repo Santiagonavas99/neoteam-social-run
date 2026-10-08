@@ -1,8 +1,8 @@
 import { callAdmin, callLogos } from '../api'
 import { errorMessage } from '../errors'
 import type { CommunityRecord, LogoItem } from '../types'
-import { uploadWebpImage } from '../ui/image-upload-field'
 import { convertImageToWebp } from '../ui/image-processing'
+import { uploadWebpImage } from '../ui/image-upload-field'
 import { canPreserveSlug, isExistingStoredImage } from './migration-guards'
 
 type CommunitySource = 'groups' | 'brands'
