@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.29.1] - 2026-10-08
+
+### Improved
+
+- **Desktop community invitation in two columns:** the text now sits at left and the WhatsApp/Instagram actions stack at right in registration success and pass recovery. Mobile/tablet retain the existing single-column layout and links.
+
 ## [0.29.0] - 2026-10-08
 
 ### Changed
