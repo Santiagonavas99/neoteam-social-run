@@ -37,13 +37,19 @@ function decodeImage(file: File): Promise<{ image: HTMLImageElement; release: ()
 
 function encodeWebp(canvas: HTMLCanvasElement, quality: number): Promise<Blob> {
   return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (!blob || blob.size === 0 || blob.type !== 'image/webp') {
-        reject(new Error('Este navegador no permite convertir a WEBP. Prueba con uno actualizado.'))
-        return
-      }
-      resolve(blob)
-    }, 'image/webp', quality)
+    canvas.toBlob(
+      (blob) => {
+        if (!blob || blob.size === 0 || blob.type !== 'image/webp') {
+          reject(
+            new Error('Este navegador no permite convertir a WEBP. Prueba con uno actualizado.'),
+          )
+          return
+        }
+        resolve(blob)
+      },
+      'image/webp',
+      quality,
+    )
   })
 }
 

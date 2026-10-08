@@ -1,10 +1,10 @@
 import { ImagePlus, ImageUp } from 'lucide-react'
 import { type ChangeEvent, useState } from 'react'
-import { convertImageToWebp } from './image-processing'
 import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
 import type { FeedbackValue } from '../types'
 import { Logo } from './admin-ui'
+import { convertImageToWebp } from './image-processing'
 
 function readFileAsBase64(file: Blob) {
   return new Promise<string>((resolve, reject) => {
