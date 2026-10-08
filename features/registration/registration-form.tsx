@@ -6,6 +6,7 @@ import type { FormEvent, ReactNode } from 'react'
 import { useActionState, useEffect, useRef, useState } from 'react'
 import { type RegistrationState, registerParticipant } from './actions'
 import { CalendarButton } from './calendar-button'
+import { CommunityConnect } from './community-connect'
 import {
   CheckboxField,
   cardClass,
@@ -173,45 +174,48 @@ export function RegistrationForm() {
 
   if (state.ok) {
     return (
-      <SuccessCard
-        eyebrow="Registro confirmado"
-        title="Estás dentro."
-        icon={
-          <span className="mb-8 grid size-12 place-items-center rounded-lg bg-neo-accent-dark text-neo-white">
-            <Check aria-hidden className="size-6" />
-          </span>
-        }
-      >
-        <Streamers />
-        <p className="m-0">Nos vemos el 18 de octubre en el Social Run del aniversario NeoTeam.</p>
-        {state.pass ? (
-          <>
-            {state.pass.emailed && (
-              <p className="m-0 mt-2 text-sm text-neo-text-secondary">
-                También te lo enviamos a tu correo.
+      <div className="min-w-0">
+        <SuccessCard
+          eyebrow="Registro confirmado"
+          title="Estás dentro."
+          icon={
+            <span className="mb-8 grid size-12 place-items-center rounded-lg bg-neo-accent-dark text-neo-white">
+              <Check aria-hidden className="size-6" />
+            </span>
+          }
+        >
+          <Streamers />
+          <p className="m-0">Nos vemos el 18 de octubre en el Social Run del aniversario NeoTeam.</p>
+          {state.pass ? (
+            <>
+              {state.pass.emailed && (
+                <p className="m-0 mt-2 text-sm text-neo-text-secondary">
+                  También te lo enviamos a tu correo.
+                </p>
+              )}
+              <PassCard pass={state.pass} />
+            </>
+          ) : (
+            <>
+              {state.calendarUrl ? (
+                <div className="mt-6">
+                  <CalendarButton href={state.calendarUrl} />
+                </div>
+              ) : null}
+              <p className="mt-7 mb-3 border border-dashed border-neo-accent bg-neo-bg p-5 text-[28px] font-bold tracking-wide break-all">
+                {state.code}
               </p>
-            )}
-            <PassCard pass={state.pass} />
-          </>
-        ) : (
-          <>
-            {state.calendarUrl ? (
-              <div className="mt-6">
-                <CalendarButton href={state.calendarUrl} />
-              </div>
-            ) : null}
-            <p className="mt-7 mb-3 border border-dashed border-neo-accent bg-neo-bg p-5 text-[28px] font-bold tracking-wide break-all">
-              {state.code}
-            </p>
-            <p className="m-0 text-sm text-neo-text-secondary">
-              Guarda este código. Tu QR de check-in estará en{' '}
-              <Link href="/pase" className={linkClass}>
-                Mi pase
-              </Link>
-            </p>
-          </>
-        )}
-      </SuccessCard>
+              <p className="m-0 text-sm text-neo-text-secondary">
+                Guarda este código. Tu QR de check-in estará en{' '}
+                <Link href="/pase" className={linkClass}>
+                  Mi pase
+                </Link>
+              </p>
+            </>
+          )}
+        </SuccessCard>
+        {state.pass && <CommunityConnect />}
+      </div>
     )
   }
 
