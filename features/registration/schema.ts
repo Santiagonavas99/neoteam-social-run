@@ -29,12 +29,7 @@ export const registrationSchema = z
         'Escribe un correo válido con dominio (ejemplo: nombre@dominio.com).',
       ),
     phone: phoneSchema,
-    birthDate: z
-      .string()
-      .refine(
-        isAllowedBirthDate,
-        'Selecciona una fecha real entre 1900 y hoy.',
-      ),
+    birthDate: z.string().refine(isAllowedBirthDate, 'Selecciona una fecha real entre 1900 y hoy.'),
     gender: z.enum(['female', 'male'], { error: 'Selecciona tu género de nacimiento.' }),
     runningGroup: z.enum(RUNNING_GROUP_VALUES),
     otherRunningGroup: z.string().trim().max(120).optional(),
