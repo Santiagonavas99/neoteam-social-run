@@ -27,7 +27,7 @@ export function LogoForm({
   return (
     <EditorForm
       title={isNew(row) ? 'Nuevo logo' : `Editar ${row.name}`}
-      hint="Recomendado: logo horizontal en PNG o WEBP con fondo transparente."
+      hint="Recomendado: logo horizontal con fondo transparente. Se guardará como WEBP."
       legend="Datos del logo"
       submitLabel="Guardar logo"
       busy={busy || listBusy}
@@ -71,7 +71,7 @@ export function LogoForm({
         name={values.name}
         uploading={uploading}
         noun="imagen"
-        hint="PNG, JPG o WEBP · máximo 4 MB · preferiblemente horizontal"
+        hint="JPG, PNG, HEIC, AVIF y más según navegador · WEBP automático · origen hasta 40 MB"
         onChange={upload}
       />
       <label className="check-label">

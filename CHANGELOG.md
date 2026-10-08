@@ -7,11 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.26.4] - 2026-10-07
+## [0.28.1] - 2026-10-07
 
 ### Fixed
 
-- **Running crews selected in registration now stay attached to their real crew.** Neo Team no longer falls back to Independiente, listed crews use relational group IDs, and only “Otro grupo / crew” is stored as free text.
+- **Running crews selected at registration now use their real group records.** Neo Team no longer shows as Independiente, listed crews save the correct relation, and only "Otro grupo / crew" is stored as free text. Known group slugs now match the database, and invalid slugs are rejected.
+
+## [0.28.0] - 2026-10-07
+
+### Added
+
+- **One-time WebP optimization in production.** Only the production admin shows "Optimizar logos existentes" while project-owned PNG/JPG logos are still in use. After the confirmed conversion finishes and no legacy references remain, the button disappears across sessions and devices; partial failures remain retryable. Originals are preserved, and Preview cannot offer the button.
+- **Existing admin logos can be optimized to WEBP in one confirmed action.** The administrator can migrate stored PNG/JPEG logos used by allied brands, running crews and organizations without deleting the originals or changing their registration IDs. The panel shows progress and preserves links when an image fails.
+- **New admin images are converted and compressed to WEBP automatically.** Upload compatible JPG, PNG, HEIC, AVIF and other browser-readable raster images from your phone or computer; the admin preserves transparent logos, adjusts oversized pictures and keeps the existing 4 MB upload limit on the resulting file.
+- **Clear upload feedback.** The panel shows the compression saving or a helpful message when an image cannot be decoded or converted; existing uploaded images remain unchanged.
+
+## [0.27.0] - 2026-10-07
+
+### Added
+
+- **Participants now use server-side pagination.** The admin loads 25 runners at a time, with global search/status filters, Previous/Next navigation, and a full-list backup export that remains independent of the current page.
 
 ## [0.26.3] - 2026-10-07
 

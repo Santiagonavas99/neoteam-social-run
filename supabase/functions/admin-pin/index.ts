@@ -824,6 +824,120 @@ Deno.serve(async (req: Request) => {
       }
       const config = Object.hasOwn(configs, resource) ? configs[resource] : undefined
       if (!config) return json({ error: 'Sección administrativa no válida.' }, 400)
+
+      if (resource === 'participants' && operation === 'list' && body?.paginated === true) {
+        const { data: event, error: eventError } = await supabase
+          .from('events')
+          .select('id')
+          .eq('code', 'SR26')
+          .single()
+        if (eventError) throw eventError
+
+        const pageSize = 25
+        const requestedPage = Math.max(1, Math.floor(Number(body?.page) || 1))
+        const status = typeof body?.status === 'string' ? body.status.trim() : ''
+        const allowedStatuses = new Set(['registered', 'checked_in', 'no_show', 'cancelled'])
+        if (status && !allowedStatuses.has(status)) {
+          return json({ error: 'Filtro de estado inválido.' }, 400)
+        }
+
+        const rawQuery = typeof body?.query === 'string' ? body.query.trim().slice(0, 80) : ''
+        const searchTokens = rawQuery
+          .split(/\s+/)
+          .map((token: string) => token.replace(/[(),%"'_\\]/g, '').trim())
+          .filter(Boolean)
+          .slice(0, 4)
+
+        const groupIdsByToken = await Promise.all(
+          searchTokens.map(async (token: string) => {
+            const { data, error } = await supabase
+              .from('running_groups')
+              .select('id')
+              .ilike('name', `%${token}%`)
+              .limit(25)
+            if (error) throw error
+            return (data ?? []).map((row: { id: string }) => row.id)
+          }),
+        )
+
+        const applyParticipantFilters = (query: unknown) => {
+          let filtered = query.eq('event_id', event.id)
+          if (status) filtered = filtered.eq('status', status)
+          searchTokens.forEach((token: string, index: number) => {
+            const filters = [
+              `first_name.ilike.%${token}%`,
+              `last_name.ilike.%${token}%`,
+              `email.ilike.%${token}%`,
+              `phone.ilike.%${token}%`,
+              `document_number.ilike.%${token}%`,
+              `registration_code.ilike.%${token}%`,
+              `other_running_group.ilike.%${token}%`,
+            ]
+            const groupIds = groupIdsByToken[index] ?? []
+            if (groupIds.length) filters.push(`running_group_id.in.(${groupIds.join(',')})`)
+            filtered = filtered.or(filters.join(','))
+          })
+          return filtered
+        }
+
+        const countQuery = applyParticipantFilters(
+          supabase.from('registrations').select('id', { count: 'exact', head: true }),
+        )
+        const statusQuery = supabase.from('registrations').select('status').eq('event_id', event.id)
+
+        const [countResult, statusResult] = await Promise.all([countQuery, statusQuery])
+        if (countResult.error) throw countResult.error
+        if (statusResult.error) throw statusResult.error
+
+        const count = countResult.count ?? 0
+        const pageCount = Math.max(1, Math.ceil(count / pageSize))
+        const page = Math.min(requestedPage, pageCount)
+        const from = (page - 1) * pageSize
+        const to = from + pageSize - 1
+
+        let rowsQuery = applyParticipantFilters(
+          supabase.from('registrations').select(config.fields),
+        )
+        rowsQuery = rowsQuery.order('created_at', { ascending: false }).range(from, to)
+        const { data: rows, error: rowsError } = await rowsQuery
+        if (rowsError) throw rowsError
+
+        const statusCounts = {
+          registered: 0,
+          checked_in: 0,
+          no_show: 0,
+          cancelled: 0,
+        }
+        for (const row of statusResult.data ?? []) {
+          if (Object.hasOwn(statusCounts, row.status)) statusCounts[row.status] += 1
+        }
+
+        return json({
+          rows: rows ?? [],
+          count,
+          page,
+          pageSize,
+          statusCounts,
+        })
+      }
+
+      if (resource === 'participants' && operation === 'backup') {
+        const { data: event, error: eventError } = await supabase
+          .from('events')
+          .select('id')
+          .eq('code', 'SR26')
+          .single()
+        if (eventError) throw eventError
+
+        const { data, error } = await supabase
+          .from('registrations')
+          .select(config.fields)
+          .eq('event_id', event.id)
+          .order('created_at', { ascending: false })
+        if (error) throw error
+        return json({ rows: data ?? [] })
+      }
+
       if (operation === 'list') {
         let query = supabase.from(config.table).select(config.fields)
         if (resource === 'participants' || resource === 'raffles') {

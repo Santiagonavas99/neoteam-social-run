@@ -69,3 +69,7 @@ Verify participant display and metrics use relational groups.
 - SQL tests green;
 - Vercel preview READY;
 - no production deploy until explicitly requested.
+
+## Integration with main (2026-10-07)
+
+Originally prepared as `0.26.4`, but `main` advanced to `0.28.0` while this PR was open. The conflict resolution keeps all current `main` work (including the WebP release) and assigns this fix to **`0.28.1`**. No unrelated dependencies or schemas were changed. The production database already has the corrected group rows and RPC access; this PR synchronizes the application code and migration history in the repository.
