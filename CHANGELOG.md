@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Desktop community invitation in two columns:** the text now sits at left and the WhatsApp/Instagram actions stack at right in registration success and pass recovery. Mobile/tablet retain the existing single-column layout and links.
 - **Persistent public social rail:** Instagram and WhatsApp shortcuts now stay fixed to the viewport across the landing page, registration and pass recovery. A compact mobile bar respects safe-area insets; admin remains unobstructed.
+- **Consistent WhatsApp brand mark:** replaced the generic speech-bubble icon with the user-provided WhatsApp SVG in the fixed social rail and the public community invitation, preserving accessible link labels.
 
 ## [0.29.0] - 2026-10-08
 
