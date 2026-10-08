@@ -11,6 +11,7 @@ import {
 // Phone autofill on iOS and Android fills "+57 300 123 4567"; keep the 10 national digits.
 const phoneSchema = z
   .string()
+  .regex(/^[+\d()\s-]+$/, 'Escribe solo números, sin letras.')
   .transform(normalizeColombianPhone)
   .pipe(z.string().regex(/^\d{10}$/, 'Escribe un número de 10 dígitos, sin +57.'))
 
