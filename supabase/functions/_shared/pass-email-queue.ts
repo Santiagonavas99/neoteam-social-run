@@ -19,16 +19,22 @@ export async function handlePassEmailQueue(supabase, body: Record<string, unknow
   if (eventError) throw eventError
 
   const active = () =>
-    supabase.from('registrations').select('id', { count: 'exact', head: true })
-      .eq('event_id', event.id).neq('status', 'cancelled')
+    supabase
+      .from('registrations')
+      .select('id', { count: 'exact', head: true })
+      .eq('event_id', event.id)
+      .neq('status', 'cancelled')
 
   if (body?.operation === 'list') {
     const [pending, sent, failed, rows] = await Promise.all([
       active().is('pass_emailed_at', null),
       active().not('pass_emailed_at', 'is', null),
       active().is('pass_emailed_at', null).not('pass_email_last_error', 'is', null),
-      supabase.from('registrations')
-        .select('id,registration_number,first_name,last_name,email,created_at,pass_email_last_error,pass_email_last_attempt_at')
+      supabase
+        .from('registrations')
+        .select(
+          'id,registration_number,first_name,last_name,email,created_at,pass_email_last_error,pass_email_last_attempt_at',
+        )
         .eq('event_id', event.id)
         .neq('status', 'cancelled')
         .is('pass_emailed_at', null)
@@ -54,7 +60,8 @@ export async function handlePassEmailQueue(supabase, body: Record<string, unknow
   // The same atomic pass_emailed_at claim is already used by the normal registration path.
   // Only one administrator/request can claim an unemailed active registration.
   const claimedAt = new Date().toISOString()
-  const { data: row, error: claimError } = await supabase.from('registrations')
+  const { data: row, error: claimError } = await supabase
+    .from('registrations')
     .update({
       pass_emailed_at: claimedAt,
       pass_email_last_attempt_at: claimedAt,
@@ -78,21 +85,26 @@ export async function handlePassEmailQueue(supabase, body: Record<string, unknow
   }
   if (delivery.ok) return json({ ok: true, queueResult: 'sent' })
 
-  const reason = delivery.status === 429
-    ? 'rate_limited'
-    : delivery.status === 503
-      ? 'not_configured'
-      : delivery.status > 0
-        ? 'provider_error'
-        : 'connection_error'
+  const reason =
+    delivery.status === 429
+      ? 'rate_limited'
+      : delivery.status === 503
+        ? 'not_configured'
+        : delivery.status > 0
+          ? 'provider_error'
+          : 'connection_error'
   // Release only our own claim. Later successful sends cannot be rolled back by a stale request.
-  const { error: releaseError } = await supabase.from('registrations')
+  const { error: releaseError } = await supabase
+    .from('registrations')
     .update({ pass_emailed_at: null, pass_email_last_error: reason })
     .eq('id', row.id)
     .eq('pass_emailed_at', claimedAt)
   if (releaseError) {
     console.error('pass queue claim release failed', { code: releaseError.code })
-    return json({ error: 'No pudimos actualizar el envío. Actualiza la bandeja antes de reintentar.' }, 503)
+    return json(
+      { error: 'No pudimos actualizar el envío. Actualiza la bandeja antes de reintentar.' },
+      503,
+    )
   }
   return json({ ok: true, queueResult: 'failed', reason })
 }
