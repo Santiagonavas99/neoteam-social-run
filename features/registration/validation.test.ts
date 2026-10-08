@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
+  digitsOnlyInput,
   isAllowedBirthDate,
   isEmailDomainValid,
   isNumericDocumentType,
@@ -8,7 +9,6 @@ import {
   MIN_BIRTH_DATE,
   maxBirthDate,
   normalizeColombianPhone,
-  digitsOnlyInput,
 } from './validation.ts'
 
 test('birth dates must exist and stay between 1900 and the current date in Colombia', () => {
