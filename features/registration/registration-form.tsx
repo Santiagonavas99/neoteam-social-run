@@ -24,6 +24,7 @@ import motion from './registration-motion.module.css'
 import { RUNNING_GROUP_OPTIONS } from './running-groups'
 import { Streamers } from './streamers'
 import {
+  digitsOnlyInput,
   isAllowedBirthDate,
   isEmailDomainValid,
   isNumericDocumentType,
@@ -144,6 +145,8 @@ export function RegistrationForm() {
   const [documentType, setDocumentType] = useState('CC')
   const [clientErrors, setClientErrors] = useState<Record<string, string[]>>({})
   const [editedSinceResponse, setEditedSinceResponse] = useState<string[]>([])
+  const [attemptedSteps, setAttemptedSteps] = useState<number[]>([])
+  const touchedFields = useRef<Set<string>>(new Set())
   const formRef = useRef<HTMLFormElement>(null)
   const values = state.values
   const errors = state.errors
@@ -158,6 +161,33 @@ export function RegistrationForm() {
       return next
     })
     setEditedSinceResponse((current) => (current.includes(name) ? current : [...current, name]))
+  }
+
+  function validateField(
+    control: HTMLInputElement | HTMLSelectElement,
+    markTouched = false,
+    currentDocumentType = documentType,
+  ) {
+    if (!control.name || control.type === 'hidden' || control.name === 'marketingAccepted') return
+    if (markTouched) touchedFields.current.add(control.name)
+    const hasBeenValidated =
+      touchedFields.current.has(control.name) ||
+      !!clientErrors[control.name] ||
+      !!errors?.[control.name]
+    if (!hasBeenValidated) return
+    const message = controlError(control, currentDocumentType)
+    setClientErrors((current) => {
+      if (current[control.name]?.[0] === message || (!message && !current[control.name])) {
+        return current
+      }
+      const next = { ...current }
+      if (message) next[control.name] = [message]
+      else delete next[control.name]
+      return next
+    })
+    setEditedSinceResponse((current) =>
+      current.includes(control.name) ? current : [...current, control.name],
+    )
   }
 
   function chooseParticipation(mode: 'solo' | 'crew') {
@@ -175,6 +205,8 @@ export function RegistrationForm() {
     setDocumentType(state.values?.documentType ?? 'CC')
     setClientErrors({})
     setEditedSinceResponse([])
+    setAttemptedSteps([])
+    touchedFields.current.clear()
     const firstFieldWithError = Object.keys(state.errors ?? {})[0]
     setStep(firstFieldWithError ? stepForError(firstFieldWithError) : 3)
   }, [state.attempt, state.ok, state.errors, state.values])
@@ -206,6 +238,7 @@ export function RegistrationForm() {
       const message = controlError(control, documentType)
       if (message) {
         nextErrors[control.name] = [message]
+        touchedFields.current.add(control.name)
         if (!firstInvalid) firstInvalid = control
       }
     }
@@ -215,10 +248,12 @@ export function RegistrationForm() {
       ),
       ...nextErrors,
     }))
+    if (Object.keys(nextErrors).length) {
+      setAttemptedSteps((current) => (current.includes(number) ? current : [...current, number]))
+    }
     if (focus) {
       if (firstInvalid) {
         firstInvalid.focus()
-        firstInvalid.reportValidity()
       } else if (nextErrors.runningGroup) {
         panel?.querySelector<HTMLButtonElement>('[data-participation-choice]')?.focus()
       }
@@ -300,7 +335,29 @@ export function RegistrationForm() {
       onInputCapture={(event) => {
         const target = event.target
         if (target instanceof HTMLInputElement || target instanceof HTMLSelectElement) {
-          if (target.name) clearFieldError(target.name)
+          if (target.name === 'phone' || target.name === 'emergencyPhone') {
+            target.value = digitsOnlyInput(target.value)
+          }
+          if (target.name === 'documentNumber' && isNumericDocumentType(documentType)) {
+            target.value = digitsOnlyInput(target.value)
+          }
+          if (target.name) {
+            if (
+              touchedFields.current.has(target.name) ||
+              clientErrors[target.name] ||
+              errors?.[target.name]
+            ) {
+              validateField(target)
+            } else {
+              clearFieldError(target.name)
+            }
+          }
+        }
+      }}
+      onBlurCapture={(event) => {
+        const target = event.target
+        if (target instanceof HTMLInputElement || target instanceof HTMLSelectElement) {
+          validateField(target, true)
         }
       }}
       noValidate
@@ -363,7 +420,8 @@ export function RegistrationForm() {
             <p className="m-0 text-sm text-neo-text-secondary">{hint}</p>
           </div>
           {number === step &&
-            (Object.keys(clientErrors).some((name) => stepForError(name) === number) ||
+            ((attemptedSteps.includes(number) &&
+              Object.keys(clientErrors).some((name) => stepForError(name) === number)) ||
               Object.keys(errors ?? {}).some(
                 (name) => stepForError(name) === number && !editedSinceResponse.includes(name),
               )) && <FormMessage>Revisa los campos marcados para continuar.</FormMessage>}
@@ -393,8 +451,17 @@ export function RegistrationForm() {
                   label="Tipo"
                   value={documentType}
                   onChange={(event) => {
-                    setDocumentType(event.target.value)
-                    clearFieldError('documentNumber')
+                    const nextDocumentType = event.target.value
+                    setDocumentType(nextDocumentType)
+                    const document = formRef.current?.querySelector<HTMLInputElement>(
+                      '[name="documentNumber"]',
+                    )
+                    if (document) {
+                      if (isNumericDocumentType(nextDocumentType)) {
+                        document.value = digitsOnlyInput(document.value)
+                      }
+                      validateField(document, false, nextDocumentType)
+                    }
                   }}
                   errors={fieldErrors('documentType')}
                 >
@@ -416,11 +483,6 @@ export function RegistrationForm() {
                   placeholder={
                     isNumericDocumentType(documentType) ? 'Solo números' : 'Número de documento'
                   }
-                  onInput={(event) => {
-                    if (isNumericDocumentType(documentType)) {
-                      event.currentTarget.value = event.currentTarget.value.replace(/\D/g, '')
-                    }
-                  }}
                   errors={fieldErrors('documentNumber')}
                 />
               </div>
