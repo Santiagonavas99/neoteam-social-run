@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { batchRecipients, EMAIL_BATCH_SIZE, emailFailureLabel, type PendingEmail } from './email-queue.ts'
+import {
+  batchRecipients,
+  EMAIL_BATCH_SIZE,
+  emailFailureLabel,
+  type PendingEmail,
+} from './email-queue.ts'
 
 const recipient = (index: number): PendingEmail => ({
   id: String(index),
@@ -16,7 +21,10 @@ const recipient = (index: number): PendingEmail => ({
 test('manual batch is capped at 10 even with 25 visible recipients', () => {
   const rows = Array.from({ length: 25 }, (_, index) => recipient(index + 1))
   assert.equal(EMAIL_BATCH_SIZE, 10)
-  assert.deepEqual(batchRecipients(rows).map((r) => r.registration_number), Array.from({ length: 10 }, (_, index) => index + 1))
+  assert.deepEqual(
+    batchRecipients(rows).map((r) => r.registration_number),
+    Array.from({ length: 10 }, (_, index) => index + 1),
+  )
   assert.equal(batchRecipients([]).length, 0)
 })
 
