@@ -1,3 +1,5 @@
+import type { CommunityRecord } from '../types'
+
 const STORAGE_ORIGIN = 'https://ohatsnkgaeccltqwhkbv.supabase.co'
 const STORAGE_PATH = /^\/storage\/v1\/object\/public\/admin-media\/[^/]+\.(?:png|jpe?g)$/i
 
