@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.29.3] - 2026-10-08
+
+### Fixed
+
+- **The registration wizard validates each step before continuing.** Invalid names, documents, emails, phone numbers, dates and required authorizations show messages beside the relevant fields instead of a generic warning at the end.
+- **Document numbers, email domains and birth dates receive stricter checks in the browser and on the server.** Numeric IDs reject letters, passports retain alphanumeric support, emails require a complete domain and dates must be real and between 1900 and today.
+- **Running crew selection starts with a clear choice.** Participants can register independently or select an existing crew, with a separate field when their crew is missing from the list.
+
+
 ## [0.29.2] - 2026-10-08
 
 ### Fixed
