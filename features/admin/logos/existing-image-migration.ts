@@ -3,6 +3,7 @@ import { errorMessage } from '../errors'
 import type { CommunityRecord, LogoItem } from '../types'
 import { uploadWebpImage } from '../ui/image-upload-field'
 import { convertImageToWebp } from '../ui/image-processing'
+import { canPreserveSlug, isExistingStoredImage } from './migration-guards'
 
 type CommunitySource = 'groups' | 'brands'
 type Source = CommunitySource | 'logos'
@@ -25,39 +26,6 @@ export type MigrationSummary = {
   converted: number
   skipped: number
   failed: string[]
-}
-
-const STORAGE_ORIGIN = 'https://ohatsnkgaeccltqwhkbv.supabase.co'
-const STORAGE_PATH = /^\/storage\/v1\/object\/public\/admin-media\/[^/]+\.(?:png|jpe?g)$/i
-
-export function isExistingStoredImage(url: string | null | undefined): boolean {
-  if (!url) return false
-  try {
-    const parsed = new URL(url)
-    return (
-      parsed.origin === STORAGE_ORIGIN &&
-      STORAGE_PATH.test(parsed.pathname) &&
-      !parsed.search &&
-      !parsed.hash
-    )
-  } catch {
-    return false
-  }
-}
-
-// adminData.save always rebuilds group/brand slugs from names. Never change registration slugs.
-export function expectedSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, 100)
-}
-
-export function canPreserveSlug(record: CommunityRecord): boolean {
-  return typeof record.slug === 'string' && record.slug === expectedSlug(record.name)
 }
 
 function candidatesFor(source: Source, rows: Item[]): ExistingImageCandidate[] {

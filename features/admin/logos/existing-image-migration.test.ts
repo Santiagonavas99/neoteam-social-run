@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { canPreserveSlug, expectedSlug, isExistingStoredImage } from './existing-image-migration.ts'
+import { canPreserveSlug, expectedSlug, isExistingStoredImage } from './migration-guards.ts'
 
 const base = 'https://ohatsnkgaeccltqwhkbv.supabase.co/storage/v1/object/public/admin-media/'
 

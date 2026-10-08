@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Existing admin logos can be optimized to WEBP in one confirmed action.** The administrator can migrate stored PNG/JPEG logos used by allied brands, running crews and organizations without deleting the originals or changing their registration IDs. The panel shows progress and preserves links when an image fails.
 - **New admin images are converted and compressed to WEBP automatically.** Upload compatible JPG, PNG, HEIC, AVIF and other browser-readable raster images from your phone or computer; the admin preserves transparent logos, adjusts oversized pictures and keeps the existing 4 MB upload limit on the resulting file.
 - **Clear upload feedback.** The panel shows the compression saving or a helpful message when an image cannot be decoded or converted; existing uploaded images remain unchanged.
 
