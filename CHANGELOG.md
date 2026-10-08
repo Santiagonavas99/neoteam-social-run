@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.28.0] - 2026-10-07
+
+### Added
+
+- **One-time WebP optimization in production.** Only the production admin shows "Optimizar logos existentes" while project-owned PNG/JPG logos are still in use. After the confirmed conversion finishes and no legacy references remain, the button disappears across sessions and devices; partial failures remain retryable. Originals are preserved, and Preview cannot offer the button.
+- **Existing admin logos can be optimized to WEBP in one confirmed action.** The administrator can migrate stored PNG/JPEG logos used by allied brands, running crews and organizations without deleting the originals or changing their registration IDs. The panel shows progress and preserves links when an image fails.
+- **New admin images are converted and compressed to WEBP automatically.** Upload compatible JPG, PNG, HEIC, AVIF and other browser-readable raster images from your phone or computer; the admin preserves transparent logos, adjusts oversized pictures and keeps the existing 4 MB upload limit on the resulting file.
+- **Clear upload feedback.** The panel shows the compression saving or a helpful message when an image cannot be decoded or converted; existing uploaded images remain unchanged.
+
 ## [0.27.0] - 2026-10-07
 
 ### Added
