@@ -457,18 +457,34 @@ export function RegistrationForm() {
                   required
                   errors={errors?.termsAccepted}
                 >
-                  Declaro que participaré bajo mi propia responsabilidad y acepto las condiciones
-                  del evento.
+                  Declaro que he leído y acepto las condiciones de participación y conozco los
+                  riesgos habituales de esta actividad deportiva.
                 </CheckboxField>
+                <p className="m-0 pl-8 text-xs leading-6 text-neo-text-secondary">
+                  <Link
+                    href="/legal/terminos"
+                    className="font-semibold underline underline-offset-4"
+                  >
+                    Leer condiciones y riesgos de participación
+                  </Link>
+                </p>
                 <CheckboxField
                   name="privacyAccepted"
                   defaultChecked={values?.privacyAccepted === 'on'}
                   required
                   errors={errors?.privacyAccepted}
                 >
-                  Acepto el tratamiento de mis datos para gestionar mi participación en Social Run
-                  NeoTeam.
+                  Autorizo el tratamiento de mis datos para gestionar mi participación en Social Run
+                  NeoTeam conforme a las finalidades informadas.
                 </CheckboxField>
+                <p className="m-0 pl-8 text-xs leading-6 text-neo-text-secondary">
+                  <Link
+                    href="/legal/privacidad"
+                    className="font-semibold underline underline-offset-4"
+                  >
+                    Leer política de tratamiento de datos
+                  </Link>
+                </p>
                 <CheckboxField
                   name="marketingAccepted"
                   defaultChecked={values?.marketingAccepted === 'on'}

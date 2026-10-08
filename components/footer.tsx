@@ -5,6 +5,8 @@ const links = [
   { href: '/registro', label: 'Registro' },
   { href: '/pase', label: 'Mi pase' },
   { href: '/#agenda', label: 'Agenda' },
+  { href: '/legal/terminos', label: 'Condiciones' },
+  { href: '/legal/privacidad', label: 'Privacidad' },
 ]
 
 export function Footer() {
