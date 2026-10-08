@@ -1,0 +1,227 @@
+/* Motion is local to the guided registration form, not other app forms. */
+.form {
+  --form-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.progressBar {
+  position: relative;
+  display: block;
+  height: 6px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--neo-border);
+  isolation: isolate;
+}
+
+.progressBar::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--neo-accent-text);
+  content: "";
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.progressBarFilled::after {
+  transform: scaleX(1);
+}
+
+.progressLabel {
+  transition:
+    color 200ms ease,
+    transform 260ms var(--form-motion-ease);
+}
+
+.progressLabelCurrent {
+  transform: translateY(-1px);
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+/* Control feedback: lightweight and fully contained within the form. */
+.form input:not([type="checkbox"]),
+.form select {
+  transition:
+    border-color 170ms ease,
+    box-shadow 200ms ease,
+    background-color 170ms ease;
+}
+
+.form input:not([type="checkbox"]):focus,
+.form select:focus {
+  box-shadow: 0 0 0 3px var(--neo-accent-soft);
+}
+
+.form label:focus-within {
+  color: var(--neo-text);
+}
+
+.form input[type="checkbox"] {
+  transition:
+    box-shadow 200ms ease,
+    transform 200ms ease;
+}
+
+.form input[type="checkbox"]:checked {
+  box-shadow: 0 0 0 3px var(--neo-accent-soft);
+}
+
+.nextButton,
+.backButton {
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 200ms ease,
+    transform 200ms var(--form-motion-ease);
+}
+
+.nextButton svg,
+.backButton svg {
+  transition: transform 220ms var(--form-motion-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nextButton:hover:not(:disabled) {
+    box-shadow: 0 6px 22px color-mix(in srgb, var(--neo-accent) 19%, transparent);
+    transform: translateY(-2px);
+  }
+
+  .nextButton:hover:not(:disabled) svg {
+    transform: translateX(4px);
+  }
+
+  .backButton:hover:not(:disabled) svg {
+    transform: translateX(-4px);
+  }
+}
+
+.nextButton:active:not(:disabled),
+.backButton:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .progressBar::after {
+    transition: transform 420ms var(--form-motion-ease);
+  }
+
+  .panel:not([hidden]) {
+    animation: form-enter-forward 330ms var(--form-motion-ease) both;
+  }
+
+  .panel[data-flow="back"]:not([hidden]) {
+    animation-name: form-enter-back;
+  }
+
+  .panel:not([hidden]) .panelIntro > * {
+    animation: form-fade-up 340ms var(--form-motion-ease) both;
+  }
+
+  .panel:not([hidden]) .panelIntro > :nth-child(2) {
+    animation-delay: 65ms;
+  }
+
+  .panel:not([hidden]) .stepFields > * {
+    animation: form-fade-up 360ms var(--form-motion-ease) both;
+  }
+
+  .panel:not([hidden]) .stepFields > :nth-child(1) {
+    animation-delay: 50ms;
+  }
+
+  .panel:not([hidden]) .stepFields > :nth-child(2) {
+    animation-delay: 105ms;
+  }
+
+  .panel:not([hidden]) .stepFields > :nth-child(3) {
+    animation-delay: 155ms;
+  }
+
+  .panel:not([hidden]) .stepFields > :nth-child(n + 4) {
+    animation-delay: 200ms;
+  }
+
+  .actions {
+    animation: form-fade-up 320ms var(--form-motion-ease) 120ms both;
+  }
+}
+
+/* Smaller travel and tighter stagger on touch screens. */
+@media (max-width: 640px) and (prefers-reduced-motion: no-preference) {
+  .panel:not([hidden]) {
+    animation-duration: 270ms;
+  }
+
+  .panel:not([hidden]) .stepFields > :nth-child(2) {
+    animation-delay: 70ms;
+  }
+
+  .panel:not([hidden]) .stepFields > :nth-child(3) {
+    animation-delay: 105ms;
+  }
+
+  .panel:not([hidden]) .stepFields > :nth-child(n + 4) {
+    animation-delay: 145ms;
+  }
+}
+
+@keyframes form-enter-forward {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes form-enter-back {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes form-fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 7px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progressLabel,
+  .form input,
+  .form select,
+  .nextButton,
+  .backButton,
+  .nextButton svg,
+  .backButton svg {
+    transition: none;
+  }
+
+  .nextButton:hover:not(:disabled),
+  .backButton:hover:not(:disabled),
+  .nextButton:active:not(:disabled),
+  .backButton:active:not(:disabled),
+  .nextButton:hover:not(:disabled) svg,
+  .backButton:hover:not(:disabled) svg {
+    transform: none;
+  }
+}

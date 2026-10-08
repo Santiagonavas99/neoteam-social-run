@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, UsersRound } from 'lucide-react'
 import Link from 'next/link'
 import type { FormEvent, ReactNode } from 'react'
 import { useActionState, useEffect, useRef, useState } from 'react'
@@ -16,7 +16,9 @@ import {
   SubmitButton,
   TextField,
 } from './form-ui'
+import { splitFullName } from './full-name'
 import { PassCard } from './pass-card'
+import motion from './registration-motion.module.css'
 import { RUNNING_GROUP_OPTIONS } from './running-groups'
 import { Streamers } from './streamers'
 
@@ -69,6 +71,7 @@ const registrationSteps = [
 function stepForError(name: string): number {
   if (
     [
+      'fullName',
       'firstName',
       'lastName',
       'documentType',
@@ -85,9 +88,22 @@ function stepForError(name: string): number {
   return 3
 }
 
+// Avoid brittle HTML pattern rules (especially with Unicode-mode pattern checks).
+// Use the same full-name parser in the browser and on the server.
+function isValidRegistrationControl(control: HTMLInputElement | HTMLSelectElement) {
+  if (control.name === 'fullName' && control instanceof HTMLInputElement) {
+    const value = control.value.trim()
+    control.setCustomValidity(
+      value && !splitFullName(value) ? 'Escribe tu nombre y al menos un apellido.' : '',
+    )
+  }
+  return control.checkValidity()
+}
+
 export function RegistrationForm() {
   const [state, formAction, pending] = useActionState(registerParticipant, initialState)
   const [step, setStep] = useState(1)
+  const [flow, setFlow] = useState<'forward' | 'back'>('forward')
   // No crew is assumed: selecting NeoTeam by default caused accidental affiliations.
   const [runningGroup, setRunningGroup] = useState('')
   const formRef = useRef<HTMLFormElement>(null)
@@ -102,6 +118,7 @@ export function RegistrationForm() {
   }, [state.attempt, state.ok, state.errors, state.values])
 
   function goToStep(next: number) {
+    setFlow(next < step ? 'back' : 'forward')
     setStep(next)
     window.requestAnimationFrame(() => {
       formRef.current?.scrollIntoView({
@@ -118,7 +135,9 @@ export function RegistrationForm() {
       `[data-registration-step="${number}"]`,
     )
     const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')
-    const firstInvalid = Array.from(controls ?? []).find((control) => !control.checkValidity())
+    const firstInvalid = Array.from(controls ?? []).find(
+      (control) => !isValidRegistrationControl(control),
+    )
     if (!firstInvalid) return true
     firstInvalid.focus()
     firstInvalid.reportValidity()
@@ -140,7 +159,7 @@ export function RegistrationForm() {
       const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
         'input, select',
       )
-      if (Array.from(controls ?? []).some((control) => !control.checkValidity())) {
+      if (Array.from(controls ?? []).some((control) => !isValidRegistrationControl(control))) {
         event.preventDefault()
         if (number === step) {
           validStep(number)
@@ -204,7 +223,7 @@ export function RegistrationForm() {
       action={formAction}
       onSubmit={handleSubmit}
       noValidate
-      className={`${cardClass} scroll-mt-6`}
+      className={`${cardClass} ${motion.form} scroll-mt-6`}
     >
       <div className="flex items-center justify-between gap-4">
         <Eyebrow>INSCRIPCIÓN GRATUITA</Eyebrow>
@@ -222,14 +241,16 @@ export function RegistrationForm() {
             <span
               aria-hidden
               className={
-                'block h-1.5 w-full rounded-full ' +
-                (number <= step ? 'bg-neo-accent-text' : 'bg-neo-border')
+                number <= step
+                  ? `${motion.progressBar} ${motion.progressBarFilled}`
+                  : motion.progressBar
               }
             />
             <div
               className={
-                'mt-3 min-w-0 ' +
-                (number === step ? 'font-bold text-neo-text' : 'text-neo-text-secondary')
+                number === step
+                  ? `mt-3 min-w-0 font-bold text-neo-text ${motion.progressLabel} ${motion.progressLabelCurrent}`
+                  : `mt-3 min-w-0 text-neo-text-secondary ${motion.progressLabel}`
               }
             >
               <span className="block text-[11px] leading-snug sm:hidden">
@@ -246,10 +267,11 @@ export function RegistrationForm() {
           key={number}
           data-registration-step={number}
           hidden={step !== number}
-          className="mt-6"
+          className={`mt-6 ${motion.panel}`}
+          data-flow={flow}
           aria-labelledby={`registration-step-${number}`}
         >
-          <div className="mb-6 border-b border-neo-border pb-5">
+          <div className={`mb-6 border-b border-neo-border pb-5 ${motion.panelIntro}`}>
             <h2
               id={`registration-step-${number}`}
               tabIndex={-1}
@@ -261,25 +283,19 @@ export function RegistrationForm() {
           </div>
 
           {number === 1 && (
-            <div className="grid gap-5">
-              <div className="grid gap-5 sm:grid-cols-2">
-                <TextField
-                  name="firstName"
-                  label="Nombre"
-                  defaultValue={values?.firstName}
-                  required
-                  autoComplete="given-name"
-                  errors={errors?.firstName}
-                />
-                <TextField
-                  name="lastName"
-                  label="Apellido"
-                  defaultValue={values?.lastName}
-                  required
-                  autoComplete="family-name"
-                  errors={errors?.lastName}
-                />
-              </div>
+            <div className={`grid gap-5 ${motion.stepFields}`}>
+              <TextField
+                name="fullName"
+                label="Nombre completo"
+                defaultValue={
+                  values?.fullName ??
+                  [values?.firstName, values?.lastName].filter(Boolean).join(' ')
+                }
+                required
+                autoComplete="name"
+                onInput={(event) => event.currentTarget.setCustomValidity('')}
+                errors={errors?.fullName ?? errors?.firstName ?? errors?.lastName}
+              />
               <div className="grid grid-cols-[100px_minmax(0,1fr)] gap-5">
                 <SelectField
                   name="documentType"
@@ -318,7 +334,8 @@ export function RegistrationForm() {
                   name="phone"
                   label="WhatsApp"
                   type="tel"
-                  inputMode="tel"
+                  inputMode="numeric"
+                  enterKeyHint="next"
                   defaultValue={values?.phone}
                   required
                   autoComplete="tel"
@@ -353,15 +370,20 @@ export function RegistrationForm() {
           )}
 
           {number === 2 && (
-            <div className="grid gap-5">
-              <div className="rounded-control border border-neo-accent-border bg-neo-accent-soft px-4 py-4">
-                <p className="m-0 text-sm font-semibold text-neo-text">
-                  No necesitas pertenecer a NeoTeam ni a otro grupo para participar.
-                </p>
-                <p className="m-0 mt-1 text-[13px] leading-normal text-neo-text-secondary">
-                  Solo queremos saber con qué crew vas a asistir. Si corres por tu cuenta,
-                  selecciona “Voy por mi cuenta”.
-                </p>
+            <div className={`grid gap-5 ${motion.stepFields}`}>
+              <div className="flex items-start gap-3 rounded-control border border-neo-border bg-neo-muted-bg px-4 py-4">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neo-surface text-neo-accent-text">
+                  <UsersRound aria-hidden className="size-5" />
+                </span>
+                <div className="min-w-0">
+                  <p className="m-0 text-sm font-semibold text-neo-text">
+                    ¿No tienes crew? También eres bienvenido.
+                  </p>
+                  <p className="m-0 mt-1 text-[13px] leading-normal text-neo-text-secondary">
+                    Selecciona “Voy por mi cuenta” y únete al Social Run. No necesitas pertenecer a
+                    NeoTeam ni a otro grupo.
+                  </p>
+                </div>
               </div>
               <SelectField
                 name="runningGroup"
@@ -393,14 +415,14 @@ export function RegistrationForm() {
                 />
               )}
               <p className="m-0 text-xs leading-normal text-neo-text-secondary">
-                Esta información solo nos ayuda a organizar a los crews invitados. Tu registro es
-                individual y gratuito.
+                Esta elección nos ayuda a organizar los grupos. Tu inscripción es individual y
+                gratuita.
               </p>
             </div>
           )}
 
           {number === 3 && (
-            <>
+            <div className={motion.stepFields}>
               <div className="mb-5 grid gap-5 sm:grid-cols-2">
                 <TextField
                   name="emergencyName"
@@ -414,7 +436,8 @@ export function RegistrationForm() {
                   name="emergencyPhone"
                   label="Celular de emergencia"
                   type="tel"
-                  inputMode="tel"
+                  inputMode="numeric"
+                  enterKeyHint="done"
                   defaultValue={values?.emergencyPhone}
                   required
                   autoComplete="off"
@@ -448,20 +471,23 @@ export function RegistrationForm() {
                   Quiero recibir novedades de próximos eventos de NeoTeam. (Opcional)
                 </CheckboxField>
               </div>
-            </>
+            </div>
           )}
         </section>
       ))}
 
       {state.message && <FormMessage>{state.message}</FormMessage>}
 
-      <div className="mt-7 grid gap-3 border-t border-neo-border pt-6 sm:grid-cols-2 sm:items-center">
+      <div
+        key={step}
+        className={`mt-7 grid gap-3 border-t border-neo-border pt-6 sm:grid-cols-2 sm:items-center ${motion.actions}`}
+      >
         {step > 1 ? (
           <button
             type="button"
             disabled={pending}
             onClick={() => goToStep(step - 1)}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-control border border-neo-border bg-neo-surface px-5 py-3 text-sm font-bold text-neo-text transition-colors hover:bg-neo-muted-bg"
+            className={`inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-control border border-neo-border bg-neo-surface px-5 py-3 text-sm font-bold text-neo-text hover:bg-neo-muted-bg ${motion.backButton}`}
           >
             <ArrowLeft aria-hidden className="size-4" />
             Volver
@@ -476,7 +502,7 @@ export function RegistrationForm() {
             type="button"
             disabled={pending}
             onClick={continueToNext}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-control bg-neo-accent px-5 py-3 text-sm font-bold text-neo-black transition-colors hover:bg-neo-accent-hover"
+            className={`inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-control bg-neo-accent px-5 py-3 text-sm font-bold text-neo-black hover:bg-neo-accent-hover ${motion.nextButton}`}
           >
             Continuar
             <ArrowRight aria-hidden className="size-4" />

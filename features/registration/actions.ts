@@ -3,6 +3,7 @@
 import { headers } from 'next/headers'
 import { calendarUrlFor } from '@/features/event/calendar'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { splitFullName } from './full-name'
 import { type Pass, registeredPass } from './pass'
 import { registrationSchema } from './schema'
 
@@ -26,13 +27,36 @@ export async function registerParticipant(
     if (typeof value === 'string' && !key.startsWith('$')) values[key] = value
   }
   const attempt = (previousState.attempt ?? 0) + 1
+
+  // Keep the Supabase contract intact: a single full-name field in the UI,
+  // firstName and lastName in the existing registration schema / RPC.
+  // Legacy callers that still submit separate fields continue to work.
+  if (values.fullName !== undefined) {
+    const name = splitFullName(values.fullName)
+    if (!name) {
+      return {
+        ok: false,
+        message: 'Hay algunos datos por revisar.',
+        errors: { fullName: ['Escribe tu nombre y al menos un apellido.'] },
+        values,
+        attempt,
+      }
+    }
+    values.firstName = name.firstName
+    values.lastName = name.lastName
+  }
+
   const parsed = registrationSchema.safeParse(values)
 
   if (!parsed.success) {
+    const errors: Record<string, string[] | undefined> = parsed.error.flatten().fieldErrors
+    if (values.fullName !== undefined && (errors.firstName?.length || errors.lastName?.length)) {
+      errors.fullName = [...(errors.firstName ?? []), ...(errors.lastName ?? [])]
+    }
     return {
       ok: false,
       message: 'Hay algunos datos por revisar.',
-      errors: parsed.error.flatten().fieldErrors,
+      errors,
       values,
       attempt,
     }
