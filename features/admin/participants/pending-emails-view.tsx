@@ -8,7 +8,12 @@ import type { FeedbackValue } from '../types'
 import { Feedback } from '../ui/admin-ui'
 import { LoadingState } from '../ui/loading-state'
 import { useAdminData } from '../ui/use-admin-data'
-import { batchRecipients, emailFailureLabel, type EmailQueue, type PendingEmail } from './email-queue'
+import {
+  batchRecipients,
+  emailFailureLabel,
+  type EmailQueue,
+  type PendingEmail,
+} from './email-queue'
 
 const INITIAL: EmailQueue = { rows: [], pending: 0, sent: 0, failed: 0 }
 
@@ -110,26 +115,32 @@ export function PendingEmailsView() {
           <p className="m-0 mt-2 text-[44px] font-extrabold leading-none tabular-nums text-neo-accent">
             {loading ? '—' : data.pending}
           </p>
-          <p className="m-0 mt-2 text-xs text-neo-on-dark-secondary">Inscripciones activas sin correo aceptado</p>
+          <p className="m-0 mt-2 text-xs text-neo-on-dark-secondary">
+            Inscripciones activas sin correo aceptado
+          </p>
         </div>
         <div className="rounded-card border border-neo-border bg-neo-surface p-5">
           <p className="m-0 flex items-center gap-2 text-xs font-bold text-neo-text-secondary">
             <CircleCheck aria-hidden className="size-4" /> Aceptados por Resend
           </p>
-          <p className="m-0 mt-3 text-[34px] font-extrabold leading-none tabular-nums">{loading ? '—' : data.sent}</p>
+          <p className="m-0 mt-3 text-[34px] font-extrabold leading-none tabular-nums">
+            {loading ? '—' : data.sent}
+          </p>
         </div>
         <div className="rounded-card border border-neo-border bg-neo-surface p-5">
           <p className="m-0 flex items-center gap-2 text-xs font-bold text-neo-text-secondary">
             <CircleAlert aria-hidden className="size-4" /> Con último intento fallido
           </p>
-          <p className="m-0 mt-3 text-[34px] font-extrabold leading-none tabular-nums">{loading ? '—' : data.failed}</p>
+          <p className="m-0 mt-3 text-[34px] font-extrabold leading-none tabular-nums">
+            {loading ? '—' : data.failed}
+          </p>
         </div>
       </div>
 
       <p className="m-0 rounded-control border border-neo-border bg-neo-muted-bg px-4 py-3 text-sm leading-6 text-neo-text-secondary">
-        Resend comparte su cupo diario entre pases, códigos de acceso al panel y reenvíos.
-        No se enviará ninguna tanda automáticamente. El botón procesa hasta 10 pases,
-        uno por uno, y se detiene si Resend informa que se agotó el cupo.
+        Resend comparte su cupo diario entre pases, códigos de acceso al panel y reenvíos. No se
+        enviará ninguna tanda automáticamente. El botón procesa hasta 10 pases, uno por uno, y se
+        detiene si Resend informa que se agotó el cupo.
       </p>
 
       <Feedback value={feedback} />
@@ -172,14 +183,21 @@ export function PendingEmailsView() {
       </div>
 
       {confirming && (
-        <section aria-label="Confirmar envío de correos" className="rounded-card border border-neo-accent-border bg-neo-accent-soft p-5">
+        <section
+          aria-label="Confirmar envío de correos"
+          className="rounded-card border border-neo-accent-border bg-neo-accent-soft p-5"
+        >
           <h3 className="m-0 text-base font-bold">¿Enviar {recipients.length} pases por correo?</h3>
           <p className="m-0 mt-2 text-sm leading-6">
-            Se enviarán en orden de inscripción usando Resend. Si se alcanza la cuota
-            diaria, los restantes seguirán pendientes para otra tanda.
+            Se enviarán en orden de inscripción usando Resend. Si se alcanza la cuota diaria, los
+            restantes seguirán pendientes para otra tanda.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            <button type="button" className="button button-secondary" onClick={() => setConfirming(false)}>
+            <button
+              type="button"
+              className="button button-secondary"
+              onClick={() => setConfirming(false)}
+            >
               Cancelar
             </button>
             <button type="button" className="button" onClick={() => void sendBatch()}>
@@ -202,13 +220,18 @@ export function PendingEmailsView() {
       ) : (
         <ul className="m-0 list-none divide-y divide-neo-border overflow-hidden rounded-card border border-neo-border bg-neo-surface p-0">
           {data.rows.map((row) => (
-            <li key={row.id} className="flex min-w-0 flex-col gap-1 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <li
+              key={row.id}
+              className="flex min-w-0 flex-col gap-1 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+            >
               <div className="min-w-0">
                 <p className="m-0 text-sm font-bold">{recipientName(row)}</p>
                 <p className="m-0 mt-1 break-all text-sm text-neo-text-secondary">{row.email}</p>
               </div>
               <div className="flex shrink-0 flex-col items-start gap-1 sm:items-end">
-                <span className="text-xs font-bold text-neo-text-secondary">Inscripción #{row.registration_number}</span>
+                <span className="text-xs font-bold text-neo-text-secondary">
+                  Inscripción #{row.registration_number}
+                </span>
                 {row.pass_email_last_error && (
                   <span className="rounded-full bg-neo-warning-bg px-2.5 py-1 text-xs font-bold text-neo-warning">
                     {emailFailureLabel(row.pass_email_last_error)}
@@ -221,7 +244,8 @@ export function PendingEmailsView() {
       )}
       {data.pending > data.rows.length && (
         <p className="m-0 text-xs text-neo-text-secondary">
-          Quedan {data.pending - data.rows.length} registros adicionales; aparecerán al completar o actualizar las tandas.
+          Quedan {data.pending - data.rows.length} registros adicionales; aparecerán al completar o
+          actualizar las tandas.
         </p>
       )}
     </section>
