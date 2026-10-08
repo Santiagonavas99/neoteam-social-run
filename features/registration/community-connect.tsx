@@ -1,5 +1,6 @@
-import { ArrowUpRight, MessageCircle } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { InstagramIcon } from '@/components/instagram-icon'
+import { WhatsAppIcon } from '@/components/whatsapp-icon'
 import { communityLinks } from '@/features/event/community-links'
 
 // The community is separate from both the QR ticket and the success/recovery card.
@@ -7,28 +8,30 @@ export function CommunityConnect() {
   return (
     <section
       aria-labelledby="community-connect-heading"
-      className="mx-auto mt-9 w-full max-w-90 text-left"
+      className="mx-auto mt-9 w-full max-w-90 text-left lg:grid lg:max-w-none lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-center lg:gap-8"
     >
-      <p className="m-0 text-xs font-bold tracking-[0.14em] text-neo-accent-text uppercase">
-        SIGAMOS CONECTADOS
-      </p>
-      <h2
-        id="community-connect-heading"
-        className="m-0 mt-2 text-xl font-bold tracking-[-0.04em] text-neo-text"
-      >
-        La comunidad sigue corriendo.
-      </h2>
-      <p className="m-0 mt-2 text-sm leading-normal text-neo-text-secondary">
-        Súmate al grupo y acompáñanos también en Instagram.
-      </p>
-      <div className="mt-5 grid gap-3">
+      <div className="min-w-0">
+        <p className="m-0 text-xs font-bold tracking-[0.14em] text-neo-accent-text uppercase">
+          SIGAMOS CONECTADOS
+        </p>
+        <h2
+          id="community-connect-heading"
+          className="m-0 mt-2 text-xl font-bold tracking-[-0.04em] text-neo-text"
+        >
+          La comunidad sigue corriendo.
+        </h2>
+        <p className="m-0 mt-2 text-sm leading-normal text-neo-text-secondary">
+          Súmate al grupo y acompáñanos también en Instagram.
+        </p>
+      </div>
+      <div className="mt-5 grid min-w-0 gap-3 lg:mt-0">
         <a
           href={communityLinks.whatsapp}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex min-h-12 items-center justify-center gap-2 rounded-control bg-neo-accent px-4 py-3 text-sm font-bold text-neo-black transition-transform active:scale-[0.98]"
         >
-          <MessageCircle aria-hidden className="size-4 shrink-0" />
+          <WhatsAppIcon aria-hidden className="size-4 shrink-0" />
           Unirme al WhatsApp
           <ArrowUpRight aria-hidden className="size-4 shrink-0" />
         </a>

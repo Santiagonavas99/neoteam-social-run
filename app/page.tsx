@@ -1,5 +1,6 @@
 import { Footer } from '@/components/footer'
 import { SiteHeader } from '@/components/site-header'
+import { SocialRail } from '@/components/social-rail'
 import {
   organizationMarqueeItems,
   runningCrewMarqueeItems,
@@ -82,11 +83,14 @@ export default async function Home() {
   })
 
   return (
-    <main className="home-v2">
-      <SiteHeader />
-      <Hero />
-      {sections}
-      <Footer />
-    </main>
+    <>
+      <SocialRail />
+      <main className="home-v2">
+        <SiteHeader />
+        <Hero />
+        {sections}
+        <Footer />
+      </main>
+    </>
   )
 }
