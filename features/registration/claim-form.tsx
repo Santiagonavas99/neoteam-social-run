@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { type ClaimState, claimPassAction } from './claim-actions'
+import { CommunityConnect } from './community-connect'
 import { cardClass, FormMessage, FormSection, SubmitButton, TextField } from './form-ui'
 import { PassCard } from './pass-card'
 import { SuccessCard } from './registration-form'
@@ -13,9 +14,12 @@ export function ClaimForm() {
 
   if (state.pass) {
     return (
-      <SuccessCard eyebrow="Tu pase" title="Listo para correr.">
-        <PassCard pass={state.pass} />
-      </SuccessCard>
+      <div className="min-w-0">
+        <SuccessCard eyebrow="Tu pase" title="Listo para correr.">
+          <PassCard pass={state.pass} />
+        </SuccessCard>
+        <CommunityConnect />
+      </div>
     )
   }
 
