@@ -18,3 +18,5 @@ Approved: user expressly requested implementation and a pull request for the thr
 9. **Approved grain visibility adjustment:** in `app/home-v2.css` change only SVG grain tile 160→120, frequency .82→.9, overlay opacity .13→.18; keep radial glow untouched. Update changelog and spec, rerun PR checks and Vercel preview.
 
 10. **Approved photographic hero reference:** add the generated monochrome runner image to `public/hero-runner-monochrome.webp` and layer it under text-protecting gradients in `app/home-v2.css`; make mobile crop intentional, preserve the cyan glow and grain. Update changelog/spec and validate GitHub CI plus Vercel preview without publishing production.
+
+11. **Approved return to grid:** in `app/home-v2.css` remove the photographic background and restore low-opacity horizontal/central guides under dark edge gradients, with mobile-specific subtler horizontal lines and the same cyan glow/grain. Delete `public/hero-runner-monochrome.webp` from the PR, update changelog/spec and rerun CI/preview. Do not deploy to production.

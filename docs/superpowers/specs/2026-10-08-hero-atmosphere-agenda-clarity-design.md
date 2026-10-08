@@ -42,3 +42,10 @@ The user provided a Stridelog-style photographic reference and explicitly reques
 - Layer the photo into the existing `.v2-hero` background under the existing cyan glows and noise. Keep existing content, typography, route card, and dates unchanged.
 - Use multi-stop gradients over the image for legible copy, buttons and countdown at 1440 and 390 pixels, adjusting the crop for the smaller viewport.
 - Preserve dark/light appearance, decorative-only semantics, and no new animation, script or external dependencies. Do not change the dedicated mobile route panel.
+
+## Final hero direction — approved 2026-10-08
+The organizer rejected the photographic version after preview. This decision supersedes the prior photographic refinement:
+- Return to a very low-contrast CSS grid (subtle central vertical guide and horizontal lines at a more open interval), avoiding the original dense high-contrast grid.
+- Use strong black gradients at the top and bottom of the hero to add depth and fade the grid toward its edges. Preserve the existing cyan radial glow and fine visible grain.
+- At widths up to 760 px omit the central vertical guide entirely, lower the opacity of the horizontal lines and keep the top/bottom fade and cyan glow.
+- Remove `public/hero-runner-monochrome.webp` from the PR altogether, with no external photographic assets or changes to content, agenda or registration.

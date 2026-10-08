@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Photographic Social Run hero:** uses a custom black-and-white, motion-blurred runner portrait (optimized WebP) inspired by the editorial sports reference. Layered dark overlays protect text and CTA contrast on mobile and desktop; cyan ambient glow and pronounced static grain remain.
+- **Subtle editorial grid on the Social Run hero:** restores faint horizontal and central guide lines under strong top/bottom dark gradients; preserves the cyan glow and pronounced static grain. Mobile uses softer horizontal lines and no central divider for better headline readability.
 - **Original hero facts restored:** the three original date, time and 5K chips remain, with the mobile two-then-one arrangement; the location stays in the route card rather than in a redundant fourth chip.
 - **Agenda with a clear title:** the board now leads with AGENDA and uses 5K · RUTA SOCIAL as secondary context, while keeping the big date on the left and activity count/times on the right. The redundant note below the timeline is removed.
 
