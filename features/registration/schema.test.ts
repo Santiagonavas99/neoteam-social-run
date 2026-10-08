@@ -136,7 +136,14 @@ test('rejects letters in numeric documents, but accepts passport letters', () =>
 })
 
 test('rejects invalid email domains on the server', () => {
-  for (const email of ['ana@localhost', 'ana@dominio', 'ana@gmail.c', 'ana@gmail..com']) {
+  for (const email of [
+    'ana@localhost',
+    'ana@dominio',
+    'ana@gmail.c',
+    'ana@gmail..com',
+    'ana@gmail.commmm',
+    'ana@gmail.commmmr',
+  ]) {
     assert.deepEqual(errorPaths({ ...valid, email }), ['email'], email)
   }
 })
