@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.29.0] - 2026-10-08
+
+### Changed
+
+- **Cleaner Social Run hero:** the heavy background grid is replaced with a subtle cyan glow and fine grain, while the existing call to action, route card and readable typography remain.
+- **More useful hero facts:** date and time remain at the top, with Park del Ingenio and the 5K social route in compact mobile-friendly chips; the agenda keeps its oversized date on the left and shows the route rather than repeating that date in its board header.
+- **Less repetitive agenda:** removed the redundant location/schedule note below the timeline.
+
 ## [0.28.2] - 2026-10-07
 
 ### Fixed
