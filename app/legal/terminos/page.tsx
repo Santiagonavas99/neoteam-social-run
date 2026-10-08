@@ -50,8 +50,8 @@ export default function TermsPage() {
           ))}
         </ul>
         <p className="mb-0 mt-4 text-sm leading-6 text-neo-text-secondary">
-          El equipo de liderazgo coordina el encuentro y las actividades previstas para la
-          comunidad participante.
+          El equipo de liderazgo coordina el encuentro y las actividades previstas para la comunidad
+          participante.
         </p>
       </section>
 
