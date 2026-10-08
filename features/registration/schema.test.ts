@@ -146,3 +146,10 @@ test('enforces real birth dates between 1900 and today', () => {
     assert.deepEqual(errorPaths({ ...valid, birthDate }), ['birthDate'], birthDate)
   }
 })
+
+test('rejects letters in WhatsApp and emergency phone even if ten digits are present', () => {
+  for (const phone of ['300abc1234567', '3001234567x', '3001234567@']) {
+    assert.deepEqual(errorPaths({ ...valid, phone }), ['phone'], phone)
+    assert.deepEqual(errorPaths({ ...valid, emergencyPhone: phone }), ['emergencyPhone'], phone)
+  }
+})
