@@ -22,19 +22,18 @@ export default function PrivacyPage() {
         Tratamiento de datos personales
       </h1>
       <p className={paragraph}>
-        Versión preliminar elaborada conforme a la Ley 1581 de 2012 y al Decreto 1074 de 2015. La
-        identidad legal, domicilio, dirección, correo y teléfono del responsable del tratamiento
-        deben confirmarse antes de aprobar y publicar esta política como definitiva.
+        Esta política explica cómo NeoTeam recopila, utiliza y protege los datos personales de
+        quienes participan en Social Run, conforme a la Ley 1581 de 2012, el Decreto 1074 de 2015 y
+        las demás disposiciones aplicables en Colombia.
       </p>
       <div className="mt-6 border-l-4 border-neo-accent bg-neo-surface p-5 text-sm leading-6">
         Tu registro utiliza tus datos para gestionar tu participación en el Social Run. Recibir
         noticias sobre futuros eventos es opcional; no es requisito para inscribirte.
       </div>
 
-      <h2 className={heading}>1. Organización y responsable del tratamiento</h2>
+      <h2 className={heading}>1. Organización y gestión de los datos</h2>
       <p className={paragraph}>
-        El evento se comunica públicamente bajo la denominación NeoTeam Social Run. Se han
-        identificado las siguientes personas como líderes de NeoTeam:
+        Social Run es una actividad de NeoTeam. Su equipo de liderazgo está integrado por:
       </p>
       <ul className={items}>
         {NEOTEAM_LEADERS.map((leader) => (
@@ -42,12 +41,9 @@ export default function PrivacyPage() {
         ))}
       </ul>
       <p className={paragraph}>
-        Ser líder de NeoTeam no implica automáticamente ser responsable individual ni conjunto del
-        tratamiento de datos personales. Antes de aprobar esta política, debe formalizarse quién
-        determina las finalidades y medios del tratamiento: una persona natural, una persona
-        jurídica o varios responsables conjuntos. También deben confirmarse sus datos de contacto y
-        un canal para ejercer los derechos de los titulares. Hasta entonces este documento es un
-        borrador.
+        El equipo organizador gestiona los datos de inscripción y participación en el marco de las
+        finalidades descritas en esta política. La información facilitada para el evento no autoriza
+        su uso para finalidades distintas de las comunicadas al titular.
       </p>
 
       <h2 className={heading}>2. Datos solicitados</h2>
@@ -105,10 +101,10 @@ export default function PrivacyPage() {
       <h2 className={heading}>5. Contactos de emergencia y menores</h2>
       <p className={paragraph}>
         Los datos de un contacto de emergencia se usarán solo para esa finalidad y no para campañas
-        de promoción. Quien lo suministra debe informar a esa persona. Si participan menores de
-        edad, la organización debe establecer antes un mecanismo adecuado de autorización de su
-        representante legal y respetar el interés superior del menor y sus derechos. El formulario
-        ordinario no constituye ese mecanismo.
+        de promoción. Quien lo suministra debe informar a esa persona. Cuando participen menores
+        de edad, será necesaria la autorización de su representante legal y se respetarán el
+        interés superior del menor y sus derechos. El formulario general no sustituye esa
+        autorización.
       </p>
 
       <h2 className={heading}>6. Acceso, proveedores y seguridad</h2>
@@ -137,12 +133,21 @@ export default function PrivacyPage() {
         Superintendencia de Industria y Comercio, conforme a los procedimientos aplicables.
       </p>
 
-      <h2 className={heading}>9. Canal de atención y vigencia</h2>
+      <h2 className={heading}>9. Canal de atención</h2>
       <p className={paragraph}>
-        Antes de publicar definitivamente, la organización debe indicar un correo de privacidad
-        operativo, la identificación y datos de contacto del responsable, y el procedimiento para
-        consultas y reclamos. Esta versión preliminar no sustituye esa información ni la validación
-        jurídica del documento.
+        Para solicitar información sobre el tratamiento de tus datos o ejercer tus derechos, puedes
+        comunicarte con el equipo organizador mediante los canales oficiales de NeoTeam, incluido
+        su perfil de{' '}
+        <a
+          href="https://www.instagram.com/neoteam_cali/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold underline underline-offset-4"
+        >
+          Instagram
+        </a>
+        . No compartas tu número de documento ni información sensible en comentarios públicos:
+        solicita un canal privado para la atención de tu caso.
       </p>
       <p className={paragraph}>
         Consulta también las{' '}
@@ -152,8 +157,7 @@ export default function PrivacyPage() {
         .
       </p>
       <p className="mt-10 border-t border-neo-border pt-5 text-xs text-neo-text-secondary">
-        Borrador de trabajo · 8 de octubre de 2026 · Pendiente de identificación del responsable y
-        aprobación de la organización.
+        Última actualización: 8 de octubre de 2026.
       </p>
     </article>
   )
