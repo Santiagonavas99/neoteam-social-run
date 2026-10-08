@@ -35,3 +35,10 @@ The organizer reviewed PR #64's preview and requested the following corrections:
 
 ## Second visual refinement — approved 2026-10-08
 To make the texture visible at normal viewing size without changing the approved cyan glow, increase only the hero's static SVG grain: tile dimensions 160×160 → 120×120, `baseFrequency` 0.82 → 0.9, and overlay opacity 0.13 → 0.18. No additional layout, motion or dependency changes.
+
+## Photographic background refinement — approved 2026-10-08
+The user provided a Stridelog-style photographic reference and explicitly requested the generated black-and-white running portrait to appear in this PR. The prior no-photography preference for this hero is superseded.
+- Store the actual generated image as `public/hero-runner-monochrome.webp` (optimized 960 × 540 monochrome WebP, about 9 KB), not an external URL or stock-image dependency.
+- Layer the photo into the existing `.v2-hero` background under the existing cyan glows and noise. Keep existing content, typography, route card, and dates unchanged.
+- Use multi-stop gradients over the image for legible copy, buttons and countdown at 1440 and 390 pixels, adjusting the crop for the smaller viewport.
+- Preserve dark/light appearance, decorative-only semantics, and no new animation, script or external dependencies. Do not change the dedicated mobile route panel.

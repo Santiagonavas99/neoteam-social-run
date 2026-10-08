@@ -47,7 +47,24 @@
 
 .v2-hero {
   position: relative;
-  background: var(--neo-black);
+  background-color: var(--neo-black);
+  background-image:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--neo-black) 18%, transparent) 0%,
+      transparent 38%,
+      color-mix(in srgb, var(--neo-black) 38%, transparent) 100%
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--neo-black) 58%, transparent) 0%,
+      color-mix(in srgb, var(--neo-black) 32%, transparent) 45%,
+      color-mix(in srgb, var(--neo-black) 58%, transparent) 100%
+    ),
+    url("/hero-runner-monochrome.webp");
+  background-position: center, center, 64% center;
+  background-size: cover;
+  background-repeat: no-repeat;
   color: var(--neo-white);
   min-height: calc(100svh - var(--site-header-height));
   display: flex;
@@ -680,6 +697,15 @@
   }
   .v2-hero {
     min-height: auto;
+    background-image:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--neo-black) 62%, transparent) 0%,
+        color-mix(in srgb, var(--neo-black) 52%, transparent) 48%,
+        color-mix(in srgb, var(--neo-black) 77%, transparent) 100%
+      ),
+      url("/hero-runner-monochrome.webp");
+    background-position: center, 73% center;
   }
   .v2-hero-meta {
     display: grid;
