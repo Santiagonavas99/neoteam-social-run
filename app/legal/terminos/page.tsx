@@ -126,15 +126,18 @@ export default function TermsPage() {
 
       <h2 className={heading}>8. Datos personales y contacto</h2>
       <p className={paragraph}>
-        La información suministrada se tratará para gestionar la inscripción, asistencia,
-        seguridad operativa y comunicaciones necesarias sobre el evento, en los términos
-        de la <Link href="/legal/privacidad" className="font-semibold underline underline-offset-4">política de datos personales</Link>.
-        La identificación definitiva del responsable del evento y su canal formal de atención
+        La información suministrada se tratará para gestionar la inscripción, asistencia, seguridad
+        operativa y comunicaciones necesarias sobre el evento, en los términos de la{' '}
+        <Link href="/legal/privacidad" className="font-semibold underline underline-offset-4">
+          política de datos personales
+        </Link>
+        . La identificación definitiva del responsable del evento y su canal formal de atención
         deben validarse antes de aprobar esta versión.
       </p>
 
       <p className="mt-10 border-t border-neo-border pt-5 text-xs text-neo-text-secondary">
-        Borrador de trabajo · 8 de octubre de 2026 · Pendiente de revisión jurídica y aprobación de la organización.
+        Borrador de trabajo · 8 de octubre de 2026 · Pendiente de revisión jurídica y aprobación de
+        la organización.
       </p>
     </article>
   )
