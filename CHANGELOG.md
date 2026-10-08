@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.29.2] - 2026-10-08
+
+### Fixed
+
+- **The public runner counter holds at +50 until confirmed registrations exceed 50.** The number then follows the real total from Supabase instead of adding a fictitious 20 each time. A temporary aggregate error keeps +50 visible, and the homepage continues refreshing its cached count about once a minute.
+
 ## [0.29.1] - 2026-10-08
 
 ### Improved
