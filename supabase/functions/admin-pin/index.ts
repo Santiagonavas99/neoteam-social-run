@@ -21,6 +21,7 @@ import {
   participantPayload,
 } from '../_shared/participants.ts'
 import { sendPassEmail } from '../_shared/pass-email.ts'
+import { handlePassEmailQueue } from '../_shared/pass-email-queue.ts'
 import { fromProxy, sha256 } from '../_shared/proxy.ts'
 import { requireSession } from '../_shared/session.ts'
 
@@ -1094,17 +1095,21 @@ Deno.serve(async (req: Request) => {
       })
     }
 
+    if (action === 'passEmailQueue') return await handlePassEmailQueue(supabase, body)
+
     if (action === 'resendPass') {
       const id = typeof body?.participantId === 'string' ? body.participantId : ''
       if (!/^[0-9a-f-]{36}$/i.test(id)) return json({ error: 'Participante no válido.' }, 400)
       const { data: row, error } = await supabase
         .from('registrations')
-        .select('id,email,first_name,last_name,registration_code,checkin_token,status')
+        .select('id,email,first_name,last_name,registration_code,checkin_token,status,pass_emailed_at')
         .eq('id', id)
         .maybeSingle()
       if (error) throw error
       if (!row || row.status === 'cancelled')
         return json({ error: 'No encontramos una inscripción activa.' }, 404)
+      if (!row.pass_emailed_at)
+        return json({ error: 'Este pase sigue pendiente. Envíalo desde Correos pendientes.' }, 409)
       const delivery = await sendPassEmail(row)
       if (!delivery.ok)
         return json({ error: 'No pudimos enviar el correo. Inténtalo en unos minutos.' }, 424)
