@@ -133,7 +133,8 @@ export type AdminResponse<Row = unknown> = {
   pageSize?: number
   statusCounts?: ParticipantStatusCounts
   deleted?: number
-  result?: CheckinResult | 'sent' | 'skipped' | 'failed'
+  result?: CheckinResult
+  queueResult?: 'sent' | 'skipped' | 'failed'
   participant?: ScannedParticipant
   dynamicRows?: DynamicRow[]
   winnerDetails?: ScannedParticipant[]
