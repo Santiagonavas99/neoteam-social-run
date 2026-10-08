@@ -123,3 +123,29 @@ test('accepts independent runners without an associated crew', () => {
     true,
   )
 })
+
+test('rejects letters in numeric documents, but accepts passport letters', () => {
+  for (const type of ['CC', 'CE', 'TI', 'PPT']) {
+    assert.deepEqual(
+      errorPaths({ ...valid, documentType: type, documentNumber: 'ssasassa' }),
+      ['documentNumber'],
+      type,
+    )
+  }
+  assert.deepEqual(
+    errorPaths({ ...valid, documentType: 'PA', documentNumber: 'AB123456' }),
+    [],
+  )
+})
+
+test('rejects invalid email domains on the server', () => {
+  for (const email of ['ana@localhost', 'ana@dominio', 'ana@gmail.c', 'ana@gmail..com']) {
+    assert.deepEqual(errorPaths({ ...valid, email }), ['email'], email)
+  }
+})
+
+test('enforces real birth dates between 1900 and today', () => {
+  for (const birthDate of ['1881-05-03', '2999-01-01', '2026-02-30']) {
+    assert.deepEqual(errorPaths({ ...valid, birthDate }), ['birthDate'], birthDate)
+  }
+})
