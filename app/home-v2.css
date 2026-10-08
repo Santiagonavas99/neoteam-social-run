@@ -62,7 +62,10 @@
       color-mix(in srgb, var(--neo-black) 58%, transparent) 100%
     ),
     url("/hero-runner-monochrome.webp");
-  background-position: center, center, 64% center;
+  background-position:
+    center,
+    center,
+    64% center;
   background-size: cover;
   background-repeat: no-repeat;
   color: var(--neo-white);
@@ -705,7 +708,9 @@
         color-mix(in srgb, var(--neo-black) 77%, transparent) 100%
       ),
       url("/hero-runner-monochrome.webp");
-    background-position: center, 73% center;
+    background-position:
+      center,
+      73% center;
   }
   .v2-hero-meta {
     display: grid;
