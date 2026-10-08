@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.30.1] - 2026-10-08
+
+### Fixed
+
+- **The registration wizard validates fields as soon as people leave them and keeps feedback live while they fix an error.** Invalid names, documents, emails, phones, dates and authorizations show guidance next to the affected field without waiting for Continue. A step summary still appears when progression is blocked.
+- **Document numbers, WhatsApp phones, real IANA email extensions and birth dates receive stricter checks in the browser and on the server.** Numeric IDs reject letters, passports retain alphanumeric support, WhatsApp and emergency phone inputs strip non-digits on entry, server validation rejects letters while preserving formatted Colombian autofill, emails require a delegated IANA TLD instead of merely a plausible extension like .commmm, the redundant numeric document placeholder is removed, and dates must be real and between 1900 and today.
+- **Running crew selection starts with a clear choice.** Participants can register independently or select an existing crew, with a separate field when their crew is missing from the list.
+
+
 ## [0.30.0] - 2026-10-08
 
 ### Added

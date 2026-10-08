@@ -11,6 +11,7 @@ import {
   CheckboxField,
   cardClass,
   Eyebrow,
+  FieldError,
   FormMessage,
   linkClass,
   SelectField,
@@ -22,6 +23,16 @@ import { PassCard } from './pass-card'
 import motion from './registration-motion.module.css'
 import { RUNNING_GROUP_OPTIONS } from './running-groups'
 import { Streamers } from './streamers'
+import {
+  digitsOnlyInput,
+  isAllowedBirthDate,
+  isEmailDomainValid,
+  isNumericDocumentType,
+  isValidDocumentNumber,
+  MIN_BIRTH_DATE,
+  maxBirthDate,
+  normalizeColombianPhone,
+} from './validation'
 
 const initialState: RegistrationState = { ok: false, message: '' }
 
@@ -89,16 +100,39 @@ function stepForError(name: string): number {
   return 3
 }
 
-// Avoid brittle HTML pattern rules (especially with Unicode-mode pattern checks).
-// Use the same full-name parser in the browser and on the server.
-function isValidRegistrationControl(control: HTMLInputElement | HTMLSelectElement) {
-  if (control.name === 'fullName' && control instanceof HTMLInputElement) {
-    const value = control.value.trim()
+function controlError(
+  control: HTMLInputElement | HTMLSelectElement,
+  documentType: string,
+): string | null {
+  control.setCustomValidity('')
+  const value = control.value.trim()
+  if (control.name === 'fullName' && value && !splitFullName(value)) {
+    control.setCustomValidity('Escribe tu nombre y al menos un apellido.')
+  }
+  if (control.name === 'documentNumber' && value && !isValidDocumentNumber(value, documentType)) {
     control.setCustomValidity(
-      value && !splitFullName(value) ? 'Escribe tu nombre y al menos un apellido.' : '',
+      isNumericDocumentType(documentType)
+        ? 'Escribe entre 5 y 30 dígitos, sin letras.'
+        : 'Escribe entre 5 y 30 letras o números, sin espacios.',
     )
   }
-  return control.checkValidity()
+  if (control.name === 'email' && value && !isEmailDomainValid(value)) {
+    control.setCustomValidity('Revisa el dominio del correo (ejemplo: nombre@dominio.com).')
+  }
+  if (control.name === 'birthDate' && value && !isAllowedBirthDate(value)) {
+    control.setCustomValidity('Selecciona una fecha real entre 1900 y hoy.')
+  }
+  if (
+    (control.name === 'phone' || control.name === 'emergencyPhone') &&
+    value &&
+    !/^\d{10}$/.test(normalizeColombianPhone(value))
+  ) {
+    control.setCustomValidity('Escribe un teléfono de 10 dígitos.')
+  }
+  if (control.checkValidity()) return null
+  if (control.validity.valueMissing) return 'Completa este campo antes de continuar.'
+  if (control.validity.typeMismatch) return 'Escribe un correo válido.'
+  return control.validationMessage || 'Revisa este dato.'
 }
 
 export function RegistrationForm() {
@@ -107,13 +141,72 @@ export function RegistrationForm() {
   const [flow, setFlow] = useState<'forward' | 'back'>('forward')
   // No crew is assumed: selecting NeoTeam by default caused accidental affiliations.
   const [runningGroup, setRunningGroup] = useState('')
+  const [participationMode, setParticipationMode] = useState<'solo' | 'crew' | ''>('')
+  const [documentType, setDocumentType] = useState('CC')
+  const [clientErrors, setClientErrors] = useState<Record<string, string[]>>({})
+  const [editedSinceResponse, setEditedSinceResponse] = useState<string[]>([])
+  const [attemptedSteps, setAttemptedSteps] = useState<number[]>([])
+  const touchedFields = useRef<Set<string>>(new Set())
   const formRef = useRef<HTMLFormElement>(null)
   const values = state.values
   const errors = state.errors
+  const fieldErrors = (name: string) =>
+    clientErrors[name] ?? (editedSinceResponse.includes(name) ? undefined : errors?.[name])
+
+  function clearFieldError(name: string) {
+    setClientErrors((current) => {
+      if (!(name in current)) return current
+      const next = { ...current }
+      delete next[name]
+      return next
+    })
+    setEditedSinceResponse((current) => (current.includes(name) ? current : [...current, name]))
+  }
+
+  function validateField(
+    control: HTMLInputElement | HTMLSelectElement,
+    markTouched = false,
+    currentDocumentType = documentType,
+  ) {
+    if (!control.name || control.type === 'hidden' || control.name === 'marketingAccepted') return
+    if (markTouched) touchedFields.current.add(control.name)
+    const hasBeenValidated =
+      touchedFields.current.has(control.name) ||
+      !!clientErrors[control.name] ||
+      !!errors?.[control.name]
+    if (!hasBeenValidated) return
+    const message = controlError(control, currentDocumentType)
+    setClientErrors((current) => {
+      if (current[control.name]?.[0] === message || (!message && !current[control.name])) {
+        return current
+      }
+      const next = { ...current }
+      if (message) next[control.name] = [message]
+      else delete next[control.name]
+      return next
+    })
+    setEditedSinceResponse((current) =>
+      current.includes(control.name) ? current : [...current, control.name],
+    )
+  }
+
+  function chooseParticipation(mode: 'solo' | 'crew') {
+    setParticipationMode(mode)
+    if (mode === 'solo') setRunningGroup('independiente')
+    else if (runningGroup === 'independiente') setRunningGroup('')
+    clearFieldError('runningGroup')
+  }
 
   useEffect(() => {
     if (!state.attempt || state.ok) return
-    setRunningGroup(state.values?.runningGroup ?? '')
+    const selectedGroup = state.values?.runningGroup ?? ''
+    setRunningGroup(selectedGroup)
+    setParticipationMode(selectedGroup === 'independiente' ? 'solo' : selectedGroup ? 'crew' : '')
+    setDocumentType(state.values?.documentType ?? 'CC')
+    setClientErrors({})
+    setEditedSinceResponse([])
+    setAttemptedSteps([])
+    touchedFields.current.clear()
     const firstFieldWithError = Object.keys(state.errors ?? {})[0]
     setStep(firstFieldWithError ? stepForError(firstFieldWithError) : 3)
   }, [state.attempt, state.ok, state.errors, state.values])
@@ -131,18 +224,41 @@ export function RegistrationForm() {
     })
   }
 
-  function validStep(number: number) {
+  function validStep(number: number, focus = number === step) {
     const panel = formRef.current?.querySelector<HTMLElement>(
       `[data-registration-step="${number}"]`,
     )
     const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')
-    const firstInvalid = Array.from(controls ?? []).find(
-      (control) => !isValidRegistrationControl(control),
-    )
-    if (!firstInvalid) return true
-    firstInvalid.focus()
-    firstInvalid.reportValidity()
-    return false
+    const nextErrors: Record<string, string[]> = {}
+    if (number === 2 && !participationMode) {
+      nextErrors.runningGroup = ['Elige si vienes por tu cuenta o con un running crew.']
+    }
+    let firstInvalid: HTMLInputElement | HTMLSelectElement | undefined
+    for (const control of Array.from(controls ?? [])) {
+      const message = controlError(control, documentType)
+      if (message) {
+        nextErrors[control.name] = [message]
+        touchedFields.current.add(control.name)
+        if (!firstInvalid) firstInvalid = control
+      }
+    }
+    setClientErrors((current) => ({
+      ...Object.fromEntries(
+        Object.entries(current).filter(([name]) => stepForError(name) !== number),
+      ),
+      ...nextErrors,
+    }))
+    if (Object.keys(nextErrors).length) {
+      setAttemptedSteps((current) => (current.includes(number) ? current : [...current, number]))
+    }
+    if (focus) {
+      if (firstInvalid) {
+        firstInvalid.focus()
+      } else if (nextErrors.runningGroup) {
+        panel?.querySelector<HTMLButtonElement>('[data-participation-choice]')?.focus()
+      }
+    }
+    return Object.keys(nextErrors).length === 0
   }
 
   function continueToNext() {
@@ -151,22 +267,10 @@ export function RegistrationForm() {
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    // Explicit validation prevents browsers from trying to focus a required field
-    // inside a hidden wizard panel, while the server remains the final authority.
     for (let number = 1; number <= 3; number += 1) {
-      const panel = formRef.current?.querySelector<HTMLElement>(
-        `[data-registration-step="${number}"]`,
-      )
-      const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
-        'input, select',
-      )
-      if (Array.from(controls ?? []).some((control) => !isValidRegistrationControl(control))) {
+      if (!validStep(number, number === step)) {
         event.preventDefault()
-        if (number === step) {
-          validStep(number)
-        } else {
-          goToStep(number)
-        }
+        if (number !== step) goToStep(number)
         return
       }
     }
@@ -228,6 +332,34 @@ export function RegistrationForm() {
       ref={formRef}
       action={formAction}
       onSubmit={handleSubmit}
+      onInputCapture={(event) => {
+        const target = event.target
+        if (target instanceof HTMLInputElement || target instanceof HTMLSelectElement) {
+          if (target.name === 'phone' || target.name === 'emergencyPhone') {
+            target.value = digitsOnlyInput(target.value)
+          }
+          if (target.name === 'documentNumber' && isNumericDocumentType(documentType)) {
+            target.value = digitsOnlyInput(target.value)
+          }
+          if (target.name) {
+            if (
+              touchedFields.current.has(target.name) ||
+              clientErrors[target.name] ||
+              errors?.[target.name]
+            ) {
+              validateField(target)
+            } else {
+              clearFieldError(target.name)
+            }
+          }
+        }
+      }}
+      onBlurCapture={(event) => {
+        const target = event.target
+        if (target instanceof HTMLInputElement || target instanceof HTMLSelectElement) {
+          validateField(target, true)
+        }
+      }}
       noValidate
       className={`${cardClass} ${motion.form} scroll-mt-6`}
     >
@@ -287,6 +419,15 @@ export function RegistrationForm() {
             </h2>
             <p className="m-0 text-sm text-neo-text-secondary">{hint}</p>
           </div>
+          {number === step &&
+            ((attemptedSteps.includes(number) &&
+              Object.keys(clientErrors).some((name) => stepForError(name) === number)) ||
+              Object.keys(errors ?? {}).some(
+                (name) => stepForError(name) === number && !editedSinceResponse.includes(name),
+              )) && <FormMessage>Revisa los campos marcados para continuar.</FormMessage>}
+          {number === step && state.message && !Object.keys(errors ?? {}).length && (
+            <FormMessage>{state.message}</FormMessage>
+          )}
 
           {number === 1 && (
             <div className={`grid gap-5 ${motion.stepFields}`}>
@@ -300,14 +441,28 @@ export function RegistrationForm() {
                 required
                 autoComplete="name"
                 onInput={(event) => event.currentTarget.setCustomValidity('')}
-                errors={errors?.fullName ?? errors?.firstName ?? errors?.lastName}
+                errors={
+                  fieldErrors('fullName') ?? fieldErrors('firstName') ?? fieldErrors('lastName')
+                }
               />
               <div className="grid grid-cols-[100px_minmax(0,1fr)] gap-5">
                 <SelectField
                   name="documentType"
                   label="Tipo"
-                  defaultValue={values?.documentType ?? 'CC'}
-                  errors={errors?.documentType}
+                  value={documentType}
+                  onChange={(event) => {
+                    const nextDocumentType = event.target.value
+                    setDocumentType(nextDocumentType)
+                    const document =
+                      formRef.current?.querySelector<HTMLInputElement>('[name="documentNumber"]')
+                    if (document) {
+                      if (isNumericDocumentType(nextDocumentType)) {
+                        document.value = digitsOnlyInput(document.value)
+                      }
+                      validateField(document, false, nextDocumentType)
+                    }
+                  }}
+                  errors={fieldErrors('documentType')}
                 >
                   <option value="CC">CC</option>
                   <option value="CE">CE</option>
@@ -321,9 +476,10 @@ export function RegistrationForm() {
                   label="Documento"
                   defaultValue={values?.documentNumber}
                   required
-                  inputMode="numeric"
+                  inputMode={isNumericDocumentType(documentType) ? 'numeric' : 'text'}
+                  maxLength={30}
                   autoComplete="off"
-                  errors={errors?.documentNumber}
+                  errors={fieldErrors('documentNumber')}
                 />
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
@@ -334,7 +490,7 @@ export function RegistrationForm() {
                   defaultValue={values?.email}
                   required
                   autoComplete="email"
-                  errors={errors?.email}
+                  errors={fieldErrors('email')}
                 />
                 <TextField
                   name="phone"
@@ -345,7 +501,7 @@ export function RegistrationForm() {
                   defaultValue={values?.phone}
                   required
                   autoComplete="tel"
-                  errors={errors?.phone}
+                  errors={fieldErrors('phone')}
                 />
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
@@ -356,14 +512,16 @@ export function RegistrationForm() {
                   defaultValue={values?.birthDate}
                   required
                   autoComplete="bday"
-                  errors={errors?.birthDate}
+                  min={MIN_BIRTH_DATE}
+                  max={maxBirthDate()}
+                  errors={fieldErrors('birthDate')}
                 />
                 <SelectField
                   name="gender"
                   label="Género de nacimiento"
                   defaultValue={values?.gender ?? ''}
                   required
-                  errors={errors?.gender}
+                  errors={fieldErrors('gender')}
                 >
                   <option value="" disabled>
                     Selecciona
@@ -377,52 +535,99 @@ export function RegistrationForm() {
 
           {number === 2 && (
             <div className={`grid gap-5 ${motion.stepFields}`}>
-              <div className="flex items-start gap-3 rounded-control border border-neo-border bg-neo-muted-bg px-4 py-4">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neo-surface text-neo-accent-text">
-                  <UsersRound aria-hidden className="size-5" />
-                </span>
-                <div className="min-w-0">
-                  <p className="m-0 text-sm font-semibold text-neo-text">
-                    ¿No tienes crew? También eres bienvenido.
-                  </p>
-                  <p className="m-0 mt-1 text-[13px] leading-normal text-neo-text-secondary">
-                    Selecciona “Voy por mi cuenta” y únete al Social Run. No necesitas pertenecer a
-                    NeoTeam ni a otro grupo.
-                  </p>
+              <fieldset className="m-0 min-w-0 border-0 p-0">
+                <legend className="mb-3 text-sm font-semibold text-neo-text">
+                  ¿Cómo quieres participar?
+                </legend>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    data-participation-choice
+                    aria-pressed={participationMode === 'solo'}
+                    onClick={() => chooseParticipation('solo')}
+                    className={
+                      'flex min-h-24 w-full flex-col items-start justify-center gap-1 rounded-control border p-4 text-left transition-colors ' +
+                      (participationMode === 'solo'
+                        ? 'border-neo-accent-text bg-neo-muted-bg'
+                        : 'border-neo-border-strong bg-neo-surface hover:bg-neo-muted-bg')
+                    }
+                  >
+                    <span className="text-base font-semibold text-neo-text">Voy por mi cuenta</span>
+                    <span className="text-xs leading-relaxed text-neo-text-secondary">
+                      No necesitas pertenecer a ningún grupo.
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    data-participation-choice
+                    aria-pressed={participationMode === 'crew'}
+                    onClick={() => chooseParticipation('crew')}
+                    className={
+                      'flex min-h-24 w-full flex-col items-start justify-center gap-1 rounded-control border p-4 text-left transition-colors ' +
+                      (participationMode === 'crew'
+                        ? 'border-neo-accent-text bg-neo-muted-bg'
+                        : 'border-neo-border-strong bg-neo-surface hover:bg-neo-muted-bg')
+                    }
+                  >
+                    <span className="flex items-center gap-2 text-base font-semibold text-neo-text">
+                      <UsersRound aria-hidden className="size-4" />
+                      Voy con mi running crew
+                    </span>
+                    <span className="text-xs leading-relaxed text-neo-text-secondary">
+                      Elige tu grupo o agrega uno nuevo.
+                    </span>
+                  </button>
                 </div>
-              </div>
-              <SelectField
-                name="runningGroup"
-                label="¿Con qué running crew participarás?"
-                value={runningGroup}
-                onChange={(event) => setRunningGroup(event.target.value)}
-                required
-                errors={errors?.runningGroup}
-              >
-                <option value="" disabled>
-                  Selecciona tu opción
-                </option>
-                {RUNNING_GROUP_OPTIONS.map((group) => (
-                  <option key={group.value} value={group.value}>
-                    {group.label}
-                  </option>
-                ))}
-                <option value="independiente">Voy por mi cuenta (sin crew)</option>
-                <option value="otro">Mi crew no aparece en la lista</option>
-              </SelectField>
-              {runningGroup === 'otro' && (
-                <TextField
-                  name="otherRunningGroup"
-                  label="¿Cómo se llama tu running crew?"
-                  defaultValue={values?.otherRunningGroup}
-                  required
-                  placeholder="Escribe el nombre de tu grupo"
-                  errors={errors?.otherRunningGroup}
-                />
+                {!participationMode && (
+                  <FieldError name="runningGroup" errors={fieldErrors('runningGroup')} />
+                )}
+              </fieldset>
+              {participationMode === 'solo' && (
+                <>
+                  <input type="hidden" name="runningGroup" value="independiente" />
+                  <p className="m-0 text-sm text-neo-text-secondary">
+                    Perfecto. Puedes correr por tu cuenta y compartir la experiencia con todos.
+                  </p>
+                </>
+              )}
+              {participationMode === 'crew' && (
+                <>
+                  <SelectField
+                    name="runningGroup"
+                    label="Selecciona tu running crew"
+                    value={runningGroup === 'independiente' ? '' : runningGroup}
+                    onChange={(event) => {
+                      setRunningGroup(event.target.value)
+                      clearFieldError('runningGroup')
+                    }}
+                    required
+                    errors={fieldErrors('runningGroup')}
+                  >
+                    <option value="" disabled>
+                      Selecciona un grupo
+                    </option>
+                    {RUNNING_GROUP_OPTIONS.map((group) => (
+                      <option key={group.value} value={group.value}>
+                        {group.label}
+                      </option>
+                    ))}
+                    <option value="otro">Mi crew no aparece en la lista</option>
+                  </SelectField>
+                  {runningGroup === 'otro' && (
+                    <TextField
+                      name="otherRunningGroup"
+                      label="Nombre de tu running crew"
+                      defaultValue={values?.otherRunningGroup}
+                      maxLength={120}
+                      required
+                      placeholder="Escribe el nombre de tu grupo"
+                      errors={fieldErrors('otherRunningGroup')}
+                    />
+                  )}
+                </>
               )}
               <p className="m-0 text-xs leading-normal text-neo-text-secondary">
-                Esta elección nos ayuda a organizar los grupos. Tu inscripción es individual y
-                gratuita.
+                La inscripción es individual, gratuita y abierta a todos los corredores.
               </p>
             </div>
           )}
@@ -436,7 +641,7 @@ export function RegistrationForm() {
                   defaultValue={values?.emergencyName}
                   required
                   autoComplete="off"
-                  errors={errors?.emergencyName}
+                  errors={fieldErrors('emergencyName')}
                 />
                 <TextField
                   name="emergencyPhone"
@@ -447,7 +652,7 @@ export function RegistrationForm() {
                   defaultValue={values?.emergencyPhone}
                   required
                   autoComplete="off"
-                  errors={errors?.emergencyPhone}
+                  errors={fieldErrors('emergencyPhone')}
                 />
               </div>
               <div className="border-t border-neo-border pt-3">
@@ -455,7 +660,7 @@ export function RegistrationForm() {
                   name="termsAccepted"
                   defaultChecked={values?.termsAccepted === 'on'}
                   required
-                  errors={errors?.termsAccepted}
+                  errors={fieldErrors('termsAccepted')}
                 >
                   Declaro que he leído y acepto las condiciones de participación y conozco los
                   riesgos habituales de esta actividad deportiva.
@@ -472,7 +677,7 @@ export function RegistrationForm() {
                   name="privacyAccepted"
                   defaultChecked={values?.privacyAccepted === 'on'}
                   required
-                  errors={errors?.privacyAccepted}
+                  errors={fieldErrors('privacyAccepted')}
                 >
                   Autorizo el tratamiento de mis datos para gestionar mi participación en Social Run
                   NeoTeam conforme a las finalidades informadas.
@@ -497,8 +702,6 @@ export function RegistrationForm() {
           )}
         </section>
       ))}
-
-      {state.message && <FormMessage>{state.message}</FormMessage>}
 
       <div
         key={step}

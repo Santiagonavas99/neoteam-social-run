@@ -123,3 +123,40 @@ test('accepts independent runners without an associated crew', () => {
     true,
   )
 })
+
+test('rejects letters in numeric documents, but accepts passport letters', () => {
+  for (const type of ['CC', 'CE', 'TI', 'PPT']) {
+    assert.deepEqual(
+      errorPaths({ ...valid, documentType: type, documentNumber: 'ssasassa' }),
+      ['documentNumber'],
+      type,
+    )
+  }
+  assert.deepEqual(errorPaths({ ...valid, documentType: 'PA', documentNumber: 'AB123456' }), [])
+})
+
+test('rejects invalid email domains on the server', () => {
+  for (const email of [
+    'ana@localhost',
+    'ana@dominio',
+    'ana@gmail.c',
+    'ana@gmail..com',
+    'ana@gmail.commmm',
+    'ana@gmail.commmmr',
+  ]) {
+    assert.deepEqual(errorPaths({ ...valid, email }), ['email'], email)
+  }
+})
+
+test('enforces real birth dates between 1900 and today', () => {
+  for (const birthDate of ['1881-05-03', '2999-01-01', '2026-02-30']) {
+    assert.deepEqual(errorPaths({ ...valid, birthDate }), ['birthDate'], birthDate)
+  }
+})
+
+test('rejects letters in WhatsApp and emergency phone even if ten digits are present', () => {
+  for (const phone of ['300abc1234567', '3001234567x', '3001234567@']) {
+    assert.deepEqual(errorPaths({ ...valid, phone }), ['phone'], phone)
+    assert.deepEqual(errorPaths({ ...valid, emergencyPhone: phone }), ['emergencyPhone'], phone)
+  }
+})
