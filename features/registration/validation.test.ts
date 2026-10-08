@@ -33,8 +33,23 @@ test('email requires a public domain with a TLD', () => {
     'ana@gmail..com',
     'ana@gmail.c',
     'ana@gmail.123',
+    'ana@gmail.commmm',
+    'ana@gmail.commmmr',
+    'ana@gmail.notarealtld',
   ]) {
     assert.equal(isEmailDomainValid(email), false, email)
+  }
+})
+
+test('validates existing IANA extensions without rejecting legitimate long TLDs', () => {
+  for (const email of [
+    'ana@gmail.com',
+    'ana@organizacion.co',
+    'ana@asociacion.travel',
+    'ana@escuela.academy',
+    'ana@correo.technology',
+  ]) {
+    assert.equal(isEmailDomainValid(email), true, email)
   }
 })
 
