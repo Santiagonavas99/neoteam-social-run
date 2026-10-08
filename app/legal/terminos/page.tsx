@@ -21,9 +21,8 @@ export default function TermsPage() {
         Condiciones de participación
       </h1>
       <p className={paragraph}>
-        Versión preliminar para revisión del equipo organizador. Antes de su publicación definitiva
-        deben identificarse formalmente las personas o entidad responsables de la actividad y
-        validarse las condiciones de participación de menores de edad.
+        Estas condiciones explican cómo participar en el Social Run de aniversario de NeoTeam y las
+        recomendaciones para disfrutar de la actividad deportiva de manera segura y responsable.
       </p>
       <div className="mt-6 border-l-4 border-neo-accent bg-neo-surface p-5 text-sm leading-6">
         La inscripción es gratuita. Lee estas condiciones antes de confirmar tu registro. El
@@ -51,9 +50,8 @@ export default function TermsPage() {
           ))}
         </ul>
         <p className="mb-0 mt-4 text-sm leading-6 text-neo-text-secondary">
-          Su identificación como líderes no implica, por sí sola, la atribución individual o
-          conjunta de responsabilidades jurídicas. Esa condición debe formalizarse en la versión
-          definitiva de estos documentos.
+          El equipo de liderazgo coordina el encuentro y las actividades previstas para la comunidad
+          participante.
         </p>
       </section>
 
@@ -110,10 +108,10 @@ export default function TermsPage() {
 
       <h2 className={heading}>6. Niñas, niños y adolescentes</h2>
       <p className={paragraph}>
-        La participación de menores requiere un procedimiento específico de autorización de su
-        representante legal y medidas de acompañamiento acordes con la actividad. El formulario
-        digital general no sustituye dicha autorización. Este procedimiento deberá quedar definido
-        antes de admitir registros de menores.
+        La participación de menores requiere autorización de su representante legal y medidas de
+        acompañamiento acordes con la actividad. El formulario digital general no sustituye dicha
+        autorización. Antes de participar, su acudiente debe completar las autorizaciones
+        correspondientes.
       </p>
 
       <h2 className={heading}>7. Fotografías y videos</h2>
@@ -131,13 +129,12 @@ export default function TermsPage() {
         <Link href="/legal/privacidad" className="font-semibold underline underline-offset-4">
           política de datos personales
         </Link>
-        . La identificación definitiva del responsable del evento y su canal formal de atención
-        deben validarse antes de aprobar esta versión.
+        . Para consultas relacionadas con el evento, puedes comunicarte con el equipo organizador
+        por los canales oficiales de NeoTeam.
       </p>
 
       <p className="mt-10 border-t border-neo-border pt-5 text-xs text-neo-text-secondary">
-        Borrador de trabajo · 8 de octubre de 2026 · Pendiente de revisión jurídica y aprobación de
-        la organización.
+        Última actualización: 8 de octubre de 2026.
       </p>
     </article>
   )

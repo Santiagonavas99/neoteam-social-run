@@ -1,15 +1,16 @@
-# Cierre legal pendiente · Social Run NeoTeam (18/10/2026)
+# Seguimiento legal y operativo · Social Run NeoTeam (18/10/2026)
 
-Borradores públicos: `/legal/terminos` y `/legal/privacidad`.
+Páginas públicas: `/legal/terminos` y `/legal/privacidad`.
 
-**Estado: borrador. No publicar en producción sin revisión y aprobación legal.**
+**Estado editorial:** textos aceptados por el equipo organizador el 8 de octubre de 2026. La publicación de los textos no sustituye la verificación del cumplimiento de las obligaciones jurídicas y operativas que figuran a continuación.
 
 ## Confirmaciones indispensables
 
 - [x] Identificar a las tres personas integrantes del **liderazgo de NeoTeam**: Camilo Benítez Soto, Nana Giraldo y Robinson Martinez. Se muestran sus nombres, no sus documentos, teléfonos ni correos personales.
 - [ ] Designar el **responsable del tratamiento**: persona(s) natural(es) o entidad jurídica y, si aplica, responsables conjuntos. Ser líder de NeoTeam no determina automáticamente la representación legal ni la responsabilidad sobre el tratamiento de datos. No inferir que sean responsables solidarios, apoderados o representantes legales.
 - [ ] Recopilar razón social / identificación jurídica cuando aplique, domicilio, dirección física, teléfono de contacto y **correo operativo para hábeas data**. No incorporar cédulas o teléfonos privados a un repositorio público sin justificación y autorización.
-- [ ] Aprobar y fechar política de tratamiento con finalidades, conservación, derechos y procedimiento de consultas/reclamos.
+- [x] Ajustar y fechar el contenido publicado de las páginas legales. 
+- [ ] Formalizar procedimiento de consultas/reclamos y un canal privado oficial para hábeas data.
 - [ ] Definir participación de **menores de edad**. El formulario actual acepta TI y fechas de nacimiento de menores, pero no tiene autorización verificable de acudiente. No asumir que aceptar un checkbox por parte del menor resuelve el requisito.
 - [ ] Establecer autorización **independiente** para tratamiento y publicación de imagen identificable con fines promocionales (y consentimiento del representante cuando corresponda).
 - [ ] Auditar conservación de prueba de consentimiento: fecha/hora, versión del texto, identidad/referencia de registro, y elección de marketing. Hoy el backend transmite `p_terms_accepted`, `p_privacy_accepted` y `p_marketing_accepted`, pero esta rama no introduce cambios de base de datos.
@@ -24,7 +25,7 @@ Borradores públicos: `/legal/terminos` y `/legal/privacidad`.
 - Casilla de futuras novedades sigue siendo opcional.
 - La aceptación de riesgos ordinarios no supone exoneración universal de responsabilidad.
 - Nunca colocar números de documento de organizadores, participantes ni teléfonos privados en código, historial Git o páginas públicas por inercia.
-- No hacer merge de este PR hasta resolver los puntos esenciales anteriores.
+- Mantener los pendientes jurídicos y operativos identificados, aun cuando la organización haya aprobado la redacción visible de las páginas.
 
 ### Marco de referencia orientativo
 
