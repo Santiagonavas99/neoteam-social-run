@@ -1,12 +1,4 @@
-import {
-  ArrowDown,
-  ArrowRight,
-  CalendarDays,
-  Clock,
-  MapPin,
-  QrCode,
-  Route,
-} from 'lucide-react'
+import { ArrowDown, ArrowRight, CalendarDays, Clock, MapPin, QrCode, Route } from 'lucide-react'
 import Link from 'next/link'
 import { eventConfig } from '@/features/event/event'
 import { EventCountdown } from '@/features/event/event-countdown'

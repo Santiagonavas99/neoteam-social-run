@@ -1,6 +1,6 @@
 import { Footer } from '@/components/footer'
-import { SocialRail } from '@/components/social-rail'
 import { SiteHeader } from '@/components/site-header'
+import { SocialRail } from '@/components/social-rail'
 import {
   organizationMarqueeItems,
   runningCrewMarqueeItems,
