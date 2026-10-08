@@ -228,12 +228,11 @@ export function RegistrationForm() {
             />
             <div
               className={
-                'mt-3 flex min-w-0 flex-col gap-1 ' +
+                'mt-3 min-w-0 ' +
                 (number === step ? 'font-bold text-neo-text' : 'text-neo-text-secondary')
               }
             >
-              <span className="text-xs font-semibold tabular-nums">0{number}</span>
-              <span className="text-[11px] leading-snug sm:hidden">
+              <span className="block text-[11px] leading-snug sm:hidden">
                 {number === 1 ? 'Datos' : number === 2 ? 'Crew' : 'Confirmar'}
               </span>
               <span className="hidden text-xs leading-snug sm:block">{label}</span>
