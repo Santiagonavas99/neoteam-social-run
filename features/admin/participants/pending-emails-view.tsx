@@ -10,8 +10,8 @@ import { LoadingState } from '../ui/loading-state'
 import { useAdminData } from '../ui/use-admin-data'
 import {
   batchRecipients,
-  emailFailureLabel,
   type EmailQueue,
+  emailFailureLabel,
   type PendingEmail,
 } from './email-queue'
 
