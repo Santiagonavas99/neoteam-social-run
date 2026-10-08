@@ -105,7 +105,9 @@ test('requires the category to be female or male', () => {
   }
 })
 
-
 test('accepts independent runners without an associated crew', () => {
-  assert.equal(registrationSchema.safeParse({ ...valid, runningGroup: 'independiente' }).success, true)
+  assert.equal(
+    registrationSchema.safeParse({ ...valid, runningGroup: 'independiente' }).success,
+    true,
+  )
 })
