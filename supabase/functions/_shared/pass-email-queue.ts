@@ -67,7 +67,7 @@ export async function handlePassEmailQueue(supabase, body: Record<string, unknow
     .select('id,email,first_name,last_name,registration_code,checkin_token')
     .maybeSingle()
   if (claimError) throw claimError
-  if (!row) return json({ ok: true, result: 'skipped' })
+  if (!row) return json({ ok: true, queueResult: 'skipped' })
 
   let delivery = { ok: false, status: 0 }
   try {
@@ -76,7 +76,7 @@ export async function handlePassEmailQueue(supabase, body: Record<string, unknow
   } catch {
     console.error('pass queue email build/network failure')
   }
-  if (delivery.ok) return json({ ok: true, result: 'sent' })
+  if (delivery.ok) return json({ ok: true, queueResult: 'sent' })
 
   const reason = delivery.status === 429
     ? 'rate_limited'
@@ -94,5 +94,5 @@ export async function handlePassEmailQueue(supabase, body: Record<string, unknow
     console.error('pass queue claim release failed', { code: releaseError.code })
     return json({ error: 'No pudimos actualizar el envío. Actualiza la bandeja antes de reintentar.' }, 503)
   }
-  return json({ ok: true, result: 'failed', reason })
+  return json({ ok: true, queueResult: 'failed', reason })
 }
