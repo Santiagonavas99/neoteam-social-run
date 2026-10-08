@@ -384,8 +384,8 @@ export function RegistrationForm() {
                 autoComplete="name"
                 onInput={(event) => event.currentTarget.setCustomValidity('')}
                 errors={
-                    fieldErrors('fullName') ?? fieldErrors('firstName') ?? fieldErrors('lastName')
-                  }
+                  fieldErrors('fullName') ?? fieldErrors('firstName') ?? fieldErrors('lastName')
+                }
               />
               <div className="grid grid-cols-[100px_minmax(0,1fr)] gap-5">
                 <SelectField
