@@ -17,10 +17,6 @@ export function Hero() {
             07:30 A. M.
           </span>
           <span className="v2-meta-pill gap-1.5">
-            <MapPin aria-hidden className="size-3.5 shrink-0 max-sm:hidden" />
-            PARQUE DEL INGENIO
-          </span>
-          <span className="v2-meta-pill gap-1.5">
             <Route aria-hidden className="size-3.5 shrink-0 max-sm:hidden" />
             5K SOCIAL
           </span>

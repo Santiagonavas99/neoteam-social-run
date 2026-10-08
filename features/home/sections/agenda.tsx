@@ -90,8 +90,8 @@ export function Agenda({ index = '02' }: { index?: string }) {
         <div className={styles.board}>
           <div className={styles.boardTop}>
             <div className={styles.boardDate}>
-              <strong>5K</strong>
-              <span>RUTA SOCIAL</span>
+              <strong>AGENDA</strong>
+              <span>5K · RUTA SOCIAL</span>
             </div>
             <span className={styles.boardCount}>
               {String(agenda.length).padStart(2, '0')} ACTIVIDADES
