@@ -52,6 +52,7 @@
   min-height: calc(100svh - var(--site-header-height));
   display: flex;
   flex-direction: column;
+  isolation: isolate;
 }
 .v2-hero::before {
   content: "";
@@ -59,16 +60,52 @@
   inset: 0;
   background:
     linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--neo-black) 96%, transparent) 0%,
+      color-mix(in srgb, var(--neo-black) 65%, transparent) 18%,
+      color-mix(in srgb, var(--neo-black) 32%, transparent) 42%,
+      color-mix(in srgb, var(--neo-black) 34%, transparent) 65%,
+      color-mix(in srgb, var(--neo-black) 69%, transparent) 84%,
+      color-mix(in srgb, var(--neo-black) 97%, transparent) 100%
+    ),
+    linear-gradient(
       90deg,
-      transparent 0,
       transparent calc(50% - 1px),
-      var(--neo-on-dark-hover) 50%,
+      color-mix(in srgb, var(--neo-white) 6%, transparent) 50%,
       transparent calc(50% + 1px)
     ),
-    linear-gradient(0deg, var(--neo-on-dark-hover) 1px, transparent 1px);
+    linear-gradient(0deg, color-mix(in srgb, var(--neo-white) 5%, transparent) 1px, transparent 1px),
+    radial-gradient(
+      ellipse 58% 76% at 24% 70%,
+      color-mix(in srgb, var(--neo-accent) 23%, transparent),
+      transparent 76%
+    ),
+    radial-gradient(
+      ellipse 37% 59% at 85% 24%,
+      color-mix(in srgb, var(--neo-accent) 12%, transparent),
+      transparent 78%
+    ),
+    radial-gradient(
+      ellipse 48% 42% at 78% 100%,
+      color-mix(in srgb, var(--neo-accent) 8%, transparent),
+      transparent 82%
+    );
   background-size:
     100% 100%,
-    100% 96px;
+    100% 100%,
+    100% 112px,
+    100% 100%,
+    100% 100%,
+    100% 100%;
+  pointer-events: none;
+}
+.v2-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='4' intercept='-2.4'/%3E%3CfeFuncG type='linear' slope='4' intercept='-2.4'/%3E%3CfeFuncB type='linear' slope='4' intercept='-2.4'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
+  opacity: 0.18;
+  mix-blend-mode: screen;
   pointer-events: none;
 }
 .v2-hero-meta {
@@ -667,11 +704,41 @@
   .v2-hero {
     min-height: auto;
   }
+  .v2-hero::before {
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--neo-black) 96%, transparent) 0%,
+        color-mix(in srgb, var(--neo-black) 58%, transparent) 24%,
+        color-mix(in srgb, var(--neo-black) 28%, transparent) 53%,
+        color-mix(in srgb, var(--neo-black) 80%, transparent) 100%
+      ),
+      linear-gradient(
+        0deg,
+        color-mix(in srgb, var(--neo-white) 4%, transparent) 1px,
+        transparent 1px
+      ),
+      radial-gradient(
+        ellipse 85% 58% at 45% 47%,
+        color-mix(in srgb, var(--neo-accent) 18%, transparent),
+        transparent 80%
+      ),
+      radial-gradient(
+        ellipse 85% 42% at 77% 90%,
+        color-mix(in srgb, var(--neo-accent) 11%, transparent),
+        transparent 80%
+      );
+    background-size:
+      100% 100%,
+      100% 104px,
+      100% 100%,
+      100% 100%;
+  }
   .v2-hero-meta {
     display: grid;
     grid-template-columns: max-content max-content;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
     padding-top: 20px;
   }
   .v2-hero-meta .v2-meta-pill:nth-child(3) {

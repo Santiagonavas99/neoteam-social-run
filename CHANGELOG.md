@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.29.0] - 2026-10-08
+
+### Changed
+
+- **Deeper black editorial hero:** retains the low-opacity reticle and cyan glows while strengthening the black top/bottom vignette and darkening the middle. Fine-grain noise is high-pass filtered so individual particles remain visible without washing the background gray; mobile keeps the quieter horizontal lines.
+- **Original hero facts restored:** the three original date, time and 5K chips remain, with the mobile two-then-one arrangement; the location stays in the route card rather than in a redundant fourth chip.
+- **Agenda with a clear title:** the board now leads with AGENDA and uses 5K · RUTA SOCIAL as secondary context, while keeping the big date on the left and activity count/times on the right. The redundant note below the timeline is removed.
+
 ## [0.28.2] - 2026-10-07
 
 ### Fixed

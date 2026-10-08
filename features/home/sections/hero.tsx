@@ -72,7 +72,7 @@ export function Hero() {
         <div className="shell">
           <div className="v2-mobile-route-heading">
             <span>EL RECORRIDO</span>
-            <span>18 OCT · 2026</span>
+            <span>CALI, COLOMBIA</span>
           </div>
           <div className="v2-mobile-route-content">
             <div className="v2-mobile-route-distance">

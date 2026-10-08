@@ -90,8 +90,8 @@ export function Agenda({ index = '02' }: { index?: string }) {
         <div className={styles.board}>
           <div className={styles.boardTop}>
             <div className={styles.boardDate}>
-              <strong>DOM 18</strong>
-              <span>OCTUBRE</span>
+              <strong>AGENDA</strong>
+              <span>5K · RUTA SOCIAL</span>
             </div>
             <span className={styles.boardCount}>
               {String(agenda.length).padStart(2, '0')} ACTIVIDADES
@@ -181,9 +181,6 @@ export function Agenda({ index = '02' }: { index?: string }) {
               })}
             </ol>
           </div>
-          <p className={styles.footerNote}>
-            {eventConfig.location} · Los estados del día siguen los horarios programados.
-          </p>
         </div>
       </div>
     </section>

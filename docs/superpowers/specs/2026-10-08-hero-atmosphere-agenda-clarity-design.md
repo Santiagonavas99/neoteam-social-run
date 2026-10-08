@@ -1,0 +1,54 @@
+# Hero atmosphere and agenda clarity — design
+
+Date: 2026-10-08
+Branch: `feat/hero-atmosphere-agenda-clarity`
+Release: 0.29.0
+
+## Problem
+The existing hero uses a repeating grid of vertical and horizontal lines, which competes with the main SOCIAL RUN typography. The hero metadata lacks a dedicated place chip. The agenda repeats the event date in the sticky board heading and its left-hand date signature, and appends a redundant footer note ("Parque del Ingenio, Cali · Los estados del día siguen los horarios programados.").
+
+## Design decision
+1. Keep the top hero date chip ("18 OCT · 2026") and the oversized agenda date signature on the lower left ("18", "OCT / DOMINGO", "2026 · CALI, COLOMBIA"). Use relevant information rather than another date in the sticky agenda board header: "5K / RUTA SOCIAL", preserving the activity count and hours on its right.
+2. Keep the new separate mobile route section introduced on main; remove its duplicate 18 OCT label in favor of CALI, COLOMBIA. Keep the hero metadata's time ("07:30 A. M.") and distance ("5K SOCIAL"), and add "PARQUE DEL INGENIO" as a separate complementary chip with a MapPin icon. On narrow screens, arrange these four facts as two rows of two; ensure text wraps safely and remains readable.
+3. Replace the CSS-grid background with one or two low-opacity cyan radial glows and an almost imperceptible fine-grain texture. Keep the hero black, typography, CTA, route-card and footer dividers; those two functional rules are sufficient. No extra animation.
+4. Delete the footer note at the bottom of the agenda and its now-unused CSS.
+5. Keep all copy in Spanish, focus, reveal, light/dark behavior and 60s ISR untouched.
+
+## Mobile
+Primary checks at 390px and 430px; no horizontal scrolling or clipped pills. At small widths, the fourth chip must not collide with the location. The two-column agenda board header must still fit above the timeline.
+
+## Design, performance and accessibility
+Use existing `--neo-*` tokens and CSS `color-mix()` for transparent cyan. The texture is a tiny SVG fractal-noise data URI in CSS (no network request, no JavaScript, no external image, no user content). The atmospheric overlays are decorative, do not intercept pointer events, and never cover actual content. No motion or new dependency; screen-reader meaningful content remains regular HTML.
+
+## Alternative rejected
+Do not replace the existing hero photograph-free editorial typography with new photography or animation; it adds loading cost and draws attention away from registration. Do not preserve the old repeating horizontal and vertical grid. Do not remove both date markers: the top event date and lower-left agenda signature serve different navigation contexts.
+
+## Out of scope
+Data collection/legal policies, registration, Wallet, Supabase, admin layout, agenda timing, event schedule, global typography and desktop navigation.
+
+## Design refinement — approved 2026-10-08
+The organizer reviewed PR #64's preview and requested the following corrections:
+- **Agenda title:** make `AGENDA` the sticky board headline, with `5K · RUTA SOCIAL` as its secondary label, without reintroducing the repeated event date. On narrow phones use a compact stacked label to avoid crowding the activity count.
+- **Restore the original hero chips:** only `18 OCT · 2026`, `07:30 A. M.` and `5K SOCIAL`. The location remains represented by the actual route card, so a redundant fourth chip is not needed. Restore the previous mobile two-then-one layout.
+- **Stronger atmosphere:** elevate cyan glows (about 23% main, 12% secondary plus 8% bottom accent) and static fractal grain (opacity about 0.13). Keep text legible, no full grid, new asset requests, or motion.
+- Keep the already-approved deletion of the unnecessary agenda footer, the separate mobile route block from main, and the larger left agenda date signature.
+
+## Second visual refinement — approved 2026-10-08
+To make the texture visible at normal viewing size without changing the approved cyan glow, increase only the hero's static SVG grain: tile dimensions 160×160 → 120×120, `baseFrequency` 0.82 → 0.9, and overlay opacity 0.13 → 0.18. No additional layout, motion or dependency changes.
+
+## Photographic background refinement — approved 2026-10-08
+The user provided a Stridelog-style photographic reference and explicitly requested the generated black-and-white running portrait to appear in this PR. The prior no-photography preference for this hero is superseded.
+- Store the actual generated image as `public/hero-runner-monochrome.webp` (optimized 960 × 540 monochrome WebP, about 9 KB), not an external URL or stock-image dependency.
+- Layer the photo into the existing `.v2-hero` background under the existing cyan glows and noise. Keep existing content, typography, route card, and dates unchanged.
+- Use multi-stop gradients over the image for legible copy, buttons and countdown at 1440 and 390 pixels, adjusting the crop for the smaller viewport.
+- Preserve dark/light appearance, decorative-only semantics, and no new animation, script or external dependencies. Do not change the dedicated mobile route panel.
+
+## Final hero direction — approved 2026-10-08
+The organizer rejected the photographic version after preview. This decision supersedes the prior photographic refinement:
+- Return to a very low-contrast CSS grid (subtle central vertical guide and horizontal lines at a more open interval), avoiding the original dense high-contrast grid.
+- Use strong black gradients at the top and bottom of the hero to add depth and fade the grid toward its edges. Preserve the existing cyan radial glow and fine visible grain.
+- At widths up to 760 px omit the central vertical guide entirely, lower the opacity of the horizontal lines and keep the top/bottom fade and cyan glow.
+- Remove `public/hero-runner-monochrome.webp` from the PR altogether, with no external photographic assets or changes to content, agenda or registration.
+
+## Final black-level refinement — approved 2026-10-08
+The organizer approved the subdued grid layout but found that the background looked gray rather than black. Keep the #050505 background and existing cyan radial glows; strengthen the dark vertical vignette, including nontransparent middle stops, on desktop and mobile. Preserve the visible grain without a gray veil by adding a grayscale/high-pass transfer to the existing SVG turbulence, so that most pixels remain black and only brighter noise particles show under the screen blend. Leave markup, mobile route, navigation, reticle layout and color palette unchanged. No new dependencies, photos or external assets.

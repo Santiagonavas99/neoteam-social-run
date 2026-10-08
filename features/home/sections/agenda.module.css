@@ -115,6 +115,7 @@
   display: flex;
   align-items: baseline;
   gap: 10px;
+  min-width: 0;
 }
 
 .boardDate strong {
@@ -399,13 +400,6 @@
   color: var(--neo-accent-dark);
 }
 
-.footerNote {
-  margin: 18px 0 0 48px;
-  color: var(--neo-text-secondary);
-  font-size: 11px;
-  line-height: 1.5;
-}
-
 /* Desktop: remove only the underline beneath DOM 18; keep the vertical timeline. */
 @media (min-width: 1025px) {
   .boardTop {
@@ -493,8 +487,18 @@
     padding-bottom: 16px;
   }
 
+  .boardDate {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+
   .boardDate strong {
-    font-size: 38px;
+    font-size: clamp(28px, 7vw, 38px);
+  }
+
+  .boardDate span {
+    font-size: 10px;
   }
 
   .boardCount {
@@ -548,10 +552,6 @@
   .summary {
     margin-top: 12px;
     font-size: 12px;
-  }
-
-  .footerNote {
-    margin-left: 31px;
   }
 }
 
