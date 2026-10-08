@@ -41,28 +41,28 @@
 }
 
 /* Control feedback: lightweight and fully contained within the form. */
-.form :global(input:not([type="checkbox"])),
-.form :global(select) {
+.form input:not([type="checkbox"]),
+.form select {
   transition:
     border-color 170ms ease,
     box-shadow 200ms ease,
     background-color 170ms ease;
 }
 
-.form :global(input:not([type="checkbox"]):focus),
-.form :global(select:focus) {
+.form input:not([type="checkbox"]):focus,
+.form select:focus {
   box-shadow: 0 0 0 3px var(--neo-accent-soft);
 }
 
-.form :global(label:focus-within) {
+.form label:focus-within {
   color: var(--neo-text);
 }
 
-.form :global(input[type="checkbox"]) {
+.form input[type="checkbox"] {
   transition: box-shadow 200ms ease, transform 200ms ease;
 }
 
-.form :global(input[type="checkbox"]:checked) {
+.form input[type="checkbox"]:checked {
   box-shadow: 0 0 0 3px var(--neo-accent-soft);
 }
 
@@ -75,8 +75,8 @@
     transform 200ms var(--form-motion-ease);
 }
 
-.nextButton :global(svg),
-.backButton :global(svg) {
+.nextButton svg,
+.backButton svg {
   transition: transform 220ms var(--form-motion-ease);
 }
 
@@ -86,11 +86,11 @@
     transform: translateY(-2px);
   }
 
-  .nextButton:hover:not(:disabled) :global(svg) {
+  .nextButton:hover:not(:disabled) svg {
     transform: translateX(4px);
   }
 
-  .backButton:hover:not(:disabled) :global(svg) {
+  .backButton:hover:not(:disabled) svg {
     transform: translateX(-4px);
   }
 }
@@ -202,15 +202,22 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .form *,
-  .form *::before,
-  .form *::after {
-    animation: none !important;
-    transition: none !important;
-    transform: none !important;
+  .progressLabel,
+  .form input,
+  .form select,
+  .nextButton,
+  .backButton,
+  .nextButton svg,
+  .backButton svg {
+    transition: none;
   }
 
-  .progressBarFilled::after {
-    transform: scaleX(1) !important;
+  .nextButton:hover:not(:disabled),
+  .backButton:hover:not(:disabled),
+  .nextButton:active:not(:disabled),
+  .backButton:active:not(:disabled),
+  .nextButton:hover:not(:disabled) svg,
+  .backButton:hover:not(:disabled) svg {
+    transform: none;
   }
 }
