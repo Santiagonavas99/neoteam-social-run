@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { NEOTEAM_LEADERS } from '@/features/legal/leaders'
 
 export const metadata: Metadata = {
   title: 'Condiciones de participación | Social Run NeoTeam',
@@ -26,6 +27,21 @@ export default function TermsPage() {
         El consentimiento sobre el tratamiento de datos se solicita por separado y puede
         consultarse en la <Link href="/legal/privacidad" className="font-semibold underline underline-offset-4">política de tratamiento de datos</Link>.
       </div>
+
+      <section aria-labelledby="neoteam-leadership" className="mt-7 rounded-xl border border-neo-border bg-neo-surface p-5 sm:p-6">
+        <h2 id="neoteam-leadership" className="m-0 text-lg font-bold">Líderes de NeoTeam</h2>
+        <p className="my-3 text-sm leading-6 text-neo-text-secondary">
+          El equipo de liderazgo de NeoTeam está integrado por:
+        </p>
+        <ul className="m-0 list-disc space-y-2 pl-5 text-sm leading-6">
+          {NEOTEAM_LEADERS.map((leader) => <li key={leader}>{leader}</li>)}
+        </ul>
+        <p className="mb-0 mt-4 text-sm leading-6 text-neo-text-secondary">
+          Su identificación como líderes no implica, por sí sola, la atribución individual
+          o conjunta de responsabilidades jurídicas. Esa condición debe formalizarse
+          en la versión definitiva de estos documentos.
+        </p>
+      </section>
 
       <h2 className={heading}>1. Actividad y lugar</h2>
       <p className={paragraph}>
