@@ -72,6 +72,10 @@ export function PendingEmailsView() {
               break
             }
           }
+          // Keep consecutive Resend requests below its per-second rate limit.
+          if (index < selected.length - 1) {
+            await new Promise<void>((resolve) => window.setTimeout(resolve, 700))
+          }
         } catch (error) {
           requestError = error
           break
