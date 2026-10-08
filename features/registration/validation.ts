@@ -1,3 +1,5 @@
+import { IANA_TLDS } from './iana-tlds.ts'
+
 export const MIN_BIRTH_DATE = '1900-01-01'
 
 export function maxBirthDate(date: Date = new Date()): string {
@@ -22,7 +24,11 @@ export function isAllowedBirthDate(value: string, today = maxBirthDate()): boole
 export function isEmailDomainValid(address: string): boolean {
   const parts = address.trim().split('@')
   if (parts.length !== 2) return false
-  return /^(?:[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?\.)+[a-z]{2,63}$/i.test(parts[1] ?? '')
+  const domain = parts[1] ?? ''
+  if (!/^(?:[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?\.)+[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?$/i.test(domain)) {
+    return false
+  }
+  return IANA_TLDS.has(domain.slice(domain.lastIndexOf('.') + 1).toLowerCase())
 }
 
 export function isNumericDocumentType(type: string): boolean {
