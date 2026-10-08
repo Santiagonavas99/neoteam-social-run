@@ -1102,7 +1102,9 @@ Deno.serve(async (req: Request) => {
       if (!/^[0-9a-f-]{36}$/i.test(id)) return json({ error: 'Participante no válido.' }, 400)
       const { data: row, error } = await supabase
         .from('registrations')
-        .select('id,email,first_name,last_name,registration_code,checkin_token,status,pass_emailed_at')
+        .select(
+          'id,email,first_name,last_name,registration_code,checkin_token,status,pass_emailed_at',
+        )
         .eq('id', id)
         .maybeSingle()
       if (error) throw error
