@@ -101,10 +101,9 @@ export default function PrivacyPage() {
       <h2 className={heading}>5. Contactos de emergencia y menores</h2>
       <p className={paragraph}>
         Los datos de un contacto de emergencia se usarán solo para esa finalidad y no para campañas
-        de promoción. Quien lo suministra debe informar a esa persona. Cuando participen menores
-        de edad, será necesaria la autorización de su representante legal y se respetarán el
-        interés superior del menor y sus derechos. El formulario general no sustituye esa
-        autorización.
+        de promoción. Quien lo suministra debe informar a esa persona. Cuando participen menores de
+        edad, será necesaria la autorización de su representante legal y se respetarán el interés
+        superior del menor y sus derechos. El formulario general no sustituye esa autorización.
       </p>
 
       <h2 className={heading}>6. Acceso, proveedores y seguridad</h2>
@@ -136,8 +135,8 @@ export default function PrivacyPage() {
       <h2 className={heading}>9. Canal de atención</h2>
       <p className={paragraph}>
         Para solicitar información sobre el tratamiento de tus datos o ejercer tus derechos, puedes
-        comunicarte con el equipo organizador mediante los canales oficiales de NeoTeam, incluido
-        su perfil de{' '}
+        comunicarte con el equipo organizador mediante los canales oficiales de NeoTeam, incluido su
+        perfil de{' '}
         <a
           href="https://www.instagram.com/neoteam_cali/"
           target="_blank"
