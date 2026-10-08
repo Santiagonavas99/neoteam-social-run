@@ -2,7 +2,6 @@ import {
   ArrowDown,
   ArrowRight,
   CalendarDays,
-  Camera,
   Clock,
   MapPin,
   MessageCircle,
@@ -10,6 +9,7 @@ import {
   Route,
 } from 'lucide-react'
 import Link from 'next/link'
+import { InstagramIcon } from '@/components/instagram-icon'
 import { communityLinks } from '@/features/event/community-links'
 import { eventConfig } from '@/features/event/event'
 import { EventCountdown } from '@/features/event/event-countdown'
@@ -82,7 +82,7 @@ export function Hero() {
             aria-label="Seguir a NeoTeam en Instagram"
             title="Instagram · @neoteam_cali"
           >
-            <Camera aria-hidden className="size-5" />
+            <InstagramIcon aria-hidden className="size-5" />
           </a>
           <a
             href={communityLinks.whatsapp}
