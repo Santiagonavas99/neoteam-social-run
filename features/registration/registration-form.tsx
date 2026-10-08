@@ -6,6 +6,7 @@ import type { FormEvent, ReactNode } from 'react'
 import { useActionState, useEffect, useRef, useState } from 'react'
 import { type RegistrationState, registerParticipant } from './actions'
 import { CalendarButton } from './calendar-button'
+import { splitFullName } from './full-name'
 import {
   CheckboxField,
   cardClass,
@@ -86,6 +87,18 @@ function stepForError(name: string): number {
   return 3
 }
 
+// Avoid brittle HTML pattern rules (especially with Unicode-mode pattern checks).
+// Use the same full-name parser in the browser and on the server.
+function isValidRegistrationControl(control: HTMLInputElement | HTMLSelectElement) {
+  if (control.name === 'fullName' && control instanceof HTMLInputElement) {
+    const value = control.value.trim()
+    control.setCustomValidity(
+      value && !splitFullName(value) ? 'Escribe tu nombre y al menos un apellido.' : '',
+    )
+  }
+  return control.checkValidity()
+}
+
 export function RegistrationForm() {
   const [state, formAction, pending] = useActionState(registerParticipant, initialState)
   const [step, setStep] = useState(1)
@@ -119,7 +132,7 @@ export function RegistrationForm() {
       `[data-registration-step="${number}"]`,
     )
     const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')
-    const firstInvalid = Array.from(controls ?? []).find((control) => !control.checkValidity())
+    const firstInvalid = Array.from(controls ?? []).find((control) => !isValidRegistrationControl(control))
     if (!firstInvalid) return true
     firstInvalid.focus()
     firstInvalid.reportValidity()
@@ -141,7 +154,7 @@ export function RegistrationForm() {
       const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
         'input, select',
       )
-      if (Array.from(controls ?? []).some((control) => !control.checkValidity())) {
+      if (Array.from(controls ?? []).some((control) => !isValidRegistrationControl(control))) {
         event.preventDefault()
         if (number === step) {
           validStep(number)
@@ -273,10 +286,12 @@ export function RegistrationForm() {
                 }
                 required
                 autoComplete="name"
-                pattern=".*\\S+\\s+\\S+.*"
-                title="Escribe al menos un nombre y un apellido."
+                onInput={(event) => event.currentTarget.setCustomValidity('')}
                 errors={errors?.fullName ?? errors?.firstName ?? errors?.lastName}
               />
+              <p className="m-0 text-xs leading-normal text-neo-text-secondary">
+                Incluye tus dos apellidos si los tienes, tal como aparecen en tu documento.
+              </p>
               <div className="grid grid-cols-[100px_minmax(0,1fr)] gap-5">
                 <SelectField
                   name="documentType"
