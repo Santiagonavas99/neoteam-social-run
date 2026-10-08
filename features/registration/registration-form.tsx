@@ -185,7 +185,9 @@ export function RegistrationForm() {
           }
         >
           <Streamers />
-          <p className="m-0">Nos vemos el 18 de octubre en el Social Run del aniversario NeoTeam.</p>
+          <p className="m-0">
+            Nos vemos el 18 de octubre en el Social Run del aniversario NeoTeam.
+          </p>
           {state.pass ? (
             <>
               {state.pass.emailed && (
