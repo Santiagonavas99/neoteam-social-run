@@ -246,17 +246,14 @@ export function RegistrationForm() {
           key={number}
           data-registration-step={number}
           hidden={step !== number}
-          className="mt-8"
+          className="mt-6"
           aria-labelledby={`registration-step-${number}`}
         >
           <div className="mb-6 border-b border-neo-border pb-5">
-            <span className="text-xs font-bold uppercase tracking-[0.13em] text-neo-accent-text">
-              0{number} / 03
-            </span>
             <h2
               id={`registration-step-${number}`}
               tabIndex={-1}
-              className="mb-2 mt-2 text-[clamp(24px,4vw,34px)] font-bold leading-tight tracking-[-0.045em]"
+              className="mb-2 mt-0 text-[clamp(24px,4vw,34px)] font-bold leading-tight tracking-[-0.045em]"
             >
               {title}
             </h2>
