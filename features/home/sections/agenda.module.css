@@ -105,7 +105,10 @@
   margin-top: -16px;
   margin-bottom: 20px;
   border-bottom: 1px solid var(--neo-border);
+  /* Solid theme background: active cards must not show through the sticky label. */
   background: var(--neo-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
 }
 
 .boardDate {
@@ -401,6 +404,41 @@
   color: var(--neo-text-secondary);
   font-size: 11px;
   line-height: 1.5;
+}
+
+/* Desktop: remove only the underline beneath DOM 18; keep the vertical timeline. */
+@media (min-width: 1025px) {
+  .boardTop {
+    border-bottom: 0;
+  }
+}
+
+/* Scroll-based entrance and exit for activities, without a JS scroll listener.
+   Unsupported browsers keep everything visible; reduced-motion users get no fading. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .step {
+      animation: agenda-activity-fade linear both;
+      animation-timeline: view(block);
+      animation-range: entry 0% exit 100%;
+    }
+  }
+}
+
+@keyframes agenda-activity-fade {
+  0% {
+    opacity: 0;
+    translate: 0 16px;
+  }
+  18%,
+  76% {
+    opacity: 1;
+    translate: 0 0;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 -12px;
+  }
 }
 
 @media (max-width: 1024px) {
