@@ -2,6 +2,7 @@ import { ArrowLeft, ArrowUpRight, CalendarDays, type LucideIcon, MapPin } from '
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { BrandLink } from '@/components/brand-link'
+import { SocialRail } from '@/components/social-rail'
 import { eventConfig } from '@/features/event/event'
 import { mapsUrl } from '@/features/event/maps'
 import { linkClass } from './form-ui'
@@ -33,6 +34,7 @@ export function RegistrationShell({
 }) {
   return (
     <main className="min-h-screen bg-neo-bg">
+      <SocialRail />
       <header className="mx-auto w-full max-w-[1336px] px-5 md:px-12">
         <div className="flex h-18 items-center justify-between gap-3 border-b border-neo-border md:h-20 md:gap-6">
           <BrandLink />
