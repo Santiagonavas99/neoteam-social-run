@@ -479,9 +479,6 @@ export function RegistrationForm() {
                   inputMode={isNumericDocumentType(documentType) ? 'numeric' : 'text'}
                   maxLength={30}
                   autoComplete="off"
-                  placeholder={
-                    isNumericDocumentType(documentType) ? 'Solo números' : 'Número de documento'
-                  }
                   errors={fieldErrors('documentNumber')}
                 />
               </div>
