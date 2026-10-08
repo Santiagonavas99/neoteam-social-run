@@ -281,7 +281,6 @@ export function RegistrationForm() {
               <TextField
                 name="fullName"
                 label="Nombre completo"
-                placeholder="Nombres y apellidos como aparecen en tu documento"
                 defaultValue={
                   values?.fullName ??
                   [values?.firstName, values?.lastName].filter(Boolean).join(' ')
@@ -291,9 +290,6 @@ export function RegistrationForm() {
                 onInput={(event) => event.currentTarget.setCustomValidity('')}
                 errors={errors?.fullName ?? errors?.firstName ?? errors?.lastName}
               />
-              <p className="m-0 text-xs leading-normal text-neo-text-secondary">
-                Incluye tus dos apellidos si los tienes, tal como aparecen en tu documento.
-              </p>
               <div className="grid grid-cols-[100px_minmax(0,1fr)] gap-5">
                 <SelectField
                   name="documentType"
