@@ -28,8 +28,8 @@ import {
   isEmailDomainValid,
   isNumericDocumentType,
   isValidDocumentNumber,
-  maxBirthDate,
   MIN_BIRTH_DATE,
+  maxBirthDate,
   normalizeColombianPhone,
 } from './validation'
 
@@ -99,16 +99,21 @@ function stepForError(name: string): number {
   return 3
 }
 
-function controlError(control: HTMLInputElement | HTMLSelectElement, documentType: string): string | null {
+function controlError(
+  control: HTMLInputElement | HTMLSelectElement,
+  documentType: string,
+): string | null {
   control.setCustomValidity('')
   const value = control.value.trim()
   if (control.name === 'fullName' && value && !splitFullName(value)) {
     control.setCustomValidity('Escribe tu nombre y al menos un apellido.')
   }
   if (control.name === 'documentNumber' && value && !isValidDocumentNumber(value, documentType)) {
-    control.setCustomValidity(isNumericDocumentType(documentType)
-      ? 'Escribe entre 5 y 30 dígitos, sin letras.'
-      : 'Escribe entre 5 y 30 letras o números, sin espacios.')
+    control.setCustomValidity(
+      isNumericDocumentType(documentType)
+        ? 'Escribe entre 5 y 30 dígitos, sin letras.'
+        : 'Escribe entre 5 y 30 letras o números, sin espacios.',
+    )
   }
   if (control.name === 'email' && value && !isEmailDomainValid(value)) {
     control.setCustomValidity('Revisa el dominio del correo (ejemplo: nombre@dominio.com).')
@@ -116,8 +121,11 @@ function controlError(control: HTMLInputElement | HTMLSelectElement, documentTyp
   if (control.name === 'birthDate' && value && !isAllowedBirthDate(value)) {
     control.setCustomValidity('Selecciona una fecha real entre 1900 y hoy.')
   }
-  if ((control.name === 'phone' || control.name === 'emergencyPhone') &&
-      value && !/^\d{10}$/.test(normalizeColombianPhone(value))) {
+  if (
+    (control.name === 'phone' || control.name === 'emergencyPhone') &&
+    value &&
+    !/^\d{10}$/.test(normalizeColombianPhone(value))
+  ) {
     control.setCustomValidity('Escribe un teléfono de 10 dígitos.')
   }
   if (control.checkValidity()) return null
@@ -149,7 +157,7 @@ export function RegistrationForm() {
       delete next[name]
       return next
     })
-    setEditedSinceResponse((current) => current.includes(name) ? current : [...current, name])
+    setEditedSinceResponse((current) => (current.includes(name) ? current : [...current, name]))
   }
 
   function chooseParticipation(mode: 'solo' | 'crew') {
@@ -186,7 +194,7 @@ export function RegistrationForm() {
 
   function validStep(number: number, focus = number === step) {
     const panel = formRef.current?.querySelector<HTMLElement>(
-      '[data-registration-step="' + number + '"]',
+      `[data-registration-step="${number}"]`,
     )
     const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')
     const nextErrors: Record<string, string[]> = {}
@@ -202,7 +210,9 @@ export function RegistrationForm() {
       }
     }
     setClientErrors((current) => ({
-      ...Object.fromEntries(Object.entries(current).filter(([name]) => stepForError(name) !== number)),
+      ...Object.fromEntries(
+        Object.entries(current).filter(([name]) => stepForError(name) !== number),
+      ),
       ...nextErrors,
     }))
     if (focus) {
@@ -373,7 +383,9 @@ export function RegistrationForm() {
                 required
                 autoComplete="name"
                 onInput={(event) => event.currentTarget.setCustomValidity('')}
-                errors={fieldErrors('fullName') ?? fieldErrors('firstName') ?? fieldErrors('lastName')}
+                errors={
+                    fieldErrors('fullName') ?? fieldErrors('firstName') ?? fieldErrors('lastName')
+                  }
               />
               <div className="grid grid-cols-[100px_minmax(0,1fr)] gap-5">
                 <SelectField
@@ -401,7 +413,9 @@ export function RegistrationForm() {
                   inputMode={isNumericDocumentType(documentType) ? 'numeric' : 'text'}
                   maxLength={30}
                   autoComplete="off"
-                  placeholder={isNumericDocumentType(documentType) ? 'Solo números' : 'Número de documento'}
+                  placeholder={
+                    isNumericDocumentType(documentType) ? 'Solo números' : 'Número de documento'
+                  }
                   onInput={(event) => {
                     if (isNumericDocumentType(documentType)) {
                       event.currentTarget.value = event.currentTarget.value.replace(/\D/g, '')
@@ -462,7 +476,7 @@ export function RegistrationForm() {
           )}
 
           {number === 2 && (
-            <div className={'grid gap-5 ' + motion.stepFields}>
+            <div className={`grid gap-5 ${motion.stepFields}`}>
               <fieldset className="m-0 min-w-0 border-0 p-0">
                 <legend className="mb-3 text-sm font-semibold text-neo-text">
                   ¿Cómo quieres participar?
@@ -480,9 +494,7 @@ export function RegistrationForm() {
                         : 'border-neo-border-strong bg-neo-surface hover:bg-neo-muted-bg')
                     }
                   >
-                    <span className="text-base font-semibold text-neo-text">
-                      Voy por mi cuenta
-                    </span>
+                    <span className="text-base font-semibold text-neo-text">Voy por mi cuenta</span>
                     <span className="text-xs leading-relaxed text-neo-text-secondary">
                       No necesitas pertenecer a ningún grupo.
                     </span>
