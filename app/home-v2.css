@@ -720,7 +720,8 @@
   .v2-story {
     grid-template-columns: 1fr;
     gap: 24px;
-    padding-block: 78px;
+    padding-top: 78px;
+    padding-bottom: 48px;
   }
   .v2-index {
     padding: 0;
@@ -750,6 +751,37 @@
     grid-template-columns: 1fr;
     gap: 4px;
     border-bottom: 0;
+  }
+  /* Mobile stats occupy a single compact row rather than two oversized blocks. */
+  .v2-numbers {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    padding: 32px 0 36px;
+  }
+  .v2-number {
+    min-width: 0;
+    align-content: center;
+    gap: 10px;
+    padding: 6px 10px;
+  }
+  .v2-number + .v2-number {
+    border-left: 1px solid var(--neo-border);
+  }
+  .v2-number:only-child {
+    grid-column: 1 / -1;
+  }
+  .v2-number strong {
+    font-size: clamp(48px, 15vw, 84px);
+    line-height: 0.95;
+    letter-spacing: -0.075em;
+    white-space: nowrap;
+  }
+  .v2-number > span {
+    max-width: 18ch;
+    font-size: clamp(11px, 2.8vw, 12px);
+    line-height: 1.4;
+    letter-spacing: 0.08em;
+    text-wrap: balance;
   }
   .v2-community {
     padding: 86px 0;
