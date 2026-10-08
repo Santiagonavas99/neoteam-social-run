@@ -46,9 +46,24 @@ export function SuccessCard({
 }
 
 const registrationSteps = [
-  { number: 1, label: 'Tus datos', title: 'Primero, hablemos de ti.', hint: 'Estos datos nos ayudan a identificar tu inscripción.' },
-  { number: 2, label: 'Tu comunidad', title: '¿Con quién vas a correr?', hint: 'Ven con tu crew o por tu cuenta. Todos son bienvenidos.' },
-  { number: 3, label: 'Confirmación', title: 'Ya casi estás dentro.', hint: 'Un contacto para emergencias y tus autorizaciones.' },
+  {
+    number: 1,
+    label: 'Tus datos',
+    title: 'Primero, hablemos de ti.',
+    hint: 'Estos datos nos ayudan a identificar tu inscripción.',
+  },
+  {
+    number: 2,
+    label: 'Tu comunidad',
+    title: '¿Con quién vas a correr?',
+    hint: 'Ven con tu crew o por tu cuenta. Todos son bienvenidos.',
+  },
+  {
+    number: 3,
+    label: 'Confirmación',
+    title: 'Ya casi estás dentro.',
+    hint: 'Un contacto para emergencias y tus autorizaciones.',
+  },
 ] as const
 
 function stepForError(name: string): number {
@@ -90,21 +105,21 @@ export function RegistrationForm() {
     setStep(next)
     window.requestAnimationFrame(() => {
       formRef.current?.scrollIntoView({
-        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 'auto'
+          : 'smooth',
         block: 'start',
       })
-      const heading = formRef.current?.querySelector<HTMLElement>('#registration-step-' + next)
+      const heading = formRef.current?.querySelector<HTMLElement>(`#registration-step-${next}`)
       heading?.focus({ preventScroll: true })
     })
   }
 
   function validStep(number: number) {
     const panel = formRef.current?.querySelector<HTMLElement>(
-      '[data-registration-step="' + number + '"]',
+      `[data-registration-step="${number}"]`,
     )
-    const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
-      'input, select',
-    )
+    const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')
     const firstInvalid = Array.from(controls ?? []).find((control) => !control.checkValidity())
     if (!firstInvalid) return true
     firstInvalid.focus()
@@ -122,11 +137,9 @@ export function RegistrationForm() {
     // inside a hidden wizard panel, while the server remains the final authority.
     for (let number = 1; number <= 3; number += 1) {
       const panel = formRef.current?.querySelector<HTMLElement>(
-        '[data-registration-step="' + number + '"]',
+        `[data-registration-step="${number}"]`,
       )
-      const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
-        'input, select',
-      )
+      const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')
       if (Array.from(controls ?? []).some((control) => !control.checkValidity())) {
         event.preventDefault()
         if (number === step) {
@@ -191,7 +204,7 @@ export function RegistrationForm() {
       action={formAction}
       onSubmit={handleSubmit}
       noValidate
-      className={cardClass + ' scroll-mt-6'}
+      className={`${cardClass} scroll-mt-6`}
     >
       <div className="flex items-center justify-between gap-4">
         <Eyebrow>INSCRIPCIÓN GRATUITA</Eyebrow>
@@ -223,19 +236,19 @@ export function RegistrationForm() {
       </ol>
 
       {registrationSteps.map(({ number, title, hint }) => (
-        <div
+        <section
           key={number}
           data-registration-step={number}
           hidden={step !== number}
           className="mt-8"
-          aria-labelledby={'registration-step-' + number}
+          aria-labelledby={`registration-step-${number}`}
         >
           <div className="mb-6 border-b border-neo-border pb-5">
             <span className="text-xs font-bold uppercase tracking-[0.13em] text-neo-accent-text">
               0{number} / 03
             </span>
             <h2
-              id={'registration-step-' + number}
+              id={`registration-step-${number}`}
               tabIndex={-1}
               className="mb-2 mt-2 text-[clamp(24px,4vw,34px)] font-bold leading-tight tracking-[-0.045em]"
             >
@@ -377,8 +390,8 @@ export function RegistrationForm() {
                 />
               )}
               <p className="m-0 text-xs leading-normal text-neo-text-secondary">
-                Esta información solo nos ayuda a organizar a los crews invitados. Tu registro
-                es individual y gratuito.
+                Esta información solo nos ayuda a organizar a los crews invitados. Tu registro es
+                individual y gratuito.
               </p>
             </div>
           )}
@@ -421,8 +434,8 @@ export function RegistrationForm() {
                   required
                   errors={errors?.privacyAccepted}
                 >
-                  Acepto el tratamiento de mis datos para gestionar mi participación en Social
-                  Run NeoTeam.
+                  Acepto el tratamiento de mis datos para gestionar mi participación en Social Run
+                  NeoTeam.
                 </CheckboxField>
                 <CheckboxField
                   name="marketingAccepted"
@@ -434,7 +447,7 @@ export function RegistrationForm() {
               </div>
             </>
           )}
-        </div>
+        </section>
       ))}
 
       {state.message && <FormMessage>{state.message}</FormMessage>}
