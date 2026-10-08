@@ -42,7 +42,7 @@ function escapeHtml(value: string) {
 }
 
 // The race bib from the site, as tables with inline styles so Gmail and Outlook render it.
-export function sendPassEmail(row: PassRecipient) {
+export function sendPassEmail(row: PassRecipient, options: { idempotencyKey?: string } = {}) {
   const name = escapeHtml(row.first_name.trim() || 'corredor')
   const fullName = escapeHtml(`${row.first_name} ${row.last_name ?? ''}`.trim() || 'corredor')
   const code = escapeHtml(row.registration_code)
@@ -87,5 +87,5 @@ export function sendPassEmail(row: PassRecipient) {
       { filename: 'pase-qr.gif', content: qrGifBase64(row.checkin_token), content_id: 'pass-qr' },
       { filename: 'neoteam.png', content: PASS_LOGO_PNG_BASE64, content_id: 'pass-logo' },
     ],
-  })
+  }, options)
 }
