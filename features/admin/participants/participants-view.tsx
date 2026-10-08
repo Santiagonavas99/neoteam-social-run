@@ -91,8 +91,8 @@ export function ParticipantsView() {
   useEffect(() => {
     let mounted = true
     callAdmin<ParticipantGroupOption>('adminData', {
-      resource: 'participants',
-      operation: 'options',
+      resource: 'groups',
+      operation: 'list',
     })
       .then((response) => {
         if (mounted) setGroups(response.rows ?? [])
