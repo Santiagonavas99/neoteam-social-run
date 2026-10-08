@@ -462,53 +462,102 @@ export function RegistrationForm() {
           )}
 
           {number === 2 && (
-            <div className={`grid gap-5 ${motion.stepFields}`}>
-              <div className="flex items-start gap-3 rounded-control border border-neo-border bg-neo-muted-bg px-4 py-4">
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neo-surface text-neo-accent-text">
-                  <UsersRound aria-hidden className="size-5" />
-                </span>
-                <div className="min-w-0">
-                  <p className="m-0 text-sm font-semibold text-neo-text">
-                    ¿No tienes crew? También eres bienvenido.
-                  </p>
-                  <p className="m-0 mt-1 text-[13px] leading-normal text-neo-text-secondary">
-                    Selecciona “Voy por mi cuenta” y únete al Social Run. No necesitas pertenecer a
-                    NeoTeam ni a otro grupo.
-                  </p>
+            <div className={'grid gap-5 ' + motion.stepFields}>
+              <fieldset className="m-0 min-w-0 border-0 p-0">
+                <legend className="mb-3 text-sm font-semibold text-neo-text">
+                  ¿Cómo quieres participar?
+                </legend>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    data-participation-choice
+                    aria-pressed={participationMode === 'solo'}
+                    onClick={() => chooseParticipation('solo')}
+                    className={
+                      'flex min-h-24 w-full flex-col items-start justify-center gap-1 rounded-control border p-4 text-left transition-colors ' +
+                      (participationMode === 'solo'
+                        ? 'border-neo-accent-text bg-neo-muted-bg'
+                        : 'border-neo-border-strong bg-neo-surface hover:bg-neo-muted-bg')
+                    }
+                  >
+                    <span className="text-base font-semibold text-neo-text">
+                      Voy por mi cuenta
+                    </span>
+                    <span className="text-xs leading-relaxed text-neo-text-secondary">
+                      No necesitas pertenecer a ningún grupo.
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    data-participation-choice
+                    aria-pressed={participationMode === 'crew'}
+                    onClick={() => chooseParticipation('crew')}
+                    className={
+                      'flex min-h-24 w-full flex-col items-start justify-center gap-1 rounded-control border p-4 text-left transition-colors ' +
+                      (participationMode === 'crew'
+                        ? 'border-neo-accent-text bg-neo-muted-bg'
+                        : 'border-neo-border-strong bg-neo-surface hover:bg-neo-muted-bg')
+                    }
+                  >
+                    <span className="flex items-center gap-2 text-base font-semibold text-neo-text">
+                      <UsersRound aria-hidden className="size-4" />
+                      Voy con mi running crew
+                    </span>
+                    <span className="text-xs leading-relaxed text-neo-text-secondary">
+                      Elige tu grupo o agrega uno nuevo.
+                    </span>
+                  </button>
                 </div>
-              </div>
-              <SelectField
-                name="runningGroup"
-                label="¿Con qué running crew participarás?"
-                value={runningGroup}
-                onChange={(event) => setRunningGroup(event.target.value)}
-                required
-                errors={errors?.runningGroup}
-              >
-                <option value="" disabled>
-                  Selecciona tu opción
-                </option>
-                {RUNNING_GROUP_OPTIONS.map((group) => (
-                  <option key={group.value} value={group.value}>
-                    {group.label}
-                  </option>
-                ))}
-                <option value="independiente">Voy por mi cuenta (sin crew)</option>
-                <option value="otro">Mi crew no aparece en la lista</option>
-              </SelectField>
-              {runningGroup === 'otro' && (
-                <TextField
-                  name="otherRunningGroup"
-                  label="¿Cómo se llama tu running crew?"
-                  defaultValue={values?.otherRunningGroup}
-                  required
-                  placeholder="Escribe el nombre de tu grupo"
-                  errors={errors?.otherRunningGroup}
-                />
+                {!participationMode && (
+                  <FieldError name="runningGroup" errors={fieldErrors('runningGroup')} />
+                )}
+              </fieldset>
+              {participationMode === 'solo' && (
+                <>
+                  <input type="hidden" name="runningGroup" value="independiente" />
+                  <p className="m-0 text-sm text-neo-text-secondary">
+                    Perfecto. Puedes correr por tu cuenta y compartir la experiencia con todos.
+                  </p>
+                </>
+              )}
+              {participationMode === 'crew' && (
+                <>
+                  <SelectField
+                    name="runningGroup"
+                    label="Selecciona tu running crew"
+                    value={runningGroup === 'independiente' ? '' : runningGroup}
+                    onChange={(event) => {
+                      setRunningGroup(event.target.value)
+                      clearFieldError('runningGroup')
+                    }}
+                    required
+                    errors={fieldErrors('runningGroup')}
+                  >
+                    <option value="" disabled>
+                      Selecciona un grupo
+                    </option>
+                    {RUNNING_GROUP_OPTIONS.map((group) => (
+                      <option key={group.value} value={group.value}>
+                        {group.label}
+                      </option>
+                    ))}
+                    <option value="otro">Mi crew no aparece en la lista</option>
+                  </SelectField>
+                  {runningGroup === 'otro' && (
+                    <TextField
+                      name="otherRunningGroup"
+                      label="Nombre de tu running crew"
+                      defaultValue={values?.otherRunningGroup}
+                      maxLength={120}
+                      required
+                      placeholder="Escribe el nombre de tu grupo"
+                      errors={fieldErrors('otherRunningGroup')}
+                    />
+                  )}
+                </>
               )}
               <p className="m-0 text-xs leading-normal text-neo-text-secondary">
-                Esta elección nos ayuda a organizar los grupos. Tu inscripción es individual y
-                gratuita.
+                La inscripción es individual, gratuita y abierta a todos los corredores.
               </p>
             </div>
           )}
