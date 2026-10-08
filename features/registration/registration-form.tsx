@@ -453,9 +453,8 @@ export function RegistrationForm() {
                   onChange={(event) => {
                     const nextDocumentType = event.target.value
                     setDocumentType(nextDocumentType)
-                    const document = formRef.current?.querySelector<HTMLInputElement>(
-                      '[name="documentNumber"]',
-                    )
+                    const document =
+                      formRef.current?.querySelector<HTMLInputElement>('[name="documentNumber"]')
                     if (document) {
                       if (isNumericDocumentType(nextDocumentType)) {
                         document.value = digitsOnlyInput(document.value)
