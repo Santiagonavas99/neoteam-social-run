@@ -39,11 +39,16 @@ function emailIsValid(value: string) {
 
 function validDate(value: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value < '1900-01-01') return false
-  const parsed = new Date(value + 'T00:00:00Z')
+  const parsed = new Date(`${value}T00:00:00Z`)
   const today = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit',
+    timeZone: 'America/Bogota',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
   }).format(new Date())
-  return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value && value <= today
+  return (
+    !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value && value <= today
+  )
 }
 
 function phone(value: string) {
@@ -51,9 +56,9 @@ function phone(value: string) {
   return digits.length === 12 && digits.startsWith('57') ? digits.slice(2) : digits
 }
 
-export function validateParticipantProfile(value: unknown):
-  | { ok: true; profile: ParticipantProfile }
-  | { ok: false; error: string } {
+export function validateParticipantProfile(
+  value: unknown,
+): { ok: true; profile: ParticipantProfile } | { ok: false; error: string } {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return { ok: false, error: 'Los datos del participante están incompletos.' }
   }
@@ -73,22 +78,31 @@ export function validateParticipantProfile(value: unknown):
     emergency_name: stringValue(input, 'emergency_name'),
     emergency_phone: phone(stringValue(input, 'emergency_phone')),
   }
-  if ([profile.first_name, profile.last_name].some(v => v.length < 2 || v.length > 80)) {
+  if ([profile.first_name, profile.last_name].some((v) => v.length < 2 || v.length > 80)) {
     return { ok: false, error: 'Nombre y apellidos: escribe entre 2 y 80 caracteres.' }
   }
-  if (!DOC_TYPES.has(profile.document_type)) return { ok: false, error: 'Tipo de documento inválido.' }
-  const documentPattern = NUMERIC_DOCUMENTS.has(profile.document_type) ? /^\d{5,30}$/ : /^[a-z\d]{5,30}$/i
+  if (!DOC_TYPES.has(profile.document_type))
+    return { ok: false, error: 'Tipo de documento inválido.' }
+  const documentPattern = NUMERIC_DOCUMENTS.has(profile.document_type)
+    ? /^\d{5,30}$/
+    : /^[a-z\d]{5,30}$/i
   if (!documentPattern.test(profile.document_number)) {
     return { ok: false, error: 'Revisa el documento: debe tener entre 5 y 30 caracteres válidos.' }
   }
   if (!emailIsValid(profile.email)) {
-    return { ok: false, error: 'Escribe un correo con dominio válido, por ejemplo nombre@dominio.com.' }
+    return {
+      ok: false,
+      error: 'Escribe un correo con dominio válido, por ejemplo nombre@dominio.com.',
+    }
   }
   if (!/^\d{10}$/.test(profile.phone) || !/^\d{10}$/.test(profile.emergency_phone)) {
     return { ok: false, error: 'Los celulares deben contener 10 dígitos, sin letras.' }
   }
   if (profile.birth_date && !validDate(profile.birth_date)) {
-    return { ok: false, error: 'Fecha de nacimiento inválida: selecciona una fecha real hasta hoy.' }
+    return {
+      ok: false,
+      error: 'Fecha de nacimiento inválida: selecciona una fecha real hasta hoy.',
+    }
   }
   if (!GENDERS.has(profile.gender)) return { ok: false, error: 'Género inválido.' }
   if (profile.running_group_id && !UUID.test(profile.running_group_id)) {
