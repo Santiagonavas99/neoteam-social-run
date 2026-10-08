@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { listedExternalRunningGroupName, RUNNING_GROUP_OPTIONS } from './running-groups.ts'
+import { RUNNING_GROUP_OPTIONS } from './running-groups.ts'
 import { registrationSchema } from './schema.ts'
 
 const valid = {
@@ -42,11 +42,23 @@ test('accepts every listed running crew', () => {
   }
 })
 
-test('maps listed external crews to the exact stored name', () => {
-  assert.equal(listedExternalRunningGroupName('byrunners'), 'ByRunners')
-  assert.equal(listedExternalRunningGroupName('guabinas-run-club'), 'Guabinas Run Club')
-  assert.equal(listedExternalRunningGroupName('neoteam'), null)
-  assert.equal(listedExternalRunningGroupName('otro'), null)
+test('uses the canonical database slugs for listed crews', () => {
+  assert.deepEqual(
+    RUNNING_GROUP_OPTIONS.map((group) => group.value),
+    [
+      'byrunners',
+      'el-cartel-running-club',
+      'run-365',
+      'neoteam',
+      'pacific-runners',
+      'beer-runners',
+      'integral-fit',
+      'running-social',
+      'united-runner-club',
+      'guabinas-run-club',
+      'pace-running',
+    ],
+  )
 })
 
 test('requires the group name when the group is "otro"', () => {

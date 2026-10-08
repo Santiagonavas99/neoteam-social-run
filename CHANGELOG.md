@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.28.1] - 2026-10-07
+
+### Fixed
+
+- **Running crews selected at registration now use their real group records.** Neo Team no longer shows as Independiente, listed crews save the correct relation, and only "Otro grupo / crew" is stored as free text. Known group slugs now match the database, and invalid slugs are rejected.
+
 ## [0.28.0] - 2026-10-07
 
 ### Added
