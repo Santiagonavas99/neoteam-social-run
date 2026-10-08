@@ -1,4 +1,12 @@
-import { ArrowUpRight, CalendarDays, Camera, Clock, ImageDown, MapPin, MessageCircle } from 'lucide-react'
+import {
+  ArrowUpRight,
+  CalendarDays,
+  Camera,
+  Clock,
+  ImageDown,
+  MapPin,
+  MessageCircle,
+} from 'lucide-react'
 import Image from 'next/image'
 import { NeoTeamLogo } from '@/components/neoteam-logo'
 import { communityLinks } from '@/features/event/community-links'
