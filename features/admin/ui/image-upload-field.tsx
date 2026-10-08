@@ -1,13 +1,12 @@
 import { ImagePlus, ImageUp } from 'lucide-react'
 import { type ChangeEvent, useState } from 'react'
+import { convertImageToWebp } from './image-processing'
 import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
 import type { FeedbackValue } from '../types'
 import { Logo } from './admin-ui'
 
-const MAX_IMAGE_BYTES = 4 * 1024 * 1024
-
-function readFileAsBase64(file: File) {
+function readFileAsBase64(file: Blob) {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => resolve(String(reader.result).split(',')[1] ?? '')
@@ -32,19 +31,19 @@ export function useImageUpload({
     const input = event.currentTarget
     const file = input.files?.[0]
     if (!file) return
-    if (file.size > MAX_IMAGE_BYTES) {
-      setFeedback({ kind: 'error', text: 'La imagen debe pesar menos de 4 MB.' })
-      input.value = ''
-      return
-    }
     setUploading(true)
     setFeedback(null)
     try {
-      const content = await readFileAsBase64(file)
-      const result = await callAdmin('uploadAdminImage', { mime: file.type, content })
+      const webp = await convertImageToWebp(file)
+      const content = await readFileAsBase64(webp)
+      const result = await callAdmin('uploadAdminImage', { mime: 'image/webp', content })
       if (!result.url) throw new Error('No pudimos obtener la imagen subida.')
       onUploaded(result.url)
-      setFeedback({ kind: 'success', text: successText })
+      const savings = Math.round((1 - webp.size / file.size) * 100)
+      setFeedback({
+        kind: 'success',
+        text: `${successText} ${savings > 0 ? `WEBP optimizado: ${savings}% menos peso.` : 'Imagen convertida a WEBP.'}`,
+      })
     } catch (error) {
       setFeedback({ kind: 'error', text: errorMessage(error, 'No pudimos subir la imagen.') })
     } finally {
@@ -83,15 +82,15 @@ export function ImageUploadField({
           ) : (
             <ImagePlus aria-hidden className="size-4 shrink-0" />
           )}
-          {uploading ? 'Subiendo imagen…' : `${url ? 'Cambiar' : 'Añadir'} ${noun}`}
+          {uploading ? 'Convirtiendo y subiendo imagen…' : `${url ? 'Cambiar' : 'Añadir'} ${noun}`}
         </strong>
         <small className="font-normal text-neo-text-secondary">{hint}</small>
         <input
           className="min-h-11 border-0! bg-transparent! px-0! py-1! text-xs! file:mr-3 file:min-h-9 file:cursor-pointer file:rounded-[6px] file:border file:border-solid file:border-neo-border-strong file:bg-neo-surface file:px-3 file:py-1.5 file:text-neo-text"
           type="file"
-          accept="image/png,image/jpeg,image/webp"
+          accept="image/*,.heic,.heif"
           onChange={(event) => void onChange(event)}
-          aria-label="Seleccionar logo"
+          aria-label={`Seleccionar ${noun}`}
         />
       </span>
     </label>

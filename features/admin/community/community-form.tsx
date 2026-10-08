@@ -102,7 +102,7 @@ export function CommunityForm({
         name={values.name}
         uploading={uploading}
         noun="logo"
-        hint="PNG, JPG o WEBP · máximo 4 MB"
+        hint="JPG, PNG, HEIC, AVIF y más según navegador · WEBP automático · origen hasta 40 MB"
         onChange={upload}
       />
       <label className="check-label">
