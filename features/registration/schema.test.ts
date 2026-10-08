@@ -110,4 +110,16 @@ test('requires the category to be female or male', () => {
   assert.deepEqual(errorPaths({ ...valid, gender: undefined }), ['gender'])
   assert.deepEqual(errorPaths({ ...valid, gender: 'other' }), ['gender'])
   assert.deepEqual(errorPaths({ ...valid, gender: 'male' }), [])
+  const missing = registrationSchema.safeParse({ ...valid, gender: undefined })
+  assert.equal(missing.success, false)
+  if (!missing.success) {
+    assert.equal(missing.error.issues[0]?.message, 'Selecciona tu género de nacimiento.')
+  }
+})
+
+test('accepts independent runners without an associated crew', () => {
+  assert.equal(
+    registrationSchema.safeParse({ ...valid, runningGroup: 'independiente' }).success,
+    true,
+  )
 })

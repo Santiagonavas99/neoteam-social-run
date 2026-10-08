@@ -8,7 +8,7 @@ export default function RegistrationPage() {
   return (
     <RegistrationShell
       title={['Reserva', 'tu lugar.']}
-      intro="El registro es gratuito y toma menos de dos minutos. Estos datos nos permitirán organizar asistentes, grupos invitados, check-in y rifas."
+      intro="Regístrate gratis en tres pasos: tus datos, tu running crew (o participación independiente) y un contacto de emergencia. Al final podrás confirmar tu inscripción."
       facts={[...eventFacts, { icon: Users, label: 'Formato', value: 'Social Run · comunidad' }]}
       aside={
         <Link href="/pase" className={`${linkClass} mt-2`}>
