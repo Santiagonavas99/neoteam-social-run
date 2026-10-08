@@ -1,15 +1,6 @@
-import {
-  ArrowUpRight,
-  CalendarDays,
-  Camera,
-  Clock,
-  ImageDown,
-  MapPin,
-  MessageCircle,
-} from 'lucide-react'
+import { CalendarDays, Clock, ImageDown, MapPin } from 'lucide-react'
 import Image from 'next/image'
 import { NeoTeamLogo } from '@/components/neoteam-logo'
-import { communityLinks } from '@/features/event/community-links'
 import { passFacts } from '@/features/event/pass-facts'
 import { CalendarButton } from './calendar-button'
 import googleWalletButton from './google-wallet-button.svg'
@@ -97,43 +88,6 @@ export function PassCard({ pass }: { pass: Pass }) {
       <p className="m-0 text-sm leading-normal text-neo-text-secondary">
         Toma una captura de pantalla: es tu entrada para el check-in.
       </p>
-
-      <aside
-        aria-label="Canales de la comunidad NeoTeam"
-        className="mt-5 w-full max-w-90 rounded-card border border-neo-border bg-neo-muted-bg p-5 text-left"
-      >
-        <p className="m-0 text-[11px] font-bold tracking-[0.14em] text-neo-accent-text uppercase">
-          SIGAMOS CONECTADOS
-        </p>
-        <h3 className="m-0 mt-2 text-xl font-bold tracking-[-0.04em] text-neo-text">
-          La comunidad sigue corriendo.
-        </h3>
-        <p className="m-0 mt-2 text-sm leading-normal text-neo-text-secondary">
-          Súmate al grupo y acompáñanos también en Instagram.
-        </p>
-        <div className="mt-5 grid gap-2">
-          <a
-            href={communityLinks.whatsapp}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-control bg-neo-accent px-4 py-3 text-sm font-bold text-neo-black transition-transform active:scale-[0.98]"
-          >
-            <MessageCircle aria-hidden className="size-4 shrink-0" />
-            Unirme al WhatsApp
-            <ArrowUpRight aria-hidden className="size-4 shrink-0" />
-          </a>
-          <a
-            href={communityLinks.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-control border border-neo-border bg-neo-surface px-4 py-3 text-sm font-semibold text-neo-text transition-transform active:scale-[0.98]"
-          >
-            <Camera aria-hidden className="size-4 shrink-0" />
-            Seguir @neoteam_cali
-            <ArrowUpRight aria-hidden className="size-4 shrink-0" />
-          </a>
-        </div>
-      </aside>
     </div>
   )
 }
