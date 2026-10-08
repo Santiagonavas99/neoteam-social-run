@@ -399,13 +399,6 @@
   color: var(--neo-accent-dark);
 }
 
-.footerNote {
-  margin: 18px 0 0 48px;
-  color: var(--neo-text-secondary);
-  font-size: 11px;
-  line-height: 1.5;
-}
-
 /* Desktop: remove only the underline beneath DOM 18; keep the vertical timeline. */
 @media (min-width: 1025px) {
   .boardTop {
@@ -550,9 +543,6 @@
     font-size: 12px;
   }
 
-  .footerNote {
-    margin-left: 31px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
