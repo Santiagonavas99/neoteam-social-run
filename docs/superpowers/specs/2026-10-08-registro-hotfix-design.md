@@ -10,7 +10,8 @@ El registro permite letras para CC/CE/TI/PPT, dominios de correo incompletos y f
 
 - Validar en cliente al salir de cada campo y durante la corrección de errores ya marcados, sin mostrar advertencias en campos intactos. Al pulsar Continuar, validar todos los campos del paso, mostrar el resumen en ese paso y bloquear el avance con errores. El servidor repite la validación antes del RPC.
 - Documentos CC/CE/TI/PPT: entre 5 y 30 dígitos. Pasaporte y Otro: identificadores alfanuméricos de 5 a 30 caracteres, para no excluir documentos válidos.
-- Correo: sintaxis válida más dominio público con al menos un punto y TLD alfabético de 2 o más caracteres. No se garantiza existencia de buzón/DNS sin verificación por correo.
+- Correo: sintaxis válida más dominio público con al menos un punto y extensión de dominio delegada por IANA (snapshot de las 1.437 extensiones de octubre de 2026). Rechazar .commmm y conservar extensiones reales largas. No se garantiza existencia de buzón o del dominio específico sin verificación por correo.
+- Quitar el placeholder redundante «Solo números» del documento; el tipo de documento sigue controlando las restricciones.
 - Fecha: fecha calendario real, entre 1900-01-01 y el día presente de Colombia (no edad mínima sin una política de participación aprobada).
 - Comunidad: primero «Voy por mi cuenta» o «Voy con un running crew». El primer camino guarda independiente; el segundo muestra el listado actual y el campo para otro crew. No preseleccionar equipo.
 - WhatsApp y teléfono de emergencia: filtrar caracteres no numéricos al escribir y pegar. Conservar la normalización de autocompletado colombiano +57; rechazar letras en el servidor.
