@@ -49,3 +49,6 @@ The organizer rejected the photographic version after preview. This decision sup
 - Use strong black gradients at the top and bottom of the hero to add depth and fade the grid toward its edges. Preserve the existing cyan radial glow and fine visible grain.
 - At widths up to 760 px omit the central vertical guide entirely, lower the opacity of the horizontal lines and keep the top/bottom fade and cyan glow.
 - Remove `public/hero-runner-monochrome.webp` from the PR altogether, with no external photographic assets or changes to content, agenda or registration.
+
+## Final black-level refinement — approved 2026-10-08
+The organizer approved the subdued grid layout but found that the background looked gray rather than black. Keep the #050505 background and existing cyan radial glows; strengthen the dark vertical vignette, including nontransparent middle stops, on desktop and mobile. Preserve the visible grain without a gray veil by adding a grayscale/high-pass transfer to the existing SVG turbulence, so that most pixels remain black and only brighter noise particles show under the screen blend. Leave markup, mobile route, navigation, reticle layout and color palette unchanged. No new dependencies, photos or external assets.
