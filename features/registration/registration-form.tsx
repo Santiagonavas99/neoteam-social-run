@@ -6,7 +6,6 @@ import type { FormEvent, ReactNode } from 'react'
 import { useActionState, useEffect, useRef, useState } from 'react'
 import { type RegistrationState, registerParticipant } from './actions'
 import { CalendarButton } from './calendar-button'
-import { splitFullName } from './full-name'
 import {
   CheckboxField,
   cardClass,
@@ -17,6 +16,7 @@ import {
   SubmitButton,
   TextField,
 } from './form-ui'
+import { splitFullName } from './full-name'
 import { PassCard } from './pass-card'
 import { RUNNING_GROUP_OPTIONS } from './running-groups'
 import { Streamers } from './streamers'
@@ -132,7 +132,9 @@ export function RegistrationForm() {
       `[data-registration-step="${number}"]`,
     )
     const controls = panel?.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')
-    const firstInvalid = Array.from(controls ?? []).find((control) => !isValidRegistrationControl(control))
+    const firstInvalid = Array.from(controls ?? []).find(
+      (control) => !isValidRegistrationControl(control),
+    )
     if (!firstInvalid) return true
     firstInvalid.focus()
     firstInvalid.reportValidity()
