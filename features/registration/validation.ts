@@ -25,7 +25,9 @@ export function isEmailDomainValid(address: string): boolean {
   const parts = address.trim().split('@')
   if (parts.length !== 2) return false
   const domain = parts[1] ?? ''
-  if (!/^(?:[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?\.)+[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?$/i.test(domain)) {
+  if (
+    !/^(?:[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?\.)+[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?$/i.test(domain)
+  ) {
     return false
   }
   return IANA_TLDS.has(domain.slice(domain.lastIndexOf('.') + 1).toLowerCase())
