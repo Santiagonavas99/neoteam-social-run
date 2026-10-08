@@ -457,11 +457,14 @@ export function RegistrationForm() {
                   required
                   errors={errors?.termsAccepted}
                 >
-                  Declaro que he leído y acepto las condiciones de participación y conozco
-                  los riesgos habituales de esta actividad deportiva.
+                  Declaro que he leído y acepto las condiciones de participación y conozco los
+                  riesgos habituales de esta actividad deportiva.
                 </CheckboxField>
                 <p className="m-0 pl-8 text-xs leading-6 text-neo-text-secondary">
-                  <Link href="/legal/terminos" className="font-semibold underline underline-offset-4">
+                  <Link
+                    href="/legal/terminos"
+                    className="font-semibold underline underline-offset-4"
+                  >
                     Leer condiciones y riesgos de participación
                   </Link>
                 </p>
@@ -475,7 +478,10 @@ export function RegistrationForm() {
                   NeoTeam conforme a las finalidades informadas.
                 </CheckboxField>
                 <p className="m-0 pl-8 text-xs leading-6 text-neo-text-secondary">
-                  <Link href="/legal/privacidad" className="font-semibold underline underline-offset-4">
+                  <Link
+                    href="/legal/privacidad"
+                    className="font-semibold underline underline-offset-4"
+                  >
                     Leer política de tratamiento de datos
                   </Link>
                 </p>
