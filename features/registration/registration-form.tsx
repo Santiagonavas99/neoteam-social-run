@@ -287,6 +287,12 @@ export function RegistrationForm() {
       ref={formRef}
       action={formAction}
       onSubmit={handleSubmit}
+      onInputCapture={(event) => {
+        const target = event.target
+        if (target instanceof HTMLInputElement || target instanceof HTMLSelectElement) {
+          if (target.name) clearFieldError(target.name)
+        }
+      }}
       noValidate
       className={`${cardClass} ${motion.form} scroll-mt-6`}
     >
@@ -346,6 +352,14 @@ export function RegistrationForm() {
             </h2>
             <p className="m-0 text-sm text-neo-text-secondary">{hint}</p>
           </div>
+          {number === step &&
+            (Object.keys(clientErrors).some((name) => stepForError(name) === number) ||
+              Object.keys(errors ?? {}).some(
+                (name) => stepForError(name) === number && !editedSinceResponse.includes(name),
+              )) && <FormMessage>Revisa los campos marcados para continuar.</FormMessage>}
+          {number === step && state.message && !Object.keys(errors ?? {}).length && (
+            <FormMessage>{state.message}</FormMessage>
+          )}
 
           {number === 1 && (
             <div className={`grid gap-5 ${motion.stepFields}`}>
@@ -359,14 +373,18 @@ export function RegistrationForm() {
                 required
                 autoComplete="name"
                 onInput={(event) => event.currentTarget.setCustomValidity('')}
-                errors={errors?.fullName ?? errors?.firstName ?? errors?.lastName}
+                errors={fieldErrors('fullName') ?? fieldErrors('firstName') ?? fieldErrors('lastName')}
               />
               <div className="grid grid-cols-[100px_minmax(0,1fr)] gap-5">
                 <SelectField
                   name="documentType"
                   label="Tipo"
-                  defaultValue={values?.documentType ?? 'CC'}
-                  errors={errors?.documentType}
+                  value={documentType}
+                  onChange={(event) => {
+                    setDocumentType(event.target.value)
+                    clearFieldError('documentNumber')
+                  }}
+                  errors={fieldErrors('documentType')}
                 >
                   <option value="CC">CC</option>
                   <option value="CE">CE</option>
@@ -380,9 +398,16 @@ export function RegistrationForm() {
                   label="Documento"
                   defaultValue={values?.documentNumber}
                   required
-                  inputMode="numeric"
+                  inputMode={isNumericDocumentType(documentType) ? 'numeric' : 'text'}
+                  maxLength={30}
                   autoComplete="off"
-                  errors={errors?.documentNumber}
+                  placeholder={isNumericDocumentType(documentType) ? 'Solo números' : 'Número de documento'}
+                  onInput={(event) => {
+                    if (isNumericDocumentType(documentType)) {
+                      event.currentTarget.value = event.currentTarget.value.replace(/\D/g, '')
+                    }
+                  }}
+                  errors={fieldErrors('documentNumber')}
                 />
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
@@ -393,7 +418,7 @@ export function RegistrationForm() {
                   defaultValue={values?.email}
                   required
                   autoComplete="email"
-                  errors={errors?.email}
+                  errors={fieldErrors('email')}
                 />
                 <TextField
                   name="phone"
@@ -404,7 +429,7 @@ export function RegistrationForm() {
                   defaultValue={values?.phone}
                   required
                   autoComplete="tel"
-                  errors={errors?.phone}
+                  errors={fieldErrors('phone')}
                 />
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
@@ -415,14 +440,16 @@ export function RegistrationForm() {
                   defaultValue={values?.birthDate}
                   required
                   autoComplete="bday"
-                  errors={errors?.birthDate}
+                  min={MIN_BIRTH_DATE}
+                  max={maxBirthDate()}
+                  errors={fieldErrors('birthDate')}
                 />
                 <SelectField
                   name="gender"
                   label="Género de nacimiento"
                   defaultValue={values?.gender ?? ''}
                   required
-                  errors={errors?.gender}
+                  errors={fieldErrors('gender')}
                 >
                   <option value="" disabled>
                     Selecciona
@@ -495,7 +522,7 @@ export function RegistrationForm() {
                   defaultValue={values?.emergencyName}
                   required
                   autoComplete="off"
-                  errors={errors?.emergencyName}
+                  errors={fieldErrors('emergencyName')}
                 />
                 <TextField
                   name="emergencyPhone"
@@ -506,7 +533,7 @@ export function RegistrationForm() {
                   defaultValue={values?.emergencyPhone}
                   required
                   autoComplete="off"
-                  errors={errors?.emergencyPhone}
+                  errors={fieldErrors('emergencyPhone')}
                 />
               </div>
               <div className="border-t border-neo-border pt-3">
@@ -514,7 +541,7 @@ export function RegistrationForm() {
                   name="termsAccepted"
                   defaultChecked={values?.termsAccepted === 'on'}
                   required
-                  errors={errors?.termsAccepted}
+                  errors={fieldErrors('termsAccepted')}
                 >
                   Declaro que he leído y acepto las condiciones de participación y conozco los
                   riesgos habituales de esta actividad deportiva.
@@ -531,7 +558,7 @@ export function RegistrationForm() {
                   name="privacyAccepted"
                   defaultChecked={values?.privacyAccepted === 'on'}
                   required
-                  errors={errors?.privacyAccepted}
+                  errors={fieldErrors('privacyAccepted')}
                 >
                   Autorizo el tratamiento de mis datos para gestionar mi participación en Social Run
                   NeoTeam conforme a las finalidades informadas.
@@ -556,8 +583,6 @@ export function RegistrationForm() {
           )}
         </section>
       ))}
-
-      {state.message && <FormMessage>{state.message}</FormMessage>}
 
       <div
         key={step}
