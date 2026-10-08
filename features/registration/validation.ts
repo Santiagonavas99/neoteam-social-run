@@ -22,7 +22,7 @@ export function isAllowedBirthDate(value: string, today = maxBirthDate()): boole
 export function isEmailDomainValid(address: string): boolean {
   const parts = address.trim().split('@')
   if (parts.length !== 2) return false
-  return /^(?:[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?\.)+[a-z]{2,63}$/i.test(parts[1])
+  return /^(?:[a-z\d](?:[a-z\d-]{0,61}[a-z\d])?\.)+[a-z]{2,63}$/i.test(parts[1] ?? '')
 }
 
 export function isNumericDocumentType(type: string): boolean {
