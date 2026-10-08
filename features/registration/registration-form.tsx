@@ -218,11 +218,7 @@ export function RegistrationForm() {
         className="m-0 mt-6 grid list-none grid-cols-3 gap-3 p-0 sm:gap-4"
       >
         {registrationSteps.map(({ number, label }) => (
-          <li
-            key={number}
-            aria-current={step === number ? 'step' : undefined}
-            className="min-w-0"
-          >
+          <li key={number} aria-current={step === number ? 'step' : undefined} className="min-w-0">
             <span
               aria-hidden
               className={
