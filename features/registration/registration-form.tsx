@@ -213,24 +213,35 @@ export function RegistrationForm() {
         </span>
       </div>
 
-      <ol aria-label="Progreso de inscripción" className="mt-5 grid grid-cols-3 gap-2">
+      <ol
+        aria-label="Progreso de inscripción"
+        className="m-0 mt-6 grid list-none grid-cols-3 gap-3 p-0 sm:gap-4"
+      >
         {registrationSteps.map(({ number, label }) => (
-          <li key={number} aria-current={step === number ? 'step' : undefined} className="min-w-0">
+          <li
+            key={number}
+            aria-current={step === number ? 'step' : undefined}
+            className="min-w-0"
+          >
             <span
               aria-hidden
               className={
-                'block h-1 rounded-full ' +
+                'block h-1.5 w-full rounded-full ' +
                 (number <= step ? 'bg-neo-accent-text' : 'bg-neo-border')
               }
             />
-            <span
+            <div
               className={
-                'mt-2 block text-[11px] leading-tight sm:text-xs ' +
+                'mt-3 flex min-w-0 flex-col gap-1 ' +
                 (number === step ? 'font-bold text-neo-text' : 'text-neo-text-secondary')
               }
             >
-              {label}
-            </span>
+              <span className="text-xs font-semibold tabular-nums">0{number}</span>
+              <span className="text-[11px] leading-snug sm:hidden">
+                {number === 1 ? 'Datos' : number === 2 ? 'Crew' : 'Confirmar'}
+              </span>
+              <span className="hidden text-xs leading-snug sm:block">{label}</span>
+            </div>
           </li>
         ))}
       </ol>
