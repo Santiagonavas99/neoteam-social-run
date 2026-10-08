@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   ListOrdered,
   type LucideIcon,
+  Mail,
   Tag,
   UserCheck,
   UserCog,
@@ -18,6 +19,7 @@ export type AdminSection =
   | 'home-order'
   | 'logos'
   | 'participants'
+  | 'email-queue'
   | 'groups'
   | 'brands'
   | 'dynamics'
@@ -66,6 +68,13 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     icon: Users,
     group: 'event',
     primary: true,
+  },
+  {
+    id: 'email-queue',
+    label: 'Correos pendientes',
+    description: 'Recupera pases no enviados y prepara una tanda manual para el día siguiente.',
+    icon: Mail,
+    group: 'event',
   },
   {
     id: 'dynamics',

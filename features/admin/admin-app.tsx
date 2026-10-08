@@ -10,6 +10,7 @@ import { HomeOrderView } from './home-order/home-order-view'
 import { LogosView } from './logos/logos-view'
 import { OverviewView } from './overview/overview-view'
 import { ParticipantsView } from './participants/participants-view'
+import { PendingEmailsView } from './participants/pending-emails-view'
 import { type AdminSection, sectionsFor } from './sections'
 import { AdminShell } from './shell/admin-shell'
 import { TeamView } from './team/team-view'
@@ -39,6 +40,8 @@ export function AdminApp({ enableLegacyWebpMigration }: { enableLegacyWebpMigrat
         <TeamView />
       ) : section === 'participants' ? (
         <ParticipantsView />
+      ) : section === 'email-queue' ? (
+        <PendingEmailsView />
       ) : section === 'groups' || section === 'brands' ? (
         <CommunityView key={section} resource={section} />
       ) : section === 'dynamics' ? (

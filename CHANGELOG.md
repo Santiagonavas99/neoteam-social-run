@@ -7,13 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.29.3] - 2026-10-08
+## [0.30.1] - 2026-10-08
 
 ### Fixed
 
 - **The registration wizard validates fields as soon as people leave them and keeps feedback live while they fix an error.** Invalid names, documents, emails, phones, dates and authorizations show guidance next to the affected field without waiting for Continue. A step summary still appears when progression is blocked.
 - **Document numbers, WhatsApp phones, real IANA email extensions and birth dates receive stricter checks in the browser and on the server.** Numeric IDs reject letters, passports retain alphanumeric support, WhatsApp and emergency phone inputs strip non-digits on entry, server validation rejects letters while preserving formatted Colombian autofill, emails require a delegated IANA TLD instead of merely a plausible extension like .commmm, the redundant numeric document placeholder is removed, and dates must be real and between 1900 and today.
 - **Running crew selection starts with a clear choice.** Participants can register independently or select an existing crew, with a separate field when their crew is missing from the list.
+
+
+## [0.30.0] - 2026-10-08
+
+### Added
+
+- **Admin queue for passes that Resend did not accept:** Correos pendientes shows active unemailed registrations, accepted sends and last-attempt failures, ordered oldest first.
+- **Manual email batches:** administrators confirm up to 10 serial deliveries, with progress and feedback. Sending stops when Resend responds that the shared daily quota has been reached.
+- **Retry safeguards:** pending-pass claims are conditional to prevent overlapping first-pass sends, Resend idempotency keys help protect retries, and safe last-error codes remain visible for troubleshooting.
+
+### Changed
+
+- **Reenviar pase** on an already emailed registration continues to work; initial emails still pending must use the new queue to prevent duplicate concurrent sends.
 
 
 ## [0.29.2] - 2026-10-08
