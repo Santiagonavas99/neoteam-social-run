@@ -74,11 +74,7 @@
       color-mix(in srgb, var(--neo-white) 6%, transparent) 50%,
       transparent calc(50% + 1px)
     ),
-    linear-gradient(
-      0deg,
-      color-mix(in srgb, var(--neo-white) 5%, transparent) 1px,
-      transparent 1px
-    ),
+    linear-gradient(0deg, color-mix(in srgb, var(--neo-white) 5%, transparent) 1px, transparent 1px),
     radial-gradient(
       ellipse 58% 76% at 24% 70%,
       color-mix(in srgb, var(--neo-accent) 23%, transparent),
