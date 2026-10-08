@@ -17,6 +17,7 @@ export function FieldError({ name, errors }: { name: string; errors?: string[] }
   return (
     <small
       id={errorId(name)}
+      role="alert"
       className="inline-flex items-start gap-1 text-xs font-medium leading-snug text-neo-danger"
     >
       <CircleAlert aria-hidden className="mt-px size-3.5 shrink-0" />
