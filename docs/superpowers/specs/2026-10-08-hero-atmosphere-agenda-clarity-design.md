@@ -9,7 +9,7 @@ The existing hero uses a repeating grid of vertical and horizontal lines, which 
 
 ## Design decision
 1. Keep the top hero date chip ("18 OCT · 2026") and the oversized agenda date signature on the lower left ("18", "OCT / DOMINGO", "2026 · CALI, COLOMBIA"). Use relevant information rather than another date in the sticky agenda board header: "5K / RUTA SOCIAL", preserving the activity count and hours on its right.
-2. Keep the hero metadata's time ("07:30 A. M.") and distance ("5K SOCIAL"), and add "PARQUE DEL INGENIO" as a separate complementary chip with a MapPin icon. On narrow screens, arrange these four facts as two rows of two; ensure text wraps safely and remains readable.
+2. Keep the new separate mobile route section introduced on main; remove its duplicate 18 OCT label in favor of CALI, COLOMBIA. Keep the hero metadata's time ("07:30 A. M.") and distance ("5K SOCIAL"), and add "PARQUE DEL INGENIO" as a separate complementary chip with a MapPin icon. On narrow screens, arrange these four facts as two rows of two; ensure text wraps safely and remains readable.
 3. Replace the CSS-grid background with one or two low-opacity cyan radial glows and an almost imperceptible fine-grain texture. Keep the hero black, typography, CTA, route-card and footer dividers; those two functional rules are sufficient. No extra animation.
 4. Delete the footer note at the bottom of the agenda and its now-unused CSS.
 5. Keep all copy in Spanish, focus, reveal, light/dark behavior and 60s ISR untouched.
