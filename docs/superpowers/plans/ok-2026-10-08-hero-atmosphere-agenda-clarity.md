@@ -14,3 +14,5 @@ Approved: user expressly requested implementation and a pull request for the thr
 6. In `features/home/sections/agenda.tsx` and `agenda.module.css`, show `AGENDA` prominently and `5K · RUTA SOCIAL` smaller; stack on phones and preserve right-side activity count and time.
 7. In `features/home/sections/hero.tsx` and `app/home-v2.css`, restore the three original metadata chips and the compact two-then-one mobile layout; increase cyan radial glow and fine static grain prominence without touching route card, CTA, or structure.
 8. Revise the `0.29.0` `CHANGELOG.md` entry to reflect the approved final content. Retest the updated PR with GitHub Actions and Vercel; do not publish to production.
+
+9. **Approved grain visibility adjustment:** in `app/home-v2.css` change only SVG grain tile 160→120, frequency .82→.9, overlay opacity .13→.18; keep radial glow untouched. Update changelog and spec, rerun PR checks and Vercel preview.

@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Stronger, calmer Social Run hero:** replaces the heavy background grid with a clearly visible cyan ambient glow and fine static grain, without changing the CTA, route card or editorial typography.
+- **Stronger, calmer Social Run hero:** replaces the heavy background grid with a clearly visible cyan ambient glow and more pronounced, tighter static grain, without changing the CTA, route card or editorial typography.
 - **Original hero facts restored:** the three original date, time and 5K chips remain, with the mobile two-then-one arrangement; the location stays in the route card rather than in a redundant fourth chip.
 - **Agenda with a clear title:** the board now leads with AGENDA and uses 5K · RUTA SOCIAL as secondary context, while keeping the big date on the left and activity count/times on the right. The redundant note below the timeline is removed.
 
