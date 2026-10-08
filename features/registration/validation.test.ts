@@ -8,6 +8,7 @@ import {
   MIN_BIRTH_DATE,
   maxBirthDate,
   normalizeColombianPhone,
+  digitsOnlyInput,
 } from './validation.ts'
 
 test('birth dates must exist and stay between 1900 and the current date in Colombia', () => {
@@ -47,6 +48,12 @@ test('numeric identification rejects letters without rejecting alphanumeric pass
   assert.equal(isValidDocumentNumber('AB123456', 'PA'), true)
   assert.equal(isValidDocumentNumber('123', 'PA'), false)
   assert.equal(isValidDocumentNumber('123 456', 'OTRO'), false)
+})
+
+test('numeric-only inputs discard letters and formatting on paste and autofill', () => {
+  assert.equal(digitsOnlyInput('sasa'), '')
+  assert.equal(digitsOnlyInput('300abc1234567'), '3001234567')
+  assert.equal(digitsOnlyInput('+57 300 123 4567'), '573001234567')
 })
 
 test('phone normalization retains complete Colombian numbers', () => {
