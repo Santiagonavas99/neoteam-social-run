@@ -132,10 +132,7 @@ test('rejects letters in numeric documents, but accepts passport letters', () =>
       type,
     )
   }
-  assert.deepEqual(
-    errorPaths({ ...valid, documentType: 'PA', documentNumber: 'AB123456' }),
-    [],
-  )
+  assert.deepEqual(errorPaths({ ...valid, documentType: 'PA', documentNumber: 'AB123456' }), [])
 })
 
 test('rejects invalid email domains on the server', () => {
