@@ -20,11 +20,7 @@ import {
 import { LogoForm } from './logo-form'
 import { canOfferLegacyWebpMigration } from './migration-guards'
 
-export function LogosView({
-  enableLegacyWebpMigration,
-}: {
-  enableLegacyWebpMigration: boolean
-}) {
+export function LogosView({ enableLegacyWebpMigration }: { enableLegacyWebpMigration: boolean }) {
   const [editor, setEditor] = useState<LogoItem | null>(null)
   const [busy, setBusy] = useState(false)
   const [feedback, setFeedback] = useState<FeedbackValue>(null)

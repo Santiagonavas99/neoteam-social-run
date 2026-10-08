@@ -14,11 +14,7 @@ import { type AdminSection, sectionsFor } from './sections'
 import { AdminShell } from './shell/admin-shell'
 import { TeamView } from './team/team-view'
 
-export function AdminApp({
-  enableLegacyWebpMigration,
-}: {
-  enableLegacyWebpMigration: boolean
-}) {
+export function AdminApp({ enableLegacyWebpMigration }: { enableLegacyWebpMigration: boolean }) {
   const session = useAdminSession()
   const [picked, setSection] = useState<AdminSection | null>(null)
 
