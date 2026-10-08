@@ -2,7 +2,7 @@
 
 Spec: `docs/superpowers/specs/2026-10-08-admin-participants-filters-edit-design.md`
 Branch: `feat/admin-participants-filters-edit-20261008`
-Status: **awaiting explicit approval** (not yet authorized for implementation).
+Status: **approved by the user on 2026-10-08**.
 
 1. **Backend filters.** `supabase/functions/admin-pin/index.ts`: extend only the existing opt-in `participants/list/paginated` endpoint with whitelisted crew, gender, email pass status and sorting. Keep status totals and full CSV backup intact. Add database indexes only if query analysis warrants them. Verify combinations, empty results, pagination and max 25 rows.
 
