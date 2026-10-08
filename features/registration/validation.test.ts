@@ -5,8 +5,8 @@ import {
   isEmailDomainValid,
   isNumericDocumentType,
   isValidDocumentNumber,
-  maxBirthDate,
   MIN_BIRTH_DATE,
+  maxBirthDate,
   normalizeColombianPhone,
 } from './validation.ts'
 
@@ -24,7 +24,15 @@ test('email requires a public domain with a TLD', () => {
   for (const email of ['ana@gmail.com', 'ana+run@univalle.edu.co', 'ana@running.travel']) {
     assert.equal(isEmailDomainValid(email), true, email)
   }
-  for (const email of ['ana@', 'ana@localhost', 'ana@dominio', 'ana@-gmail.com', 'ana@gmail..com', 'ana@gmail.c', 'ana@gmail.123']) {
+  for (const email of [
+    'ana@',
+    'ana@localhost',
+    'ana@dominio',
+    'ana@-gmail.com',
+    'ana@gmail..com',
+    'ana@gmail.c',
+    'ana@gmail.123',
+  ]) {
     assert.equal(isEmailDomainValid(email), false, email)
   }
 })
