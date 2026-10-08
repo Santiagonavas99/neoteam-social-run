@@ -13,6 +13,7 @@ import {
   randomCode,
   validCode,
 } from '../_shared/otp.ts'
+import { validateParticipantProfile } from '../_shared/participant-profile.ts'
 import {
   checkInParticipant,
   normalizeParticipantCode,
@@ -22,7 +23,6 @@ import {
 } from '../_shared/participants.ts'
 import { sendPassEmail } from '../_shared/pass-email.ts'
 import { handlePassEmailQueue } from '../_shared/pass-email-queue.ts'
-import { validateParticipantProfile } from '../_shared/participant-profile.ts'
 import { fromProxy, sha256 } from '../_shared/proxy.ts'
 import { requireSession } from '../_shared/session.ts'
 
