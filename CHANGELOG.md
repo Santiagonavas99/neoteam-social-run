@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.30.0] - 2026-10-08
+
+### Added
+
+- **Admin queue for passes that Resend did not accept:** Correos pendientes shows active unemailed registrations, accepted sends and last-attempt failures, ordered oldest first.
+- **Manual email batches:** administrators confirm up to 10 serial deliveries, with progress and feedback. Sending stops when Resend responds that the shared daily quota has been reached.
+- **Retry safeguards:** pending-pass claims are conditional to prevent overlapping first-pass sends, Resend idempotency keys help protect retries, and safe last-error codes remain visible for troubleshooting.
+
+### Changed
+
+- **Reenviar pase** on an already emailed registration continues to work; initial emails still pending must use the new queue to prevent duplicate concurrent sends.
+
+
 ## [0.29.2] - 2026-10-08
 
 ### Fixed
