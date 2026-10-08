@@ -205,7 +205,7 @@ export function LogosView({
             >
               {previewingMigration ? 'Buscando imágenes…' : 'Optimizar logos existentes'}
             </button>
-          )
+          )}
           <button
             type="button"
             className="button"
