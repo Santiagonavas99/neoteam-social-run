@@ -21,3 +21,6 @@ The right-edge "CONECTA" Instagram/WhatsApp rail is nested in the landing hero (
 
 ## Constraints and QA
 Mobile-first at 390px and 430px, confirm pill within safe-area and no clipped elements; tablet 800px compact; desktop at 1101/1440px vertical. Scroll through hero, story, agenda and footer, and open /registro, /pase; rail must persist and be absent at /admin. Verify z-index, keyboard focus, both themes, two external links. GitHub CI `pnpm ci:check` and SQL; Vercel preview. No changes to DB, auth or registrations.
+
+## User-supplied WhatsApp vector — approved refinement (2026-10-08)
+The user supplied the exact official-style WhatsApp speech-bubble/phone SVG, viewBox `0 0 308 308`, with two `path` contours, and requested using it for the WhatsApp icon. Replace the generic Lucide `MessageCircle` specifically in the persistent `SocialRail` and the shared `CommunityConnect` WhatsApp CTA so public surfaces remain consistent. Follow the precedent of `components/instagram-icon.tsx`: an accessible, typed brand-mark React component with the supplied path geometry, `fill="currentColor"`, no illustrator XML metadata/empty groups, and unchanged parent accessibility labels. Do not change icon size, destination URLs, layout, or Instagram. This is a user-provided third-party brand mark exception to the default Lucide icon vocabulary.
