@@ -17,6 +17,25 @@ test('preserves compound names and surnames in their original order', () => {
   })
 })
 
+test('accepts one or two surnames without losing any name words', () => {
+  assert.deepEqual(splitFullName('Santiago Navas'), {
+    firstName: 'Santiago',
+    lastName: 'Navas',
+  })
+  assert.deepEqual(splitFullName('Santiago Navas López'), {
+    firstName: 'Santiago',
+    lastName: 'Navas López',
+  })
+  assert.deepEqual(splitFullName('Santiago Andrés Navas López'), {
+    firstName: 'Santiago Andrés',
+    lastName: 'Navas López',
+  })
+  assert.deepEqual(splitFullName('María del Carmen Pérez Rodríguez'), {
+    firstName: 'María del Carmen',
+    lastName: 'Pérez Rodríguez',
+  })
+})
+
 test('normalizes whitespace without changing spelling', () => {
   assert.deepEqual(splitFullName('  José   Andrés  Niño\tGarcía  '), {
     firstName: 'José Andrés',
