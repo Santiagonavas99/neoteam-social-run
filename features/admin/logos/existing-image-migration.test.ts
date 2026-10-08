@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { canPreserveSlug, expectedSlug, isExistingStoredImage } from './migration-guards.ts'
+import {
+  canOfferLegacyWebpMigration,
+  canPreserveSlug,
+  expectedSlug,
+  isExistingStoredImage,
+} from './migration-guards.ts'
 
 const base = 'https://ohatsnkgaeccltqwhkbv.supabase.co/storage/v1/object/public/admin-media/'
 
@@ -49,4 +54,11 @@ test('matches backend slug normalization exactly before changing community logos
     }),
     false,
   )
+})
+
+test('offers the one-time migration only in production with remaining legacy images', () => {
+  assert.equal(canOfferLegacyWebpMigration(false, 17), false)
+  assert.equal(canOfferLegacyWebpMigration(true, null), false)
+  assert.equal(canOfferLegacyWebpMigration(true, 17), true)
+  assert.equal(canOfferLegacyWebpMigration(true, 0), false)
 })

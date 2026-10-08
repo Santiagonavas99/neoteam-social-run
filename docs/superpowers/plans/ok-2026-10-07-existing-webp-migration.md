@@ -27,3 +27,13 @@ Branch: `feat/admin-webp-image-uploads` (extends PR #58, requested 2026-10-07).
 ## Out of scope
 
 No deletion of original Storage objects, no conversion of unrelated orphaned bucket objects (four currently), external URLs or bundled static logo assets, no SQL or API schema changes, no automatic background jobs.
+
+## Task 4 — One-time production-only visibility (follow-up approved in chat 2026-10-07)
+
+- `app/admin/page.tsx`: pass the server-derived production deployment flag to `AdminApp`.
+- `features/admin/admin-app.tsx`: pass the flag only to the logos screen; no changes to other sections.
+- `features/admin/logos/logos-view.tsx`: query remaining eligible URLs when the screen mounts in production; don't show the button while checking, in Preview, after all URLs become WebP, or during the confirmed migration. Recheck remaining files after migration; allow retry on partial failures.
+- `features/admin/logos/migration-guards.ts` and `.test.ts`: pure visibility rule and cases for production/preview/unknown/zero/positive counts.
+- `CHANGELOG.md`: describe the one-time behavior.
+- Checks: `pnpm ci:check`, SQL, Preview deployment. Do not execute the migration on live Supabase.
+- Commit: `feat(admin): retire WebP migration button when backlog is empty`.

@@ -32,3 +32,11 @@ export function expectedSlug(name: string): string {
 export function canPreserveSlug(record: CommunityRecord): boolean {
   return typeof record.slug === 'string' && record.slug === expectedSlug(record.name)
 }
+
+/** Hidden in Preview and whenever there are no legacy image references left. */
+export function canOfferLegacyWebpMigration(
+  production: boolean,
+  remaining: number | null,
+): boolean {
+  return production && remaining !== null && remaining > 0
+}

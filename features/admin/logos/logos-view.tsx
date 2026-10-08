@@ -1,7 +1,7 @@
 'use client'
 
 import { Eye, EyeOff, ImagePlus, Link as LinkIcon, Plus, Trash2 } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { callLogos } from '../api'
 import { errorMessage } from '../errors'
 import { type FeedbackValue, isNew, type LogoItem } from '../types'
@@ -18,17 +18,27 @@ import {
   migrateExistingImages,
 } from './existing-image-migration'
 import { LogoForm } from './logo-form'
+import { canOfferLegacyWebpMigration } from './migration-guards'
 
-export function LogosView() {
+export function LogosView({
+  enableLegacyWebpMigration,
+}: {
+  enableLegacyWebpMigration: boolean
+}) {
   const [editor, setEditor] = useState<LogoItem | null>(null)
   const [busy, setBusy] = useState(false)
   const [feedback, setFeedback] = useState<FeedbackValue>(null)
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
+  const [migrationCount, setMigrationCount] = useState<number | null>(null)
   const [previewingMigration, setPreviewingMigration] = useState(false)
   const [pendingMigration, setPendingMigration] = useState<ExistingImageCandidate[] | null>(null)
   const [migrating, setMigrating] = useState(false)
   const [migrationProgress, setMigrationProgress] = useState<MigrationProgress | null>(null)
   const migrationLocked = previewingMigration || migrating || pendingMigration !== null
+  const showMigrationButton =
+    canOfferLegacyWebpMigration(enableLegacyWebpMigration, migrationCount) &&
+    pendingMigration === null &&
+    !migrating
   const fail = useCallback(
     (error: unknown, fallback: string) =>
       setFeedback({ kind: 'error', text: errorMessage(error, fallback) }),
@@ -41,11 +51,27 @@ export function LogosView() {
   const load = useCallback(async () => (await callLogos<LogoItem>('list')).rows ?? [], [])
   const { data: rows, loading, reload } = useAdminData(load, [], onLoadError)
 
+  useEffect(() => {
+    if (!enableLegacyWebpMigration) return
+    let active = true
+    void listExistingImageCandidates()
+      .then((candidates) => {
+        if (active) setMigrationCount(candidates.length)
+      })
+      .catch((error: unknown) => {
+        if (active) fail(error, 'No pudimos comprobar las imágenes pendientes.')
+      })
+    return () => {
+      active = false
+    }
+  }, [enableLegacyWebpMigration, fail])
+
   async function previewExistingImages() {
     setPreviewingMigration(true)
     setFeedback(null)
     try {
       const candidates = await listExistingImageCandidates()
+      setMigrationCount(candidates.length)
       if (!candidates.length) {
         setFeedback({
           kind: 'success',
@@ -67,12 +93,14 @@ export function LogosView() {
     setFeedback(null)
     try {
       const summary = await migrateExistingImages(pendingMigration, setMigrationProgress)
+      const remaining = await listExistingImageCandidates()
+      setMigrationCount(remaining.length)
       const resultText = `Proceso terminado: ${summary.converted} convertidos, ${summary.skipped} omitidos y ${summary.failed.length} fallidos.`
       setFeedback({
-        kind: summary.failed.length || summary.skipped ? 'error' : 'success',
-        text: summary.failed.length
-          ? `${resultText} ${summary.failed.slice(0, 2).join(' · ')}`
-          : resultText,
+        kind: remaining.length ? 'error' : 'success',
+        text: remaining.length
+          ? `${resultText} Quedan ${remaining.length} imágenes por optimizar. ${summary.failed.slice(0, 2).join(' · ')}`.trim()
+          : `${resultText} Todos los logos están optimizados; esta opción ya no aparecerá.`,
       })
       await reload()
     } catch (error) {
@@ -168,18 +196,16 @@ export function LogosView() {
             disabled={loading || busy || !!editor || migrationLocked}
             onClick={() => void reload()}
           />
-          <button
-            type="button"
-            className="button button-secondary"
-            onClick={() => void previewExistingImages()}
-            disabled={loading || busy || !!editor || migrationLocked}
-          >
-            {previewingMigration
-              ? 'Buscando imágenes…'
-              : migrating
-                ? 'Optimizando…'
-                : 'Optimizar logos existentes'}
-          </button>
+          {showMigrationButton && (
+            <button
+              type="button"
+              className="button button-secondary"
+              onClick={() => void previewExistingImages()}
+              disabled={loading || busy || !!editor || migrationLocked}
+            >
+              {previewingMigration ? 'Buscando imágenes…' : 'Optimizar logos existentes'}
+            </button>
+          )
           <button
             type="button"
             className="button"
@@ -205,8 +231,8 @@ export function LogosView() {
           <p className="m-0 mb-4 text-sm text-neo-text-secondary">
             Se optimizarán los logos de marcas, running crews y organizaciones que siguen en PNG o
             JPG. Se mantendrán los archivos originales y solo se cambiarán los enlaces después de
-            subir cada WEBP correctamente. La base de datos puede ser la misma en Preview y
-            Producción.
+            subir cada WEBP correctamente. Cuando no queden logos pendientes, esta opción
+            desaparecerá de forma permanente.
           </p>
           <div className="flex flex-wrap gap-2">
             <button

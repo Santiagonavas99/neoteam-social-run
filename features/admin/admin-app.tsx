@@ -14,7 +14,11 @@ import { type AdminSection, sectionsFor } from './sections'
 import { AdminShell } from './shell/admin-shell'
 import { TeamView } from './team/team-view'
 
-export function AdminApp() {
+export function AdminApp({
+  enableLegacyWebpMigration,
+}: {
+  enableLegacyWebpMigration: boolean
+}) {
   const session = useAdminSession()
   const [picked, setSection] = useState<AdminSection | null>(null)
 
@@ -34,7 +38,7 @@ export function AdminApp() {
       ) : section === 'home-order' ? (
         <HomeOrderView />
       ) : section === 'logos' ? (
-        <LogosView />
+        <LogosView enableLegacyWebpMigration={enableLegacyWebpMigration} />
       ) : section === 'team' ? (
         <TeamView />
       ) : section === 'participants' ? (

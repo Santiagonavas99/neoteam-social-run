@@ -37,3 +37,11 @@ Add an explicit **Optimizar imágenes actuales** action to the admin logos scree
 ## Tests
 
 Pure tests for strict URL matching, file-name handling and slug safety; existing `pnpm ci:check` and SQL checks. Manual QA on a test image before executing against the 17 production references. Verify a saved WebP URL, `Content-Type: image/webp`, unchanged registration slugs, working marquees and no missing images at 390px/1440px.
+
+## One-time production-only action (follow-up 2026-10-07)
+
+The button is visible **only** on Vercel production, and only after the admin has fetched the current data and confirmed at least one referenced legacy PNG/JPEG from the project's Storage. Never display it while checking, in Preview or in local development.
+
+The migration itself is not automatic. After a confirmed run, re-fetch all three admin collections. As soon as no qualifying old references remain, hide the button immediately and on every later session/device; the database's actual image URLs are the durable source of truth (not localStorage, browser cookies or new SQL state). Keep the confirmation and processing states accessible while work is in progress. If a file cannot be converted, keep its original reference and offer a retry only for the remaining files: never silently mark the migration done while legacy images remain. New admin image uploads already use WebP, so completing the initial backlog naturally retires the action.
+
+Passing the production flag from the server-side `app/admin/page.tsx` prevents the action being offered by a Preview that shares Supabase. It does not change the privilege model or mutate Supabase by itself. Simultaneous starts from two different administrators are not globally locked; the existing before-save URL rechecks reduce, but do not eliminate, duplicate uploads. No new DB/edge migrations.
