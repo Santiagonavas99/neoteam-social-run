@@ -21,6 +21,7 @@ import {
   participantPayload,
 } from '../_shared/participants.ts'
 import { sendPassEmail } from '../_shared/pass-email.ts'
+import { validateParticipantProfile } from '../_shared/participant-profile.ts'
 import { handlePassEmailQueue } from '../_shared/pass-email-queue.ts'
 import { fromProxy, sha256 } from '../_shared/proxy.ts'
 import { requireSession } from '../_shared/session.ts'
@@ -760,7 +761,7 @@ Deno.serve(async (req: Request) => {
         participants: {
           table: 'registrations',
           fields:
-            'id,registration_number,registration_code,first_name,last_name,document_type,document_number,email,phone,gender,running_group_id,other_running_group,shirt_size,status,checked_in_at,created_at,running_groups(name)',
+            'id,registration_number,registration_code,first_name,last_name,document_type,document_number,email,phone,birth_date,gender,running_group_id,other_running_group,shirt_size,emergency_name,emergency_phone,status,checked_in_at,created_at,updated_at,pass_emailed_at,running_groups(name)',
           writable: ['status', 'checked_in_at'],
         },
         raffles: {
@@ -826,6 +827,12 @@ Deno.serve(async (req: Request) => {
       const config = Object.hasOwn(configs, resource) ? configs[resource] : undefined
       if (!config) return json({ error: 'Sección administrativa no válida.' }, 400)
 
+      if (resource === 'participants' && operation === 'options') {
+        const groups = await supabase.from('running_groups').select('id,name,active')
+          .order('name', { ascending: true })
+        if (groups.error) throw groups.error
+        return json({ rows: groups.data ?? [] })
+      }
       if (resource === 'participants' && operation === 'list' && body?.paginated === true) {
         const { data: event, error: eventError } = await supabase
           .from('events')
@@ -837,6 +844,18 @@ Deno.serve(async (req: Request) => {
         const pageSize = 25
         const requestedPage = Math.max(1, Math.floor(Number(body?.page) || 1))
         const status = typeof body?.status === 'string' ? body.status.trim() : ''
+        const crew = typeof body?.crew === 'string' ? body.crew.trim() : ''
+        const gender = typeof body?.gender === 'string' ? body.gender.trim() : ''
+        const emailStatus = typeof body?.emailStatus === 'string' ? body.emailStatus.trim() : ''
+        const sort = typeof body?.sort === 'string' ? body.sort.trim() : 'newest'
+        const validCrew = !crew || crew === 'custom' || crew === 'unassigned' ||
+          /^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i.test(crew)
+        if (!validCrew || (gender && !['female','male','non_binary','prefer_not_to_say','other'].includes(gender)) ||
+          (emailStatus && !['sent', 'pending'].includes(emailStatus)) ||
+          !['newest','oldest','name'].includes(sort)) {
+          return json({ error: 'Alguno de los filtros no es válido.' }, 400)
+        }
+
         const allowedStatuses = new Set(['registered', 'checked_in', 'no_show', 'cancelled'])
         if (status && !allowedStatuses.has(status)) {
           return json({ error: 'Filtro de estado inválido.' }, 400)
@@ -864,6 +883,12 @@ Deno.serve(async (req: Request) => {
         const applyParticipantFilters = (query: unknown) => {
           let filtered = query.eq('event_id', event.id)
           if (status) filtered = filtered.eq('status', status)
+          if (crew === 'custom') filtered = filtered.is('running_group_id', null).not('other_running_group', 'is', null)
+          else if (crew === 'unassigned') filtered = filtered.is('running_group_id', null).is('other_running_group', null)
+          else if (crew) filtered = filtered.eq('running_group_id', crew)
+          if (gender) filtered = filtered.eq('gender', gender)
+          if (emailStatus === 'sent') filtered = filtered.not('pass_emailed_at', 'is', null)
+          else if (emailStatus === 'pending') filtered = filtered.is('pass_emailed_at', null)
           searchTokens.forEach((token: string, index: number) => {
             const filters = [
               `first_name.ilike.%${token}%`,
@@ -899,7 +924,11 @@ Deno.serve(async (req: Request) => {
         let rowsQuery = applyParticipantFilters(
           supabase.from('registrations').select(config.fields),
         )
-        rowsQuery = rowsQuery.order('created_at', { ascending: false }).range(from, to)
+        if (sort === 'name') rowsQuery = rowsQuery.order('last_name', { ascending: true })
+          .order('first_name', { ascending: true }).order('id', { ascending: true })
+        else rowsQuery = rowsQuery.order('created_at', { ascending: sort === 'oldest' })
+          .order('id', { ascending: sort === 'oldest' })
+        rowsQuery = rowsQuery.range(from, to)
         const { data: rows, error: rowsError } = await rowsQuery
         if (rowsError) throw rowsError
 
@@ -1093,6 +1122,55 @@ Deno.serve(async (req: Request) => {
         result: outcome.result,
         participant: participantPayload(outcome.participant),
       })
+    }
+
+    if (action === 'updateParticipantProfile') {
+      const valid = validateParticipantProfile(body?.profile)
+      if (!valid.ok) return json({ error: valid.error }, 400)
+      const id = typeof body?.participantId === 'string' ? body.participantId : ''
+      const stamp = typeof body?.updatedAt === 'string' ? body.updatedAt : ''
+      if (!/^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i.test(id) ||
+          !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d/.test(stamp) ||
+          Number.isNaN(Date.parse(stamp))) {
+        return json({ error: 'El registro cambió o no es válido. Actualiza la lista.' }, 400)
+      }
+      const { data: event, error: eventError } = await supabase
+        .from('events').select('id').eq('code', 'SR26').single()
+      if (eventError) throw eventError
+      if (valid.profile.running_group_id) {
+        const group = await supabase.from('running_groups').select('id')
+          .eq('id', valid.profile.running_group_id).maybeSingle()
+        if (group.error) throw group.error
+        if (!group.data) return json({ error: 'El running crew seleccionado ya no existe.' }, 400)
+      }
+      const [sameEmail, sameDocument] = await Promise.all([
+        supabase.from('registrations').select('id')
+          .eq('event_id', event.id).eq('email', valid.profile.email).neq('id', id).limit(1),
+        supabase.from('registrations').select('id')
+          .eq('event_id', event.id).eq('document_number', valid.profile.document_number)
+          .neq('id', id).limit(1),
+      ])
+      if (sameEmail.error) throw sameEmail.error
+      if (sameDocument.error) throw sameDocument.error
+      if (sameEmail.data?.length) return json({ error: 'Ese correo ya pertenece a otra inscripción.' }, 409)
+      if (sameDocument.data?.length) return json({ error: 'Ese documento ya pertenece a otra inscripción.' }, 409)
+      const result = await supabase.rpc('admin_update_registration_profile', {
+        p_event_id: event.id,
+        p_registration_id: id,
+        p_admin_user_id: session.userId,
+        p_expected_updated_at: stamp,
+        p_profile: valid.profile,
+      })
+      if (result.error?.code === '23505')
+        return json({ error: 'El correo o documento ya está registrado en este evento.' }, 409)
+      if (result.error) throw result.error
+      if (result.data === 'stale') return json({
+        error: 'Otro administrador modificó esta inscripción. Actualiza antes de guardar.',
+      }, 409)
+      if (result.data === 'not_found') return json({ error: 'Inscripción no encontrada.' }, 404)
+      if (result.data === 'invalid_fields' || result.data === 'invalid_group' || result.data === 'not_allowed')
+        return json({ error: 'No pudimos validar la corrección. Actualiza y vuelve a intentar.' }, 400)
+      return json({ ok: true, emailChanged: result.data === 'email_changed', unchanged: result.data === 'unchanged' })
     }
 
     if (action === 'passEmailQueue') return await handlePassEmailQueue(supabase, body)
