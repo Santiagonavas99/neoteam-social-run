@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, UsersRound } from 'lucide-react'
 import Link from 'next/link'
 import type { FormEvent, ReactNode } from 'react'
 import { useActionState, useEffect, useRef, useState } from 'react'
@@ -369,14 +369,19 @@ export function RegistrationForm() {
 
           {number === 2 && (
             <div className="grid gap-5">
-              <div className="rounded-control border border-neo-accent-border bg-neo-accent-soft px-4 py-4">
-                <p className="m-0 text-sm font-semibold text-neo-text">
-                  No necesitas pertenecer a NeoTeam ni a otro grupo para participar.
-                </p>
-                <p className="m-0 mt-1 text-[13px] leading-normal text-neo-text-secondary">
-                  Solo queremos saber con qué crew vas a asistir. Si corres por tu cuenta,
-                  selecciona “Voy por mi cuenta”.
-                </p>
+              <div className="flex items-start gap-3 rounded-control border border-neo-border bg-neo-muted-bg px-4 py-4">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-neo-surface text-neo-accent-text">
+                  <UsersRound aria-hidden className="size-5" />
+                </span>
+                <div className="min-w-0">
+                  <p className="m-0 text-sm font-semibold text-neo-text">
+                    ¿No tienes crew? También eres bienvenido.
+                  </p>
+                  <p className="m-0 mt-1 text-[13px] leading-normal text-neo-text-secondary">
+                    Selecciona “Voy por mi cuenta” y únete al Social Run. No necesitas pertenecer a
+                    NeoTeam ni a otro grupo.
+                  </p>
+                </div>
               </div>
               <SelectField
                 name="runningGroup"
@@ -408,8 +413,8 @@ export function RegistrationForm() {
                 />
               )}
               <p className="m-0 text-xs leading-normal text-neo-text-secondary">
-                Esta información solo nos ayuda a organizar a los crews invitados. Tu registro es
-                individual y gratuito.
+                Esta elección nos ayuda a organizar los grupos. Tu inscripción es individual y
+                gratuita.
               </p>
             </div>
           )}
