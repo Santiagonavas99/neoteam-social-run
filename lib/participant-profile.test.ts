@@ -42,6 +42,15 @@ test('refuses wrong document, nonexistent domain suffix, invalid birth date and 
   }
 })
 
+test('only Mujer and Hombre match the real registration options', () => {
+  for (const gender of ['female', 'male']) {
+    assert.equal(validateParticipantProfile({ ...valid, gender }).ok, true, gender)
+  }
+  for (const gender of ['non_binary', 'prefer_not_to_say', 'other']) {
+    assert.equal(validateParticipantProfile({ ...valid, gender }).ok, false, gender)
+  }
+})
+
 test('allows registered groups, custom crews and missing optional birth date', () => {
   const existing = validateParticipantProfile({
     ...valid,
