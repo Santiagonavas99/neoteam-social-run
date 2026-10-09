@@ -2,12 +2,13 @@ import { QrCode, Users } from 'lucide-react'
 import Link from 'next/link'
 import { linkClass } from '@/features/registration/form-ui'
 import { RegistrationAvailability } from '@/features/registration/registration-availability'
-import { isRegistrationClosed } from '@/features/registration/registration-deadline'
+import { getRegistrationSettings } from '@/features/registration/registration-settings'
 import { eventFacts, RegistrationShell } from '@/features/registration/registration-shell'
 
 export const dynamic = 'force-dynamic'
 
-export default function RegistrationPage() {
+export default async function RegistrationPage() {
+  const initialSettings = await getRegistrationSettings()
   return (
     <RegistrationShell
       title={['Reserva', 'tu lugar.']}
@@ -20,7 +21,7 @@ export default function RegistrationPage() {
         </Link>
       }
     >
-      <RegistrationAvailability initiallyClosed={isRegistrationClosed()} />
+      <RegistrationAvailability initialSettings={initialSettings} />
     </RegistrationShell>
   )
 }
