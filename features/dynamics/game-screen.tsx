@@ -50,12 +50,12 @@ function SpectatorContent({ game, now }: { game: PublicGame; now: number }) {
             </p>
             {game.winners.length ? (
               <ol className="m-0 grid list-none gap-3 p-0">
-                {game.winners.map((winner, index) => (
+                {game.winners.map((winner) => (
                   <li
-                    key={index}
+                    key={winner.rank}
                     className="rounded-2xl border border-neo-accent/40 bg-neo-accent/10 px-5 py-5 text-2xl font-extrabold break-words text-white shadow-[0_0_40px_rgba(3,248,246,0.08)] sm:text-4xl md:px-8"
                   >
-                    <span className="mr-3 text-neo-accent">{index + 1}.</span>
+                    <span className="mr-3 text-neo-accent">{winner.rank}.</span>
                     {winner.name}
                   </li>
                 ))}
