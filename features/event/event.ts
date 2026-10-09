@@ -14,6 +14,7 @@ export const eventConfig = {
   description:
     'Un encuentro para correr, conectar con otros crews, descubrir marcas aliadas y celebrar un nuevo año de NeoTeam como comunidad.',
   registrationOpen: true,
+  registrationDeadline: '2026-10-10T20:00:00-05:00',
 } as const
 
 export const agenda = [
