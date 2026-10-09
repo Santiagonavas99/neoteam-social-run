@@ -2,6 +2,7 @@ import { ArrowRight, MapPin, QrCode } from 'lucide-react'
 import Link from 'next/link'
 import { eventConfig } from '@/features/event/event'
 import styles from './steps.module.css'
+import { StepsMotion } from './steps-motion'
 
 const steps = [
   {
@@ -29,10 +30,10 @@ const steps = [
 
 export function Steps() {
   return (
-    <section className={styles.section} id="pasos" aria-labelledby="steps-heading">
+    <StepsMotion>
       <div className="shell">
         <div className={styles.top}>
-          <div className={styles.intro}>
+          <div className={styles.intro} data-reveal>
             <p className={styles.eyebrow}>ANTES Y DURANTE EL SOCIAL RUN</p>
             <h2 id="steps-heading">
               CUATRO PASOS.
@@ -44,12 +45,12 @@ export function Steps() {
               presentas al llegar y nuestro equipo registra tu asistencia.
             </p>
           </div>
-          <div className={styles.passVisual}>
+          <div className={styles.passVisual} data-reveal>
             <div className={styles.passVisualTop}>
               <span>NEO TEAM / SOCIAL RUN</span>
               <span>18.10.26</span>
             </div>
-            <div className={styles.iconFrame}>
+            <div className={styles.iconFrame} aria-hidden="true">
               <QrCode size={104} strokeWidth={1.1} aria-hidden="true" />
             </div>
             <strong>UN QR. TU CHECK-IN.</strong>
@@ -58,7 +59,7 @@ export function Steps() {
 
         <ol className={styles.timeline}>
           {steps.map((step, i) => (
-            <li className={i === 2 ? styles.featured : styles.step} key={step.title}>
+            <li className={i === 2 ? styles.featured : styles.step} key={step.title} data-reveal>
               <div className={styles.stepTop}>
                 <strong className={styles.number}>{String(i + 1).padStart(2, '0')}</strong>
                 <span className={styles.tag}>{step.tag}</span>
@@ -74,7 +75,7 @@ export function Steps() {
           ))}
         </ol>
 
-        <div className={styles.bottom}>
+        <div className={styles.bottom} data-reveal>
           <div className={styles.actions}>
             <Link href="/pase" className={styles.mainLink}>
               Ver o recuperar mi pase <ArrowRight size={18} aria-hidden="true" />
@@ -85,6 +86,6 @@ export function Steps() {
           </div>
         </div>
       </div>
-    </section>
+    </StepsMotion>
   )
 }
