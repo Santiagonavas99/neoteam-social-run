@@ -4,7 +4,8 @@ import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
 import type { FeedbackValue } from '../types'
 import { Logo } from './admin-ui'
-import { convertImageToWebp } from './image-processing'
+import { prepareImageForUpload, type UploadImageMime } from './image-processing'
+import styles from './image-upload-field.module.css'
 
 function readFileAsBase64(file: Blob) {
   return new Promise<string>((resolve, reject) => {
@@ -16,9 +17,9 @@ function readFileAsBase64(file: Blob) {
   })
 }
 
-export async function uploadWebpImage(blob: Blob): Promise<string> {
+export async function uploadAdminImage(blob: Blob, mime: UploadImageMime): Promise<string> {
   const content = await readFileAsBase64(blob)
-  const result = await callAdmin('uploadAdminImage', { mime: 'image/webp', content })
+  const result = await callAdmin('uploadAdminImage', { mime, content })
   if (!result.url) throw new Error('No pudimos obtener la imagen subida.')
   return result.url
 }
@@ -33,6 +34,7 @@ export function useImageUpload({
   setFeedback: (value: FeedbackValue) => void
 }) {
   const [uploading, setUploading] = useState(false)
+  const [uploadFeedback, setUploadFeedback] = useState<FeedbackValue>(null)
 
   async function upload(event: ChangeEvent<HTMLInputElement>) {
     const input = event.currentTarget
@@ -40,24 +42,27 @@ export function useImageUpload({
     if (!file) return
     setUploading(true)
     setFeedback(null)
+    setUploadFeedback(null)
     try {
-      const webp = await convertImageToWebp(file)
-      const url = await uploadWebpImage(webp)
+      const processed = await prepareImageForUpload(file)
+      const url = await uploadAdminImage(processed.blob, processed.mime)
       onUploaded(url)
-      const savings = Math.round((1 - webp.size / file.size) * 100)
-      setFeedback({
+      const savings = Math.round((1 - processed.blob.size / file.size) * 100)
+      setUploadFeedback({
         kind: 'success',
-        text: `${successText} ${savings > 0 ? `WEBP optimizado: ${savings}% menos peso.` : 'Imagen convertida a WEBP.'}`,
+        text: processed.webp
+          ? `${successText} ${savings > 0 ? `WEBP optimizado: ${savings}% menos peso.` : 'Imagen WEBP lista.'}`
+          : `${successText} Archivo ${processed.mime === 'image/png' ? 'PNG' : 'JPG'} compatible con tu navegador${savings > 0 ? ` · ${savings}% menos peso.` : '.'}`,
       })
     } catch (error) {
-      setFeedback({ kind: 'error', text: errorMessage(error, 'No pudimos subir la imagen.') })
+      setUploadFeedback({ kind: 'error', text: errorMessage(error, 'No pudimos subir la imagen.') })
     } finally {
       setUploading(false)
       input.value = ''
     }
   }
 
-  return { uploading, upload }
+  return { uploading, upload, uploadFeedback }
 }
 
 export function ImageUploadField({
@@ -66,6 +71,7 @@ export function ImageUploadField({
   uploading,
   noun,
   hint,
+  uploadFeedback,
   onChange,
 }: {
   url?: string | null
@@ -73,31 +79,57 @@ export function ImageUploadField({
   uploading: boolean
   noun: 'logo' | 'imagen'
   hint: string
+  uploadFeedback?: FeedbackValue
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
 }) {
   return (
-    <label className="col-span-full flex-row! items-start gap-3 rounded-control border border-dashed border-neo-border-strong bg-neo-bg p-4 md:items-center md:gap-5 md:p-5">
-      <span className="hidden md:contents">
-        <Logo url={url} name={name || 'Logo'} />
-      </span>
-      <span className="flex min-w-0 flex-1 flex-col gap-2">
-        <strong className="inline-flex items-center gap-2">
-          {url ? (
-            <ImageUp aria-hidden className="size-4 shrink-0" />
-          ) : (
-            <ImagePlus aria-hidden className="size-4 shrink-0" />
-          )}
-          {uploading ? 'Convirtiendo y subiendo imagen…' : `${url ? 'Cambiar' : 'Añadir'} ${noun}`}
-        </strong>
-        <small className="font-normal text-neo-text-secondary">{hint}</small>
+    <div className="col-span-full min-w-0">
+      <label className={styles.picker}>
+        <span className={styles.preview}>
+          <Logo url={url} name={name || 'Logo'} />
+        </span>
+        <span className={styles.copy}>
+          <span className={styles.heading}>
+            {url ? (
+              <ImageUp aria-hidden className="size-4 shrink-0" />
+            ) : (
+              <ImagePlus aria-hidden className="size-4 shrink-0" />
+            )}
+            {uploading ? 'Procesando imagen…' : url ? `Cambiar ${noun}` : `Añadir ${noun}`}
+            {url && <span className={styles.ready}>Logo listo</span>}
+          </span>
+          <span className={styles.hint}>{hint}</span>
+          <span className={styles.action}>
+            {uploading ? 'Subiendo imagen…' : url ? 'Elegir otra imagen' : 'Seleccionar imagen'}
+          </span>
+        </span>
         <input
-          className="min-h-11 border-0! bg-transparent! px-0! py-1! text-xs! file:mr-3 file:min-h-9 file:cursor-pointer file:rounded-[6px] file:border file:border-solid file:border-neo-border-strong file:bg-neo-surface file:px-3 file:py-1.5 file:text-neo-text"
+          className="sr-only"
           type="file"
           accept="image/*,.heic,.heif"
-          onChange={(event) => void onChange(event)}
+          disabled={uploading}
+          onChange={onChange}
           aria-label={`Seleccionar ${noun}`}
         />
-      </span>
-    </label>
+      </label>
+      {uploadFeedback && (
+        <p
+          className={`feedback feedback-${uploadFeedback.kind} mb-0! mt-3 flex items-start gap-2 text-sm`}
+          role={uploadFeedback.kind === 'error' ? 'alert' : 'status'}
+        >
+          {uploadFeedback.text}
+        </p>
+      )}
+      {url && (
+        <p className="mb-0! mt-3 text-xs text-neo-text-secondary">
+          Imagen subida. El cambio será visible cuando guardes el registro.
+        </p>
+      )}
+    </div>
   )
+}
+
+/** The existing one-time migration requires genuine WebP uploads. */
+export function uploadWebpImage(blob: Blob): Promise<string> {
+  return uploadAdminImage(blob, 'image/webp')
 }
