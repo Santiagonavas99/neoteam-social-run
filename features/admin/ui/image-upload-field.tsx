@@ -102,8 +102,8 @@ export function ImageUploadField({
             {uploading ? 'Procesando logo…' : url ? `Cambiar ${noun}` : `Añadir ${noun}`}
           </span>
           <span className="text-xs font-normal leading-relaxed text-neo-text-secondary">
-              {hint}
-            </span>
+            {hint}
+          </span>
           <span className="inline-flex min-h-11 items-center justify-center rounded-control border border-neo-accent-border bg-neo-accent-soft px-4 py-2 text-sm font-semibold text-neo-accent-text">
             {uploading
               ? 'Subiendo imagen…'
