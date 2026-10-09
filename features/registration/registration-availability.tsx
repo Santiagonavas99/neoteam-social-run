@@ -7,8 +7,8 @@ import { cardClass, linkClass } from './form-ui'
 import {
   isRegistrationClosed,
   REGISTRATION_UNAVAILABLE_MESSAGE,
-  registrationDeadlineLabel,
   type RegistrationSettings,
+  registrationDeadlineLabel,
 } from './registration-deadline'
 import { RegistrationForm } from './registration-form'
 
