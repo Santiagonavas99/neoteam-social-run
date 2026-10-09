@@ -457,13 +457,16 @@ Deno.serve(async (req: Request) => {
             const { data: dynamic, error: dynamicError } = await supabase
               .from('dynamics')
               .select('id,type,status')
-              .eq('id', body.id).eq('event_id', event.id).maybeSingle()
+              .eq('id', body.id)
+              .eq('event_id', event.id)
+              .maybeSingle()
             if (dynamicError) throw dynamicError
             if (!dynamic) return json({ error: 'Dinámica no encontrada.' }, 404)
             const { data: stage, error: stageError } = await supabase
               .from('dynamic_game_state')
               .select('phase,shown_count,updated_at')
-              .eq('dynamic_id', body.id).maybeSingle()
+              .eq('dynamic_id', body.id)
+              .maybeSingle()
             if (stageError) throw stageError
             return json({ ok: true, stage: stage ?? { phase: 'ready', shown_count: 0 } })
           }
