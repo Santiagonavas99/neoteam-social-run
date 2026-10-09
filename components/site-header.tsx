@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { LandingRegistrationCta } from '@/features/registration/landing-registration-status'
 import { BrandLink } from './brand-link'
 import { ThemeToggle } from './theme-toggle'
 
@@ -12,9 +13,7 @@ export function SiteHeader() {
           <a href="/#agenda">Agenda</a>
           <Link href="/pase">Mi pase</Link>
           <ThemeToggle />
-          <Link className="button button-small" href="/registro">
-            Registrarme
-          </Link>
+          <LandingRegistrationCta label="Registrarme" compact />
         </nav>
       </div>
     </header>
