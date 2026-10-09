@@ -41,11 +41,11 @@ export function Steps({ index = '02' }: { index?: string }) {
               <em>CERO DUDAS.</em>
             </h2>
             <p className={styles.lead}>
-              ¿No sabes para qué sirve el QR que recibes al registrarte? Es tu pase personal:
-              lo presentas al llegar y nuestro equipo registra tu asistencia.
+              ¿No sabes para qué sirve el QR que recibes al registrarte? Es tu pase personal: lo
+              presentas al llegar y nuestro equipo registra tu asistencia.
             </p>
           </div>
-          <div className={styles.passVisual} aria-label="Representación ilustrativa del pase digital">
+          <div className={styles.passVisual}>
             <div className={styles.passVisualTop}>
               <span>NEO TEAM / SOCIAL RUN</span>
               <span>18.10.26</span>
@@ -80,8 +80,8 @@ export function Steps({ index = '02' }: { index?: string }) {
           <div className={styles.reminder}>
             <CheckCheck size={22} aria-hidden="true" />
             <p>
-              <strong>Ojo: no tienes que escanear el QR tú mismo.</strong> Muéstralo al personal
-              de NeoTeam cuando llegues. Es único para cada inscripción.
+              <strong>Ojo: no tienes que escanear el QR tú mismo.</strong> Muéstralo al personal de
+              NeoTeam cuando llegues. Es único para cada inscripción.
             </p>
           </div>
           <div className={styles.actions}>
