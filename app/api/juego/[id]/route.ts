@@ -17,9 +17,12 @@ export async function GET(_request: Request, context: { params: Promise<{ id: st
     })
   } catch (error) {
     console.error('game_status_error', error instanceof Error ? error.message : 'unknown')
-    return Response.json({ error: 'Pantalla de juego temporalmente no disponible.' }, {
-      status: 503,
-      headers: { 'Cache-Control': 'no-store' },
-    })
+    return Response.json(
+      { error: 'Pantalla de juego temporalmente no disponible.' },
+      {
+        status: 503,
+        headers: { 'Cache-Control': 'no-store' },
+      },
+    )
   }
 }
