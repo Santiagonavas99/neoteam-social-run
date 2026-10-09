@@ -75,7 +75,7 @@ export function OnlineAdmins() {
       ) : (
         <ul className="m-0 grid list-none gap-2 p-0 sm:grid-cols-2">
           {rows.map((user) => (
-            <li key={user.name} className="flex min-w-0 items-center gap-3 rounded-control border border-neo-border bg-neo-bg px-3 py-3">
+            <li key={user.id} className="flex min-w-0 items-center gap-3 rounded-control border border-neo-border bg-neo-bg px-3 py-3">
               <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-full bg-neo-accent-soft font-bold text-neo-accent-text">
                 {user.name.slice(0, 1).toUpperCase()}
               </span>
