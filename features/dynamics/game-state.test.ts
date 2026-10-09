@@ -16,6 +16,7 @@ test('countdown is derived from the stage timestamp', () => {
 })
 
 test('demo uses fictional names only', () => {
+  assert.deepEqual(demoGame.winners.map((w) => w.rank), [1, 2, 3])
   assert.deepEqual(
     demoGame.winners.map((w) => w.name),
     ['Participante de prueba 1', 'Participante de prueba 2', 'Participante de prueba 3'],
