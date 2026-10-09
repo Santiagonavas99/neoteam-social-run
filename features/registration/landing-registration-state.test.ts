@@ -12,11 +12,20 @@ test('landing is open until deadline, then closes exactly at the configured inst
 })
 
 test('manual admin closure disables landing calls to register immediately', () => {
-  assert.equal(landingRegistrationState({ ...settings, registrationOpen: false }, beforeDeadline), 'closed')
-  assert.equal(landingRegistrationState({ ...settings, registrationOpen: true }, beforeDeadline), 'open')
+  assert.equal(
+    landingRegistrationState({ ...settings, registrationOpen: false }, beforeDeadline),
+    'closed',
+  )
+  assert.equal(
+    landingRegistrationState({ ...settings, registrationOpen: true }, beforeDeadline),
+    'open',
+  )
 })
 
 test('uncertain backend status never advertises an active registration', () => {
   assert.equal(landingRegistrationState(null, beforeDeadline), 'unavailable')
-  assert.equal(landingRegistrationState({ registrationOpen: true, deadline: null }, beforeDeadline), 'open')
+  assert.equal(
+    landingRegistrationState({ registrationOpen: true, deadline: null }, beforeDeadline),
+    'open',
+  )
 })
