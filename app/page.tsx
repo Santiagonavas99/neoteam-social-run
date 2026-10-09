@@ -1,4 +1,6 @@
 import { Footer } from '@/components/footer'
+import { LandingRegistrationProvider } from '@/features/registration/landing-registration-status'
+import { getRegistrationSettings } from '@/features/registration/registration-settings'
 import { SiteHeader } from '@/components/site-header'
 import { SocialRail } from '@/components/social-rail'
 import {
@@ -21,18 +23,19 @@ import { Numbers } from '@/features/home/sections/numbers'
 import { Raffle } from '@/features/home/sections/raffle'
 import { Story } from '@/features/home/sections/story'
 
-// Served from the CDN and rebuilt in the background at most once a minute; counter, logos and
-// section ordering and visibility may lag 60 s.
-export const revalidate = 60
+// Render the live registration state on each request; participant and carousel data use
+// their own caching, but the registration deadline must never be rendered from a stale ISR page.
+export const dynamic = 'force-dynamic'
 
 const numberedSections = new Set(['story', 'agenda', 'community', 'raffle', 'final'])
 
 export default async function Home() {
-  const [logoItems, community, registered, sectionOrder] = await Promise.all([
+  const [logoItems, community, registered, sectionOrder, registrationSettings] = await Promise.all([
     getHomeLogoCarouselItems(),
     getHomeCommunity(),
     getRegisteredCount(),
     getHomeSectionOrder(),
+    getRegistrationSettings(),
   ])
 
   const otherBrands = community.brands.filter((brand) => brand.type !== 'organizer')
@@ -83,7 +86,7 @@ export default async function Home() {
   })
 
   return (
-    <>
+    <LandingRegistrationProvider initialSettings={registrationSettings}>
       <SocialRail />
       <main className="home-v2">
         <SiteHeader />
@@ -91,6 +94,6 @@ export default async function Home() {
         {sections}
         <Footer />
       </main>
-    </>
+    </LandingRegistrationProvider>
   )
 }
