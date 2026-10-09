@@ -29,32 +29,32 @@ export function AdminApp({ enableLegacyWebpMigration }: { enableLegacyWebpMigrat
     <>
       {session.role === 'admin' ? <AdminPresenceTracker /> : null}
       <AdminShell
-      sections={allowed}
-      section={section}
-      onNavigate={setSection}
-      onSignOut={() => void session.signOut()}
-    >
-      {section === 'checkin' ? (
-        <CheckinView />
-      ) : section === 'registration-settings' ? (
-        <RegistrationSettingsView />
-      ) : section === 'home-order' ? (
-        <HomeOrderView />
-      ) : section === 'logos' ? (
-        <LogosView enableLegacyWebpMigration={enableLegacyWebpMigration} />
-      ) : section === 'team' ? (
-        <TeamView />
-      ) : section === 'participants' ? (
-        <ParticipantsView />
-      ) : section === 'email-queue' ? (
-        <PendingEmailsView />
-      ) : section === 'groups' || section === 'brands' ? (
-        <CommunityView key={section} resource={section} />
-      ) : section === 'dynamics' ? (
-        <DynamicsView />
-      ) : (
-        <OverviewView navigate={setSection} />
-      )}
+        sections={allowed}
+        section={section}
+        onNavigate={setSection}
+        onSignOut={() => void session.signOut()}
+      >
+        {section === 'checkin' ? (
+          <CheckinView />
+        ) : section === 'registration-settings' ? (
+          <RegistrationSettingsView />
+        ) : section === 'home-order' ? (
+          <HomeOrderView />
+        ) : section === 'logos' ? (
+          <LogosView enableLegacyWebpMigration={enableLegacyWebpMigration} />
+        ) : section === 'team' ? (
+          <TeamView />
+        ) : section === 'participants' ? (
+          <ParticipantsView />
+        ) : section === 'email-queue' ? (
+          <PendingEmailsView />
+        ) : section === 'groups' || section === 'brands' ? (
+          <CommunityView key={section} resource={section} />
+        ) : section === 'dynamics' ? (
+          <DynamicsView />
+        ) : (
+          <OverviewView navigate={setSection} />
+        )}
       </AdminShell>
     </>
   )
