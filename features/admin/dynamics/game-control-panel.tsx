@@ -5,22 +5,21 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { callAdmin } from '../api'
 import type { DynamicRow, DynamicStageStatus } from '../types'
+import { gamePrimaryAction } from './primary-action'
 
 const phases: Record<string, string> = {
   ready: 'En espera',
   countdown: 'Cuenta atrás iniciada',
   reveal: 'Revelando ganadores',
-  finished: 'Finalizada',
+  finished: 'Juego finalizado',
 }
 
 export function GameControlPanel({
   dynamic,
   onDraw,
-  onShowWinners,
 }: {
   dynamic: DynamicRow
   onDraw: () => void
-  onShowWinners: () => void
 }) {
   const [stage, setStage] = useState<DynamicStageStatus | null>(null)
   const [busy, setBusy] = useState(false)
@@ -33,7 +32,7 @@ export function GameControlPanel({
   }, [dynamic.id])
 
   useEffect(() => {
-    if (dynamic.type !== 'raffle' || dynamic.status === 'draft') return
+    if (dynamic.type !== 'raffle' || !['open', 'completed'].includes(dynamic.status)) return
     void refresh().catch(() => setError('No pudimos conectar con la pantalla de juego.'))
     const poll = window.setInterval(() => void refresh().catch(() => undefined), 2000)
     return () => window.clearInterval(poll)
@@ -60,162 +59,141 @@ export function GameControlPanel({
   }
 
   const isRaffle = dynamic.type === 'raffle'
+  const active = dynamic.status === 'open' || dynamic.status === 'completed'
   const phase = stage?.phase ?? 'ready'
   const total = dynamic.winners_count ?? 0
   const shown = stage?.shown_count ?? 0
-  const active = dynamic.status === 'open' || dynamic.status === 'completed'
+  const action = gamePrimaryAction(dynamic.status, stage, total)
+
+  const labels = {
+    countdown: 'Iniciar cuenta atrás',
+    draw: 'Realizar sorteo',
+    prepare: 'Preparar ganadores',
+    next: `Revelar ganador ${Math.min(shown + 1, total)} de ${total}`,
+    finish: 'Finalizar presentación',
+  }
+
+  function primary() {
+    if (action === 'draw') onDraw()
+    else if (action === 'countdown') void command('countdown')
+    else if (action === 'prepare') void command('drawn')
+    else if (action === 'next') void command('next')
+    else if (action === 'finish') void command('finish')
+  }
 
   return (
-    <section className="grid gap-5">
-      <div className="rounded-card border border-neo-border bg-neo-surface p-5 md:p-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="m-0 text-xs font-bold tracking-widest text-neo-accent-text uppercase">
-              Modo evento · Control
-            </p>
-            <h3 className="m-0 mt-2 text-xl font-bold">
-              {isRaffle ? 'Dirige el sorteo' : 'Registra las participaciones'}
-            </h3>
-            <p className="m-0 mt-2 text-sm text-neo-text-secondary">
-              {isRaffle
-                ? 'Controla desde aquí la cuenta atrás y revela cada ganador en la pantalla pública.'
-                : 'Abre el escáner en la sección Control. La pantalla pública muestra el avance.'}
-            </p>
-          </div>
-          <span className="rounded-full border border-neo-border px-3 py-2 text-xs font-bold">
-            {active ? (phases[phase] ?? phase) : 'Activa primero la dinámica'}
-          </span>
+    <section className="rounded-card border border-neo-border bg-neo-surface p-5 md:p-7">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="m-0 text-xs font-bold tracking-widest text-neo-accent-text uppercase">
+            Día del evento
+          </p>
+          <h3 className="m-0 mt-2 text-xl font-bold">
+            {isRaffle ? 'Control del sorteo' : 'Participaciones'}
+          </h3>
+          <p className="m-0 mt-1 text-sm text-neo-text-secondary">
+            {isRaffle
+              ? 'Una acción a la vez. El público solo ve lo que reveles desde aquí.'
+              : 'Registra corredores desde el escáner y muestra el progreso en pantalla.'}
+          </p>
         </div>
-
-        {error && (
-          <p role="alert" className="mt-4 text-sm text-neo-danger">
-            {error}
-          </p>
-        )}
-        {notice && (
-          <p role="status" className="mt-4 text-sm text-neo-accent-text">
-            {notice}
-          </p>
-        )}
-
-        {isRaffle && active && (
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {dynamic.status === 'open' && (
-              <>
-                <button
-                  type="button"
-                  className="button button-secondary"
-                  disabled={busy}
-                  onClick={() => void command('countdown')}
-                >
-                  <Play aria-hidden className="size-4" /> Iniciar cuenta atrás
-                </button>
-                <button type="button" className="button" disabled={busy} onClick={onDraw}>
-                  <Dices aria-hidden className="size-4" /> Confirmar sorteo real
-                </button>
-              </>
-            )}
-            {dynamic.status === 'completed' && phase === 'ready' && (
-              <button
-                type="button"
-                className="button"
-                disabled={busy}
-                onClick={() => void command('drawn')}
-              >
-                <Play aria-hidden className="size-4" /> Preparar revelación
-              </button>
-            )}
-            {dynamic.status === 'completed' && phase === 'countdown' && (
-              <button
-                type="button"
-                className="button"
-                disabled={busy}
-                onClick={() => void command('drawn')}
-              >
-                <Play aria-hidden className="size-4" /> Preparar ganadores
-              </button>
-            )}
-            {dynamic.status === 'completed' && phase === 'reveal' && (
-              <>
-                <button
-                  type="button"
-                  className="button"
-                  disabled={busy || shown >= total}
-                  onClick={() => void command('next')}
-                >
-                  <Eye aria-hidden className="size-4" />
-                  Revelar siguiente ({Math.min(shown + 1, total)} de {total})
-                </button>
-                <button
-                  type="button"
-                  className="button button-secondary"
-                  disabled={busy || shown < total}
-                  onClick={() => void command('finish')}
-                >
-                  <Trophy aria-hidden className="size-4" /> Finalizar juego
-                </button>
-              </>
-            )}
-            {dynamic.status === 'completed' && (
-              <button
-                type="button"
-                className="button button-secondary"
-                disabled={busy}
-                onClick={onShowWinners}
-              >
-                <Trophy aria-hidden className="size-4" /> Lista de ganadores
-              </button>
-            )}
-            <button
-              type="button"
-              className="button button-secondary"
-              disabled={busy}
-              onClick={() => {
-                if (
-                  window.confirm(
-                    'La pantalla volverá a espera. No se borrarán los ganadores. ¿Continuar?',
-                  )
-                )
-                  void command('ready')
-              }}
-            >
-              <RotateCcw aria-hidden className="size-4" /> Volver a espera
-            </button>
-          </div>
-        )}
-        {isRaffle && dynamic.status === 'draft' && (
-          <p className="mt-5 text-sm text-neo-text-secondary">
-            Activa el borrador desde Resumen para empezar.
-          </p>
+        {active && (
+          <span className="rounded-full border border-neo-border px-3 py-2 text-xs font-bold">
+            {isRaffle ? phases[phase] ?? phase : 'Activa'}
+          </span>
         )}
       </div>
 
-      <div className="rounded-card border border-neo-border bg-neo-surface p-5 md:p-6">
-        <div className="flex items-center gap-2">
-          <MonitorPlay aria-hidden className="size-6 text-neo-accent-text" />
-          <h3 className="m-0 text-lg font-bold">Pantalla pública</h3>
+      {error && <p role="alert" className="mt-4 text-sm text-neo-danger">{error}</p>}
+      {notice && <p role="status" className="mt-4 text-sm text-neo-accent-text">{notice}</p>}
+
+      {isRaffle && (
+        <div className="mt-6">
+          {!active ? (
+            <p className="m-0 rounded-control bg-neo-muted-bg p-4 text-sm text-neo-text-secondary">
+              Activa esta dinámica desde Preparación para poder iniciar el juego.
+            </p>
+          ) : action ? (
+            <button
+              type="button"
+              className="button min-h-14 w-full justify-center text-base sm:w-auto"
+              disabled={busy}
+              onClick={primary}
+            >
+              {action === 'draw' ? <Dices aria-hidden className="size-5" /> :
+                action === 'next' ? <Eye aria-hidden className="size-5" /> :
+                  action === 'finish' ? <Trophy aria-hidden className="size-5" /> :
+                    <Play aria-hidden className="size-5" />}
+              {busy ? 'Actualizando…' : labels[action]}
+            </button>
+          ) : (
+            <p className="m-0 rounded-control bg-neo-success-bg p-4 text-sm font-bold">
+              Presentación terminada. Los resultados siguen guardados.
+            </p>
+          )}
+          {dynamic.status === 'completed' && phase === 'reveal' && (
+            <p className="m-0 mt-3 text-sm text-neo-text-secondary">
+              {shown} de {total} ganadores mostrados al público.
+            </p>
+          )}
         </div>
-        <p className="mt-2 text-sm text-neo-text-secondary">
-          Abre el juego en otra pestaña o dispositivo. Su contenido se sincroniza aproximadamente
-          cada 2 segundos. No muestra correos, documentos ni controles del staff.
-        </p>
-        <div className="flex flex-wrap gap-2">
-          <Link
-            href={'/juego/' + dynamic.id}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="button"
-          >
-            Abrir pantalla real <ArrowUpRight aria-hidden className="size-4" />
-          </Link>
-          <Link
-            href={'/juego/' + dynamic.id + '?ensayo=1'}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="button button-secondary"
-          >
-            Ensayar con datos ficticios <ArrowUpRight aria-hidden className="size-4" />
-          </Link>
+      )}
+
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-neo-border pt-5">
+        <div className="flex items-center gap-2 text-sm font-semibold">
+          <MonitorPlay aria-hidden className="size-4 text-neo-accent-text" />
+          <span>Pantalla para proyectar</span>
+        </div>
+        <div className="flex flex-wrap items-center gap-4">
+          {active && (
+            <Link
+              href={`/juego/${dynamic.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-link"
+            >
+              Abrir pantalla <ArrowUpRight aria-hidden className="size-4" />
+            </Link>
+          )}
+          <details className="group relative">
+            <summary className="cursor-pointer list-none text-sm font-semibold text-neo-text-secondary hover:text-neo-text">
+              Más opciones <span aria-hidden>⌄</span>
+            </summary>
+            <div className="mt-3 flex min-w-56 flex-col gap-3 rounded-control border border-neo-border bg-neo-muted-bg p-4 sm:absolute sm:right-0 sm:z-10 sm:shadow-lg">
+              <Link
+                href={`/juego/${dynamic.id}?ensayo=1`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-link text-sm"
+              >
+                Ensayar con datos ficticios <ArrowUpRight aria-hidden className="size-4" />
+              </Link>
+              {isRaffle && active && (
+                <>
+                  {dynamic.status === 'open' && phase !== 'countdown' && (
+                    <button type="button" className="text-link text-left text-sm" disabled={busy} onClick={onDraw}>
+                      <Dices aria-hidden className="size-4" /> Sortear sin cuenta atrás
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="text-link text-left text-sm"
+                    disabled={busy}
+                    onClick={() => {
+                      if (window.confirm('¿Reiniciar solo la presentación? Los ganadores no se borrarán.')) {
+                        void command('ready')
+                      }
+                    }}
+                  >
+                    <RotateCcw aria-hidden className="size-4" /> Reiniciar presentación
+                  </button>
+                </>
+              )}
+              <p className="m-0 text-xs text-neo-text-secondary">
+                El ensayo no modifica participaciones ni resultados.
+              </p>
+            </div>
+          </details>
         </div>
       </div>
     </section>
