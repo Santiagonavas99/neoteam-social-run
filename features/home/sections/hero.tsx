@@ -49,6 +49,10 @@ export function Hero() {
                 Ver agenda <ArrowDown aria-hidden className="size-4 shrink-0" />
               </a>
             </div>
+            <a href="#pasos" className="v2-hero-qr-help">
+              ¿Para qué sirve el QR? <span>Te lo explicamos en 4 pasos</span>
+              <ArrowDown aria-hidden className="size-4 shrink-0" />
+            </a>
             <div className="v2-route-card v2-route-card-desktop">
               <strong>5K</strong>
               <span>RUTA SOCIAL</span>
