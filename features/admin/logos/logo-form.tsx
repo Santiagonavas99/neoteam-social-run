@@ -45,8 +45,8 @@ export function LogoForm({
         <div>
           <h4 className="mb-1 text-base font-bold">¿De quién es este logo?</h4>
           <p className="mb-0 text-sm text-neo-text-secondary">
-              Escribe el nombre del club, marca u organización.
-            </p>
+            Escribe el nombre del club, marca u organización.
+          </p>
         </div>
       </div>
       <label className="col-span-full">
@@ -89,8 +89,8 @@ export function LogoForm({
         <div>
           <h4 className="mb-1 text-base font-bold">Dónde mostrarlo</h4>
           <p className="mb-0 text-sm text-neo-text-secondary">
-              Puedes utilizar el mismo logo en varias cintas.
-            </p>
+            Puedes utilizar el mismo logo en varias cintas.
+          </p>
         </div>
       </div>
       <div className="col-span-full grid gap-4 rounded-xl border border-neo-border bg-neo-bg p-4">
