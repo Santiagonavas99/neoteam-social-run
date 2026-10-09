@@ -7,7 +7,7 @@ import {
   type LandingRegistrationState,
   landingRegistrationState,
 } from './landing-registration-state'
-import { type RegistrationSettings, registrationDeadlineLabel } from './registration-deadline'
+import { type RegistrationSettings, registrationDeadlineCompactLabel } from './registration-deadline'
 
 type StatusContextValue = {
   state: LandingRegistrationState
@@ -72,38 +72,36 @@ function useLandingRegistration() {
 
 export function LandingRegistrationNotice() {
   const { state, settings } = useLandingRegistration()
+
   if (state === 'unavailable') {
     return (
-      <p className="mb-3 text-sm text-neo-text-secondary" role="status">
-        Consultando disponibilidad de inscripciones…
-      </p>
-    )
-  }
-  if (state === 'closed') {
-    return (
-      <div role="status" aria-live="polite" className="mb-4 max-w-md">
-        <span className="inline-flex items-center gap-2 rounded-full border border-neo-border-strong bg-neo-muted-bg px-3 py-2 text-xs font-extrabold uppercase tracking-[0.07em] text-neo-text">
-          <Clock3 aria-hidden className="size-4 shrink-0" />
-          Inscripciones cerradas
-        </span>
-        <p className="mt-2 mb-0 text-sm text-neo-text-secondary">
-          {settings?.registrationOpen
-            ? 'El plazo de inscripción ha finalizado. Si ya te registraste, tu pase sigue disponible.'
-            : 'El registro de participantes está cerrado. Si ya te registraste, consulta tu pase.'}
-        </p>
+      <div className="v2-registration-feedback" role="status">
+        <span className="v2-registration-feedback-indicator" aria-hidden="true" />
+        <span className="v2-registration-feedback-label">Consultando inscripciones</span>
       </div>
     )
   }
+
+  if (state === 'closed') {
+    return (
+      <div className="v2-registration-feedback v2-registration-feedback-closed" role="status">
+        <Clock3 aria-hidden="true" className="size-3.5 shrink-0" />
+        <span className="v2-registration-feedback-label">Inscripciones cerradas</span>
+        <span className="v2-registration-feedback-detail">Tu pase sigue disponible</span>
+      </div>
+    )
+  }
+
   return (
-    <p
-      className="mb-3 flex items-center gap-2 text-sm font-semibold text-neo-accent-text"
-      role="status"
-    >
-      <Clock3 aria-hidden className="size-4 shrink-0" />
-      {settings?.deadline
-        ? `Inscripciones abiertas · hasta el ${registrationDeadlineLabel(settings.deadline)} (Colombia)`
-        : 'Inscripciones abiertas'}
-    </p>
+    <div className="v2-registration-feedback v2-registration-feedback-open" role="status">
+      <span className="v2-registration-feedback-indicator" aria-hidden="true" />
+      <span className="v2-registration-feedback-label">Inscripciones abiertas</span>
+      {settings?.deadline && (
+        <span className="v2-registration-feedback-detail">
+          Cierre · {registrationDeadlineCompactLabel(settings.deadline)} (COL)
+        </span>
+      )}
+    </div>
   )
 }
 
