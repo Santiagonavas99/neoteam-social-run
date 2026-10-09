@@ -1,5 +1,6 @@
 export type HomeSectionKey =
   | 'story'
+  | 'steps'
   | 'numbers'
   | 'allies'
   | 'running_crews'
@@ -18,6 +19,7 @@ export type HomeSectionOrder = {
 
 export const defaultHomeSectionOrder: HomeSectionOrder[] = [
   { section_key: 'story', sort_order: 1, visible: true },
+  { section_key: 'steps', sort_order: 2, visible: true },
   { section_key: 'numbers', sort_order: 2, visible: true },
   { section_key: 'allies', sort_order: 3, visible: true },
   { section_key: 'running_crews', sort_order: 4, visible: true },
@@ -30,6 +32,10 @@ export const defaultHomeSectionOrder: HomeSectionOrder[] = [
 ]
 
 export const homeSectionMeta: Record<HomeSectionKey, { label: string; description: string }> = {
+  steps: {
+    label: 'Paso a paso',
+    description: 'Explica cómo guardar el pase y presentar el QR en el check-in del evento.',
+  },
   story: {
     label: 'El plan',
     description: 'Presentación del encuentro, fecha, hora y ruta.',
