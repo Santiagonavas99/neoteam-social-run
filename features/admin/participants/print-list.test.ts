@@ -71,7 +71,7 @@ test('escapes HTML from user-provided names and crews instead of executing it', 
     {
       ...base,
       first_name: '<script>alert(1)</script>',
-      last_name: 'O\'Brian',
+      last_name: "O'Brian",
       running_groups: null,
       other_running_group: 'Amigos & "Runners"',
     },
