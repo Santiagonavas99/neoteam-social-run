@@ -4,12 +4,12 @@ import { Clock3, QrCode } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { cardClass, linkClass } from './form-ui'
-import { RegistrationForm } from './registration-form'
 import {
   isRegistrationClosed,
   REGISTRATION_CLOSED_MESSAGE,
   REGISTRATION_DEADLINE_LABEL,
 } from './registration-deadline'
+import { RegistrationForm } from './registration-form'
 
 export function RegistrationAvailability({ initiallyClosed }: { initiallyClosed: boolean }) {
   const [closed, setClosed] = useState(initiallyClosed)
