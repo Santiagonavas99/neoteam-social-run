@@ -1,6 +1,7 @@
 'use client'
 
 import { type ReactNode, useEffect, useRef } from 'react'
+import { sectionFadeOpacity } from './steps-fade'
 import styles from './steps.module.css'
 
 /**
@@ -41,7 +42,23 @@ export function StepsMotion({ children }: { children: ReactNode }) {
       { threshold: 0 },
     )
 
+    // Fade all content at both viewport boundaries. Reads are RAF-throttled,
+    // so the fade naturally reverses when scrolling upward.
+    let frame = 0
+    const updateFade = () => {
+      frame = 0
+      const { top, bottom } = section.getBoundingClientRect()
+      const opacity = sectionFadeOpacity(top, bottom, window.innerHeight)
+      section.style.setProperty('--steps-fade-opacity', String(opacity))
+    }
+    const requestFadeUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(updateFade)
+    }
+
+    updateFade()
     section.dataset.motion = 'enabled'
+    window.addEventListener('scroll', requestFadeUpdate, { passive: true })
+    window.addEventListener('resize', requestFadeUpdate)
     revealTargets.forEach((target) => {
       revealObserver.observe(target)
     })
@@ -50,12 +67,18 @@ export function StepsMotion({ children }: { children: ReactNode }) {
     return () => {
       revealObserver.disconnect()
       activeObserver.disconnect()
+      window.removeEventListener('scroll', requestFadeUpdate)
+      window.removeEventListener('resize', requestFadeUpdate)
+      if (frame) window.cancelAnimationFrame(frame)
+      section.style.removeProperty('--steps-fade-opacity')
+      delete section.dataset.motion
+      delete section.dataset.inView
     }
   }, [])
 
   return (
     <section ref={sectionRef} className={styles.section} id="pasos" aria-labelledby="steps-heading">
-      {children}
+      <div className={styles.scene}>{children}</div>
     </section>
   )
 }
