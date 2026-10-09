@@ -38,10 +38,7 @@ function escapeHtml(value: string): string {
 export function printableRegistrationsHtml(rows: Participant[]): string {
   const registrations = printableRegistrations(rows)
   const body = registrations
-    .map(
-      ({ name, crew }) =>
-        `<tr><td>${escapeHtml(name)}</td><td>${escapeHtml(crew)}</td></tr>`,
-    )
+    .map(({ name, crew }) => `<tr><td>${escapeHtml(name)}</td><td>${escapeHtml(crew)}</td></tr>`)
     .join('\n')
 
   return `<!doctype html>
