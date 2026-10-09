@@ -7,7 +7,10 @@ import {
   type LandingRegistrationState,
   landingRegistrationState,
 } from './landing-registration-state'
-import { type RegistrationSettings, registrationDeadlineCompactLabel } from './registration-deadline'
+import {
+  type RegistrationSettings,
+  registrationDeadlineCompactLabel,
+} from './registration-deadline'
 
 type StatusContextValue = {
   state: LandingRegistrationState
