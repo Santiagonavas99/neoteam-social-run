@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.32.0] - 2026-10-09
+
+### Added
+
+- **«Así se vive el Social Run»:** paso a paso visual y responsive en la Home que explica inscripción, recuperación de pase, escaneo por personal NeoTeam para check-in y celebración del evento.
+- **QR explicado desde el hero:** acceso directo al tutorial antes de llegar al evento.
+- **Orden de la Home:** nuevo bloque «Paso a paso» reordenable y ocultable por el equipo desde Administración, con migración SQL aditiva y permisos existentes.
+
+
 ## [0.31.3] - 2026-10-09
 
 ### Fixed
