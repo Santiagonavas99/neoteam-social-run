@@ -857,8 +857,7 @@ Deno.serve(async (req: Request) => {
           /^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i.test(crew)
         if (
           !validCrew ||
-          (gender &&
-            !['female', 'male'].includes(gender)) ||
+          (gender && !['female', 'male'].includes(gender)) ||
           (emailStatus && !['sent', 'pending'].includes(emailStatus)) ||
           !['newest', 'oldest', 'name'].includes(sort)
         ) {
