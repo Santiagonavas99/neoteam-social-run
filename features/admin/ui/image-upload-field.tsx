@@ -100,11 +100,7 @@ export function ImageUploadField({
           </span>
           <span className={styles.hint}>{hint}</span>
           <span className={styles.action}>
-            {uploading
-              ? 'Subiendo imagen…'
-              : url
-                ? 'Elegir otra imagen'
-                : 'Seleccionar imagen'}
+            {uploading ? 'Subiendo imagen…' : url ? 'Elegir otra imagen' : 'Seleccionar imagen'}
           </span>
         </span>
         <input
