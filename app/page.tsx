@@ -26,7 +26,7 @@ import { Story } from '@/features/home/sections/story'
 // section ordering and visibility may lag 60 s.
 export const revalidate = 60
 
-const numberedSections = new Set(['story', 'steps', 'agenda', 'community', 'raffle', 'final'])
+const numberedSections = new Set(['story', 'agenda', 'community', 'raffle', 'final'])
 
 export default async function Home() {
   const [logoItems, community, registered, sectionOrder] = await Promise.all([
@@ -49,7 +49,7 @@ export default async function Home() {
       case 'story':
         return <Story key={section_key} index={index} />
       case 'steps':
-        return <Steps key={section_key} index={index} />
+        return <Steps key={section_key} />
       case 'numbers':
         return <Numbers key={section_key} registered={registered} brands={logoItems.length} />
       case 'allies':
