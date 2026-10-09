@@ -1,11 +1,17 @@
 'use client'
 
-import { FileDown, Mail, Trash2, UserCheck, Users } from 'lucide-react'
+import { FileDown, ListFilter, Mail, Pencil, Trash2, UserCheck, Users } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
+import type { ParticipantProfile } from '@/lib/participant-profile'
 import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
 import { genderLabels, participantStates } from '../labels'
-import type { FeedbackValue, Participant, ParticipantStatusCounts } from '../types'
+import type {
+  FeedbackValue,
+  Participant,
+  ParticipantGroupOption,
+  ParticipantStatusCounts,
+} from '../types'
 import { Feedback, StatusBadge } from '../ui/admin-ui'
 import { ConfirmPanel } from '../ui/confirm-panel'
 import { EmptyState, NoMatches } from '../ui/empty-state'
@@ -14,6 +20,7 @@ import { ListToolbar } from '../ui/list-toolbar'
 import { LoadingState } from '../ui/loading-state'
 import { useAdminData } from '../ui/use-admin-data'
 import { backupListCsv, backupListFileName } from './backup-list'
+import { ParticipantEditor } from './participant-editor'
 
 const EMPTY_COUNTS: ParticipantStatusCounts = {
   registered: 0,
@@ -56,6 +63,12 @@ export function ParticipantsView() {
   const [query, setQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
   const [status, setStatus] = useState('')
+  const [crew, setCrew] = useState('')
+  const [gender, setGender] = useState('')
+  const [emailStatus, setEmailStatus] = useState('')
+  const [sort, setSort] = useState('newest')
+  const [groups, setGroups] = useState<ParticipantGroupOption[]>([])
+  const [editing, setEditing] = useState<Participant | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<FeedbackValue>(null)
   const [confirmation, setConfirmation] = useState<Participant | null>(null)
@@ -75,6 +88,23 @@ export function ParticipantsView() {
     return () => window.clearTimeout(timer)
   }, [query])
 
+  useEffect(() => {
+    let mounted = true
+    callAdmin<ParticipantGroupOption>('adminData', {
+      resource: 'groups',
+      operation: 'list',
+    })
+      .then((response) => {
+        if (mounted) setGroups(response.rows ?? [])
+      })
+      .catch((error: unknown) => {
+        if (mounted) onError(error)
+      })
+    return () => {
+      mounted = false
+    }
+  }, [onError])
+
   const load = useCallback(async (): Promise<ParticipantPage> => {
     const response = await callAdmin<Participant>('adminData', {
       resource: 'participants',
@@ -83,6 +113,10 @@ export function ParticipantsView() {
       page,
       query: debouncedQuery,
       status,
+      crew,
+      gender,
+      emailStatus,
+      sort,
     })
     return {
       rows: response.rows ?? [],
@@ -91,7 +125,7 @@ export function ParticipantsView() {
       pageSize: response.pageSize ?? 25,
       statusCounts: response.statusCounts ?? EMPTY_COUNTS,
     }
-  }, [debouncedQuery, page, status])
+  }, [crew, debouncedQuery, emailStatus, gender, page, sort, status])
 
   const { data, loading, reload } = useAdminData(load, EMPTY_PAGE, onError)
 
@@ -102,11 +136,52 @@ export function ParticipantsView() {
   function updateQuery(next: string) {
     setQuery(next)
     setPage(1)
+    setEditing(null)
   }
 
   function updateStatus(next: string) {
     setStatus(next)
+    setEditing(null)
     setPage(1)
+  }
+
+  async function saveProfile(profile: ParticipantProfile) {
+    if (!editing?.updated_at) return
+    setBusy(`edit-${editing.id}`)
+    setFeedback(null)
+    try {
+      const response = await callAdmin('updateParticipantProfile', {
+        participantId: editing.id,
+        updatedAt: editing.updated_at,
+        profile,
+      })
+      setEditing(null)
+      setFeedback({
+        kind: 'success',
+        text: response.unchanged
+          ? 'No había cambios por guardar.'
+          : response.emailChanged
+            ? 'Datos guardados. El pase está pendiente para el correo corregido.'
+            : 'Datos del participante actualizados.',
+      })
+      await reload()
+    } catch (error) {
+      onError(error)
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  function clearFilters() {
+    setQuery('')
+    setDebouncedQuery('')
+    setStatus('')
+    setCrew('')
+    setGender('')
+    setEmailStatus('')
+    setSort('newest')
+    setPage(1)
+    setEditing(null)
   }
 
   async function changeAttendance(row: Participant, next: string) {
@@ -242,6 +317,96 @@ export function ParticipantsView() {
           </div>
         </fieldset>
       )}
+      <div className="mb-4 rounded-card border border-neo-border bg-neo-surface p-3 md:p-4">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <p className="m-0 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-neo-text-secondary">
+            <ListFilter aria-hidden className="size-4" /> Filtrar y ordenar
+          </p>
+          <button
+            type="button"
+            className="min-h-11 border-0 bg-transparent px-2 text-xs font-bold text-neo-accent-text"
+            disabled={loading || !!busy}
+            onClick={clearFilters}
+          >
+            Limpiar filtros
+          </button>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <label className="flex flex-col gap-1 text-xs font-bold text-neo-text-secondary">
+            Running crew
+            <select
+              className="min-h-11 w-full"
+              value={crew}
+              disabled={!!busy}
+              onChange={(event) => {
+                setCrew(event.currentTarget.value)
+                setEditing(null)
+                setPage(1)
+              }}
+            >
+              <option value="">Todos los crews</option>
+              {groups.map((group) => (
+                <option key={group.id} value={group.id}>
+                  {group.name}
+                </option>
+              ))}
+              <option value="custom">Otros crews</option>
+              <option value="unassigned">Sin crew asignado</option>
+            </select>
+          </label>
+          <label className="flex flex-col gap-1 text-xs font-bold text-neo-text-secondary">
+            Género
+            <select
+              className="min-h-11 w-full"
+              value={gender}
+              disabled={!!busy}
+              onChange={(event) => {
+                setGender(event.currentTarget.value)
+                setEditing(null)
+                setPage(1)
+              }}
+            >
+              <option value="">Todos</option>
+              <option value="female">Mujeres</option>
+              <option value="male">Hombres</option>
+            </select>
+          </label>
+          <label className="flex flex-col gap-1 text-xs font-bold text-neo-text-secondary">
+            Correo del pase
+            <select
+              className="min-h-11 w-full"
+              value={emailStatus}
+              disabled={!!busy}
+              onChange={(event) => {
+                setEmailStatus(event.currentTarget.value)
+                setEditing(null)
+                setPage(1)
+              }}
+            >
+              <option value="">Todos los correos</option>
+              <option value="sent">Envío registrado</option>
+              <option value="pending">Pendiente de envío</option>
+            </select>
+          </label>
+          <label className="flex flex-col gap-1 text-xs font-bold text-neo-text-secondary">
+            Ordenar
+            <select
+              className="min-h-11 w-full"
+              value={sort}
+              disabled={!!busy}
+              onChange={(event) => {
+                setSort(event.currentTarget.value)
+                setEditing(null)
+                setPage(1)
+              }}
+            >
+              <option value="newest">Más recientes primero</option>
+              <option value="oldest">Más antiguos primero</option>
+              <option value="name">Apellidos A–Z</option>
+            </select>
+          </label>
+        </div>
+      </div>
       <Feedback value={feedback} />
       {confirmation && (
         <ConfirmPanel
@@ -257,13 +422,10 @@ export function ParticipantsView() {
       {loading ? (
         <LoadingState>Cargando registros…</LoadingState>
       ) : !data.rows.length ? (
-        debouncedQuery || status ? (
+        debouncedQuery || status || crew || gender || emailStatus ? (
           <NoMatches
             onClear={() => {
-              setQuery('')
-              setDebouncedQuery('')
-              setStatus('')
-              setPage(1)
+              clearFilters()
             }}
           />
         ) : (
@@ -297,6 +459,9 @@ export function ParticipantsView() {
                         {' · '}
                         {row.running_groups?.name || row.other_running_group || 'Independiente'}
                       </span>
+                      <span className="col-span-2 truncate text-xs text-neo-text-secondary md:hidden">
+                        {row.email}
+                      </span>
                     </summary>
                     <div className="grid gap-4 border-t border-neo-border bg-neo-bg px-4 py-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
                       <dl className="m-0 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 text-sm">
@@ -310,12 +475,33 @@ export function ParticipantsView() {
                         <dd className="m-0 text-neo-text">{row.phone}</dd>
                         <dt className="text-neo-text-secondary">Talla</dt>
                         <dd className="m-0 text-neo-text">{row.shirt_size || '—'}</dd>
+                        <dt className="text-neo-text-secondary">Nacimiento</dt>
+                        <dd className="m-0 text-neo-text">{row.birth_date || '—'}</dd>
+                        <dt className="text-neo-text-secondary">Contacto emergencia</dt>
+                        <dd className="m-0 text-neo-text">
+                          {row.emergency_name || '—'} · {row.emergency_phone || '—'}
+                        </dd>
+                        <dt className="text-neo-text-secondary">Pase por correo</dt>
+                        <dd className="m-0 text-neo-text">
+                          {row.pass_emailed_at ? 'Envío registrado' : 'Pendiente'}
+                        </dd>
                         <dt className="text-neo-text-secondary">Género</dt>
                         <dd className="m-0 text-neo-text">
                           {(row.gender && genderLabels[row.gender]) || '—'}
                         </dd>
                       </dl>
                       <div className="flex flex-wrap items-center gap-3">
+                        <button
+                          type="button"
+                          className="button button-small button-secondary"
+                          onClick={() =>
+                            setEditing((previous) => (previous?.id === row.id ? null : row))
+                          }
+                          disabled={!!busy}
+                        >
+                          <Pencil aria-hidden className="size-4 shrink-0" />
+                          {editing?.id === row.id ? 'Cerrar edición' : 'Editar datos'}
+                        </button>
                         {state === 'registered' && (
                           <button
                             type="button"
@@ -358,6 +544,16 @@ export function ParticipantsView() {
                         </button>
                       </div>
                     </div>
+                    {editing?.id === row.id && (
+                      <ParticipantEditor
+                        key={row.id}
+                        participant={row}
+                        groups={groups}
+                        saving={!!busy}
+                        onSave={saveProfile}
+                        onCancel={() => setEditing(null)}
+                      />
+                    )}
                   </details>
                 </li>
               )

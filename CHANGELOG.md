@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.0] - 2026-10-08
+
+### Added
+
+- **Participantes con filtros globales:** buscar por running crew, género, correo pendiente o enviado; ordenar por antigüedad o apellido sin perder la paginación de 25 personas.
+- **Corrección de inscripciones desde Administración:** editar nombre, documento, correo, celular, nacimiento, talla, grupo y datos del contacto de emergencia con validación y confirmación manual.
+- **Auditoría sin copiar datos personales:** cada corrección guarda administrador, fecha e identificación de campos modificados; los cambios simultáneos requieren recargar antes de sobrescribir.
+
+### Changed
+
+- Corregir el correo de un participante vuelve a dejar el envío del pase pendiente para procesarlo manualmente desde «Correos pendientes». El código QR y los datos de inscripción se conservan.
+
+
 ## [0.30.1] - 2026-10-08
 
 ### Fixed
