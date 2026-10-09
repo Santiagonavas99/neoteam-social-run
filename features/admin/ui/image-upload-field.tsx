@@ -4,7 +4,7 @@ import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
 import type { FeedbackValue } from '../types'
 import { Logo } from './admin-ui'
-import { convertImageToWebp } from './image-processing'
+import { prepareImageForUpload, type UploadImageMime } from './image-processing'
 
 function readFileAsBase64(file: Blob) {
   return new Promise<string>((resolve, reject) => {
@@ -16,9 +16,9 @@ function readFileAsBase64(file: Blob) {
   })
 }
 
-export async function uploadWebpImage(blob: Blob): Promise<string> {
+export async function uploadAdminImage(blob: Blob, mime: UploadImageMime): Promise<string> {
   const content = await readFileAsBase64(blob)
-  const result = await callAdmin('uploadAdminImage', { mime: 'image/webp', content })
+  const result = await callAdmin('uploadAdminImage', { mime, content })
   if (!result.url) throw new Error('No pudimos obtener la imagen subida.')
   return result.url
 }
@@ -41,13 +41,15 @@ export function useImageUpload({
     setUploading(true)
     setFeedback(null)
     try {
-      const webp = await convertImageToWebp(file)
-      const url = await uploadWebpImage(webp)
+      const processed = await prepareImageForUpload(file)
+      const url = await uploadAdminImage(processed.blob, processed.mime)
       onUploaded(url)
-      const savings = Math.round((1 - webp.size / file.size) * 100)
+      const savings = Math.round((1 - processed.blob.size / file.size) * 100)
       setFeedback({
         kind: 'success',
-        text: `${successText} ${savings > 0 ? `WEBP optimizado: ${savings}% menos peso.` : 'Imagen convertida a WEBP.'}`,
+        text: processed.webp
+          ? `${successText} ${savings > 0 ? `WEBP optimizado: ${savings}% menos peso.` : 'Imagen WEBP lista.'}`
+          : `${successText} Archivo ${processed.mime === 'image/png' ? 'PNG' : 'JPG'} compatible con tu navegador${savings > 0 ? ` · ${savings}% menos peso.` : '.'}`, 
       })
     } catch (error) {
       setFeedback({ kind: 'error', text: errorMessage(error, 'No pudimos subir la imagen.') })
