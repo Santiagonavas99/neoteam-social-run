@@ -3,7 +3,10 @@
 import { ArrowRight, Clock3 } from 'lucide-react'
 import Link from 'next/link'
 import { createContext, type ReactNode, useContext, useEffect, useState } from 'react'
-import { type LandingRegistrationState, landingRegistrationState } from './landing-registration-state'
+import {
+  type LandingRegistrationState,
+  landingRegistrationState,
+} from './landing-registration-state'
 import { type RegistrationSettings, registrationDeadlineLabel } from './registration-deadline'
 
 type StatusContextValue = {
@@ -114,9 +117,7 @@ export function LandingRegistrationCta({
   const { state } = useLandingRegistration()
   if (state !== 'open') {
     return (
-      <span
-        className={`button ${compact ? 'button-small' : ''} cursor-not-allowed opacity-60`}
-      >
+      <span className={`button ${compact ? 'button-small' : ''} cursor-not-allowed opacity-60`}>
         {state === 'closed'
           ? compact
             ? 'Cerradas'
