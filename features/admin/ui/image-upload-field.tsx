@@ -5,6 +5,7 @@ import { errorMessage } from '../errors'
 import type { FeedbackValue } from '../types'
 import { Logo } from './admin-ui'
 import { prepareImageForUpload, type UploadImageMime } from './image-processing'
+import styles from './image-upload-field.module.css'
 
 function readFileAsBase64(file: Blob) {
   return new Promise<string>((resolve, reject) => {
@@ -83,33 +84,27 @@ export function ImageUploadField({
 }) {
   return (
     <div className="col-span-full min-w-0">
-      <label className="group flex cursor-pointer flex-col gap-4 rounded-xl border-2 border-dashed border-neo-border-strong bg-neo-bg p-4 transition-colors hover:border-neo-accent-text focus-within:border-neo-accent-text focus-within:ring-2 focus-within:ring-neo-accent-border md:flex-row md:items-center md:p-5">
-        <span className="flex shrink-0 items-center gap-3">
+      <label className={styles.picker}>
+        <span className={styles.preview}>
           <Logo url={url} name={name || 'Logo'} />
-          {url && (
-            <span className="rounded-full bg-neo-accent-soft px-2.5 py-1 text-xs font-bold text-neo-accent-text">
-              Logo listo
-            </span>
-          )}
         </span>
-        <span className="flex min-w-0 flex-1 flex-col items-start gap-3">
-          <span className="inline-flex items-center gap-2 text-base font-bold text-neo-text">
+        <span className={styles.copy}>
+          <span className={styles.heading}>
             {url ? (
-              <ImageUp aria-hidden className="size-5 shrink-0" />
+              <ImageUp aria-hidden className="size-4 shrink-0" />
             ) : (
-              <ImagePlus aria-hidden className="size-5 shrink-0" />
+              <ImagePlus aria-hidden className="size-4 shrink-0" />
             )}
-            {uploading ? 'Procesando logo…' : url ? `Cambiar ${noun}` : `Añadir ${noun}`}
+            {uploading ? 'Procesando imagen…' : url ? `Cambiar ${noun}` : `Añadir ${noun}`}
+            {url && <span className={styles.ready}>Logo listo</span>}
           </span>
-          <span className="text-xs font-normal leading-relaxed text-neo-text-secondary">
-            {hint}
-          </span>
-          <span className="inline-flex min-h-11 items-center justify-center rounded-control border border-neo-accent-border bg-neo-accent-soft px-4 py-2 text-sm font-semibold text-neo-accent-text">
+          <span className={styles.hint}>{hint}</span>
+          <span className={styles.action}>
             {uploading
               ? 'Subiendo imagen…'
               : url
                 ? 'Elegir otra imagen'
-                : 'Seleccionar imagen del celular'}
+                : 'Seleccionar imagen'}
           </span>
         </span>
         <input
