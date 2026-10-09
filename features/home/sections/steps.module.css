@@ -331,3 +331,269 @@
     gap: 10px;
   }
 }
+
+
+/* The section stays readable without JavaScript; scroll motion is progressive enhancement. */
+@media (prefers-reduced-motion: no-preference) {
+  .section[data-motion='enabled'] [data-reveal] {
+    opacity: 0;
+    translate: 0 26px;
+    transition:
+      opacity 720ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      translate 720ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      transform 380ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      border-color 380ms ease,
+      box-shadow 380ms ease;
+  }
+
+  .section[data-motion='enabled'] [data-reveal][data-revealed='true'] {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .section[data-motion='enabled'] .timeline li:nth-child(2) {
+    transition-delay: 95ms, 95ms, 0ms, 0ms, 0ms;
+  }
+
+  .section[data-motion='enabled'] .timeline li:nth-child(3) {
+    transition-delay: 190ms, 190ms, 0ms, 0ms, 0ms;
+  }
+
+  .section[data-motion='enabled'] .timeline li:nth-child(4) {
+    transition-delay: 285ms, 285ms, 0ms, 0ms, 0ms;
+  }
+}
+
+/* A tiny signal makes the intro feel active without adding another message. */
+.eyebrow::before {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 10px;
+  border-radius: 50%;
+  background: var(--neo-accent);
+  vertical-align: 2px;
+  content: "";
+}
+
+.passVisual {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition:
+    transform 380ms ease,
+    border-color 380ms ease,
+    box-shadow 380ms ease;
+}
+
+.passVisual::before {
+  position: absolute;
+  top: -35%;
+  left: -65%;
+  z-index: -1;
+  width: 35%;
+  height: 180%;
+  background: linear-gradient(90deg, transparent, rgb(3 248 246 / 13%), transparent);
+  transform: rotate(17deg) translateX(0);
+  pointer-events: none;
+  content: "";
+}
+
+.iconFrame {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  --scan-distance: 109px;
+}
+
+.iconFrame svg {
+  position: relative;
+  z-index: 1;
+}
+
+.iconFrame::after {
+  position: absolute;
+  top: 13%;
+  right: 10%;
+  left: 10%;
+  z-index: 2;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--neo-black);
+  box-shadow: 0 0 13px 2px rgb(0 35 35 / 30%);
+  opacity: 0;
+  pointer-events: none;
+  content: "";
+}
+
+.number {
+  transition: transform 350ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.step,
+.featured {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 380ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    border-color 380ms ease,
+    box-shadow 380ms ease;
+}
+
+.step::before,
+.featured::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: var(--neo-accent);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition:
+    transform 430ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 430ms ease;
+  pointer-events: none;
+  content: "";
+}
+
+.featured::before {
+  background: var(--neo-black);
+}
+
+.mainLink,
+.secondaryLink,
+.mainLink svg {
+  transition:
+    transform 280ms ease,
+    box-shadow 280ms ease,
+    color 280ms ease;
+}
+
+.mainLink:focus-visible,
+.secondaryLink:focus-visible {
+  outline: 2px solid var(--neo-white);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .section[data-in-view='true'] .eyebrow::before {
+    animation: neoSignal 2.8s ease-out infinite;
+  }
+
+  .section[data-in-view='true'] .passVisual::before {
+    animation: neoCardSweep 8s ease-in-out infinite;
+  }
+
+  .section[data-in-view='true'] .iconFrame::after {
+    animation: neoQrScan 3.6s ease-in-out infinite;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .passVisual:hover {
+    border-color: var(--neo-accent);
+    box-shadow: 0 18px 55px rgb(3 248 246 / 10%);
+    transform: rotate(0deg) translateY(-5px);
+  }
+
+  .step:hover,
+  .featured:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 20px 38px rgb(0 0 0 / 24%);
+  }
+
+  .step:hover {
+    border-color: var(--neo-accent);
+  }
+
+  .step:hover::before,
+  .featured:hover::before {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .step:hover .number,
+  .featured:hover .number {
+    transform: translateY(-3px) rotate(-3deg);
+  }
+
+  .mainLink:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgb(3 248 246 / 19%);
+  }
+
+  .mainLink:hover svg {
+    transform: translateX(5px);
+  }
+
+  .secondaryLink:hover {
+    color: var(--neo-accent);
+  }
+}
+
+@keyframes neoSignal {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(3 248 246 / 34%);
+  }
+  45% {
+    box-shadow: 0 0 0 7px rgb(3 248 246 / 0%);
+  }
+}
+
+@keyframes neoCardSweep {
+  0%,
+  18% {
+    transform: rotate(17deg) translateX(0);
+  }
+  44%,
+  100% {
+    transform: rotate(17deg) translateX(1150%);
+  }
+}
+
+@keyframes neoQrScan {
+  0%,
+  9% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  17% {
+    opacity: 0.85;
+  }
+  61% {
+    opacity: 0.85;
+    transform: translateY(var(--scan-distance));
+  }
+  69%,
+  100% {
+    opacity: 0;
+    transform: translateY(var(--scan-distance));
+  }
+}
+
+@media (max-width: 640px) {
+  .iconFrame {
+    --scan-distance: 77px;
+  }
+
+  .section[data-motion='enabled'] .timeline li {
+    transition-delay: 0ms, 0ms, 0ms, 0ms, 0ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section *,
+  .section *::before,
+  .section *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .section [data-reveal] {
+    opacity: 1 !important;
+    translate: none !important;
+  }
+}
