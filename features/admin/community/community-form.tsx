@@ -3,6 +3,7 @@
 import { brandTypes } from '../labels'
 import { type CommunityRecord, isNew } from '../types'
 import { EditorForm, useEditor } from '../ui/editor-form'
+import { FormStep } from '../ui/form-step'
 import { ImageUploadField, useImageUpload } from '../ui/image-upload-field'
 import { LabelOptions } from '../ui/label-options'
 
@@ -58,16 +59,11 @@ export function CommunityForm({
       onCancel={onCancel}
       onDelete={onDelete}
     >
-      <div className="col-span-full flex items-start gap-3 border-b border-neo-border pb-1">
-        <span className="grid size-9 shrink-0 place-items-center rounded-control bg-neo-accent-soft font-bold text-neo-accent-text">
-          01
-        </span>
-        <div className="min-w-0">
-          <h4 className="mb-1 text-base font-bold tracking-[-0.025em]">Nombre del {subject}</h4>
-          <p className="mb-0 text-sm text-neo-text-secondary">
-            Este nombre identificará el logo en el panel y en la web.
-          </p>
-        </div>
+      <FormStep
+        number="01"
+        title={`Nombre del ${subject}`}
+        description="Este nombre identificará el logo en el panel y en la web."
+      />
       </div>
       <label className="col-span-full">
         <span className="font-semibold">
@@ -97,17 +93,11 @@ export function CommunityForm({
         </label>
       )}
 
-      <div className="col-span-full mt-1 flex items-start gap-3 border-b border-neo-border pb-1">
-        <span className="grid size-9 shrink-0 place-items-center rounded-control bg-neo-accent-soft font-bold text-neo-accent-text">
-          02
-        </span>
-        <div className="min-w-0">
-          <h4 className="mb-1 text-base font-bold tracking-[-0.025em]">Sube el logo</h4>
-          <p className="mb-0 text-sm text-neo-text-secondary">
-            Elige la imagen de{' '}
-            <strong className="text-neo-text">{values.name.trim() || `tu ${subject}`}</strong>.
-          </p>
-        </div>
+      <FormStep
+        number="02"
+        title="Sube el logo"
+        description={`Elige la imagen de ${values.name.trim() || `tu ${subject}`}.`}
+      />
       </div>
       <ImageUploadField
         url={values.logo_url}
@@ -119,16 +109,11 @@ export function CommunityForm({
         onChange={upload}
       />
 
-      <div className="col-span-full mt-1 flex items-start gap-3 border-b border-neo-border pb-1">
-        <span className="grid size-9 shrink-0 place-items-center rounded-control bg-neo-accent-soft font-bold text-neo-accent-text">
-          03
-        </span>
-        <div className="min-w-0">
-          <h4 className="mb-1 text-base font-bold tracking-[-0.025em]">Visibilidad</h4>
-          <p className="mb-0 text-sm text-neo-text-secondary">
-            Elige si aparecerá en la web del evento.
-          </p>
-        </div>
+      <FormStep
+        number="03"
+        title="Visibilidad"
+        description="Elige si aparecerá en la web del evento."
+      />
       </div>
       <div className="col-span-full grid gap-4 rounded-xl border border-neo-border bg-neo-bg p-4">
         <label className="check-label">
