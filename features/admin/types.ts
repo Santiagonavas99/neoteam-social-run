@@ -128,6 +128,8 @@ export type AdminResponse<Row = unknown> = {
   name?: string
   valid?: boolean
   expiresAt?: string
+  deadline?: string | null
+  registrationOpen?: boolean
   rows?: Row[]
   metrics?: Metrics
   url?: string
