@@ -1,17 +1,6 @@
 'use client'
 
-import {
-  ArrowLeft,
-  ArrowUpRight,
-  Dices,
-  MonitorPlay,
-  Play,
-  Plus,
-  ScanLine,
-  Trash2,
-  Trophy,
-  Zap,
-} from 'lucide-react'
+import { ArrowLeft, ArrowUpRight, Dices, MonitorPlay, Play, Plus, ScanLine, Trash2, Trophy, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { callAdmin } from '../api'
@@ -48,17 +37,12 @@ const categoryTypes: Record<Category, string[]> = {
 }
 
 function categoryLabel(category: Category) {
-  return category === 'raffles'
-    ? 'Sorteos'
-    : category === 'stands'
-      ? 'Stands y retos'
-      : 'Premios instantáneos'
+  return category === 'raffles' ? 'Sorteos' : category === 'stands' ? 'Stands y retos' : 'Premios instantáneos'
 }
 
 function ruleDescription(row: DynamicRow, eligible: number | null) {
   if (eligible === null) return 'Calculando participantes elegibles…'
-  if (eligible === 0)
-    return 'Todavía no hay corredores elegibles. Revisa las condiciones y el check-in.'
+  if (eligible === 0) return 'Todavía no hay corredores elegibles. Revisa las condiciones y el check-in.'
   const parts = [
     row.requires_checkin ? 'con check-in' : 'inscritos',
     row.config?.gender ? raffleGenders[String(row.config.gender)]?.toLowerCase() : '',
@@ -66,21 +50,18 @@ function ruleDescription(row: DynamicRow, eligible: number | null) {
     row.config?.exclude_winners === true ? 'sin ganadores anteriores' : '',
   ].filter(Boolean)
   return [
-    `${eligible} participantes elegibles`,
-    parts.length ? `(${parts.join(', ')})` : '',
-    `· hasta ${Math.min(row.winner_count, eligible)} ganadores. El sorteo real guarda sus resultados.`,
+    eligible + ' participantes elegibles',
+    parts.length ? '(' + parts.join(', ') + ')' : '',
+    '· hasta ' + Math.min(row.winner_count, eligible) + ' ganadores. El sorteo real guarda sus resultados.',
   ].join(' ')
 }
 
 export function DynamicsView() {
   const dynamics = useDynamics()
   const { rows, busy, feedback, editor, confirmation, winners } = dynamics
-  const loadBrands = useCallback(
-    async () =>
-      (await callAdmin<CommunityRecord>('adminData', { resource: 'brands', operation: 'list' }))
-        .rows ?? [],
-    [],
-  )
+  const loadBrands = useCallback(async () => (
+    await callAdmin<CommunityRecord>('adminData', { resource: 'brands', operation: 'list' })
+  ).rows ?? [], [])
   const sponsors = useAdminData<CommunityRecord[]>(loadBrands, [], dynamics.onError)
   const [category, setCategory] = useState<Category>('raffles')
   const [query, setQuery] = useState('')
@@ -91,10 +72,9 @@ export function DynamicsView() {
   const [showRanking, setShowRanking] = useState(false)
   const loading = dynamics.loading || sponsors.loading
   const selected = rows.find((row) => row.id === selectedId) ?? null
-  const visible = rows.filter(
-    (row) =>
-      categoryTypes[category].includes(row.type) &&
-      matchesQuery([row.name, row.description, row.prize, dynamicTypes[row.type]], query),
+  const visible = rows.filter((row) =>
+    categoryTypes[category].includes(row.type) &&
+    matchesQuery([row.name, row.description, row.prize, dynamicTypes[row.type]], query)
   )
   const drafts = rows.filter((row) => row.status === 'draft')
   const counts = {
@@ -126,46 +106,48 @@ export function DynamicsView() {
     dynamics.setWinners(null)
   }
 
-  const confirmationPanel =
-    confirmation?.action === 'draw' ? (
-      <ConfirmPanel
-        kind="draw"
-        title={`¿Todo listo para “${confirmation.row.name}”?`}
-        text={ruleDescription(confirmation.row, dynamics.eligible)}
-        confirmLabel="Confirmar sorteo real"
-        busy={busy}
-        confirmDisabled={!dynamics.eligible}
-        onCancel={() => dynamics.setConfirmation(null)}
-        onConfirm={() => void dynamics.confirm()}
-      />
-    ) : confirmation?.action === 'redraw' ? (
-      <ConfirmPanel
-        kind="draw"
-        title={`${confirmation.winner.firstName} no está. ¿Sortear reemplazo?`}
-        text={
-          'Se marcará como ausente y se buscará otra persona para el puesto ' +
-          confirmation.place +
-          '. Los demás ganadores no cambian.'
-        }
-        confirmLabel="Buscar reemplazo"
-        busy={busy}
-        onCancel={() => dynamics.setConfirmation(null)}
-        onConfirm={() => void dynamics.confirm()}
-      />
-    ) : confirmation?.action === 'delete' ? (
-      <ConfirmPanel
-        kind="delete"
-        title={`¿Eliminar “${confirmation.row.name}”?`}
-        text="Se eliminará esta dinámica y todas sus participaciones. No se puede deshacer."
-        confirmLabel="Sí, eliminar"
-        busy={busy}
-        onCancel={() => dynamics.setConfirmation(null)}
-        onConfirm={() => void dynamics.confirm()}
-      />
-    ) : confirmation?.action === 'deleteDrafts' ? (
-      <ConfirmPanel
-        kind="delete"
-        title={`¿Eliminar los ${confirmation.drafts.length} borradores?`}
+  const confirmationPanel = confirmation?.action === 'draw' ? (
+    <ConfirmPanel
+      kind="draw"
+      title={'¿Todo listo para “' + confirmation.row.name + '”?'}
+      text={ruleDescription(confirmation.row, dynamics.eligible)}
+      confirmLabel="Confirmar sorteo real"
+      busy={busy}
+      confirmDisabled={!dynamics.eligible}
+      onCancel={() => dynamics.setConfirmation(null)}
+      onConfirm={() => void dynamics.confirm()}
+    />
+  ) : confirmation?.action === 'redraw' ? (
+    <ConfirmPanel
+      kind="draw"
+      title={confirmation.winner.firstName + ' no está. ¿Sortear reemplazo?'}
+      text={'Se marcará como ausente y se buscará otra persona para el puesto ' + confirmation.place + '. Los demás ganadores no cambian.'}
+      confirmLabel="Buscar reemplazo"
+      busy={busy}
+      onCancel={() => dynamics.setConfirmation(null)}
+      onConfirm={() => void dynamics.confirm()}
+    />
+  ) : confirmation?.action === 'delete' ? (
+    <ConfirmPanel
+      kind="delete"
+      title={'¿Eliminar “' + confirmation.row.name + '” ?'}
+      text="Se eliminará esta dinámica y todas sus participaciones. No se puede deshacer."
+      confirmLabel="Sí, eliminar"
+      busy={busy}
+      onCancel={() => dynamics.setConfirmation(null)}
+      onConfirm={() => void dynamics.confirm()}
+    />
+  ) : confirmation?.action === 'deleteDrafts' ? (
+    <ConfirmPanel
+      kind="delete"
+      title={'¿Eliminar los ' + confirmation.drafts.length + ' borradores?'}
+      text="Se perderán las configuraciones de los borradores y sus participaciones."
+      confirmLabel="Eliminar borradores"
+      busy={busy}
+      onCancel={() => dynamics.setConfirmation(null)}
+      onConfirm={() => void dynamics.confirm()}
+    />
+  ) : null
 
   return (
     <section aria-busy={loading || busy} className="flex flex-col gap-5">
@@ -307,10 +289,10 @@ export function DynamicsView() {
                 El panel de control es privado; los espectadores solo ven el espectáculo.
               </p>
               <div className="mt-5 flex flex-wrap gap-3">
-                <Link className="button" href={`/juego/${selected.id}`} target="_blank" rel="noopener noreferrer">
+                <Link className="button" href={'/juego/' + selected.id} target="_blank" rel="noopener noreferrer">
                   Abrir pantalla real <ArrowUpRight aria-hidden className="size-4" />
                 </Link>
-                <Link className="button button-secondary" href={`/juego/${selected.id}?ensayo=1`} target="_blank" rel="noopener noreferrer">
+                <Link className="button button-secondary" href={'/juego/' + selected.id + '?ensayo=1'} target="_blank" rel="noopener noreferrer">
                   Probar en modo ensayo <ArrowUpRight aria-hidden className="size-4" />
                 </Link>
               </div>
@@ -427,7 +409,7 @@ export function DynamicsView() {
           ) : (
             <EmptyState
               icon={Zap}
-              title={`Sin ${categoryLabel(category).toLowerCase()}`}
+              title={'Sin ' + categoryLabel(category).toLowerCase()}
               text="Crea una dinámica con el asistente. Podrás configurarla antes de activarla."
               action={<button type="button" className="button" onClick={() => setCreating(true)}><Plus aria-hidden className="size-4" /> Nueva dinámica</button>}
             />
