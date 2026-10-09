@@ -1,4 +1,4 @@
-import { ArrowDown, CalendarDays, Clock, MapPin, QrCode, Route } from 'lucide-react'
+import { CalendarDays, Clock, MapPin, QrCode, Route } from 'lucide-react'
 import Link from 'next/link'
 import { eventConfig } from '@/features/event/event'
 import { EventCountdown } from '@/features/event/event-countdown'
@@ -48,14 +48,7 @@ export function Hero() {
               <Link href="/pase" className="text-link">
                 Mi pase <QrCode aria-hidden className="size-4 shrink-0" />
               </Link>
-              <a href="#agenda" className="text-link">
-                Ver agenda <ArrowDown aria-hidden className="size-4 shrink-0" />
-              </a>
             </div>
-            <a href="#pasos" className="v2-hero-qr-help">
-              ¿Para qué sirve el QR? <span>Te lo explicamos en 4 pasos</span>
-              <ArrowDown aria-hidden className="size-4 shrink-0" />
-            </a>
             <div className="v2-route-card v2-route-card-desktop">
               <strong>5K</strong>
               <span>RUTA SOCIAL</span>
