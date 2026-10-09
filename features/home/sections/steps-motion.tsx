@@ -35,6 +35,7 @@ export function StepsMotion({ children }: { children: ReactNode }) {
 
     const activeObserver = new IntersectionObserver(
       ([entry]) => {
+        if (!entry) return
         section.dataset.inView = entry.isIntersecting ? 'true' : 'false'
       },
       { threshold: 0 },
