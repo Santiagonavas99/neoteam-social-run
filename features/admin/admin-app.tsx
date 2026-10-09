@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { AdminPresenceTracker } from './auth/admin-presence-tracker'
 import { AuthScreen } from './auth/auth-screen'
 import { useAdminSession } from './auth/use-admin-session'
 import { CheckinView } from './checkin/checkin-view'
@@ -25,7 +26,9 @@ export function AdminApp({ enableLegacyWebpMigration }: { enableLegacyWebpMigrat
   const section = allowed.find((item) => item.id === picked)?.id ?? allowed[0]?.id ?? 'checkin'
 
   return (
-    <AdminShell
+    <>
+      {session.role === 'admin' ? <AdminPresenceTracker /> : null}
+      <AdminShell
       sections={allowed}
       section={section}
       onNavigate={setSection}
@@ -52,6 +55,7 @@ export function AdminApp({ enableLegacyWebpMigration }: { enableLegacyWebpMigrat
       ) : (
         <OverviewView navigate={setSection} />
       )}
-    </AdminShell>
+      </AdminShell>
+    </>
   )
 }
