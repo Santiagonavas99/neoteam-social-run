@@ -6,8 +6,8 @@ import {
   colombiaInputToUtc,
   colombiaLocalInput,
   isRegistrationClosed,
-  registrationDeadlineLabel,
   type RegistrationSettings,
+  registrationDeadlineLabel,
 } from '@/features/registration/registration-deadline'
 import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
@@ -59,7 +59,10 @@ export function RegistrationSettingsView() {
         registrationOpen: open,
       })
       await reload()
-      setFeedback({ kind: 'success', text: 'Plazo actualizado. El cambio ya aplica a nuevas inscripciones.' })
+      setFeedback({
+        kind: 'success',
+        text: 'Plazo actualizado. El cambio ya aplica a nuevas inscripciones.',
+      })
     } catch (error) {
       onError(error)
     } finally {
@@ -73,7 +76,8 @@ export function RegistrationSettingsView() {
         <div>
           <h2 className="m-0 text-xl font-extrabold tracking-tight">Plazo de inscripción</h2>
           <p className="m-0 mt-2 text-sm text-neo-text-secondary">
-            Cambia el cierre del evento sin actualizar la web. Todos los horarios son de Colombia (UTC−5).
+            Cambia el cierre del evento sin actualizar la web. Todos los horarios son de Colombia
+            (UTC−5).
           </p>
         </div>
         <RefreshButton
@@ -134,21 +138,25 @@ export function RegistrationSettingsView() {
               className="w-full"
             />
             <p className="m-0 text-xs text-neo-text-secondary">
-              Al llegar esta hora se cierra automáticamente. Borra la fecha para no tener cierre automático.
+              Al llegar esta hora se cierra automáticamente. Borra la fecha para no tener cierre
+              automático.
             </p>
             {!valid && (
               <p role="alert" className="m-0 text-xs text-neo-danger">
                 Selecciona una fecha y hora válidas.
               </p>
             )}
-            {open && dateLocal && valid && isRegistrationClosed({
-              registrationOpen: true,
-              deadline: colombiaInputToUtc(dateLocal),
-            }) && (
-              <p className="m-0 text-xs font-medium text-neo-danger">
-                Esta fecha ya pasó: al guardar, el registro quedará cerrado.
-              </p>
-            )}
+            {open &&
+              dateLocal &&
+              valid &&
+              isRegistrationClosed({
+                registrationOpen: true,
+                deadline: colombiaInputToUtc(dateLocal),
+              }) && (
+                <p className="m-0 text-xs font-medium text-neo-danger">
+                  Esta fecha ya pasó: al guardar, el registro quedará cerrado.
+                </p>
+              )}
           </div>
 
           <button
