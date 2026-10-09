@@ -18,7 +18,7 @@ export type ParticipantProfile = {
 
 const DOC_TYPES = new Set(['CC', 'TI', 'CE', 'PA', 'PPT', 'OTRO'])
 const NUMERIC_DOCUMENTS = new Set(['CC', 'CE', 'TI', 'PPT'])
-const GENDERS = new Set(['female', 'male', 'non_binary', 'prefer_not_to_say', 'other'])
+const GENDERS = new Set(['female', 'male'])
 const SHIRT_SIZES = new Set(['XS', 'S', 'M', 'L', 'XL', 'XXL'])
 const UUID = /^[a-f\d]{8}-(?:[a-f\d]{4}-){3}[a-f\d]{12}$/i
 
