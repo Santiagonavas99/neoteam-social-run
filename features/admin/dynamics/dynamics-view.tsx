@@ -99,7 +99,9 @@ export function DynamicsView() {
 
   function open(row: DynamicRow) {
     setSelectedId(row.id)
-    setTab(row.status === 'draft' ? 'preparar' : row.status === 'completed' ? 'resultados' : 'en-vivo')
+    setTab(
+      row.status === 'draft' ? 'preparar' : row.status === 'completed' ? 'resultados' : 'en-vivo',
+    )
     setCreating(false)
     setScanning(false)
     setSettingsOpen(false)
@@ -345,11 +347,7 @@ export function DynamicsView() {
               {selected.type !== 'raffle' && selected.status === 'open' && (
                 <div className="rounded-card border border-neo-border bg-neo-surface p-5">
                   {!scanning ? (
-                    <button
-                      type="button"
-                      className="button"
-                      onClick={() => setScanning(true)}
-                    >
+                    <button type="button" className="button" onClick={() => setScanning(true)}>
                       <ScanLine aria-hidden className="size-4" /> Registrar participación
                     </button>
                   ) : (
