@@ -1,7 +1,7 @@
-import { ArrowRight, ArrowUpRight, MapPin } from 'lucide-react'
-import Link from 'next/link'
+import { ArrowUpRight, MapPin } from 'lucide-react'
 import { eventConfig } from '@/features/event/event'
 import { mapsEmbedUrl, mapsUrl } from '@/features/event/maps'
+import { LandingRegistrationCta } from '@/features/registration/landing-registration-status'
 
 export function Final({ index = '05' }: { index?: string }) {
   return (
@@ -11,9 +11,7 @@ export function Final({ index = '05' }: { index?: string }) {
         <div className="v2-final-main reveal">
           <p>DOMINGO · SOCIAL RUN · ANIVERSARIO NEOTEAM</p>
           <h2>18.10.26</h2>
-          <Link href="/registro" className="button">
-            Quiero estar ahí <ArrowRight aria-hidden className="size-4 shrink-0" />
-          </Link>
+          <LandingRegistrationCta label="Quiero estar ahí" />
         </div>
         <div className="v2-meeting reveal">
           <p className="section-label inline-flex items-center gap-1.5">

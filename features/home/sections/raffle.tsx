@@ -1,5 +1,5 @@
-import { ArrowRight, Gift } from 'lucide-react'
-import Link from 'next/link'
+import { Gift } from 'lucide-react'
+import { LandingRegistrationCta } from '@/features/registration/landing-registration-status'
 
 export function Raffle({ index = '04' }: { index?: string }) {
   return (
@@ -30,9 +30,7 @@ export function Raffle({ index = '04' }: { index?: string }) {
           Celebración, reconocimiento a las marcas aliadas, rifas, premios y contenido con la
           comunidad.
         </p>
-        <Link href="/registro" className="button">
-          Registrarme <ArrowRight aria-hidden className="size-4 shrink-0" />
-        </Link>
+        <LandingRegistrationCta label="Registrarme" />
       </div>
     </section>
   )

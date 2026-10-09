@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.4] - 2026-10-09
+
+### Improved
+
+- **Visible enrollment status on the landing page:** hero displays a live open/closed notice. Registration calls to action in the navigation, hero, raffle and final section stop promoting signups when registration closes; the pass-recovery link remains accessible.
+- **Single source of truth:** landing page reads the same Supabase enrollment configuration as the registration form, updates immediately on fresh visits and polls while the page remains open.
+- **Clearer administration toggle:** replace the stray checkbox with an accessible switch alongside the current enrollment status; unsaved adjustments are explicitly identified.
+
+
 ## [0.31.3] - 2026-10-09
 
 ### Fixed
