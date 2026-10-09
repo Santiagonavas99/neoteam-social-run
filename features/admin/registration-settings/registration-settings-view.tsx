@@ -121,6 +121,7 @@ export function RegistrationSettingsView() {
                 <input
                   type="checkbox"
                   role="switch"
+                  aria-checked={open}
                   checked={open}
                   onChange={(event) => setOpen(event.target.checked)}
                   disabled={saving}
