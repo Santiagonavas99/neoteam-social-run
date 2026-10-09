@@ -64,7 +64,6 @@ export function CommunityForm({
         title={`Nombre del ${subject}`}
         description="Este nombre identificará el logo en el panel y en la web."
       />
-      </div>
       <label className="col-span-full">
         <span className="font-semibold">
           Nombre del {subject} <span aria-hidden="true">*</span>
@@ -98,7 +97,6 @@ export function CommunityForm({
         title="Sube el logo"
         description={`Elige la imagen de ${values.name.trim() || `tu ${subject}`}.`}
       />
-      </div>
       <ImageUploadField
         url={values.logo_url}
         name={values.name}
@@ -114,7 +112,6 @@ export function CommunityForm({
         title="Visibilidad"
         description="Elige si aparecerá en la web del evento."
       />
-      </div>
       <div className="col-span-full grid gap-4 rounded-xl border border-neo-border bg-neo-bg p-4">
         <label className="check-label">
           <input
