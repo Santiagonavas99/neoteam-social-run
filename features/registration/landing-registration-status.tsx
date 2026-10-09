@@ -79,8 +79,10 @@ export function LandingRegistrationNotice() {
   if (state === 'unavailable') {
     return (
       <div className="v2-registration-feedback" role="status">
-        <span className="v2-registration-feedback-indicator" aria-hidden="true" />
-        <span className="v2-registration-feedback-label">Consultando inscripciones</span>
+        <span className="v2-registration-feedback-heading">
+          <span className="v2-registration-feedback-indicator" aria-hidden="true" />
+          <span className="v2-registration-feedback-label">Consultando inscripciones</span>
+        </span>
       </div>
     )
   }
@@ -88,8 +90,10 @@ export function LandingRegistrationNotice() {
   if (state === 'closed') {
     return (
       <div className="v2-registration-feedback v2-registration-feedback-closed" role="status">
-        <Clock3 aria-hidden="true" className="size-3.5 shrink-0" />
-        <span className="v2-registration-feedback-label">Inscripciones cerradas</span>
+        <span className="v2-registration-feedback-heading">
+          <Clock3 aria-hidden="true" className="size-3.5 shrink-0" />
+          <span className="v2-registration-feedback-label">Inscripciones cerradas</span>
+        </span>
         <span className="v2-registration-feedback-detail">Tu pase sigue disponible</span>
       </div>
     )
@@ -97,8 +101,10 @@ export function LandingRegistrationNotice() {
 
   return (
     <div className="v2-registration-feedback v2-registration-feedback-open" role="status">
-      <span className="v2-registration-feedback-indicator" aria-hidden="true" />
-      <span className="v2-registration-feedback-label">Inscripciones abiertas</span>
+      <span className="v2-registration-feedback-heading">
+        <span className="v2-registration-feedback-indicator" aria-hidden="true" />
+        <span className="v2-registration-feedback-label">Inscripciones abiertas</span>
+      </span>
       {settings?.deadline && (
         <span className="v2-registration-feedback-detail">
           Cierre · {registrationDeadlineCompactLabel(settings.deadline)} (COL)
