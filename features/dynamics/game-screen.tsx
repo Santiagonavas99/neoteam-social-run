@@ -18,7 +18,9 @@ function SpectatorContent({ game, now }: { game: PublicGame; now: number }) {
       <h1 className="m-0 text-5xl font-black leading-[0.96] tracking-[-0.07em] break-words text-white sm:text-7xl lg:text-9xl">
         {game.name}
       </h1>
-      {game.prize && <p className="m-0 text-lg font-medium text-white/75 sm:text-2xl">{game.prize}</p>}
+      {game.prize && (
+        <p className="m-0 text-lg font-medium text-white/75 sm:text-2xl">{game.prize}</p>
+      )}
       {isRaffle ? (
         waiting ? (
           <div className="mx-auto mt-6 flex min-h-40 flex-col items-center justify-center gap-4">
@@ -167,7 +169,10 @@ export function GameScreen({ id, demo }: { id: string; demo: boolean }) {
       )}
 
       {demo && (
-        <nav aria-label="Controles de ensayo" className="mx-auto mb-3 flex w-full max-w-xl flex-wrap justify-center gap-2 rounded-2xl border border-neo-accent/40 p-4">
+        <nav
+          aria-label="Controles de ensayo"
+          className="mx-auto mb-3 flex w-full max-w-xl flex-wrap justify-center gap-2 rounded-2xl border border-neo-accent/40 p-4"
+        >
           <button
             type="button"
             className="rounded-xl bg-neo-accent px-5 py-3 font-bold text-neo-black"
