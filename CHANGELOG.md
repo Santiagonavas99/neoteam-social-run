@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.30.2] - 2026-10-08
+
+### Improved
+
+- **Private printable registered-runner roster:** an explicit «Imprimir inscritos» action creates a name-and-crew-only A4 printout, including all non-cancelled registrations across pages, with names safely escaped and sorted alphabetically. The existing complete administrative CSV is retained and relabeled «Exportar respaldo» to avoid confusing a private backup with the publicly printable roster.
+
+
 ## [0.30.1] - 2026-10-08
 
 ### Fixed
