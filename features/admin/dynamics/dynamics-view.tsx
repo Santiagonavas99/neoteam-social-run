@@ -1,6 +1,17 @@
 'use client'
 
-import { ArrowLeft, ArrowUpRight, Dices, MonitorPlay, Play, Plus, ScanLine, Trash2, Trophy, Zap } from 'lucide-react'
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  Dices,
+  MonitorPlay,
+  Play,
+  Plus,
+  ScanLine,
+  Trash2,
+  Trophy,
+  Zap,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { callAdmin } from '../api'
@@ -37,12 +48,17 @@ const categoryTypes: Record<Category, string[]> = {
 }
 
 function categoryLabel(category: Category) {
-  return category === 'raffles' ? 'Sorteos' : category === 'stands' ? 'Stands y retos' : 'Premios instantáneos'
+  return category === 'raffles'
+    ? 'Sorteos'
+    : category === 'stands'
+      ? 'Stands y retos'
+      : 'Premios instantáneos'
 }
 
 function ruleDescription(row: DynamicRow, eligible: number | null) {
   if (eligible === null) return 'Calculando participantes elegibles…'
-  if (eligible === 0) return 'Todavía no hay corredores elegibles. Revisa las condiciones y el check-in.'
+  if (eligible === 0)
+    return 'Todavía no hay corredores elegibles. Revisa las condiciones y el check-in.'
   const parts = [
     row.requires_checkin ? 'con check-in' : 'inscritos',
     row.config?.gender ? raffleGenders[String(row.config.gender)]?.toLowerCase() : '',
@@ -52,16 +68,21 @@ function ruleDescription(row: DynamicRow, eligible: number | null) {
   return [
     eligible + ' participantes elegibles',
     parts.length ? '(' + parts.join(', ') + ')' : '',
-    '· hasta ' + Math.min(row.winner_count, eligible) + ' ganadores. El sorteo real guarda sus resultados.',
+    '· hasta ' +
+      Math.min(row.winner_count, eligible) +
+      ' ganadores. El sorteo real guarda sus resultados.',
   ].join(' ')
 }
 
 export function DynamicsView() {
   const dynamics = useDynamics()
   const { rows, busy, feedback, editor, confirmation, winners } = dynamics
-  const loadBrands = useCallback(async () => (
-    await callAdmin<CommunityRecord>('adminData', { resource: 'brands', operation: 'list' })
-  ).rows ?? [], [])
+  const loadBrands = useCallback(
+    async () =>
+      (await callAdmin<CommunityRecord>('adminData', { resource: 'brands', operation: 'list' }))
+        .rows ?? [],
+    [],
+  )
   const sponsors = useAdminData<CommunityRecord[]>(loadBrands, [], dynamics.onError)
   const [category, setCategory] = useState<Category>('raffles')
   const [query, setQuery] = useState('')
@@ -72,9 +93,10 @@ export function DynamicsView() {
   const [showRanking, setShowRanking] = useState(false)
   const loading = dynamics.loading || sponsors.loading
   const selected = rows.find((row) => row.id === selectedId) ?? null
-  const visible = rows.filter((row) =>
-    categoryTypes[category].includes(row.type) &&
-    matchesQuery([row.name, row.description, row.prize, dynamicTypes[row.type]], query)
+  const visible = rows.filter(
+    (row) =>
+      categoryTypes[category].includes(row.type) &&
+      matchesQuery([row.name, row.description, row.prize, dynamicTypes[row.type]], query),
   )
   const drafts = rows.filter((row) => row.status === 'draft')
   const counts = {
@@ -106,61 +128,74 @@ export function DynamicsView() {
     dynamics.setWinners(null)
   }
 
-  const confirmationPanel = confirmation?.action === 'draw' ? (
-    <ConfirmPanel
-      kind="draw"
-      title={'¿Todo listo para “' + confirmation.row.name + '”?'}
-      text={ruleDescription(confirmation.row, dynamics.eligible)}
-      confirmLabel="Confirmar sorteo real"
-      busy={busy}
-      confirmDisabled={!dynamics.eligible}
-      onCancel={() => dynamics.setConfirmation(null)}
-      onConfirm={() => void dynamics.confirm()}
-    />
-  ) : confirmation?.action === 'redraw' ? (
-    <ConfirmPanel
-      kind="draw"
-      title={confirmation.winner.firstName + ' no está. ¿Sortear reemplazo?'}
-      text={'Se marcará como ausente y se buscará otra persona para el puesto ' + confirmation.place + '. Los demás ganadores no cambian.'}
-      confirmLabel="Buscar reemplazo"
-      busy={busy}
-      onCancel={() => dynamics.setConfirmation(null)}
-      onConfirm={() => void dynamics.confirm()}
-    />
-  ) : confirmation?.action === 'delete' ? (
-    <ConfirmPanel
-      kind="delete"
-      title={'¿Eliminar “' + confirmation.row.name + '” ?'}
-      text="Se eliminará esta dinámica y todas sus participaciones. No se puede deshacer."
-      confirmLabel="Sí, eliminar"
-      busy={busy}
-      onCancel={() => dynamics.setConfirmation(null)}
-      onConfirm={() => void dynamics.confirm()}
-    />
-  ) : confirmation?.action === 'deleteDrafts' ? (
-    <ConfirmPanel
-      kind="delete"
-      title={'¿Eliminar los ' + confirmation.drafts.length + ' borradores?'}
-      text="Se perderán las configuraciones de los borradores y sus participaciones."
-      confirmLabel="Eliminar borradores"
-      busy={busy}
-      onCancel={() => dynamics.setConfirmation(null)}
-      onConfirm={() => void dynamics.confirm()}
-    />
-  ) : null
+  const confirmationPanel =
+    confirmation?.action === 'draw' ? (
+      <ConfirmPanel
+        kind="draw"
+        title={'¿Todo listo para “' + confirmation.row.name + '”?'}
+        text={ruleDescription(confirmation.row, dynamics.eligible)}
+        confirmLabel="Confirmar sorteo real"
+        busy={busy}
+        confirmDisabled={!dynamics.eligible}
+        onCancel={() => dynamics.setConfirmation(null)}
+        onConfirm={() => void dynamics.confirm()}
+      />
+    ) : confirmation?.action === 'redraw' ? (
+      <ConfirmPanel
+        kind="draw"
+        title={confirmation.winner.firstName + ' no está. ¿Sortear reemplazo?'}
+        text={
+          'Se marcará como ausente y se buscará otra persona para el puesto ' +
+          confirmation.place +
+          '. Los demás ganadores no cambian.'
+        }
+        confirmLabel="Buscar reemplazo"
+        busy={busy}
+        onCancel={() => dynamics.setConfirmation(null)}
+        onConfirm={() => void dynamics.confirm()}
+      />
+    ) : confirmation?.action === 'delete' ? (
+      <ConfirmPanel
+        kind="delete"
+        title={'¿Eliminar “' + confirmation.row.name + '” ?'}
+        text="Se eliminará esta dinámica y todas sus participaciones. No se puede deshacer."
+        confirmLabel="Sí, eliminar"
+        busy={busy}
+        onCancel={() => dynamics.setConfirmation(null)}
+        onConfirm={() => void dynamics.confirm()}
+      />
+    ) : confirmation?.action === 'deleteDrafts' ? (
+      <ConfirmPanel
+        kind="delete"
+        title={'¿Eliminar los ' + confirmation.drafts.length + ' borradores?'}
+        text="Se perderán las configuraciones de los borradores y sus participaciones."
+        confirmLabel="Eliminar borradores"
+        busy={busy}
+        onCancel={() => dynamics.setConfirmation(null)}
+        onConfirm={() => void dynamics.confirm()}
+      />
+    ) : null
 
   return (
     <section aria-busy={loading || busy} className="flex flex-col gap-5">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="m-0 text-xs font-bold tracking-widest text-neo-accent-text uppercase">NeoTeam · Día del evento</p>
+          <p className="m-0 text-xs font-bold tracking-widest text-neo-accent-text uppercase">
+            NeoTeam · Día del evento
+          </p>
           <h2 className="m-0 mt-1 text-2xl font-black tracking-tight sm:text-3xl">Dinámicas</h2>
           <p className="m-0 mt-2 max-w-xl text-sm text-neo-text-secondary">
-            Prepara tus actividades con calma. El día del evento, entra en «Control» para ejecutarlas.
+            Prepara tus actividades con calma. El día del evento, entra en «Control» para
+            ejecutarlas.
           </p>
         </div>
         {!selected && !creating && (
-          <button type="button" className="button" disabled={busy} onClick={() => setCreating(true)}>
+          <button
+            type="button"
+            className="button"
+            disabled={busy}
+            onClick={() => setCreating(true)}
+          >
             <Plus aria-hidden className="size-4" /> Nueva dinámica
           </button>
         )}
@@ -184,13 +219,22 @@ export function DynamicsView() {
           <div className="rounded-card border border-neo-border bg-neo-surface p-5 md:p-7">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="min-w-0">
-                <p className="m-0 text-xs font-bold text-neo-accent-text uppercase">{dynamicTypes[selected.type]}</p>
-                <h3 className="m-0 mt-2 text-2xl font-black tracking-tight break-words">{selected.name}</h3>
-                {selected.prize && <p className="m-0 mt-1 text-sm text-neo-text-secondary">{selected.prize}</p>}
+                <p className="m-0 text-xs font-bold text-neo-accent-text uppercase">
+                  {dynamicTypes[selected.type]}
+                </p>
+                <h3 className="m-0 mt-2 text-2xl font-black tracking-tight break-words">
+                  {selected.name}
+                </h3>
+                {selected.prize && (
+                  <p className="m-0 mt-1 text-sm text-neo-text-secondary">{selected.prize}</p>
+                )}
               </div>
               <StatusBadge status={selected.status} label={dynamicStates[selected.status]} />
             </div>
-            <nav className="mt-6 flex flex-wrap gap-2 border-t border-neo-border pt-4" aria-label="Secciones de la dinámica">
+            <nav
+              className="mt-6 flex flex-wrap gap-2 border-t border-neo-border pt-4"
+              aria-label="Secciones de la dinámica"
+            >
               {(Object.keys(tabLabels) as DetailTab[]).map((item) => (
                 <button
                   type="button"
@@ -201,9 +245,12 @@ export function DynamicsView() {
                     setScanning(false)
                     dynamics.setEditor(null)
                   }}
-                  className={'min-h-11 rounded-control border px-3 text-sm font-bold ' +
-                    (tab === item ? 'border-neo-text bg-neo-text text-neo-surface' :
-                      'border-neo-border hover:bg-neo-muted-bg')}
+                  className={
+                    'min-h-11 rounded-control border px-3 text-sm font-bold ' +
+                    (tab === item
+                      ? 'border-neo-text bg-neo-text text-neo-surface'
+                      : 'border-neo-border hover:bg-neo-muted-bg')
+                  }
                 >
                   {tabLabels[item]}
                 </button>
@@ -218,18 +265,30 @@ export function DynamicsView() {
                 ['Ganadores', String(selected.winners_count ?? 0)],
                 ['Check-in obligatorio', selected.requires_checkin ? 'Sí' : 'No'],
               ].map(([title, value]) => (
-                <div key={title} className="rounded-card border border-neo-border bg-neo-surface p-5">
+                <div
+                  key={title}
+                  className="rounded-card border border-neo-border bg-neo-surface p-5"
+                >
                   <p className="m-0 text-xs font-bold text-neo-text-secondary">{title}</p>
                   <p className="m-0 mt-2 text-3xl font-black">{value}</p>
                 </div>
               ))}
               <div className="md:col-span-3 flex flex-wrap gap-3 rounded-card border border-neo-border bg-neo-surface p-5">
                 {selected.status === 'draft' && (
-                  <button type="button" className="button" disabled={busy} onClick={() => void dynamics.activate(selected)}>
+                  <button
+                    type="button"
+                    className="button"
+                    disabled={busy}
+                    onClick={() => void dynamics.activate(selected)}
+                  >
                     <Play aria-hidden className="size-4" /> Activar dinámica
                   </button>
                 )}
-                <button type="button" className="button button-secondary" onClick={() => setTab('configuracion')}>
+                <button
+                  type="button"
+                  className="button button-secondary"
+                  onClick={() => setTab('configuracion')}
+                >
                   Revisar configuración
                 </button>
                 <button type="button" className="button" onClick={() => setTab('control')}>
@@ -260,11 +319,17 @@ export function DynamicsView() {
               />
               {selected.type !== 'raffle' && selected.status === 'open' && (
                 <div className="rounded-card border border-neo-border bg-neo-surface p-5">
-                  <button type="button" className="button" onClick={() => setScanning((value) => !value)}>
+                  <button
+                    type="button"
+                    className="button"
+                    onClick={() => setScanning((value) => !value)}
+                  >
                     <ScanLine aria-hidden className="size-4" />
                     {scanning ? 'Cerrar escáner' : 'Registrar participación'}
                   </button>
-                  {scanning && <ParticipationPanel dynamic={selected} onClose={() => setScanning(false)} />}
+                  {scanning && (
+                    <ParticipationPanel dynamic={selected} onClose={() => setScanning(false)} />
+                  )}
                 </div>
               )}
               {winners?.row.id === selected.id && (
@@ -273,7 +338,9 @@ export function DynamicsView() {
                   winners={winners.list}
                   reveal={winners.reveal}
                   busy={busy || !!confirmation}
-                  onAbsent={(winner, place) => dynamics.setConfirmation({ row: selected, winner, place, action: 'redraw' })}
+                  onAbsent={(winner, place) =>
+                    dynamics.setConfirmation({ row: selected, winner, place, action: 'redraw' })
+                  }
                   onClose={() => dynamics.setWinners(null)}
                 />
               )}
@@ -285,14 +352,24 @@ export function DynamicsView() {
               <MonitorPlay aria-hidden className="mb-3 size-9 text-neo-accent-text" />
               <h3 className="m-0 text-xl font-bold">Pantalla de juego</h3>
               <p className="mt-2 text-sm text-neo-text-secondary">
-                Abre esta pantalla en un televisor, proyector u otro dispositivo.
-                El panel de control es privado; los espectadores solo ven el espectáculo.
+                Abre esta pantalla en un televisor, proyector u otro dispositivo. El panel de
+                control es privado; los espectadores solo ven el espectáculo.
               </p>
               <div className="mt-5 flex flex-wrap gap-3">
-                <Link className="button" href={'/juego/' + selected.id} target="_blank" rel="noopener noreferrer">
+                <Link
+                  className="button"
+                  href={'/juego/' + selected.id}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Abrir pantalla real <ArrowUpRight aria-hidden className="size-4" />
                 </Link>
-                <Link className="button button-secondary" href={'/juego/' + selected.id + '?ensayo=1'} target="_blank" rel="noopener noreferrer">
+                <Link
+                  className="button button-secondary"
+                  href={'/juego/' + selected.id + '?ensayo=1'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Probar en modo ensayo <ArrowUpRight aria-hidden className="size-4" />
                 </Link>
               </div>
@@ -305,7 +382,11 @@ export function DynamicsView() {
           {tab === 'resultados' && (
             <>
               {selected.type === 'raffle' && selected.status === 'completed' && (
-                <button type="button" className="button self-start" onClick={() => void dynamics.showWinners(selected)}>
+                <button
+                  type="button"
+                  className="button self-start"
+                  onClick={() => void dynamics.showWinners(selected)}
+                >
                   <Trophy aria-hidden className="size-4" /> Consultar ganadores
                 </button>
               )}
@@ -315,7 +396,9 @@ export function DynamicsView() {
                   winners={winners.list}
                   reveal={false}
                   busy={busy || !!confirmation}
-                  onAbsent={(winner, place) => dynamics.setConfirmation({ row: selected, winner, place, action: 'redraw' })}
+                  onAbsent={(winner, place) =>
+                    dynamics.setConfirmation({ row: selected, winner, place, action: 'redraw' })
+                  }
                   onClose={() => dynamics.setWinners(null)}
                 />
               ) : (
@@ -336,29 +419,42 @@ export function DynamicsView() {
               ['Activas', counts.open],
               ['Completadas', counts.completed],
             ].map(([label, count]) => (
-              <div key={label} className="rounded-card border border-neo-border bg-neo-surface p-4 md:p-5">
+              <div
+                key={label}
+                className="rounded-card border border-neo-border bg-neo-surface p-4 md:p-5"
+              >
                 <p className="m-0 text-xs text-neo-text-secondary">{label}</p>
                 <p className="m-0 mt-1 text-2xl font-black tabular-nums sm:text-3xl">{count}</p>
               </div>
             ))}
           </div>
           <nav aria-label="Categorías de dinámicas" className="flex flex-wrap gap-2">
-            {(['raffles','stands','instant'] as Category[]).map((item) => (
+            {(['raffles', 'stands', 'instant'] as Category[]).map((item) => (
               <button
                 type="button"
                 key={item}
                 aria-pressed={category === item}
                 onClick={() => setCategory(item)}
-                className={'min-h-11 rounded-control border px-4 text-sm font-bold ' +
-                  (category === item ? 'border-neo-text bg-neo-text text-neo-surface' :
-                    'border-neo-border bg-neo-surface hover:bg-neo-muted-bg')}
+                className={
+                  'min-h-11 rounded-control border px-4 text-sm font-bold ' +
+                  (category === item
+                    ? 'border-neo-text bg-neo-text text-neo-surface'
+                    : 'border-neo-border bg-neo-surface hover:bg-neo-muted-bg')
+                }
               >
-                {categoryLabel(item)} ({rows.filter((row) => categoryTypes[item].includes(row.type)).length})
+                {categoryLabel(item)} (
+                {rows.filter((row) => categoryTypes[item].includes(row.type)).length})
               </button>
             ))}
           </nav>
-          <label className="max-w-lg">Buscar {categoryLabel(category).toLowerCase()}
-            <input type="search" placeholder="Nombre, premio o actividad…" value={query} onChange={(event) => setQuery(event.target.value)} />
+          <label className="max-w-lg">
+            Buscar {categoryLabel(category).toLowerCase()}
+            <input
+              type="search"
+              placeholder="Nombre, premio o actividad…"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
           </label>
 
           {loading ? (
@@ -366,14 +462,23 @@ export function DynamicsView() {
           ) : visible.length ? (
             <div className="grid gap-3 lg:grid-cols-2">
               {visible.map((row) => (
-                <article key={row.id} className="flex min-w-0 flex-col justify-between rounded-card border border-neo-border bg-neo-surface p-5">
+                <article
+                  key={row.id}
+                  className="flex min-w-0 flex-col justify-between rounded-card border border-neo-border bg-neo-surface p-5"
+                >
                   <div>
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-xs font-bold text-neo-accent-text uppercase">{dynamicTypes[row.type]}</span>
+                      <span className="text-xs font-bold text-neo-accent-text uppercase">
+                        {dynamicTypes[row.type]}
+                      </span>
                       <StatusBadge status={row.status} label={dynamicStates[row.status]} />
                     </div>
-                    <h3 className="m-0 mt-3 text-xl font-black tracking-tight break-words">{row.name}</h3>
-                    <p className="m-0 mt-1 text-sm text-neo-text-secondary">{row.prize || row.description || 'Actividad del Social Run'}</p>
+                    <h3 className="m-0 mt-3 text-xl font-black tracking-tight break-words">
+                      {row.name}
+                    </h3>
+                    <p className="m-0 mt-1 text-sm text-neo-text-secondary">
+                      {row.prize || row.description || 'Actividad del Social Run'}
+                    </p>
                     <div className="mt-4 flex flex-wrap gap-3 text-xs font-semibold text-neo-text-secondary">
                       <span>{row.participations_count ?? 0} participaciones</span>
                       {row.type === 'raffle' && <span>{row.winner_count} premios</span>}
@@ -381,22 +486,39 @@ export function DynamicsView() {
                     </div>
                   </div>
                   <div className="mt-5 flex flex-wrap gap-2 border-t border-neo-border pt-4">
-                    <button type="button" className="button button-secondary" onClick={() => open(row)}>
+                    <button
+                      type="button"
+                      className="button button-secondary"
+                      onClick={() => open(row)}
+                    >
                       Ver dinámica
                     </button>
                     {row.status === 'draft' && (
-                      <button type="button" className="button" disabled={busy} onClick={() => void dynamics.activate(row)}>
+                      <button
+                        type="button"
+                        className="button"
+                        disabled={busy}
+                        onClick={() => void dynamics.activate(row)}
+                      >
                         <Play aria-hidden className="size-4" /> Activar
                       </button>
                     )}
                     {row.status === 'open' && (
                       <button type="button" className="button" onClick={() => open(row, 'control')}>
-                        {row.type === 'raffle' ? <Dices aria-hidden className="size-4" /> : <ScanLine aria-hidden className="size-4" />}
+                        {row.type === 'raffle' ? (
+                          <Dices aria-hidden className="size-4" />
+                        ) : (
+                          <ScanLine aria-hidden className="size-4" />
+                        )}
                         Ir a control
                       </button>
                     )}
                     {row.status === 'completed' && (
-                      <button type="button" className="button button-secondary" onClick={() => open(row, 'resultados')}>
+                      <button
+                        type="button"
+                        className="button button-secondary"
+                        onClick={() => open(row, 'resultados')}
+                      >
                         <Trophy aria-hidden className="size-4" /> Ver resultados
                       </button>
                     )}
@@ -411,12 +533,20 @@ export function DynamicsView() {
               icon={Zap}
               title={'Sin ' + categoryLabel(category).toLowerCase()}
               text="Crea una dinámica con el asistente. Podrás configurarla antes de activarla."
-              action={<button type="button" className="button" onClick={() => setCreating(true)}><Plus aria-hidden className="size-4" /> Nueva dinámica</button>}
+              action={
+                <button type="button" className="button" onClick={() => setCreating(true)}>
+                  <Plus aria-hidden className="size-4" /> Nueva dinámica
+                </button>
+              }
             />
           )}
           {!!dynamics.ranking.length && (
             <div className="mt-3">
-              <button type="button" className="text-link" onClick={() => setShowRanking((value) => !value)}>
+              <button
+                type="button"
+                className="text-link"
+                onClick={() => setShowRanking((value) => !value)}
+              >
                 {showRanking ? 'Ocultar ranking de puntos' : 'Ver ranking de puntos'}
               </button>
               {showRanking && <Ranking runners={dynamics.ranking} />}
