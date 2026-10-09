@@ -63,7 +63,7 @@ export function GameControlPanel({
   const phase = stage?.phase ?? 'ready'
   const total = dynamic.winners_count ?? 0
   const shown = stage?.shown_count ?? 0
-  const active = dynamic.status !== 'draft' && dynamic.status !== 'cancelled'
+  const active = dynamic.status === 'open' || dynamic.status === 'completed'
 
   return (
     <section className="grid gap-5">
