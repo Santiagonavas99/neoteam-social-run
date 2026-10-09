@@ -19,8 +19,8 @@ import { Hero } from '@/features/home/sections/hero'
 import { LandakStudio } from '@/features/home/sections/landak-studio'
 import { Numbers } from '@/features/home/sections/numbers'
 import { Raffle } from '@/features/home/sections/raffle'
-import { Story } from '@/features/home/sections/story'
 import { Steps } from '@/features/home/sections/steps'
+import { Story } from '@/features/home/sections/story'
 
 // Served from the CDN and rebuilt in the background at most once a minute; counter, logos and
 // section ordering and visibility may lag 60 s.
