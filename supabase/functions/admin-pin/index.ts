@@ -858,7 +858,7 @@ Deno.serve(async (req: Request) => {
         if (
           !validCrew ||
           (gender &&
-            !['female', 'male', 'non_binary', 'prefer_not_to_say', 'other'].includes(gender)) ||
+            !['female', 'male'].includes(gender)) ||
           (emailStatus && !['sent', 'pending'].includes(emailStatus)) ||
           !['newest', 'oldest', 'name'].includes(sort)
         ) {
