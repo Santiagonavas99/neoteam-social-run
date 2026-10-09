@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.32.1] - 2026-10-09
+
+### Fixed
+
+- **Hero inscripción state:** sustituye el aviso de fecha límite gigante por un indicador compacto cyan para inscripciones abiertas, con fecha abreviada y zona Colombia, junto con variantes para cierre y consulta temporal. Conserva el estado en tiempo real, los botones condicionados y las validaciones del backend.
+- **Diseño móvil:** limita el ancho del indicador y coloca la fecha en una segunda línea cuando no cabe, sin desplazar los CTA innecesariamente.
+
+
 ## [0.32.0] - 2026-10-09
 
 ### Added

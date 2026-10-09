@@ -4,6 +4,7 @@ import {
   colombiaInputToUtc,
   colombiaLocalInput,
   isRegistrationClosed,
+  registrationDeadlineCompactLabel,
   registrationDeadlineLabel,
 } from './registration-deadline.ts'
 
@@ -32,4 +33,12 @@ test('deadline label includes date and uses Colombia timezone', () => {
   const label = registrationDeadlineLabel(open.deadline)
   assert.match(label, /17/)
   assert.match(label.toLowerCase(), /octubre/)
+})
+
+test('compact hero deadline is short and uses Colombian local time', () => {
+  const label = registrationDeadlineCompactLabel(open.deadline)
+  assert.match(label, /17/)
+  assert.match(label.toLowerCase(), /oct/)
+  assert.match(label, /8:00/)
+  assert.ok(label.length < registrationDeadlineLabel(open.deadline).length)
 })

@@ -173,6 +173,78 @@
   color: var(--neo-white);
   margin: 0 0 28px;
 }
+/* Compact, quiet state feedback: never competes with the hero headline or CTA. */
+.v2-registration-feedback {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 36px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 10px;
+  margin: -4px 0 20px;
+  padding: 8px 12px;
+  border: 1px solid var(--neo-on-dark-border);
+  border-radius: 8px;
+  background: var(--neo-on-dark-hover);
+  color: var(--neo-on-dark-secondary);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.v2-registration-feedback-indicator {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--neo-accent);
+  box-shadow: 0 0 0 3px rgb(3 248 246 / 10%);
+}
+
+.v2-registration-feedback-label {
+  color: var(--neo-white);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.v2-registration-feedback-open .v2-registration-feedback-label {
+  color: var(--neo-accent);
+}
+
+.v2-registration-feedback-detail {
+  color: var(--neo-on-dark-secondary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.v2-registration-feedback-open .v2-registration-feedback-detail {
+  padding-left: 10px;
+  border-left: 1px solid var(--neo-on-dark-border);
+}
+
+.v2-registration-feedback-closed {
+  border-color: var(--neo-on-dark-border);
+}
+
+@media (max-width: 520px) {
+  .v2-registration-feedback {
+    gap: 5px 8px;
+    padding: 8px 10px;
+  }
+
+  .v2-registration-feedback-detail {
+    flex-basis: 100%;
+    padding-left: 15px;
+  }
+
+  .v2-registration-feedback-open .v2-registration-feedback-detail {
+    padding-left: 15px;
+    border-left: 0;
+  }
+}
+
 .v2-hero-actions {
   display: flex;
   align-items: center;
