@@ -2,6 +2,21 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { defaultHomeSectionOrder, normalizeHomeSectionOrder } from './section-order.ts'
 
+test('includes event steps after the event introduction by default', () => {
+  const keys = normalizeHomeSectionOrder([]).map((section) => section.section_key)
+  assert.ok(keys.indexOf('steps') > keys.indexOf('story'))
+  assert.ok(keys.indexOf('steps') < keys.indexOf('agenda'))
+  assert.equal(normalizeHomeSectionOrder([]).find((row) => row.section_key === 'steps')?.visible, true)
+})
+
+test('supports hiding and reordering the steps independently', () => {
+  const result = normalizeHomeSectionOrder([
+    { section_key: 'steps', sort_order: 999, visible: false },
+  ])
+  assert.equal(result.at(-1)?.section_key, 'steps')
+  assert.equal(result.at(-1)?.visible, false)
+})
+
 test('uses the editorial default order when no rows are stored', () => {
   assert.deepEqual(normalizeHomeSectionOrder([]), defaultHomeSectionOrder)
 })
