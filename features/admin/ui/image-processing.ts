@@ -20,7 +20,10 @@ export function isImageInput(file: { name: string; type: string }) {
 }
 
 /** On devices without WebP encoding, keep potentially transparent files as PNG. */
-export function fallbackImageMime(file: { name: string; type: string }): 'image/png' | 'image/jpeg' {
+export function fallbackImageMime(file: {
+  name: string
+  type: string
+}): 'image/png' | 'image/jpeg' {
   const name = file.name.toLowerCase()
   const mime = file.type.toLowerCase()
   if (mime === 'image/jpeg' || mime === 'image/heic' || mime === 'image/heif') {
@@ -174,7 +177,9 @@ export async function prepareImageForUpload(file: File): Promise<PreparedImage> 
         }
       }
     }
-    throw new Error('No fue posible reducir esta imagen a menos de 4 MB. Prueba con una más pequeña.')
+    throw new Error(
+      'No fue posible reducir esta imagen a menos de 4 MB. Prueba con una más pequeña.',
+    )
   } finally {
     release()
   }
