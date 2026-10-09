@@ -138,9 +138,6 @@ export function ParticipantEditor({
           >
             <option value="female">Mujer</option>
             <option value="male">Hombre</option>
-            <option value="non_binary">No binario</option>
-            <option value="prefer_not_to_say">Prefiere no decir</option>
-            <option value="other">Otro</option>
           </select>
         </label>
         <label className="flex flex-col gap-1.5 text-sm font-semibold">
