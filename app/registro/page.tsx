@@ -1,8 +1,11 @@
 import { QrCode, Users } from 'lucide-react'
 import Link from 'next/link'
 import { linkClass } from '@/features/registration/form-ui'
-import { RegistrationForm } from '@/features/registration/registration-form'
+import { RegistrationAvailability } from '@/features/registration/registration-availability'
+import { isRegistrationClosed } from '@/features/registration/registration-deadline'
 import { eventFacts, RegistrationShell } from '@/features/registration/registration-shell'
+
+export const dynamic = 'force-dynamic'
 
 export default function RegistrationPage() {
   return (
@@ -17,7 +20,7 @@ export default function RegistrationPage() {
         </Link>
       }
     >
-      <RegistrationForm />
+      <RegistrationAvailability initiallyClosed={isRegistrationClosed()} />
     </RegistrationShell>
   )
 }
