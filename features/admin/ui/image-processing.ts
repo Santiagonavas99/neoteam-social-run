@@ -184,3 +184,17 @@ export async function prepareImageForUpload(file: File): Promise<PreparedImage> 
     release()
   }
 }
+
+/**
+ * Keep the one-time existing-image migration WebP-only.
+ * A PNG/JPG fallback is valid for new logos, not for a migration advertised as WebP.
+ */
+export async function convertImageToWebp(file: File): Promise<Blob> {
+  const result = await prepareImageForUpload(file)
+  if (!result.webp) {
+    throw new Error(
+      'La conversión masiva a WEBP necesita un navegador compatible. Los logos nuevos sí pueden subirse en PNG/JPG.',
+    )
+  }
+  return result.blob
+}
