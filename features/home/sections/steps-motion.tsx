@@ -41,7 +41,9 @@ export function StepsMotion({ children }: { children: ReactNode }) {
     )
 
     section.dataset.motion = 'enabled'
-    revealTargets.forEach((target) => revealObserver.observe(target))
+    revealTargets.forEach((target) => {
+      revealObserver.observe(target)
+    })
     activeObserver.observe(section)
 
     return () => {
@@ -51,12 +53,7 @@ export function StepsMotion({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <section
-      ref={sectionRef}
-      className={styles.section}
-      id="pasos"
-      aria-labelledby="steps-heading"
-    >
+    <section ref={sectionRef} className={styles.section} id="pasos" aria-labelledby="steps-heading">
       {children}
     </section>
   )
