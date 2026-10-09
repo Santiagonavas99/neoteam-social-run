@@ -1,7 +1,8 @@
-import { ArrowDown, ArrowRight, CalendarDays, Clock, MapPin, QrCode, Route } from 'lucide-react'
+import { ArrowDown, CalendarDays, Clock, MapPin, QrCode, Route } from 'lucide-react'
 import Link from 'next/link'
 import { eventConfig } from '@/features/event/event'
 import { EventCountdown } from '@/features/event/event-countdown'
+import { LandingRegistrationCta, LandingRegistrationNotice } from '@/features/registration/landing-registration-status'
 
 export function Hero() {
   return (
@@ -38,10 +39,9 @@ export function Hero() {
               endsAt={eventConfig.endsAt}
               initialNow={Date.now()}
             />
+            <LandingRegistrationNotice />
             <div className="v2-hero-actions">
-              <Link href="/registro" className="button">
-                Quiero participar <ArrowRight aria-hidden className="size-4 shrink-0" />
-              </Link>
+              <LandingRegistrationCta label="Quiero participar" />
               <Link href="/pase" className="text-link">
                 Mi pase <QrCode aria-hidden className="size-4 shrink-0" />
               </Link>
