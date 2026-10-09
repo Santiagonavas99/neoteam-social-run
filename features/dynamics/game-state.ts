@@ -9,7 +9,7 @@ export type PublicGame = {
   shownCount: number
   updatedAt: string
   participations: number
-  winners: { name: string }[]
+  winners: { rank: number; name: string }[]
 }
 
 export function isGameId(value: string): boolean {
@@ -33,8 +33,8 @@ export const demoGame: PublicGame = {
   updatedAt: '2026-10-09T00:00:00.000Z',
   participations: 24,
   winners: [
-    { name: 'Participante de prueba 1' },
-    { name: 'Participante de prueba 2' },
-    { name: 'Participante de prueba 3' },
+    { rank: 1, name: 'Participante de prueba 1' },
+    { rank: 2, name: 'Participante de prueba 2' },
+    { rank: 3, name: 'Participante de prueba 3' },
   ],
 }
