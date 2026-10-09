@@ -1,6 +1,6 @@
+import { notFound } from 'next/navigation'
 import { GameScreen } from '@/features/dynamics/game-screen'
 import { isGameId } from '@/features/dynamics/game-state'
-import { notFound } from 'next/navigation'
 
 export const dynamic = 'force-dynamic'
 
