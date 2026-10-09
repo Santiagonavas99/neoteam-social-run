@@ -2,7 +2,10 @@ import { ArrowDown, CalendarDays, Clock, MapPin, QrCode, Route } from 'lucide-re
 import Link from 'next/link'
 import { eventConfig } from '@/features/event/event'
 import { EventCountdown } from '@/features/event/event-countdown'
-import { LandingRegistrationCta, LandingRegistrationNotice } from '@/features/registration/landing-registration-status'
+import {
+  LandingRegistrationCta,
+  LandingRegistrationNotice,
+} from '@/features/registration/landing-registration-status'
 
 export function Hero() {
   return (
