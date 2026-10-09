@@ -147,12 +147,14 @@ export function ScanStation({
   title = 'Escanea el código QR',
   helper = 'Apunta la cámara al QR del pase del corredor.',
   busyLabel = 'Validando corredor…',
+  showIntro = true,
 }: {
   inputId: string
   onCode: (code: string) => Promise<ScanOutcome>
   title?: string
   helper?: string
   busyLabel?: string
+  showIntro?: boolean
 }) {
   const [outcome, setOutcome] = useState<ScanOutcome | null>(null)
   const [busy, setBusy] = useState(false)
@@ -202,10 +204,12 @@ export function ScanStation({
 
   return (
     <div className="flex flex-col gap-3 md:gap-4" onPointerDown={unlockScanSound}>
-      <header>
-        <h2 className="m-0 text-[22px] font-bold tracking-[-0.035em] md:text-2xl">{title}</h2>
-        <p className="m-0 mt-1 text-sm leading-relaxed text-neo-text-secondary">{helper}</p>
-      </header>
+      {showIntro ? (
+        <header>
+          <h2 className="m-0 text-[22px] font-bold tracking-[-0.035em] md:text-2xl">{title}</h2>
+          <p className="m-0 mt-1 text-sm leading-relaxed text-neo-text-secondary">{helper}</p>
+        </header>
+      ) : null}
 
       <div className="relative aspect-square w-full overflow-hidden rounded-card border border-neo-border bg-neo-black md:aspect-[4/3]">
         <QrScanner
