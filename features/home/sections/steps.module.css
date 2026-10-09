@@ -385,11 +385,16 @@
     box-shadow 380ms ease;
 }
 
+.passVisual > * {
+  position: relative;
+  z-index: 1;
+}
+
 .passVisual::before {
   position: absolute;
   top: -35%;
   left: -65%;
-  z-index: -1;
+  z-index: 0;
   width: 35%;
   height: 180%;
   background: linear-gradient(90deg, transparent, rgb(3 248 246 / 13%), transparent);
