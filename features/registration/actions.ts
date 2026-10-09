@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 import { calendarUrlFor } from '@/features/event/calendar'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { splitFullName } from './full-name'
+import { isRegistrationClosed, REGISTRATION_CLOSED_MESSAGE } from './registration-deadline'
 import { type Pass, registeredPass } from './pass'
 import { registrationSchema } from './schema'
 
@@ -27,6 +28,10 @@ export async function registerParticipant(
     if (typeof value === 'string' && !key.startsWith('$')) values[key] = value
   }
   const attempt = (previousState.attempt ?? 0) + 1
+
+  if (isRegistrationClosed()) {
+    return { ok: false, message: REGISTRATION_CLOSED_MESSAGE, values, attempt }
+  }
 
   // Keep the Supabase contract intact: a single full-name field in the UI,
   // firstName and lastName in the existing registration schema / RPC.
@@ -84,6 +89,9 @@ export async function registerParticipant(
     })
 
     if (error) {
+      if (error.message.includes('INSCRIPCIONES_CERRADAS')) {
+        return { ok: false, message: REGISTRATION_CLOSED_MESSAGE, values, attempt }
+      }
       if (error.message.includes('Ya existe una inscripción')) {
         return {
           ok: false,
