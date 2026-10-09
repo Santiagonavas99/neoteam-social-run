@@ -103,7 +103,9 @@ select jsonb_build_object(
     select count(*) from public.dynamic_participations dp where dp.dynamic_id = d.id
   ),
   'winners', coalesce((
-    select jsonb_agg(jsonb_build_object('name', trim(concat_ws(' ', r.first_name, r.last_name)))
+    select jsonb_agg(jsonb_build_object(
+      'rank', (dp.metadata->>'rank')::integer,
+      'name', trim(concat_ws(' ', r.first_name, r.last_name)))
       order by (dp.metadata->>'rank')::int)
     from public.dynamic_participations dp
     join public.registrations r on r.id = dp.registration_id
