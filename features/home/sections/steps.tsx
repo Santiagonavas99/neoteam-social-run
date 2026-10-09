@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCheck, MapPin, QrCode } from 'lucide-react'
+import { ArrowRight, MapPin, QrCode } from 'lucide-react'
 import Link from 'next/link'
 import { eventConfig } from '@/features/event/event'
 import styles from './steps.module.css'
@@ -18,7 +18,7 @@ const steps = [
     title: 'Muestra tu QR al llegar',
     description:
       'El equipo de NeoTeam lo escaneará para confirmar tu inscripción y registrar tu asistencia. Tú solo tienes que mostrarlo.',
-    tag: 'CHECK-IN · 7:30 A. M.',
+    tag: 'CHECK-IN',
   },
   {
     title: 'Corre y celebra',
@@ -27,12 +27,11 @@ const steps = [
   },
 ] as const
 
-export function Steps({ index = '02' }: { index?: string }) {
+export function Steps() {
   return (
     <section className={styles.section} id="pasos" aria-labelledby="steps-heading">
       <div className="shell">
         <div className={styles.top}>
-          <span className={styles.index}>{index} / PASO A PASO</span>
           <div className={styles.intro}>
             <p className={styles.eyebrow}>ANTES Y DURANTE EL SOCIAL RUN</p>
             <h2 id="steps-heading">
@@ -54,7 +53,6 @@ export function Steps({ index = '02' }: { index?: string }) {
               <QrCode size={104} strokeWidth={1.1} aria-hidden="true" />
             </div>
             <strong>UN QR. TU CHECK-IN.</strong>
-            <small>Ilustración · Usa el QR de tu propio pase</small>
           </div>
         </div>
 
@@ -77,13 +75,6 @@ export function Steps({ index = '02' }: { index?: string }) {
         </ol>
 
         <div className={styles.bottom}>
-          <div className={styles.reminder}>
-            <CheckCheck size={22} aria-hidden="true" />
-            <p>
-              <strong>Ojo: no tienes que escanear el QR tú mismo.</strong> Muéstralo al personal de
-              NeoTeam cuando llegues. Es único para cada inscripción.
-            </p>
-          </div>
           <div className={styles.actions}>
             <Link href="/pase" className={styles.mainLink}>
               Ver o recuperar mi pase <ArrowRight size={18} aria-hidden="true" />
