@@ -4,7 +4,7 @@ import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
 import type { FeedbackValue } from '../types'
 import { Logo } from './admin-ui'
-import { convertImageToWebp } from './image-processing'
+import { prepareImageForUpload, type UploadImageMime } from './image-processing'
 
 function readFileAsBase64(file: Blob) {
   return new Promise<string>((resolve, reject) => {
@@ -16,9 +16,9 @@ function readFileAsBase64(file: Blob) {
   })
 }
 
-export async function uploadWebpImage(blob: Blob): Promise<string> {
+export async function uploadAdminImage(blob: Blob, mime: UploadImageMime): Promise<string> {
   const content = await readFileAsBase64(blob)
-  const result = await callAdmin('uploadAdminImage', { mime: 'image/webp', content })
+  const result = await callAdmin('uploadAdminImage', { mime, content })
   if (!result.url) throw new Error('No pudimos obtener la imagen subida.')
   return result.url
 }
@@ -33,6 +33,7 @@ export function useImageUpload({
   setFeedback: (value: FeedbackValue) => void
 }) {
   const [uploading, setUploading] = useState(false)
+  const [uploadFeedback, setUploadFeedback] = useState<FeedbackValue>(null)
 
   async function upload(event: ChangeEvent<HTMLInputElement>) {
     const input = event.currentTarget
@@ -40,24 +41,27 @@ export function useImageUpload({
     if (!file) return
     setUploading(true)
     setFeedback(null)
+    setUploadFeedback(null)
     try {
-      const webp = await convertImageToWebp(file)
-      const url = await uploadWebpImage(webp)
+      const processed = await prepareImageForUpload(file)
+      const url = await uploadAdminImage(processed.blob, processed.mime)
       onUploaded(url)
-      const savings = Math.round((1 - webp.size / file.size) * 100)
-      setFeedback({
+      const savings = Math.round((1 - processed.blob.size / file.size) * 100)
+      setUploadFeedback({
         kind: 'success',
-        text: `${successText} ${savings > 0 ? `WEBP optimizado: ${savings}% menos peso.` : 'Imagen convertida a WEBP.'}`,
+        text: processed.webp
+          ? `${successText} ${savings > 0 ? `WEBP optimizado: ${savings}% menos peso.` : 'Imagen WEBP lista.'}`
+          : `${successText} Archivo ${processed.mime === 'image/png' ? 'PNG' : 'JPG'} compatible con tu navegador${savings > 0 ? ` · ${savings}% menos peso.` : '.'}`,
       })
     } catch (error) {
-      setFeedback({ kind: 'error', text: errorMessage(error, 'No pudimos subir la imagen.') })
+      setUploadFeedback({ kind: 'error', text: errorMessage(error, 'No pudimos subir la imagen.') })
     } finally {
       setUploading(false)
       input.value = ''
     }
   }
 
-  return { uploading, upload }
+  return { uploading, upload, uploadFeedback }
 }
 
 export function ImageUploadField({
@@ -66,6 +70,7 @@ export function ImageUploadField({
   uploading,
   noun,
   hint,
+  uploadFeedback,
   onChange,
 }: {
   url?: string | null
@@ -73,31 +78,67 @@ export function ImageUploadField({
   uploading: boolean
   noun: 'logo' | 'imagen'
   hint: string
+  uploadFeedback?: FeedbackValue
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
 }) {
   return (
-    <label className="col-span-full flex-row! items-start gap-3 rounded-control border border-dashed border-neo-border-strong bg-neo-bg p-4 md:items-center md:gap-5 md:p-5">
-      <span className="hidden md:contents">
-        <Logo url={url} name={name || 'Logo'} />
-      </span>
-      <span className="flex min-w-0 flex-1 flex-col gap-2">
-        <strong className="inline-flex items-center gap-2">
-          {url ? (
-            <ImageUp aria-hidden className="size-4 shrink-0" />
-          ) : (
-            <ImagePlus aria-hidden className="size-4 shrink-0" />
+    <div className="col-span-full min-w-0">
+      <label className="group flex cursor-pointer flex-col gap-4 rounded-xl border-2 border-dashed border-neo-border-strong bg-neo-bg p-4 transition-colors hover:border-neo-accent-text focus-within:border-neo-accent-text focus-within:ring-2 focus-within:ring-neo-accent-border md:flex-row md:items-center md:p-5">
+        <span className="flex shrink-0 items-center gap-3">
+          <Logo url={url} name={name || 'Logo'} />
+          {url && (
+            <span className="rounded-full bg-neo-accent-soft px-2.5 py-1 text-xs font-bold text-neo-accent-text">
+              Logo listo
+            </span>
           )}
-          {uploading ? 'Convirtiendo y subiendo imagen…' : `${url ? 'Cambiar' : 'Añadir'} ${noun}`}
-        </strong>
-        <small className="font-normal text-neo-text-secondary">{hint}</small>
+        </span>
+        <span className="flex min-w-0 flex-1 flex-col items-start gap-3">
+          <span className="inline-flex items-center gap-2 text-base font-bold text-neo-text">
+            {url ? (
+              <ImageUp aria-hidden className="size-5 shrink-0" />
+            ) : (
+              <ImagePlus aria-hidden className="size-5 shrink-0" />
+            )}
+            {uploading ? 'Procesando logo…' : url ? `Cambiar ${noun}` : `Añadir ${noun}`}
+          </span>
+          <span className="text-xs font-normal leading-relaxed text-neo-text-secondary">
+            {hint}
+          </span>
+          <span className="inline-flex min-h-11 items-center justify-center rounded-control border border-neo-accent-border bg-neo-accent-soft px-4 py-2 text-sm font-semibold text-neo-accent-text">
+            {uploading
+              ? 'Subiendo imagen…'
+              : url
+                ? 'Elegir otra imagen'
+                : 'Seleccionar imagen del celular'}
+          </span>
+        </span>
         <input
-          className="min-h-11 border-0! bg-transparent! px-0! py-1! text-xs! file:mr-3 file:min-h-9 file:cursor-pointer file:rounded-[6px] file:border file:border-solid file:border-neo-border-strong file:bg-neo-surface file:px-3 file:py-1.5 file:text-neo-text"
+          className="sr-only"
           type="file"
           accept="image/*,.heic,.heif"
-          onChange={(event) => void onChange(event)}
+          disabled={uploading}
+          onChange={onChange}
           aria-label={`Seleccionar ${noun}`}
         />
-      </span>
-    </label>
+      </label>
+      {uploadFeedback && (
+        <p
+          className={`feedback feedback-${uploadFeedback.kind} mb-0! mt-3 flex items-start gap-2 text-sm`}
+          role={uploadFeedback.kind === 'error' ? 'alert' : 'status'}
+        >
+          {uploadFeedback.text}
+        </p>
+      )}
+      {url && (
+        <p className="mb-0! mt-3 text-xs text-neo-text-secondary">
+          Imagen subida. El cambio será visible cuando guardes el registro.
+        </p>
+      )}
+    </div>
   )
+}
+
+/** The existing one-time migration requires genuine WebP uploads. */
+export function uploadWebpImage(blob: Blob): Promise<string> {
+  return uploadAdminImage(blob, 'image/webp')
 }

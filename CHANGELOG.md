@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.32.3] - 2026-10-09
+
+### Fixed
+
+- **Mobile admin image upload:** when Safari or another browser cannot encode `image/webp` on canvas (and may silently return PNG), the uploader no longer blocks logos. Use WebP whenever supported, otherwise upload a compatible JPG/PNG using the existing server MIME and file-signature checks.
+- **Large and HEIC images:** when WebP conversion is unavailable, resize and export phone photos to JPG and transparency-capable logos to PNG, always respecting the existing 4 MB upload limit.
+- **Transparent image workflow:** preserve PNG and image alpha in the mobile fallback and show the actual uploaded format rather than falsely claiming WebP. Upload hints now describe supported fallback formats.
+- **Regression tests:** simulate WebP support, Safari's silent PNG fallback, phone HEIC, and large JPEG uploads.
+- **Mobile-first crew form:** now guides admins through three clearly labeled steps (name, logo and visibility), shows an always-visible image preview and groups Instagram/order under optional settings.
+- **Reusable carousel logos:** the same naming-first flow makes it obvious which club or brand owns the image and where it appears.
+- **Inline upload feedback:** upload errors and success are displayed immediately beside the selected image, with a large mobile file-picker target.
+
+
 ## [0.32.2] - 2026-10-09
 
 ### Fixed
