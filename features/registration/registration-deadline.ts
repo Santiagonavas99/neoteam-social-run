@@ -26,6 +26,21 @@ export function registrationDeadlineLabel(deadline: string | null): string {
   }).format(new Date(deadline))
 }
 
+/** Short date for narrow hero status chips, always in Colombia time. */
+export function registrationDeadlineCompactLabel(deadline: string): string {
+  return new Intl.DateTimeFormat('es-CO', {
+    timeZone: 'America/Bogota',
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  })
+    .format(new Date(deadline))
+    .replace(/, /g, ' · ')
+}
+
 export function colombiaLocalInput(deadline: string): string {
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/Bogota',
