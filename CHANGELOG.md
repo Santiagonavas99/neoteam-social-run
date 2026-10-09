@@ -7,12 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.30.2] - 2026-10-08
+## [0.31.1] - 2026-10-09
 
 ### Improved
 
 - **Registration cutoff Saturday 10 October 2026 at 8:00 p.m. Colombia time:** show the deadline to runners and a closed notice afterwards, block form submission on the server and in the database at the exact instant, keeping existing pass recovery and admin data unaffected.
 - **Private printable registered-runner roster:** an explicit «Imprimir inscritos» action creates a name-and-crew-only A4 printout, including all non-cancelled registrations across pages, with names safely escaped and sorted alphabetically. The existing complete administrative CSV is retained and relabeled «Exportar respaldo» to avoid confusing a private backup with the publicly printable roster.
+
+
+## [0.31.0] - 2026-10-08
+
+### Added
+
+- **Participantes con filtros globales:** buscar por running crew, género, correo pendiente o enviado; ordenar por antigüedad o apellido sin perder la paginación de 25 personas.
+- **Corrección de inscripciones desde Administración:** editar nombre, documento, correo, celular, nacimiento, talla, grupo y datos del contacto de emergencia con validación y confirmación manual.
+- **Auditoría sin copiar datos personales:** cada corrección guarda administrador, fecha e identificación de campos modificados; los cambios simultáneos requieren recargar antes de sobrescribir.
+
+### Changed
+
+- Corregir el correo de un participante vuelve a dejar el envío del pase pendiente para procesarlo manualmente desde «Correos pendientes». El código QR y los datos de inscripción se conservan.
 
 
 ## [0.30.1] - 2026-10-08

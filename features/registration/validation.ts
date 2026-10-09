@@ -1,4 +1,4 @@
-import { IANA_TLDS } from './iana-tlds.ts'
+import { IANA_TLDS } from '../../lib/iana-tlds.ts'
 
 export const MIN_BIRTH_DATE = '1900-01-01'
 

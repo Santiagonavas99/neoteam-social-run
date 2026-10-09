@@ -10,6 +10,13 @@ export type Participant = {
   document_number: string
   registration_code?: string
   registration_number?: number
+  birth_date?: string | null
+  running_group_id?: string | null
+  emergency_name?: string
+  emergency_phone?: string
+  created_at?: string
+  updated_at?: string
+  pass_emailed_at?: string | null
   running_groups?: { name: string } | null
   other_running_group?: string | null
   shirt_size?: string | null
@@ -19,6 +26,8 @@ export type Participant = {
 }
 
 // Running groups and brands share one table shape and one form; brands add type and website.
+export type ParticipantGroupOption = { id: string; name: string; active: boolean }
+
 export type CommunityRecord = {
   id: string
   name: string
@@ -135,6 +144,8 @@ export type AdminResponse<Row = unknown> = {
   deleted?: number
   result?: CheckinResult
   queueResult?: 'sent' | 'skipped' | 'failed'
+  emailChanged?: boolean
+  unchanged?: boolean
   participant?: ScannedParticipant
   dynamicRows?: DynamicRow[]
   winnerDetails?: ScannedParticipant[]
