@@ -83,31 +83,18 @@ export function GameControlPanel({
             </p>
           </div>
           <span className="rounded-full border border-neo-border px-3 py-2 text-xs font-bold">
-            {active ? (phases[phase] ?? phase) : 'Activa primero la dinámica'}
+            {active ? phases[phase] ?? phase : 'Activa primero la dinámica'}
           </span>
         </div>
 
-        {error && (
-          <p role="alert" className="mt-4 text-sm text-neo-danger">
-            {error}
-          </p>
-        )}
-        {notice && (
-          <p role="status" className="mt-4 text-sm text-neo-accent-text">
-            {notice}
-          </p>
-        )}
+        {error && <p role="alert" className="mt-4 text-sm text-neo-danger">{error}</p>}
+        {notice && <p role="status" className="mt-4 text-sm text-neo-accent-text">{notice}</p>}
 
         {isRaffle && active && (
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             {dynamic.status === 'open' && (
               <>
-                <button
-                  type="button"
-                  className="button button-secondary"
-                  disabled={busy}
-                  onClick={() => void command('countdown')}
-                >
+                <button type="button" className="button button-secondary" disabled={busy} onClick={() => void command('countdown')}>
                   <Play aria-hidden className="size-4" /> Iniciar cuenta atrás
                 </button>
                 <button type="button" className="button" disabled={busy} onClick={onDraw}>
@@ -116,53 +103,28 @@ export function GameControlPanel({
               </>
             )}
             {dynamic.status === 'completed' && phase === 'ready' && (
-              <button
-                type="button"
-                className="button"
-                disabled={busy}
-                onClick={() => void command('drawn')}
-              >
+              <button type="button" className="button" disabled={busy} onClick={() => void command('drawn')}>
                 <Play aria-hidden className="size-4" /> Preparar revelación
               </button>
             )}
             {dynamic.status === 'completed' && phase === 'countdown' && (
-              <button
-                type="button"
-                className="button"
-                disabled={busy}
-                onClick={() => void command('drawn')}
-              >
+              <button type="button" className="button" disabled={busy} onClick={() => void command('drawn')}>
                 <Play aria-hidden className="size-4" /> Preparar ganadores
               </button>
             )}
             {dynamic.status === 'completed' && phase === 'reveal' && (
               <>
-                <button
-                  type="button"
-                  className="button"
-                  disabled={busy || shown >= total}
-                  onClick={() => void command('next')}
-                >
+                <button type="button" className="button" disabled={busy || shown >= total} onClick={() => void command('next')}>
                   <Eye aria-hidden className="size-4" />
                   Revelar siguiente ({Math.min(shown + 1, total)} de {total})
                 </button>
-                <button
-                  type="button"
-                  className="button button-secondary"
-                  disabled={busy || shown < total}
-                  onClick={() => void command('finish')}
-                >
+                <button type="button" className="button button-secondary" disabled={busy || shown < total} onClick={() => void command('finish')}>
                   <Trophy aria-hidden className="size-4" /> Finalizar juego
                 </button>
               </>
             )}
             {dynamic.status === 'completed' && (
-              <button
-                type="button"
-                className="button button-secondary"
-                disabled={busy}
-                onClick={onShowWinners}
-              >
+              <button type="button" className="button button-secondary" disabled={busy} onClick={onShowWinners}>
                 <Trophy aria-hidden className="size-4" /> Lista de ganadores
               </button>
             )}
@@ -171,11 +133,7 @@ export function GameControlPanel({
               className="button button-secondary"
               disabled={busy}
               onClick={() => {
-                if (
-                  window.confirm(
-                    'La pantalla volverá a espera. No se borrarán los ganadores. ¿Continuar?',
-                  )
-                )
+                if (window.confirm('La pantalla volverá a espera. No se borrarán los ganadores. ¿Continuar?'))
                   void command('ready')
               }}
             >
@@ -184,9 +142,7 @@ export function GameControlPanel({
           </div>
         )}
         {isRaffle && dynamic.status === 'draft' && (
-          <p className="mt-5 text-sm text-neo-text-secondary">
-            Activa el borrador desde Resumen para empezar.
-          </p>
+          <p className="mt-5 text-sm text-neo-text-secondary">Activa el borrador desde Resumen para empezar.</p>
         )}
       </div>
 
@@ -196,24 +152,14 @@ export function GameControlPanel({
           <h3 className="m-0 text-lg font-bold">Pantalla pública</h3>
         </div>
         <p className="mt-2 text-sm text-neo-text-secondary">
-          Abre el juego en otra pestaña o dispositivo. Su contenido se sincroniza aproximadamente
-          cada 2 segundos. No muestra correos, documentos ni controles del staff.
+          Abre el juego en otra pestaña o dispositivo. Su contenido se sincroniza aproximadamente cada 2 segundos.
+          No muestra correos, documentos ni controles del staff.
         </p>
         <div className="flex flex-wrap gap-2">
-          <Link
-            href={`/juego/${dynamic.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="button"
-          >
+          <Link href={'/juego/' + dynamic.id} target="_blank" rel="noopener noreferrer" className="button">
             Abrir pantalla real <ArrowUpRight aria-hidden className="size-4" />
           </Link>
-          <Link
-            href={`/juego/${dynamic.id}?ensayo=1`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="button button-secondary"
-          >
+          <Link href={'/juego/' + dynamic.id + '?ensayo=1'} target="_blank" rel="noopener noreferrer" className="button button-secondary">
             Ensayar con datos ficticios <ArrowUpRight aria-hidden className="size-4" />
           </Link>
         </div>
