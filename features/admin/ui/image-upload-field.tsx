@@ -4,7 +4,7 @@ import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
 import type { FeedbackValue } from '../types'
 import { Logo } from './admin-ui'
-import { prepareImageForUpload, type UploadImageMime } from './image-processing'
+import { type UploadImageMime, prepareImageForUpload } from './image-processing'
 
 function readFileAsBase64(file: Blob) {
   return new Promise<string>((resolve, reject) => {
@@ -49,7 +49,7 @@ export function useImageUpload({
         kind: 'success',
         text: processed.webp
           ? `${successText} ${savings > 0 ? `WEBP optimizado: ${savings}% menos peso.` : 'Imagen WEBP lista.'}`
-          : `${successText} Archivo ${processed.mime === 'image/png' ? 'PNG' : 'JPG'} compatible con tu navegador${savings > 0 ? ` · ${savings}% menos peso.` : '.'}`, 
+          : `${successText} Archivo ${processed.mime === 'image/png' ? 'PNG' : 'JPG'} compatible con tu navegador${savings > 0 ? ` · ${savings}% menos peso.` : '.'}`,
       })
     } catch (error) {
       setFeedback({ kind: 'error', text: errorMessage(error, 'No pudimos subir la imagen.') })
