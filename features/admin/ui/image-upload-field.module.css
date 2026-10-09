@@ -11,7 +11,9 @@
   border-radius: 12px;
   background: var(--neo-bg);
   cursor: pointer;
-  transition: border-color 150ms ease, background 150ms ease;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease;
 }
 
 .picker:hover,
