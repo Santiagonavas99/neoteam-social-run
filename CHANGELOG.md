@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.33.0] - 2026-10-09
+
+### Added
+
+- **Dynamics V2:** group activities by Sorteos, Stands y retos and Premios instantáneos; cards now lead to the five clear sections Resumen, Configuración, Control, Pantalla pública and Resultados.
+- **Guided setup:** three-step wizard to create safe drafts without exposing advanced configuration immediately. Existing drafts, registrations and winner history are preserved.
+- **Game screens:** independent full-screen stage at `/juego/[id]` for each activity. A raffle can display a synchronized countdown and names progressively, on command from the private admin controller. Other activities display anonymous participation totals.
+- **Rehearsal:** `?ensayo=1` displays fictional winners, with no draw or Supabase writes. The public read-only RPC projects only safe game content and only the names explicitly revealed by operators.
+- **Protected game controls:** an atomic SQL state machine and authenticated edge operations prevent anonymous users from starting, finishing or revealing a game. The existing atomic draw RPC still selects winners.
+
+### Notes
+
+- Apply the SQL migration and deploy `admin-pin` from this PR before enabling live projection in production. The demo works without them.
+- Check-in, participant registration, past raffle records and pass recovery are unchanged.
+
 ## [0.32.2] - 2026-10-09
 
 ### Fixed
