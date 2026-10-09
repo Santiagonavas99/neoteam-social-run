@@ -4,8 +4,8 @@ import { headers } from 'next/headers'
 import { calendarUrlFor } from '@/features/event/calendar'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { splitFullName } from './full-name'
-import { isRegistrationClosed, REGISTRATION_CLOSED_MESSAGE } from './registration-deadline'
 import { type Pass, registeredPass } from './pass'
+import { isRegistrationClosed, REGISTRATION_CLOSED_MESSAGE } from './registration-deadline'
 import { registrationSchema } from './schema'
 
 export type RegistrationState = {
