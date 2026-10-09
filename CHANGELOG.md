@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.1] - 2026-10-09
+
+### Fixed
+
+- **Participant pagination advances correctly.** Prevents an earlier API response from resetting the page when an admin selects Siguiente/Anterior. Server-side page clamping remains supported after filters or deleted records, with regression tests for stale responses.
+
+
 ## [0.31.0] - 2026-10-08
 
 ### Added
