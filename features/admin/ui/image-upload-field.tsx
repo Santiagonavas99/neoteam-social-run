@@ -103,3 +103,8 @@ export function ImageUploadField({
     </label>
   )
 }
+
+/** The existing one-time migration requires genuine WebP uploads. */
+export function uploadWebpImage(blob: Blob): Promise<string> {
+  return uploadAdminImage(blob, 'image/webp')
+}
