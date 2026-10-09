@@ -2,6 +2,7 @@
 
 import { isNew, type LogoItem } from '../types'
 import { EditorForm, useEditor } from '../ui/editor-form'
+import { FormStep } from '../ui/form-step'
 import { ImageUploadField, useImageUpload } from '../ui/image-upload-field'
 
 export function LogoForm({
@@ -38,16 +39,11 @@ export function LogoForm({
       onSubmit={submit}
       onCancel={onCancel}
     >
-      <div className="col-span-full flex items-start gap-3 border-b border-neo-border pb-1">
-        <span className="grid size-9 shrink-0 place-items-center rounded-control bg-neo-accent-soft font-bold text-neo-accent-text">
-          01
-        </span>
-        <div>
-          <h4 className="mb-1 text-base font-bold">¿De quién es este logo?</h4>
-          <p className="mb-0 text-sm text-neo-text-secondary">
-            Escribe el nombre del club, marca u organización.
-          </p>
-        </div>
+      <FormStep
+        number="01"
+        title="¿De quién es este logo?"
+        description="Escribe el nombre del club, marca u organización."
+      />
       </div>
       <label className="col-span-full">
         Nombre del club, marca u organización *
@@ -61,16 +57,11 @@ export function LogoForm({
         />
       </label>
 
-      <div className="col-span-full mt-1 flex items-start gap-3 border-b border-neo-border pb-1">
-        <span className="grid size-9 shrink-0 place-items-center rounded-control bg-neo-accent-soft font-bold text-neo-accent-text">
-          02
-        </span>
-        <div>
-          <h4 className="mb-1 text-base font-bold">Añade el logo</h4>
-          <p className="mb-0 text-sm text-neo-text-secondary">
-            Recomendado: imagen horizontal con fondo transparente.
-          </p>
-        </div>
+      <FormStep
+        number="02"
+        title="Añade el logo"
+        description="Recomendado: imagen horizontal con fondo transparente."
+      />
       </div>
       <ImageUploadField
         url={values.logo_url}
@@ -82,16 +73,11 @@ export function LogoForm({
         onChange={upload}
       />
 
-      <div className="col-span-full mt-1 flex items-start gap-3 border-b border-neo-border pb-1">
-        <span className="grid size-9 shrink-0 place-items-center rounded-control bg-neo-accent-soft font-bold text-neo-accent-text">
-          03
-        </span>
-        <div>
-          <h4 className="mb-1 text-base font-bold">Dónde mostrarlo</h4>
-          <p className="mb-0 text-sm text-neo-text-secondary">
-            Puedes utilizar el mismo logo en varias cintas.
-          </p>
-        </div>
+      <FormStep
+        number="03"
+        title="Dónde mostrarlo"
+        description="Puedes utilizar el mismo logo en varias cintas."
+      />
       </div>
       <div className="col-span-full grid gap-4 rounded-xl border border-neo-border bg-neo-bg p-4">
         <label className="check-label">
