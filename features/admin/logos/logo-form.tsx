@@ -44,7 +44,6 @@ export function LogoForm({
         title="¿De quién es este logo?"
         description="Escribe el nombre del club, marca u organización."
       />
-      </div>
       <label className="col-span-full">
         Nombre del club, marca u organización *
         <input
@@ -62,7 +61,6 @@ export function LogoForm({
         title="Añade el logo"
         description="Recomendado: imagen horizontal con fondo transparente."
       />
-      </div>
       <ImageUploadField
         url={values.logo_url}
         name={values.name}
@@ -78,7 +76,6 @@ export function LogoForm({
         title="Dónde mostrarlo"
         description="Puedes utilizar el mismo logo en varias cintas."
       />
-      </div>
       <div className="col-span-full grid gap-4 rounded-xl border border-neo-border bg-neo-bg p-4">
         <label className="check-label">
           <input
