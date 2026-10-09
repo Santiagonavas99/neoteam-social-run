@@ -3,11 +3,8 @@
 import { ArrowRight, Clock3 } from 'lucide-react'
 import Link from 'next/link'
 import { createContext, type ReactNode, useContext, useEffect, useState } from 'react'
-import {
-  registrationDeadlineLabel,
-  type RegistrationSettings,
-} from './registration-deadline'
-import { landingRegistrationState, type LandingRegistrationState } from './landing-registration-state'
+import { type LandingRegistrationState, landingRegistrationState } from './landing-registration-state'
+import { type RegistrationSettings, registrationDeadlineLabel } from './registration-deadline'
 
 type StatusContextValue = {
   state: LandingRegistrationState
@@ -95,7 +92,10 @@ export function LandingRegistrationNotice() {
     )
   }
   return (
-    <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-neo-accent-text" role="status">
+    <p
+      className="mb-3 flex items-center gap-2 text-sm font-semibold text-neo-accent-text"
+      role="status"
+    >
       <Clock3 aria-hidden className="size-4 shrink-0" />
       {settings?.deadline
         ? `Inscripciones abiertas · hasta el ${registrationDeadlineLabel(settings.deadline)} (Colombia)`
@@ -115,10 +115,13 @@ export function LandingRegistrationCta({
   if (state !== 'open') {
     return (
       <span
-        aria-label={state === 'closed' ? 'Inscripciones cerradas' : 'Inscripciones no disponibles'}
         className={`button ${compact ? 'button-small' : ''} cursor-not-allowed opacity-60`}
       >
-        {state === 'closed' ? (compact ? 'Cerradas' : 'Inscripciones cerradas') : 'Registro no disponible'}
+        {state === 'closed'
+          ? compact
+            ? 'Cerradas'
+            : 'Inscripciones cerradas'
+          : 'Registro no disponible'}
       </span>
     )
   }
@@ -134,7 +137,11 @@ export function LandingRegistrationFooterLink() {
   const { state } = useLandingRegistration()
   return (
     <Link href="/registro" className="text-link">
-      {state === 'open' ? 'Registro' : state === 'closed' ? 'Inscripciones cerradas' : 'Consultar registro'}
+      {state === 'open'
+        ? 'Registro'
+        : state === 'closed'
+          ? 'Inscripciones cerradas'
+          : 'Consultar registro'}
     </Link>
   )
 }
