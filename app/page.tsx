@@ -20,12 +20,13 @@ import { LandakStudio } from '@/features/home/sections/landak-studio'
 import { Numbers } from '@/features/home/sections/numbers'
 import { Raffle } from '@/features/home/sections/raffle'
 import { Story } from '@/features/home/sections/story'
+import { Steps } from '@/features/home/sections/steps'
 
 // Served from the CDN and rebuilt in the background at most once a minute; counter, logos and
 // section ordering and visibility may lag 60 s.
 export const revalidate = 60
 
-const numberedSections = new Set(['story', 'agenda', 'community', 'raffle', 'final'])
+const numberedSections = new Set(['story', 'steps', 'agenda', 'community', 'raffle', 'final'])
 
 export default async function Home() {
   const [logoItems, community, registered, sectionOrder] = await Promise.all([
@@ -47,6 +48,8 @@ export default async function Home() {
     switch (section_key) {
       case 'story':
         return <Story key={section_key} index={index} />
+      case 'steps':
+        return <Steps key={section_key} index={index} />
       case 'numbers':
         return <Numbers key={section_key} registered={registered} brands={logoItems.length} />
       case 'allies':
