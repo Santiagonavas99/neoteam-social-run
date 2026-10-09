@@ -1,8 +1,8 @@
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
+import { LandingRegistrationFooterLink } from '@/features/registration/landing-registration-status'
 
 const links = [
-  { href: '/registro', label: 'Registro' },
   { href: '/pase', label: 'Mi pase' },
   { href: '/#agenda', label: 'Agenda' },
   { href: '/legal/terminos', label: 'Condiciones' },
@@ -14,6 +14,7 @@ export function Footer() {
     <footer className="footer flex-wrap items-center">
       <strong>NEOTEAM · SOCIAL RUN</strong>
       <nav aria-label="Enlaces del pie" className="flex flex-wrap gap-x-5">
+        <LandingRegistrationFooterLink />
         {links.map(({ href, label }) => (
           <Link key={href} href={href} className="text-link">
             {label}

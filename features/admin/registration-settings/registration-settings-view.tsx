@@ -96,34 +96,53 @@ export function RegistrationSettingsView() {
         <LoadingState>Cargando configuración del registro…</LoadingState>
       ) : (
         <div className="flex flex-col gap-5 rounded-card border border-neo-border bg-neo-surface p-5 sm:p-7">
-          <div className="flex items-start gap-3">
-            <CalendarClock aria-hidden className="mt-1 size-5 shrink-0 text-neo-accent-text" />
-            <div>
-              <p className="m-0 text-sm font-bold">
-                Estado actual: {isRegistrationClosed(data) ? 'Cerradas' : 'Abiertas'}
-              </p>
-              <p className="m-0 mt-1 text-sm text-neo-text-secondary">
-                {data.deadline
-                  ? `Cierre actual: ${registrationDeadlineLabel(data.deadline)} (Colombia)`
-                  : 'Sin cierre automático programado'}
-              </p>
+          <div className="flex flex-col gap-4 border-b border-neo-border pb-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-start gap-3">
+              <CalendarClock aria-hidden className="mt-1 size-5 shrink-0 text-neo-accent-text" />
+              <div>
+                <p className="m-0 text-sm font-bold">
+                  Estado actual: {isRegistrationClosed(data) ? 'Cerradas' : 'Abiertas'}
+                </p>
+                <p className="m-0 mt-1 text-sm text-neo-text-secondary">
+                  {data.deadline
+                    ? `Cierre actual: ${registrationDeadlineLabel(data.deadline)} (Colombia)`
+                    : 'Sin cierre automático programado'}
+                </p>
+              </div>
             </div>
-          </div>
-
-          <label className="flex cursor-pointer items-center gap-3 border-t border-neo-border pt-5">
-            <input
-              type="checkbox"
-              checked={open}
-              onChange={(event) => setOpen(event.target.checked)}
-              className="size-5 shrink-0"
-            />
-            <span className="flex flex-col">
-              <span className="font-semibold">Permitir nuevas inscripciones</span>
-              <span className="text-xs text-neo-text-secondary">
-                Desactiva para cerrar inmediatamente, sin borrar los registros existentes.
+            <label className="inline-flex min-h-12 shrink-0 cursor-pointer items-center justify-between gap-4 self-stretch rounded-control border border-neo-border bg-neo-muted-bg px-4 py-2 sm:self-center">
+              <span className="flex flex-col">
+                <span className="text-sm font-bold">Permitir inscripciones</span>
+                <span className="text-xs text-neo-text-secondary">
+                  {open ? 'Habilitadas' : 'Deshabilitadas'}
+                </span>
               </span>
-            </span>
-          </label>
+              <span className="relative inline-flex h-7 w-12 shrink-0 items-center">
+                <input
+                  type="checkbox"
+                  role="switch"
+                  aria-checked={open}
+                  checked={open}
+                  onChange={(event) => setOpen(event.target.checked)}
+                  disabled={saving}
+                  className="peer sr-only"
+                />
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 rounded-full bg-neo-border-strong transition-colors peer-checked:bg-neo-accent peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-neo-accent-text"
+                />
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-1 size-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5"
+                />
+              </span>
+            </label>
+          </div>
+          {changed && (
+            <p className="m-0 text-xs font-medium text-neo-accent-text">
+              Tienes cambios sin guardar. Pulsa «Guardar configuración» para aplicarlos.
+            </p>
+          )}
 
           <div className="flex flex-col gap-2">
             <label htmlFor="registration-deadline" className="text-sm font-semibold">
