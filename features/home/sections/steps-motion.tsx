@@ -1,8 +1,8 @@
 'use client'
 
 import { type ReactNode, useEffect, useRef } from 'react'
-import { sectionFadeOpacity } from './steps-fade'
 import styles from './steps.module.css'
+import { sectionFadeOpacity } from './steps-fade'
 
 /**
  * Progressive enhancement: the section is fully visible without JavaScript.
