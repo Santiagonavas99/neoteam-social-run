@@ -88,9 +88,9 @@ export function CommunityForm({
         <label className="col-span-full">
           Tipo de participación
           <select
-              value={values.type ?? 'invited'}
-              onChange={(event) => update('type', event.target.value)}
-            >
+            value={values.type ?? 'invited'}
+            onChange={(event) => update('type', event.target.value)}
+          >
             <LabelOptions labels={brandTypes} />
           </select>
           <small>El tipo determina en qué sección aparecerá la marca.</small>
