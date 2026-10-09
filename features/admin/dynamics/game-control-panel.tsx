@@ -14,13 +14,7 @@ const phases: Record<string, string> = {
   finished: 'Juego finalizado',
 }
 
-export function GameControlPanel({
-  dynamic,
-  onDraw,
-}: {
-  dynamic: DynamicRow
-  onDraw: () => void
-}) {
+export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onDraw: () => void }) {
   const [stage, setStage] = useState<DynamicStageStatus | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -99,13 +93,21 @@ export function GameControlPanel({
         </div>
         {active && (
           <span className="rounded-full border border-neo-border px-3 py-2 text-xs font-bold">
-            {isRaffle ? phases[phase] ?? phase : 'Activa'}
+            {isRaffle ? (phases[phase] ?? phase) : 'Activa'}
           </span>
         )}
       </div>
 
-      {error && <p role="alert" className="mt-4 text-sm text-neo-danger">{error}</p>}
-      {notice && <p role="status" className="mt-4 text-sm text-neo-accent-text">{notice}</p>}
+      {error && (
+        <p role="alert" className="mt-4 text-sm text-neo-danger">
+          {error}
+        </p>
+      )}
+      {notice && (
+        <p role="status" className="mt-4 text-sm text-neo-accent-text">
+          {notice}
+        </p>
+      )}
 
       {isRaffle && (
         <div className="mt-6">
@@ -120,10 +122,15 @@ export function GameControlPanel({
               disabled={busy}
               onClick={primary}
             >
-              {action === 'draw' ? <Dices aria-hidden className="size-5" /> :
-                action === 'next' ? <Eye aria-hidden className="size-5" /> :
-                  action === 'finish' ? <Trophy aria-hidden className="size-5" /> :
-                    <Play aria-hidden className="size-5" />}
+              {action === 'draw' ? (
+                <Dices aria-hidden className="size-5" />
+              ) : action === 'next' ? (
+                <Eye aria-hidden className="size-5" />
+              ) : action === 'finish' ? (
+                <Trophy aria-hidden className="size-5" />
+              ) : (
+                <Play aria-hidden className="size-5" />
+              )}
               {busy ? 'Actualizando…' : labels[action]}
             </button>
           ) : (
@@ -171,7 +178,12 @@ export function GameControlPanel({
               {isRaffle && active && (
                 <>
                   {dynamic.status === 'open' && phase !== 'countdown' && (
-                    <button type="button" className="text-link text-left text-sm" disabled={busy} onClick={onDraw}>
+                    <button
+                      type="button"
+                      className="text-link text-left text-sm"
+                      disabled={busy}
+                      onClick={onDraw}
+                    >
                       <Dices aria-hidden className="size-4" /> Sortear sin cuenta atrás
                     </button>
                   )}
@@ -180,7 +192,11 @@ export function GameControlPanel({
                     className="text-link text-left text-sm"
                     disabled={busy}
                     onClick={() => {
-                      if (window.confirm('¿Reiniciar solo la presentación? Los ganadores no se borrarán.')) {
+                      if (
+                        window.confirm(
+                          '¿Reiniciar solo la presentación? Los ganadores no se borrarán.',
+                        )
+                      ) {
                         void command('ready')
                       }
                     }}
