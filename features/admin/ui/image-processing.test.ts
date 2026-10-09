@@ -121,8 +121,8 @@ test('Safari PNG fallback no longer prevents a small transparent PNG upload', as
 })
 
 test('HEIC on mobile falls back to resized JPEG when WebP encoder is unsupported', async () => {
-  const browser = browserWithEncoder((mime) =>
-    new Blob(['small image'], { type: mime === 'image/webp' ? 'image/png' : mime }),
+  const browser = browserWithEncoder(
+    (mime) => new Blob(['small image'], { type: mime === 'image/webp' ? 'image/png' : mime }),
   )
   try {
     const file = new File(['heic bytes'], 'photo.heic', { type: 'image/heic' })
@@ -136,8 +136,8 @@ test('HEIC on mobile falls back to resized JPEG when WebP encoder is unsupported
 })
 
 test('oversized JPEG has a bounded fallback under the server upload limit', async () => {
-  const browser = browserWithEncoder((mime) =>
-    new Blob(['small image'], { type: mime === 'image/webp' ? 'image/png' : mime }),
+  const browser = browserWithEncoder(
+    (mime) => new Blob(['small image'], { type: mime === 'image/webp' ? 'image/png' : mime }),
   )
   try {
     const file = new File([new Uint8Array(MAX_IMAGE_BYTES + 1)], 'large.jpg', {
