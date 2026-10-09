@@ -81,6 +81,12 @@ export type DynamicType =
 
 export type DynamicStatus = 'draft' | 'open' | 'closed' | 'completed' | 'cancelled'
 
+export type DynamicStageStatus = {
+  phase: 'ready' | 'countdown' | 'reveal' | 'finished'
+  shown_count: number
+  updated_at?: string
+}
+
 export type DynamicRow = {
   id: string
   name: string
@@ -151,6 +157,8 @@ export type AdminResponse<Row = unknown> = {
   participant?: ScannedParticipant
   dynamicRows?: DynamicRow[]
   winnerDetails?: ScannedParticipant[]
+  stage?: DynamicStageStatus | null
+  stageReady?: boolean
   ranking?: RankedRunner[]
   alreadyCompleted?: boolean
   won?: boolean
