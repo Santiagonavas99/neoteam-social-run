@@ -7,7 +7,10 @@ export const REGISTRATION_UNAVAILABLE_MESSAGE =
   'No podemos confirmar que las inscripciones estén abiertas. Inténtalo de nuevo en unos minutos.'
 
 export function isRegistrationClosed(settings: RegistrationSettings, now = Date.now()): boolean {
-  return !settings.registrationOpen || (settings.deadline !== null && now >= Date.parse(settings.deadline))
+  return (
+    !settings.registrationOpen ||
+    (settings.deadline !== null && now >= Date.parse(settings.deadline))
+  )
 }
 
 export function registrationDeadlineLabel(deadline: string | null): string {
