@@ -20,8 +20,8 @@ import { ListToolbar } from '../ui/list-toolbar'
 import { LoadingState } from '../ui/loading-state'
 import { useAdminData } from '../ui/use-admin-data'
 import { backupListCsv, backupListFileName } from './backup-list'
-import { printableRegistrationsHtml } from './print-list'
 import { ParticipantEditor } from './participant-editor'
+import { printableRegistrationsHtml } from './print-list'
 
 const EMPTY_COUNTS: ParticipantStatusCounts = {
   registered: 0,
