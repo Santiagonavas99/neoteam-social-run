@@ -49,6 +49,56 @@
   }
 }
 
+/* Logo strips: pause on real hover only. iOS Safari can retain :hover after tapping
+   an external link, so never let tap focus permanently freeze the marquee. */
+.logo-marquee-viewport {
+  -webkit-mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
+}
+.logo-marquee-track {
+  animation: marquee 40s linear infinite;
+}
+@media (hover: hover) and (pointer: fine) {
+  .logo-marquee-viewport:hover .logo-marquee-track {
+    animation-play-state: paused;
+  }
+}
+@supports selector(:has(:focus-visible)) {
+  .logo-marquee-viewport:has(a:focus-visible) .logo-marquee-track {
+    animation-play-state: paused;
+  }
+}
+.logo-marquee-swipe-hint {
+  display: none;
+}
+/* Touch and reduced-motion fallback: no reliance on autoplay to reach every logo.
+   Native momentum scrolling keeps the strips usable in older Safari and low-power iOS. */
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .logo-marquee-viewport {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .logo-marquee-viewport::-webkit-scrollbar {
+    display: none;
+  }
+  .logo-marquee-track {
+    animation: none;
+    transform: none;
+  }
+  .logo-marquee-link-hint {
+    display: none;
+  }
+  .logo-marquee-swipe-hint {
+    display: block;
+  }
+}
+
 /* Fade-up as an element scrolls into view. CSS only: browsers without scroll-driven
    animations, and reduced-motion users, simply see the element at rest. */
 @utility reveal {
