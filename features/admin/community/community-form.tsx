@@ -63,16 +63,16 @@ export function CommunityForm({
           01
         </span>
         <div className="min-w-0">
-          <h4 className="mb-1 text-base font-bold tracking-[-0.025em]">
-            Nombre del {subject}
-          </h4>
+          <h4 className="mb-1 text-base font-bold tracking-[-0.025em]">Nombre del {subject}</h4>
           <p className="mb-0 text-sm text-neo-text-secondary">
             Este nombre identificará el logo en el panel y en la web.
           </p>
         </div>
       </div>
       <label className="col-span-full">
-        <span className="font-semibold">Nombre del {subject} <span aria-hidden="true">*</span></span>
+        <span className="font-semibold">
+          Nombre del {subject} <span aria-hidden="true">*</span>
+        </span>
         <input
           required
           maxLength={120}
@@ -87,7 +87,10 @@ export function CommunityForm({
       {brand && (
         <label className="col-span-full">
           Tipo de participación
-          <select value={values.type ?? 'invited'} onChange={(event) => update('type', event.target.value)}>
+          <select
+              value={values.type ?? 'invited'}
+              onChange={(event) => update('type', event.target.value)}
+            >
             <LabelOptions labels={brandTypes} />
           </select>
           <small>El tipo determina en qué sección aparecerá la marca.</small>
@@ -99,11 +102,10 @@ export function CommunityForm({
           02
         </span>
         <div className="min-w-0">
-          <h4 className="mb-1 text-base font-bold tracking-[-0.025em]">
-            Sube el logo
-          </h4>
+          <h4 className="mb-1 text-base font-bold tracking-[-0.025em]">Sube el logo</h4>
           <p className="mb-0 text-sm text-neo-text-secondary">
-            Elige la imagen de <strong className="text-neo-text">{values.name.trim() || `tu ${subject}`}</strong>.
+            Elige la imagen de{' '}
+            <strong className="text-neo-text">{values.name.trim() || `tu ${subject}`}</strong>.
           </p>
         </div>
       </div>
@@ -123,7 +125,9 @@ export function CommunityForm({
         </span>
         <div className="min-w-0">
           <h4 className="mb-1 text-base font-bold tracking-[-0.025em]">Visibilidad</h4>
-          <p className="mb-0 text-sm text-neo-text-secondary">Elige si aparecerá en la web del evento.</p>
+          <p className="mb-0 text-sm text-neo-text-secondary">
+            Elige si aparecerá en la web del evento.
+          </p>
         </div>
       </div>
       <div className="col-span-full grid gap-4 rounded-xl border border-neo-border bg-neo-bg p-4">
@@ -152,9 +156,13 @@ export function CommunityForm({
         </small>
       </div>
 
-      <details className="group col-span-full rounded-xl border border-neo-border p-4" open={!newRecord || undefined}>
+      <details
+        className="group col-span-full rounded-xl border border-neo-border p-4"
+        open={!newRecord || undefined}
+      >
         <summary className="min-h-10 cursor-pointer font-semibold text-neo-text">
-          Opciones adicionales <span className="font-normal text-neo-text-secondary">(opcional)</span>
+          Opciones adicionales{' '}
+          <span className="font-normal text-neo-text-secondary">(opcional)</span>
         </summary>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <label>
