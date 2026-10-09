@@ -605,12 +605,12 @@
   .section *,
   .section *::before,
   .section *::after {
-    animation: none !important;
-    transition-duration: 0.01ms !important;
+    animation: none;
+    transition-duration: 0.01ms;
   }
 
   .section [data-reveal] {
-    opacity: 1 !important;
-    translate: none !important;
+    opacity: 1;
+    translate: none;
   }
 }
