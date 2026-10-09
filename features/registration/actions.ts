@@ -5,7 +5,8 @@ import { calendarUrlFor } from '@/features/event/calendar'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { splitFullName } from './full-name'
 import { type Pass, registeredPass } from './pass'
-import { isRegistrationClosed, REGISTRATION_CLOSED_MESSAGE } from './registration-deadline'
+import { isRegistrationClosed, REGISTRATION_UNAVAILABLE_MESSAGE } from './registration-deadline'
+import { getRegistrationSettings } from './registration-settings'
 import { registrationSchema } from './schema'
 
 export type RegistrationState = {
@@ -29,8 +30,14 @@ export async function registerParticipant(
   }
   const attempt = (previousState.attempt ?? 0) + 1
 
-  if (isRegistrationClosed()) {
-    return { ok: false, message: REGISTRATION_CLOSED_MESSAGE, values, attempt }
+  const settings = await getRegistrationSettings()
+  if (!settings || isRegistrationClosed(settings)) {
+    return {
+      ok: false,
+      message: settings ? 'Las inscripciones están cerradas.' : REGISTRATION_UNAVAILABLE_MESSAGE,
+      values,
+      attempt,
+    }
   }
 
   // Keep the Supabase contract intact: a single full-name field in the UI,
@@ -90,7 +97,7 @@ export async function registerParticipant(
 
     if (error) {
       if (error.message.includes('INSCRIPCIONES_CERRADAS')) {
-        return { ok: false, message: REGISTRATION_CLOSED_MESSAGE, values, attempt }
+        return { ok: false, message: 'Las inscripciones están cerradas.', values, attempt }
       }
       if (error.message.includes('Ya existe una inscripción')) {
         return {

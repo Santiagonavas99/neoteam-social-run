@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.3] - 2026-10-09
+
+### Fixed
+
+- **Corrected the registration deadline from October 10 to October 17 at 8:00 p.m. Colombia time.** The database now stores and enforces this time instead of a hard-coded timestamp, including after reloads or direct submissions.
+- **Administrator-configurable registration closure:** a new Inscripciones section lets authorized admins edit the deadline in Colombia time, clear the automatic cutoff or manually close/reopen registration; the public registration form reads its status dynamically and refreshes while open.
+- **Pass recovery unaffected:** existing registrations, check-in and participant management continue after enrollment closes.
+
+
 ## [0.31.2] - 2026-10-09
 
 ### Improved

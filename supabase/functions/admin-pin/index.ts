@@ -147,6 +147,54 @@ Deno.serve(async (req: Request) => {
         return json({ error: 'Tu usuario no tiene acceso a esta sección.' }, 403)
     }
 
+    // Only authenticated administrators can read or change the registration deadline.
+    if (action === 'getRegistrationSettings' || action === 'saveRegistrationSettings') {
+      if (action === 'saveRegistrationSettings') {
+        const registrationOpen = body?.registrationOpen
+        if (typeof registrationOpen !== 'boolean') {
+          return json({ error: 'El estado de inscripción no es válido.' }, 400)
+        }
+        const local = body?.deadlineLocal
+        let deadline: string | null = null
+        if (local !== null) {
+          if (typeof local !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(local)) {
+            return json({ error: 'Indica una fecha y hora válidas de Colombia.' }, 400)
+          }
+          const date = new Date(`${local}:00-05:00`)
+          if (
+            Number.isNaN(date.getTime()) ||
+            new Date(date.getTime() - 5 * 60 * 60 * 1000).toISOString().slice(0, 16) !== local
+          ) {
+            return json({ error: 'Indica una fecha y hora reales.' }, 400)
+          }
+          deadline = date.toISOString()
+        }
+        const { data, error } = await supabase
+          .from('events')
+          .update({ registration_deadline: deadline, registration_open: registrationOpen })
+          .eq('code', 'SR26')
+          .select('registration_deadline,registration_open')
+          .single()
+        if (error) throw error
+        console.info('registration-settings-updated', { adminUserId: session.userId })
+        return json({
+          ok: true,
+          deadline: data.registration_deadline,
+          registrationOpen: data.registration_open,
+        })
+      }
+      const { data, error } = await supabase
+        .from('events')
+        .select('registration_deadline,registration_open')
+        .eq('code', 'SR26')
+        .single()
+      if (error) throw error
+      return json({
+        deadline: data.registration_deadline,
+        registrationOpen: data.registration_open,
+      })
+    }
+
     if (action === 'requestCode') {
       const email = cleanEmail(body?.email)
       if (!email) return json({ error: 'Escribe un correo válido.' }, 400)

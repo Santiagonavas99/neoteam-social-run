@@ -1,4 +1,5 @@
 import {
+  CalendarClock,
   Flag,
   GalleryHorizontal,
   LayoutDashboard,
@@ -19,6 +20,7 @@ export type AdminSection =
   | 'home-order'
   | 'logos'
   | 'participants'
+  | 'registration-settings'
   | 'email-queue'
   | 'groups'
   | 'brands'
@@ -50,6 +52,13 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     label: 'Overview',
     description: 'El pulso del Social Run, en un vistazo.',
     icon: LayoutDashboard,
+    group: 'event',
+  },
+  {
+    id: 'registration-settings',
+    label: 'Inscripciones',
+    description: 'Configura la fecha y hora límite y abre o cierra el formulario.',
+    icon: CalendarClock,
     group: 'event',
   },
   {
