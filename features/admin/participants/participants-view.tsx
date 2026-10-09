@@ -20,6 +20,7 @@ import { ListToolbar } from '../ui/list-toolbar'
 import { LoadingState } from '../ui/loading-state'
 import { useAdminData } from '../ui/use-admin-data'
 import { backupListCsv, backupListFileName } from './backup-list'
+import { pageCorrection } from './pagination'
 import { ParticipantEditor } from './participant-editor'
 import { printableRegistrationsHtml } from './print-list'
 
@@ -34,6 +35,7 @@ type ParticipantPage = {
   rows: Participant[]
   count: number
   page: number
+  requestedPage: number
   pageSize: number
   statusCounts: ParticipantStatusCounts
 }
@@ -42,6 +44,7 @@ const EMPTY_PAGE: ParticipantPage = {
   rows: [],
   count: 0,
   page: 1,
+  requestedPage: 1,
   pageSize: 25,
   statusCounts: EMPTY_COUNTS,
 }
@@ -124,6 +127,7 @@ export function ParticipantsView() {
       rows: response.rows ?? [],
       count: response.count ?? 0,
       page: response.page ?? page,
+      requestedPage: page,
       pageSize: response.pageSize ?? 25,
       statusCounts: response.statusCounts ?? EMPTY_COUNTS,
     }
@@ -132,8 +136,11 @@ export function ParticipantsView() {
   const { data, loading, reload } = useAdminData(load, EMPTY_PAGE, onError)
 
   useEffect(() => {
-    if (data.page !== page) setPage(data.page)
-  }, [data.page, page])
+    // A page click updates React state before the next request resolves.
+    // Do not replace it with the page number from the previous response.
+    const corrected = pageCorrection(page, data.requestedPage, data.page)
+    if (corrected !== null) setPage(corrected)
+  }, [data.page, data.requestedPage, page])
 
   function updateQuery(next: string) {
     setQuery(next)
