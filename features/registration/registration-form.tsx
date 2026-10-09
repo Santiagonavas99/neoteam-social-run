@@ -1,11 +1,12 @@
 'use client'
 
-import { ArrowLeft, ArrowRight, Check, UsersRound } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Clock3, UsersRound } from 'lucide-react'
 import Link from 'next/link'
 import type { FormEvent, ReactNode } from 'react'
 import { useActionState, useEffect, useRef, useState } from 'react'
 import { type RegistrationState, registerParticipant } from './actions'
 import { CalendarButton } from './calendar-button'
+import { registrationDeadlineLabel } from './registration-deadline'
 import { CommunityConnect } from './community-connect'
 import {
   CheckboxField,
@@ -135,7 +136,7 @@ function controlError(
   return control.validationMessage || 'Revisa este dato.'
 }
 
-export function RegistrationForm() {
+export function RegistrationForm({ deadline }: { deadline: string | null }) {
   const [state, formAction, pending] = useActionState(registerParticipant, initialState)
   const [step, setStep] = useState(1)
   const [flow, setFlow] = useState<'forward' | 'back'>('forward')
@@ -399,6 +400,15 @@ export function RegistrationForm() {
           </li>
         ))}
       </ol>
+
+      <p className="mt-5 mb-0 flex items-start gap-2 text-xs leading-relaxed font-semibold text-neo-accent-text sm:text-sm">
+        <Clock3 aria-hidden className="mt-0.5 size-4 shrink-0" />
+        <span>
+          {deadline
+            ? `Cierre de inscripciones: ${registrationDeadlineLabel(deadline)} (Colombia)`
+            : 'Inscripciones abiertas · sin fecha límite'}
+        </span>
+      </p>
 
       {registrationSteps.map(({ number, title, hint }) => (
         <section
