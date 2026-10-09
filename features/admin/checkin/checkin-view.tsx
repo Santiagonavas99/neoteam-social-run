@@ -23,7 +23,7 @@ async function checkIn(code: string): Promise<ScanOutcome> {
 export function CheckinView() {
   return (
     <section className="mx-auto w-full max-w-120">
-      <ScanStation inputId="checkin-code" onCode={(code) => checkIn(code)} />
+      <ScanStation inputId="checkin-code" onCode={(code) => checkIn(code)} showIntro={false} />
     </section>
   )
 }
