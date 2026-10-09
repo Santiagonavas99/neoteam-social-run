@@ -22,13 +22,12 @@
 
 .top {
   display: grid;
-  grid-template-columns: 92px minmax(0, 1.25fr) minmax(260px, 0.65fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
   gap: clamp(22px, 3.2vw, 46px);
   align-items: start;
   margin-bottom: clamp(45px, 6vw, 82px);
 }
 
-.index,
 .eyebrow,
 .tag,
 .passVisualTop,
@@ -40,15 +39,13 @@
   text-transform: uppercase;
 }
 
-.index {
-  padding-top: 8px;
-  white-space: nowrap;
-  color: var(--neo-accent);
-}
-
 .eyebrow {
   margin-bottom: 22px;
   color: var(--neo-accent);
+}
+
+.intro {
+  min-width: 0;
 }
 
 .intro h2 {
@@ -74,7 +71,8 @@
 
 .passVisual {
   display: flex;
-  min-height: 320px;
+  min-height: 294px;
+  min-width: 0;
   flex-direction: column;
   align-items: center;
   gap: 14px;
@@ -110,12 +108,6 @@
   margin-top: auto;
   font-size: 17px;
   letter-spacing: -0.04em;
-}
-
-.passVisual small {
-  color: var(--neo-on-dark-secondary);
-  font-size: 11px;
-  text-align: center;
 }
 
 .timeline {
@@ -215,45 +207,21 @@
 
 .bottom {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 28px 40px;
-  padding-top: 32px;
-}
-
-.reminder {
-  display: flex;
-  max-width: 60ch;
-  align-items: start;
-  gap: 14px;
-  color: var(--neo-on-dark-secondary);
-}
-
-.reminder svg {
-  flex: 0 0 auto;
-  color: var(--neo-accent);
-}
-
-.reminder p {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.6;
-}
-
-.reminder strong {
-  color: var(--neo-white);
+  justify-content: center;
+  padding-top: 36px;
 }
 
 .actions {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 16px;
+  width: min(100%, 360px);
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
 }
 
 .mainLink {
   display: inline-flex;
+  width: 100%;
   min-height: 48px;
   align-items: center;
   justify-content: center;
@@ -275,6 +243,7 @@
   display: inline-flex;
   min-height: 48px;
   align-items: center;
+  justify-content: center;
   color: var(--neo-white);
   font-size: 14px;
   font-weight: 650;
@@ -284,11 +253,10 @@
 
 @media (max-width: 1050px) {
   .top {
-    grid-template-columns: 72px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.35fr) minmax(240px, 0.65fr);
   }
   .passVisual {
-    grid-column: 2;
-    width: min(100%, 360px);
+    width: 100%;
     min-height: 250px;
     transform: none;
   }
@@ -320,8 +288,8 @@
     margin-top: 18px;
   }
   .passVisual {
-    grid-column: auto;
     width: 100%;
+    max-width: 420px;
     min-height: 0;
     padding: 18px;
   }
@@ -357,17 +325,9 @@
     font-size: 25px;
   }
   .bottom {
-    gap: 22px;
+    padding-top: 26px;
   }
   .actions {
-    width: 100%;
     gap: 10px;
-  }
-  .mainLink {
-    width: 100%;
-  }
-  .secondaryLink {
-    width: 100%;
-    justify-content: center;
   }
 }
