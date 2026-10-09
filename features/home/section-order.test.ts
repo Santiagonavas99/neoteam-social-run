@@ -6,7 +6,10 @@ test('includes event steps after the event introduction by default', () => {
   const keys = normalizeHomeSectionOrder([]).map((section) => section.section_key)
   assert.ok(keys.indexOf('steps') > keys.indexOf('story'))
   assert.ok(keys.indexOf('steps') < keys.indexOf('agenda'))
-  assert.equal(normalizeHomeSectionOrder([]).find((row) => row.section_key === 'steps')?.visible, true)
+  assert.equal(
+    normalizeHomeSectionOrder([]).find((row) => row.section_key === 'steps')?.visible,
+    true,
+  )
 })
 
 test('supports hiding and reordering the steps independently', () => {
