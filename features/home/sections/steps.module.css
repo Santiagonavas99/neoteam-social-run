@@ -332,6 +332,19 @@
   }
 }
 
+/* Reversible fade for the complete walkthrough without shifting the layout.
+   Background remains steady; every text block and CTA fades together. */
+.scene {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .section[data-motion="enabled"] .scene {
+    opacity: var(--steps-fade-opacity, 1);
+    transition: opacity 90ms linear;
+  }
+}
+
 /* The section stays readable without JavaScript; scroll motion is progressive enhancement. */
 @media (prefers-reduced-motion: no-preference) {
   .section[data-motion="enabled"] [data-reveal] {
