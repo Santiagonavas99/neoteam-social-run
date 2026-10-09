@@ -1,0 +1,111 @@
+/* Explicit grid beats the global label { flex-direction: column } rule.
+   Keep preview, action and copy aligned at phone widths. */
+.picker {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1.5px dashed var(--neo-border-strong);
+  border-radius: 12px;
+  background: var(--neo-bg);
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.picker:hover,
+.picker:focus-within {
+  border-color: var(--neo-accent-text);
+  background: var(--neo-accent-soft);
+}
+
+.picker:focus-within {
+  outline: 2px solid var(--neo-accent-text);
+  outline-offset: 2px;
+}
+
+.preview {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  min-width: 0;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-width: 0;
+  margin: 0;
+  color: var(--neo-text);
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.heading svg {
+  flex-shrink: 0;
+}
+
+.ready {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: var(--neo-accent-soft);
+  color: var(--neo-accent-text);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.hint {
+  color: var(--neo-text-secondary);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.action {
+  display: inline-flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  border: 1px solid var(--neo-accent-border);
+  border-radius: var(--radius-control);
+  background: var(--neo-accent-soft);
+  color: var(--neo-accent-text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .picker {
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .heading {
+    font-size: 16px;
+  }
+
+  .action {
+    width: auto;
+    padding-inline: 16px;
+  }
+}
