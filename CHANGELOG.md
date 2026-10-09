@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.32.2] - 2026-10-09
+
+### Fixed
+
+- **Mobile hero status centered:** inscripciones abiertas/cerradas now render as a narrow, horizontally centered badge, with the cyan indicator and state label aligned and the deadline centered underneath.
+- **Breathing room:** more spacing between registration status and the registration/pass actions; slightly reduced unused space at the bottom of the hero.
+- **Hero simplified:** removed redundant «Ver agenda» and «¿Para qué sirve el QR?» shortcuts, retaining the full agenda and event steps in their own sections.
+
+
 ## [0.32.1] - 2026-10-09
 
 ### Fixed
