@@ -187,6 +187,24 @@
 .v2-hero-actions .text-link {
   color: var(--neo-on-dark-secondary);
 }
+.v2-hero-qr-help {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-height: 44px;
+  margin-top: 15px;
+  color: var(--neo-accent);
+  font-size: 13px;
+  font-weight: 750;
+}
+.v2-hero-qr-help span {
+  color: var(--neo-on-dark-secondary);
+  font-weight: 500;
+}
+.v2-hero-qr-help:hover span {
+  color: var(--neo-white);
+}
 .v2-route-card {
   margin-top: 42px;
   padding-top: 20px;

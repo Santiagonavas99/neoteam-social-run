@@ -56,6 +56,7 @@ const STAFF_ACTIONS = new Set(['checkin'])
 
 const HOME_SECTION_KEYS = new Set([
   'story',
+  'steps',
   'numbers',
   'allies',
   'running_crews',

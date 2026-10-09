@@ -19,6 +19,7 @@ import { Hero } from '@/features/home/sections/hero'
 import { LandakStudio } from '@/features/home/sections/landak-studio'
 import { Numbers } from '@/features/home/sections/numbers'
 import { Raffle } from '@/features/home/sections/raffle'
+import { Steps } from '@/features/home/sections/steps'
 import { Story } from '@/features/home/sections/story'
 import { LandingRegistrationProvider } from '@/features/registration/landing-registration-status'
 import { getRegistrationSettings } from '@/features/registration/registration-settings'
@@ -50,6 +51,8 @@ export default async function Home() {
     switch (section_key) {
       case 'story':
         return <Story key={section_key} index={index} />
+      case 'steps':
+        return <Steps key={section_key} />
       case 'numbers':
         return <Numbers key={section_key} registered={registered} brands={logoItems.length} />
       case 'allies':
