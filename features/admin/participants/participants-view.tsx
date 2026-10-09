@@ -369,9 +369,6 @@ export function ParticipantsView() {
               <option value="">Todos</option>
               <option value="female">Mujeres</option>
               <option value="male">Hombres</option>
-              <option value="non_binary">No binario</option>
-              <option value="prefer_not_to_say">Prefiere no decir</option>
-              <option value="other">Otro</option>
             </select>
           </label>
           <label className="flex flex-col gap-1 text-xs font-bold text-neo-text-secondary">
