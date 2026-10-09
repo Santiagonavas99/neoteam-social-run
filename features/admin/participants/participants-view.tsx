@@ -1,6 +1,6 @@
 'use client'
 
-import { FileDown, Mail, Trash2, UserCheck, Users } from 'lucide-react'
+import { FileDown, Mail, Printer, Trash2, UserCheck, Users } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { callAdmin } from '../api'
 import { errorMessage } from '../errors'
@@ -14,6 +14,7 @@ import { ListToolbar } from '../ui/list-toolbar'
 import { LoadingState } from '../ui/loading-state'
 import { useAdminData } from '../ui/use-admin-data'
 import { backupListCsv, backupListFileName } from './backup-list'
+import { printableRegistrationsHtml } from './print-list'
 
 const EMPTY_COUNTS: ParticipantStatusCounts = {
   registered: 0,
@@ -60,6 +61,7 @@ export function ParticipantsView() {
   const [feedback, setFeedback] = useState<FeedbackValue>(null)
   const [confirmation, setConfirmation] = useState<Participant | null>(null)
   const [downloading, setDownloading] = useState(false)
+  const [printing, setPrinting] = useState(false)
 
   const onError = useCallback(
     (error: unknown) =>
@@ -163,6 +165,36 @@ export function ParticipantsView() {
     }
   }
 
+  async function printAllParticipants() {
+    // Open synchronously from the click so popup blockers allow the private print window.
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) {
+      onError(new Error('Permite las ventanas emergentes para imprimir la lista.'))
+      return
+    }
+
+    printWindow.document.title = 'Preparando lista de inscritos'
+    printWindow.document.body.textContent = 'Preparando lista para imprimir…'
+    setPrinting(true)
+    setFeedback(null)
+    try {
+      const response = await callAdmin<Participant>('adminData', {
+        resource: 'participants',
+        operation: 'backup',
+      })
+      printWindow.document.open()
+      printWindow.document.write(printableRegistrationsHtml(response.rows ?? []))
+      printWindow.document.close()
+      printWindow.focus()
+      printWindow.print()
+    } catch (error) {
+      printWindow.close()
+      onError(error)
+    } finally {
+      setPrinting(false)
+    }
+  }
+
   async function downloadAllParticipants() {
     setDownloading(true)
     setFeedback(null)
@@ -203,21 +235,34 @@ export function ParticipantsView() {
         query={query}
         onQuery={updateQuery}
         loading={loading}
-        refreshDisabled={loading || !!busy || downloading}
+        refreshDisabled={loading || !!busy || downloading || printing}
         onRefresh={() => {
           setFeedback(null)
           void reload()
         }}
         action={
-          <button
-            type="button"
-            className="button button-secondary"
-            onClick={() => void downloadAllParticipants()}
-            disabled={loading || downloading || totalParticipants === 0}
-          >
-            <FileDown aria-hidden className="size-4 shrink-0" />
-            {downloading ? 'Preparando lista…' : 'Descargar lista'}
-          </button>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <button
+              type="button"
+              className="button button-secondary"
+              onClick={() => void printAllParticipants()}
+              disabled={loading || printing || downloading || totalParticipants === 0}
+              title="Imprime únicamente nombre y running crew"
+            >
+              <Printer aria-hidden className="size-4 shrink-0" />
+              {printing ? 'Preparando impresión…' : 'Imprimir inscritos'}
+            </button>
+            <button
+              type="button"
+              className="button button-secondary"
+              onClick={() => void downloadAllParticipants()}
+              disabled={loading || downloading || printing || totalParticipants === 0}
+              title="Respaldo administrativo: incluye información personal y no debe imprimirse ni compartirse"
+            >
+              <FileDown aria-hidden className="size-4 shrink-0" />
+              {downloading ? 'Preparando respaldo…' : 'Exportar respaldo'}
+            </button>
+          </div>
         }
       />
       {!loading && totalParticipants > 0 && (
