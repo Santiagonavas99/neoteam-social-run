@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.32.4] - 2026-10-09
+
+### Fixed
+
+- **Mobile logo editor alignment:** consistent, compact 01/02/03 headings with smaller numbers, top-aligned labels and descriptions, and tighter spacing for phone displays.
+- **Logo picker alignment:** thumbnail and upload controls now share one row on mobile, with no oversized stacked image preview; desktop remains responsive.
+- **Shared forms:** the same step component applies to reusable logos, Running crews and allied brands. No changes to upload logic or stored data.
+
+
 ## [0.32.3] - 2026-10-09
 
 ### Fixed
