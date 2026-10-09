@@ -5,6 +5,7 @@ export const PRESENCE_IDLE_MS = 120_000
 export const PRESENCE_EXPIRY_MS = 75_000
 
 export type OnlineAdministrator = {
+  id: string
   name: string
   lastActiveAt: string
 }
