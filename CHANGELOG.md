@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.33.0] - 2026-10-09
+## [0.34.0] - 2026-10-09
 
 ### Added
 
@@ -22,6 +22,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Apply the SQL migration and deploy `admin-pin` from this PR before enabling live projection in production. The demo works without them.
 - Check-in, participant registration, past raffle records and pass recovery are unchanged.
+
+## [0.32.4] - 2026-10-09
+
+### Fixed
+
+- **Mobile logo editor alignment:** consistent, compact 01/02/03 headings with smaller numbers, top-aligned labels and descriptions, and tighter spacing for phone displays.
+- **Logo picker alignment:** thumbnail and upload controls now share one row on mobile, with no oversized stacked image preview; desktop remains responsive.
+- **Shared forms:** the same step component applies to reusable logos, Running crews and allied brands. No changes to upload logic or stored data.
+
+
+## [0.32.3] - 2026-10-09
+
+### Fixed
+
+- **Mobile admin image upload:** when Safari or another browser cannot encode `image/webp` on canvas (and may silently return PNG), the uploader no longer blocks logos. Use WebP whenever supported, otherwise upload a compatible JPG/PNG using the existing server MIME and file-signature checks.
+- **Large and HEIC images:** when WebP conversion is unavailable, resize and export phone photos to JPG and transparency-capable logos to PNG, always respecting the existing 4 MB upload limit.
+- **Transparent image workflow:** preserve PNG and image alpha in the mobile fallback and show the actual uploaded format rather than falsely claiming WebP. Upload hints now describe supported fallback formats.
+- **Regression tests:** simulate WebP support, Safari's silent PNG fallback, phone HEIC, and large JPEG uploads.
+- **Mobile-first crew form:** now guides admins through three clearly labeled steps (name, logo and visibility), shows an always-visible image preview and groups Instagram/order under optional settings.
+- **Reusable carousel logos:** the same naming-first flow makes it obvious which club or brand owns the image and where it appears.
+- **Inline upload feedback:** upload errors and success are displayed immediately beside the selected image, with a large mobile file-picker target.
+
+
+## [0.33.0] - 2026-10-09
+
+### Added
+
+- **Administradores conectados:** nuevo indicador privado en Overview con nombres de administradores autenticados, cantidad en línea y última actividad; se refresca cada 20 segundos.
+- **Desconexión automática:** presencia temporal por pestaña, con cierre inmediato al salir u ocultar el panel cuando el navegador lo permite; expira al perder el heartbeat o tras 2 minutos de inactividad.
+- **Privacidad:** el servidor deriva la identidad de una sesión verificada, no de datos enviados por el navegador. Los visitantes públicos y personal de check-in no aparecen en el listado; no se muestra correo ni se expone la tabla con claves públicas.
+
 
 ## [0.32.4] - 2026-10-09
 

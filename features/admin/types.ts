@@ -137,6 +137,7 @@ export type AdminResponse<Row = unknown> = {
   deadline?: string | null
   registrationOpen?: boolean
   rows?: Row[]
+  online?: Row[]
   metrics?: Metrics
   url?: string
   error?: string
