@@ -484,8 +484,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .stage *, .stage *::before, .stage *::after {
-    animation: none !important;
-    transition: none !important;
+    animation: none;
+    transition: none;
   }
   .slot span { filter: none; }
 }
