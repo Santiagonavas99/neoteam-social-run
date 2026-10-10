@@ -50,7 +50,7 @@ function sameEntity(left: CommunityMarqueeItem, right: CommunityMarqueeItem) {
 function mergeItems(
   nativeItems: MarqueeSource[],
   allies: HomeLogoCarouselItem[],
-  include: 'show_in_running_crews' | 'show_in_organizations',
+  include: 'show_in_races' | 'show_in_running_crews' | 'show_in_organizations',
 ): CommunityMarqueeItem[] {
   const candidates: Candidate[] = nativeItems.map((item, sequence) => ({
     item: {
@@ -122,4 +122,21 @@ export function organizationMarqueeItems(
     allies,
     'show_in_organizations',
   )
+}
+
+/** A race can be an original logo or a linked brand. Never copy files or duplicate tiles. */
+export function alliedRaceMarqueeItems(
+  races: HomeLogoCarouselItem[],
+  brands: HomeLogoCarouselItem[],
+): CommunityMarqueeItem[] {
+  const nativeRaces = races
+    .filter((item) => item.active)
+    .map((item) => ({
+      id: item.id,
+      name: item.name,
+      logo_url: item.logo_url,
+      website: item.link_url,
+      sort_order: item.sort_order,
+    }))
+  return mergeItems(nativeRaces, brands, 'show_in_races')
 }

@@ -45,7 +45,18 @@ export function AdminApp({ enableLegacyWebpMigration }: { enableLegacyWebpMigrat
         ) : section === 'brand-composer' ? (
           <BrandComposerView />
         ) : section === 'logos' ? (
-          <LogosView enableLegacyWebpMigration={enableLegacyWebpMigration} />
+          <LogosView
+            key="brand"
+            enableLegacyWebpMigration={enableLegacyWebpMigration}
+            onNavigateKind={(kind) => setSection(kind === 'brand' ? 'logos' : 'race-logos')}
+          />
+        ) : section === 'race-logos' ? (
+          <LogosView
+            key="race"
+            kind="race"
+            enableLegacyWebpMigration={false}
+            onNavigateKind={(kind) => setSection(kind === 'brand' ? 'logos' : 'race-logos')}
+          />
         ) : section === 'team' ? (
           <TeamView />
         ) : section === 'participants' ? (

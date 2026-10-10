@@ -114,18 +114,19 @@ export function LogoMarquee({
           {title}
         </h2>
         {linked && (
-          <p className="m-0 text-[13px] text-neo-text-secondary">
+          <p className="logo-marquee-link-hint m-0 text-[13px] text-neo-text-secondary">
             Toca una tarjeta para conocer más
           </p>
         )}
+        {shouldAnimate && (
+          <p className="logo-marquee-swipe-hint m-0 text-[13px] text-neo-text-secondary">
+            Desliza para ver más
+          </p>
+        )}
       </div>
-      <div className="group reveal overflow-hidden py-2 [mask-image:linear-gradient(90deg,transparent,black_8%,black_92%,transparent)] motion-reduce:overflow-x-auto">
+      <div className="logo-marquee-viewport reveal overflow-hidden py-2">
         <div
-          className={
-            shouldAnimate
-              ? 'flex w-max animate-marquee group-has-[:focus-visible]:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-reduce:animate-none'
-              : 'flex w-full justify-center'
-          }
+          className={shouldAnimate ? 'logo-marquee-track flex w-max' : 'flex w-full justify-center'}
           style={{ animationDuration: `${repeatedItems.length * 5}s` }}
         >
           {group(false)}

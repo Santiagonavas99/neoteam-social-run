@@ -2,8 +2,8 @@ import {
   CalendarClock,
   Flag,
   GalleryHorizontal,
-  Layers3,
   LayoutDashboard,
+  Layers3,
   ListOrdered,
   type LucideIcon,
   Mail,
@@ -21,6 +21,7 @@ export type AdminSection =
   | 'home-order'
   | 'logos'
   | 'brand-composer'
+  | 'race-logos'
   | 'participants'
   | 'registration-settings'
   | 'email-queue'
@@ -105,14 +106,21 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
   {
     id: 'brand-composer',
     label: 'Compositor de marcas',
-    description: 'Crea piezas con logos aliados y exporta PNG o JPG.',
+    description: 'Crea piezas adaptables con logos aliados para exportar en PNG o JPG.',
     icon: Layers3,
     group: 'content',
   },
   {
     id: 'logos',
-    label: 'Carrusel logos',
-    description: 'Sube, ordena y publica los logos de la cinta horizontal de la Home.',
+    label: 'Biblioteca de logos',
+    description: 'Gestiona logos compartidos entre marcas, carreras, crews y organizaciones.',
+    icon: GalleryHorizontal,
+    group: 'content',
+  },
+  {
+    id: 'race-logos',
+    label: 'Carreras aliadas',
+    description: 'Reutiliza logos existentes o añade nuevas carreras desde la biblioteca.',
     icon: GalleryHorizontal,
     group: 'content',
   },
