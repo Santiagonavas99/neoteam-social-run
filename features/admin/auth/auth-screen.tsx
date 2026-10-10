@@ -12,6 +12,7 @@ import type { FeedbackValue } from '../types'
 import { Feedback } from '../ui/admin-ui'
 import { LoadingState } from '../ui/loading-state'
 import { isEmail, normalizeEmail } from './code'
+import { LoginBackground } from './login-background'
 import type { AdminSession } from './use-admin-session'
 
 const RESEND_SECONDS = 60
@@ -71,10 +72,14 @@ export function AuthScreen({ session }: { session: AdminSession }) {
   }
 
   return (
-    <main className="flex min-h-svh flex-col items-center justify-center gap-6 border-t-[6px] border-neo-accent-dark bg-neo-bg px-5 py-7 md:gap-8 md:py-10">
+    <main
+      data-theme="dark"
+      className="relative isolate flex min-h-svh flex-col items-center justify-center gap-6 overflow-hidden border-t-[6px] border-neo-accent-dark bg-neo-bg px-5 py-7 text-neo-text md:gap-8 md:py-10"
+    >
+      <LoginBackground />
       <BrandLink />
       <section
-        className="w-full max-w-[460px] rounded-card border border-neo-border bg-neo-surface px-6 py-7 md:p-10"
+        className="w-full max-w-[460px] rounded-card border border-neo-border bg-neo-surface/95 px-6 py-7 shadow-xl md:p-10"
         aria-labelledby="login-title"
       >
         <p className="section-label">SOCIAL RUN · ADMIN</p>
