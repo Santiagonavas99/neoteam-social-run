@@ -100,7 +100,6 @@ export function OverviewView({ navigate }: { navigate: (section: AdminSection) =
             ))}
           </div>
 
-
           <section aria-labelledby="active-dynamics" className="flex flex-col gap-2">
             <h2 id="active-dynamics" className="m-0 text-base font-bold">
               Dinámicas activas
