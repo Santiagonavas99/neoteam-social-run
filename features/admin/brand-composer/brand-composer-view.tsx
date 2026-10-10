@@ -25,7 +25,12 @@ import {
 } from './composer-layout'
 import { type ComposerBrand, composerBrands } from './composer-library'
 import { type ComposerSettings, exportComposition, renderComposition } from './composer-renderer'
-import { clampLogoZone, type LogoZone, type TemplateColumns, verticalAlliesZone } from './composer-template'
+import {
+  clampLogoZone,
+  type LogoZone,
+  type TemplateColumns,
+  verticalAlliesZone,
+} from './composer-template'
 import { TemplateZoneOverlay } from './template-zone-overlay'
 
 type Source = { brands: CommunityRecord[]; logos: LogoItem[] }
@@ -126,7 +131,22 @@ export function BrandComposerView() {
       backgroundUrl: background,
       brands: chosen,
     }),
-    [format, mode, zone, columns, gap, padding, radius, layout, scale, overlay, tiles, title, background, chosen],
+    [
+      format,
+      mode,
+      zone,
+      columns,
+      gap,
+      padding,
+      radius,
+      layout,
+      scale,
+      overlay,
+      tiles,
+      title,
+      background,
+      chosen,
+    ],
   )
   const output = compositionFormats[format]
 
@@ -433,14 +453,20 @@ export function BrandComposerView() {
 
           <section className="rounded-card border border-neo-border bg-neo-surface p-5">
             <h3 className="m-0 text-base font-bold">03 · Composición</h3>
-            <p className="m-0 mt-1 text-xs text-neo-text-secondary">La plantilla adaptable respeta el arte de fondo, sin tapar título ni fecha.</p>
+            <p className="m-0 mt-1 text-xs text-neo-text-secondary">
+              La plantilla adaptable respeta el arte de fondo, sin tapar título ni fecha.
+            </p>
             <div className="mt-4 grid gap-4">
               <fieldset className="grid grid-cols-2 gap-2">
                 <legend className="sr-only">Modo de composición</legend>
                 <button
                   type="button"
                   aria-pressed={mode === 'template'}
-                  className={mode === 'template' ? 'button justify-center' : 'button button-secondary justify-center'}
+                  className={
+                    mode === 'template'
+                      ? 'button justify-center'
+                      : 'button button-secondary justify-center'
+                  }
                   onClick={() => setMode('template')}
                 >
                   Plantilla adaptable
@@ -448,7 +474,11 @@ export function BrandComposerView() {
                 <button
                   type="button"
                   aria-pressed={mode === 'free'}
-                  className={mode === 'free' ? 'button justify-center' : 'button button-secondary justify-center'}
+                  className={
+                    mode === 'free'
+                      ? 'button justify-center'
+                      : 'button button-secondary justify-center'
+                  }
                   onClick={() => setMode('free')}
                 >
                   Modo libre
@@ -459,77 +489,132 @@ export function BrandComposerView() {
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <strong className="block text-sm">Marcas Aliadas · Vertical</strong>
-                      <p className="m-0 mt-1 text-xs text-neo-text-secondary">Zona central calibrada para esta base 3:4. Puedes moverla en la vista previa.</p>
+                      <p className="m-0 mt-1 text-xs text-neo-text-secondary">
+                        Zona central calibrada para esta base 3:4. Puedes moverla en la vista
+                        previa.
+                      </p>
                     </div>
-                    <button type="button" className="text-link text-xs" onClick={() => {
-                      setZone(verticalAlliesZone)
-                      setFormat('three-four')
-                      setColumns('auto')
-                      setGap(0.012)
-                      setPadding(0.13)
-                      setRadius(0.1)
-                      setTiles(true)
-                      setOverlay(0)
-                      setTitle('')
-                    }}>
+                    <button
+                      type="button"
+                      className="text-link text-xs"
+                      onClick={() => {
+                        setZone(verticalAlliesZone)
+                        setFormat('three-four')
+                        setColumns('auto')
+                        setGap(0.012)
+                        setPadding(0.13)
+                        setRadius(0.1)
+                        setTiles(true)
+                        setOverlay(0)
+                        setTitle('')
+                      }}
+                    >
                       Restaurar preset
                     </button>
                   </div>
                   <label className="block text-sm font-semibold">
                     Columnas
-                    <select value={columns} onChange={(event) => {
-                      const value = event.target.value
-                      setColumns(value === 'auto' ? 'auto' : Number(value) as TemplateColumns)
-                    }}>
+                    <select
+                      value={columns}
+                      onChange={(event) => {
+                        const value = event.target.value
+                        setColumns(value === 'auto' ? 'auto' : (Number(value) as TemplateColumns))
+                      }}
+                    >
                       <option value="auto">Automático · según cantidad</option>
-                      {[2, 3, 4, 5, 6].map((value) => <option key={value} value={value}>{value} columnas</option>)}
+                      {[2, 3, 4, 5, 6].map((value) => (
+                        <option key={value} value={value}>
+                          {value} columnas
+                        </option>
+                      ))}
                     </select>
                   </label>
                   <label className="block text-sm font-semibold">
                     Separación · {Math.round(gap * 1000) / 10} %
-                    <input type="range" min="0" max="0.04" step="0.002" value={gap} onChange={(event) => setGap(Number(event.target.value))} className="mt-2 w-full accent-neo-accent-text" />
+                    <input
+                      type="range"
+                      min="0"
+                      max="0.04"
+                      step="0.002"
+                      value={gap}
+                      onChange={(event) => setGap(Number(event.target.value))}
+                      className="mt-2 w-full accent-neo-accent-text"
+                    />
                   </label>
                   <label className="block text-sm font-semibold">
                     Margen dentro de cada tarjeta · {Math.round(padding * 100)} %
-                    <input type="range" min="0" max="0.3" step="0.01" value={padding} onChange={(event) => setPadding(Number(event.target.value))} className="mt-2 w-full accent-neo-accent-text" />
+                    <input
+                      type="range"
+                      min="0"
+                      max="0.3"
+                      step="0.01"
+                      value={padding}
+                      onChange={(event) => setPadding(Number(event.target.value))}
+                      className="mt-2 w-full accent-neo-accent-text"
+                    />
                   </label>
                   <label className="block text-sm font-semibold">
                     Esquinas · {Math.round(radius * 100)} %
-                    <input type="range" min="0" max="0.25" step="0.01" value={radius} onChange={(event) => setRadius(Number(event.target.value))} className="mt-2 w-full accent-neo-accent-text" />
+                    <input
+                      type="range"
+                      min="0"
+                      max="0.25"
+                      step="0.01"
+                      value={radius}
+                      onChange={(event) => setRadius(Number(event.target.value))}
+                      className="mt-2 w-full accent-neo-accent-text"
+                    />
                   </label>
                   <label className="check-label flex items-center gap-2 text-xs font-semibold">
-                    <input type="checkbox" checked={showGuide} onChange={(event) => setShowGuide(event.target.checked)} />
+                    <input
+                      type="checkbox"
+                      checked={showGuide}
+                      onChange={(event) => setShowGuide(event.target.checked)}
+                    />
                     Mostrar zona editable en vista previa
                   </label>
                   <details>
-                    <summary className="cursor-pointer text-xs font-semibold text-neo-text-secondary">Ajustar posición y tamaño con precisión</summary>
+                    <summary className="cursor-pointer text-xs font-semibold text-neo-text-secondary">
+                      Ajustar posición y tamaño con precisión
+                    </summary>
                     <div className="mt-3 grid grid-cols-2 gap-3">
                       {(['x', 'y', 'width', 'height'] as const).map((axis) => (
                         <label key={axis} className="text-xs font-semibold">
-                          {{ x: 'Izquierda', y: 'Arriba', width: 'Ancho', height: 'Alto' }[axis]} · {Math.round(zone[axis] * 100)} %
-                          <input type="range" min={axis === 'width' ? 20 : axis === 'height' ? 15 : 0} max={axis === 'width' ? 98 : axis === 'height' ? 90 : 100} step="1" value={Math.round(zone[axis] * 100)} onChange={(event) => {
-                            const next = { ...zone, [axis]: Number(event.target.value) / 100 }
-                            setZone(clampLogoZone(next))
-                          }} className="mt-2 w-full accent-neo-accent-text" />
+                          {{ x: 'Izquierda', y: 'Arriba', width: 'Ancho', height: 'Alto' }[axis]} ·{' '}
+                          {Math.round(zone[axis] * 100)} %
+                          <input
+                            type="range"
+                            min={axis === 'width' ? 20 : axis === 'height' ? 15 : 0}
+                            max={axis === 'width' ? 98 : axis === 'height' ? 90 : 100}
+                            step="1"
+                            value={Math.round(zone[axis] * 100)}
+                            onChange={(event) => {
+                              const next = { ...zone, [axis]: Number(event.target.value) / 100 }
+                              setZone(clampLogoZone(next))
+                            }}
+                            className="mt-2 w-full accent-neo-accent-text"
+                          />
                         </label>
                       ))}
                     </div>
                   </details>
                 </div>
               )}
-              {mode === 'free' && <label className="block text-sm font-semibold">
-                Distribución
-                <select
-                  value={layout}
-                  onChange={(event) => setLayout(event.target.value as CompositionLayout)}
-                >
-                  {Object.entries(compositionLayouts).map(([key, label]) => (
-                    <option key={key} value={key}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </label>}
+              {mode === 'free' && (
+                <label className="block text-sm font-semibold">
+                  Distribución
+                  <select
+                    value={layout}
+                    onChange={(event) => setLayout(event.target.value as CompositionLayout)}
+                  >
+                    {Object.entries(compositionLayouts).map(([key, label]) => (
+                      <option key={key} value={key}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
               <label className="block text-sm font-semibold">
                 Tamaño de los logos · {Math.round(scale * 100)} %
                 <input
@@ -563,15 +648,17 @@ export function BrandComposerView() {
                 />
                 Tarjetas blancas detrás de los logos
               </label>
-              {mode === 'free' && <label className="block text-sm font-semibold">
-                Titular opcional
-                <input
-                  maxLength={48}
-                  value={title}
-                  onChange={(event) => setTitle(event.target.value)}
-                  placeholder="Ej. MARCAS ALIADAS"
-                />
-              </label>}
+              {mode === 'free' && (
+                <label className="block text-sm font-semibold">
+                  Titular opcional
+                  <input
+                    maxLength={48}
+                    value={title}
+                    onChange={(event) => setTitle(event.target.value)}
+                    placeholder="Ej. MARCAS ALIADAS"
+                  />
+                </label>
+              )}
             </div>
           </section>
         </div>
@@ -594,23 +681,25 @@ export function BrandComposerView() {
           <div className="grid min-w-0 place-items-center overflow-hidden rounded-control bg-[#111919] p-2 sm:p-4">
             <div
               className="relative w-full"
-              style={{ maxWidth: `min(100%, ${Math.round(720 * output.width / output.height)}px, ${Math.round(62 * output.width / output.height)}vh)` }}
-            >
-            <canvas
-              ref={previewRef}
-              role="img"
-              aria-label="Vista previa de la composición con el fondo y las marcas elegidas"
-              className="block h-auto w-full rounded-sm shadow-xl"
               style={{
-                maxHeight: 'min(62vh, 720px)',
-                aspectRatio: `${output.width} / ${output.height}`,
+                maxWidth: `min(100%, ${Math.round((720 * output.width) / output.height)}px, ${Math.round((62 * output.width) / output.height)}vh)`,
               }}
-              width={output.width}
-              height={output.height}
-            />
-            {mode === 'template' && showGuide && (
-              <TemplateZoneOverlay zone={zone} onChange={setZone} canvasRef={previewRef} />
-            )}
+            >
+              <canvas
+                ref={previewRef}
+                role="img"
+                aria-label="Vista previa de la composición con el fondo y las marcas elegidas"
+                className="block h-auto w-full rounded-sm shadow-xl"
+                style={{
+                  maxHeight: 'min(62vh, 720px)',
+                  aspectRatio: `${output.width} / ${output.height}`,
+                }}
+                width={output.width}
+                height={output.height}
+              />
+              {mode === 'template' && showGuide && (
+                <TemplateZoneOverlay zone={zone} onChange={setZone} canvasRef={previewRef} />
+              )}
             </div>
           </div>
           {missing.length > 0 && (
