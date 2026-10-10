@@ -1,9 +1,9 @@
 'use client'
 
-import { REVEAL_SUSPENSE_MS } from '@/features/dynamics/game-scene'
 import { ArrowUpRight, Dices, Eye, MonitorPlay, Play, RotateCcw, Trophy } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
+import { REVEAL_SUSPENSE_MS } from '@/features/dynamics/game-scene'
 import { callAdmin } from '../api'
 import type { DynamicRow, DynamicStageStatus } from '../types'
 import { gamePrimaryAction } from './primary-action'
