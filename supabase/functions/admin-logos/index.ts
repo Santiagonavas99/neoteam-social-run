@@ -61,17 +61,22 @@ Deno.serve(async (req: Request) => {
       return json({ error: 'Tu usuario no tiene acceso a esta sección.' }, 403)
 
     const action = body?.action
+    const carouselKind = body?.carousel_kind ?? 'brand'
+    if (carouselKind !== 'brand' && carouselKind !== 'race') {
+      return json({ error: 'Tipo de carrusel no válido.' }, 400)
+    }
     if (action === 'list') {
       const { data, error } = await supabase
         .from('home_logo_carousel_items')
         .select(
-          'id,event_code,name,logo_url,link_url,active,sort_order,show_in_running_crews,show_in_organizations,created_at,updated_at',
+          'id,event_code,carousel_kind,name,logo_url,link_url,active,sort_order,show_in_running_crews,show_in_organizations,created_at,updated_at',
         )
         .eq('event_code', 'SR26')
+        .eq('carousel_kind', carouselKind)
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: true })
       if (error) throw error
-      return json({ rows: data ?? [] })
+      return json({ rows: data ?? [], carousel_kind: carouselKind })
     }
 
     if (action === 'save') {
@@ -94,8 +99,8 @@ Deno.serve(async (req: Request) => {
         link_url: linkUrl || null,
         active: values.active !== false,
         sort_order: Number.isFinite(Number(values.sort_order)) ? Number(values.sort_order) : 0,
-        show_in_running_crews: values.show_in_running_crews === true,
-        show_in_organizations: values.show_in_organizations === true,
+        show_in_running_crews: carouselKind === 'brand' && values.show_in_running_crews === true,
+        show_in_organizations: carouselKind === 'brand' && values.show_in_organizations === true,
         updated_at: new Date().toISOString(),
       }
 
@@ -105,11 +110,12 @@ Deno.serve(async (req: Request) => {
           .update(payload)
           .eq('id', values.id)
           .eq('event_code', 'SR26')
+          .eq('carousel_kind', carouselKind)
         if (error) throw error
       } else {
         const { error } = await supabase
           .from('home_logo_carousel_items')
-          .insert({ ...payload, event_code: 'SR26' })
+          .insert({ ...payload, event_code: 'SR26', carousel_kind: carouselKind })
         if (error) throw error
       }
       return json({ ok: true })
@@ -122,6 +128,7 @@ Deno.serve(async (req: Request) => {
         .delete()
         .eq('id', body.id)
         .eq('event_code', 'SR26')
+        .eq('carousel_kind', carouselKind)
       if (error) throw error
       return json({ ok: true })
     }
