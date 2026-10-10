@@ -239,7 +239,7 @@ export function DynamicCreateWizard({
                 onChange={(e) => setPoints(Math.max(0, Number(e.target.value) || 0))}
               />
             </label>
-          )}
+          ) : null}
         </div>
       )}
 
