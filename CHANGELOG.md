@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed · 2026-10-10
+- **Dinámicas UX:** tarjetas activas primero y destacadas, acceso PLAY directo al control y acceso rápido a la pantalla pública.
+- **Flujo de operación:** Preparación, En vivo y Resultados con estilos y explicaciones diferenciadas.
+- **Retos claros:** creación en cuatro pasos con criterio de finalización, validación por personal mediante QR, puntos, check-in y revisión previa. Se advierte que los cronómetros y rankings automáticos no están disponibles.
+- **Seguridad de configuración:** se pide una descripción de finalización antes de activar retos incompletos.
+
+
 ## [0.34.0] - 2026-10-09
 
 ### Added
