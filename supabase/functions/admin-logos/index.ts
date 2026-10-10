@@ -118,7 +118,13 @@ Deno.serve(async (req: Request) => {
         link_url: linkUrl || null,
         active: values.active !== false,
         sort_order: Number.isFinite(Number(values.sort_order)) ? Number(values.sort_order) : 0,
-        show_in_races: carouselKind === 'brand' && values.show_in_races === true,
+        // Legacy production editors do not send this flag; preserve linked brands
+        // instead of silently disconnecting them on an unrelated edit.
+        ...(carouselKind === 'race'
+          ? { show_in_races: false }
+          : typeof values.show_in_races === 'boolean'
+            ? { show_in_races: values.show_in_races }
+            : {}),
         show_in_running_crews: carouselKind === 'brand' && values.show_in_running_crews === true,
         show_in_organizations: carouselKind === 'brand' && values.show_in_organizations === true,
         updated_at: new Date().toISOString(),
