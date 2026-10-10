@@ -26,12 +26,12 @@ export function LogoForm({
     row,
     (next) => onSave(next, newRecord && addAnother),
     (logo) => {
-    if (!logo.name.trim()) {
-      return kind === 'race'
-        ? 'Escribe el nombre de la carrera.'
-        : 'Escribe el nombre del club o marca antes de guardar.'
-    }
-    return logo.logo_url ? null : 'Sube una imagen antes de guardar el logo.'
+      if (!logo.name.trim()) {
+        return kind === 'race'
+          ? 'Escribe el nombre de la carrera.'
+          : 'Escribe el nombre del club o marca antes de guardar.'
+      }
+      return logo.logo_url ? null : 'Sube una imagen antes de guardar el logo.'
     },
   )
   const { uploading, upload, uploadFeedback } = useImageUpload({
