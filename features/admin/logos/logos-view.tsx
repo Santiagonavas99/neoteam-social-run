@@ -18,8 +18,8 @@ import {
   migrateExistingImages,
 } from './existing-image-migration'
 import { LogoForm } from './logo-form'
-import { RaceReusePicker } from './race-reuse-picker'
 import { canOfferLegacyWebpMigration } from './migration-guards'
+import { RaceReusePicker } from './race-reuse-picker'
 
 export function LogosView({
   enableLegacyWebpMigration,
@@ -247,7 +247,8 @@ export function LogosView({
   return (
     <section aria-busy={loading}>
       {onNavigateKind && (
-        <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label="Catálogo de logos">
+        <fieldset className="mb-5 flex flex-wrap gap-2 border-0 p-0">
+          <legend className="sr-only">Catálogo de logos</legend>
           <button
             type="button"
             className={raceMode ? 'button button-secondary' : 'button'}
@@ -266,7 +267,7 @@ export function LogosView({
           >
             Carreras aliadas
           </button>
-        </div>
+        </fieldset>
       )}
       <div className="mb-5 flex flex-col gap-3 md:mb-6 md:flex-row md:items-start md:justify-between">
         <div>
