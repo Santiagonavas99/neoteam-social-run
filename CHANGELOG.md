@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.34.0] - 2026-10-09
+
+### Added
+
+- **Dinámicas V2 simplificada:** grupos por Sorteos, Stands y retos y Premios instantáneos; cada tarjeta tiene una sola acción y el detalle reúne Preparación, En vivo y Resultados. Los ajustes y herramientas administrativas quedan como opciones secundarias.
+- **Guided setup:** three-step wizard to create safe drafts without exposing advanced configuration immediately. Existing drafts, registrations and winner history are preserved.
+- **Control simplificado:** una única acción principal, según el estado: iniciar cuenta atrás, sortear, preparar/revelar ganadores o finalizar. El ensayo y el reinicio están en «Más opciones».
+- **Game screens:** independent full-screen stage at `/juego/[id]` for each activity. A raffle can display a synchronized countdown and names progressively, on command from the private admin controller. Other activities display anonymous participation totals.
+- **Rehearsal:** `?ensayo=1` displays fictional winners, with no draw or Supabase writes. The public read-only RPC projects only safe game content and only the names explicitly revealed by operators.
+- **Protected game controls:** an atomic SQL state machine and authenticated edge operations prevent anonymous users from starting, finishing or revealing a game. The existing atomic draw RPC still selects winners.
+
+### Notes
+
+- Apply the SQL migration and deploy `admin-pin` from this PR before enabling live projection in production. The demo works without them.
+- Check-in, participant registration, past raffle records and pass recovery are unchanged.
+
+## [0.32.4] - 2026-10-09
+
+### Fixed
+
+- **Mobile logo editor alignment:** consistent, compact 01/02/03 headings with smaller numbers, top-aligned labels and descriptions, and tighter spacing for phone displays.
+- **Logo picker alignment:** thumbnail and upload controls now share one row on mobile, with no oversized stacked image preview; desktop remains responsive.
+- **Shared forms:** the same step component applies to reusable logos, Running crews and allied brands. No changes to upload logic or stored data.
+
+
+## [0.32.3] - 2026-10-09
+
+### Fixed
+
+- **Mobile admin image upload:** when Safari or another browser cannot encode `image/webp` on canvas (and may silently return PNG), the uploader no longer blocks logos. Use WebP whenever supported, otherwise upload a compatible JPG/PNG using the existing server MIME and file-signature checks.
+- **Large and HEIC images:** when WebP conversion is unavailable, resize and export phone photos to JPG and transparency-capable logos to PNG, always respecting the existing 4 MB upload limit.
+- **Transparent image workflow:** preserve PNG and image alpha in the mobile fallback and show the actual uploaded format rather than falsely claiming WebP. Upload hints now describe supported fallback formats.
+- **Regression tests:** simulate WebP support, Safari's silent PNG fallback, phone HEIC, and large JPEG uploads.
+- **Mobile-first crew form:** now guides admins through three clearly labeled steps (name, logo and visibility), shows an always-visible image preview and groups Instagram/order under optional settings.
+- **Reusable carousel logos:** the same naming-first flow makes it obvious which club or brand owns the image and where it appears.
+- **Inline upload feedback:** upload errors and success are displayed immediately beside the selected image, with a large mobile file-picker target.
+
+
 ## [0.33.0] - 2026-10-09
 
 ### Added

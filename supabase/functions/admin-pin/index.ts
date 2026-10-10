@@ -522,6 +522,51 @@ Deno.serve(async (req: Request) => {
             .map((entry: { registrations: unknown }) => participantPayload(entry.registrations))
         }
 
+        if (operation === 'stageStatus' || operation === 'stage') {
+          if (typeof body?.id !== 'string' || !/^[0-9a-f-]{36}$/i.test(body.id))
+            return json({ error: 'Dinámica inválida.' }, 400)
+          if (operation === 'stageStatus') {
+            const { data: dynamic, error: dynamicError } = await supabase
+              .from('dynamics')
+              .select('id,type,status')
+              .eq('id', body.id)
+              .eq('event_id', event.id)
+              .maybeSingle()
+            if (dynamicError) throw dynamicError
+            if (!dynamic) return json({ error: 'Dinámica no encontrada.' }, 404)
+            const { data: stage, error: stageError } = await supabase
+              .from('dynamic_game_state')
+              .select('phase,shown_count,updated_at')
+              .eq('dynamic_id', body.id)
+              .maybeSingle()
+            if (stageError) throw stageError
+            return json({ ok: true, stage: stage ?? { phase: 'ready', shown_count: 0 } })
+          }
+
+          if (!['ready', 'countdown', 'drawn', 'next', 'finish'].includes(body?.command))
+            return json({ error: 'Acción de juego inválida.' }, 400)
+          const { data: stage, error: stageError } = await supabase.rpc('dynamic_game_command', {
+            p_dynamic_id: body.id,
+            p_event_id: event.id,
+            p_command: body.command,
+          })
+          const known = rpcErrorResponse(stageError, {
+            game_not_found: ['No encontramos esta dinámica.', 404],
+            game_not_raffle: ['Esta pantalla todavía no tiene controles interactivos.', 400],
+            game_not_active: ['Primero activa la dinámica.', 409],
+            game_not_open: ['Solo puedes iniciar antes de ejecutar el sorteo.', 409],
+            game_not_drawn: ['Primero realiza el sorteo.', 409],
+            game_no_winners: ['Este sorteo no tiene ganadores todavía.', 409],
+            game_not_revealing: ['Primero prepara la revelación de ganadores.', 409],
+            game_reveal_remaining: ['Revela todos los ganadores antes de finalizar.', 409],
+            game_reveal_wait: ['El público está descubriendo al ganador. Espera un momento.', 409],
+            game_invalid_command: ['Acción inválida.', 400],
+          })
+          if (known) return known
+          if (stageError) throw stageError
+          return json({ ok: true, stage: stage?.[0] ?? null })
+        }
+
         if (operation === 'list') {
           const { data: rows, error } = await supabase
             .from('dynamics')
@@ -810,8 +855,21 @@ Deno.serve(async (req: Request) => {
           if (known) return known
           if (drawError) throw drawError
 
+          // Only the existing atomic draw RPC selects winners. Stage updates control
+          // the public *reveal*, never the actual draw. A stage failure is recoverable.
+          const { error: stageError } = await supabase.rpc('dynamic_game_command', {
+            p_dynamic_id: body.id,
+            p_event_id: event.id,
+            p_command: 'drawn',
+          })
+          if (stageError) console.error('game_stage_prepare_failed', { code: stageError.code })
           const winnerDetails = await rankedWinners(body.id)
-          return json({ ok: true, winners: (drawn ?? []).length, winnerDetails })
+          return json({
+            ok: true,
+            winners: (drawn ?? []).length,
+            winnerDetails,
+            stageReady: !stageError,
+          })
         }
 
         if (operation === 'winners') {
