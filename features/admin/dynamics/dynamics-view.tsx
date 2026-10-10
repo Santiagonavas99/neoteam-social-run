@@ -10,7 +10,6 @@ import {
   MonitorPlay,
   Play,
   Plus,
-  ScanLine,
   Settings2,
   Target,
   Trash2,
