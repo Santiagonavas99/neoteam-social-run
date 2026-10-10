@@ -82,12 +82,7 @@ export function templateLogoSlots(
 }
 
 /** Normalize pointer positions within the real rendered image, not its outer panel. */
-export function moveLogoZone(
-  current: LogoZone,
-  dx: number,
-  dy: number,
-  resize: boolean,
-): LogoZone {
+export function moveLogoZone(current: LogoZone, dx: number, dy: number, resize: boolean): LogoZone {
   return clampLogoZone(
     resize
       ? { ...current, width: current.width + dx, height: current.height + dy }
