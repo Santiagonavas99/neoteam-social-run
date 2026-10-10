@@ -10,6 +10,7 @@ export function nameFromLogoFilename(filename: string): string {
     raw.length > 120 ||
     /^(?:img|dsc|image|foto|captura|screenshot|whatsapp)(?:\s|\d|$)/i.test(raw) ||
     /^\d+$/.test(raw)
-  ) return ''
+  )
+    return ''
   return raw
 }
