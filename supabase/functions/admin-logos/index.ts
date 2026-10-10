@@ -61,17 +61,41 @@ Deno.serve(async (req: Request) => {
       return json({ error: 'Tu usuario no tiene acceso a esta sección.' }, 403)
 
     const action = body?.action
+    const carouselKind = body?.carousel_kind ?? 'brand'
+    if (carouselKind !== 'brand' && carouselKind !== 'race') {
+      return json({ error: 'Tipo de carrusel no válido.' }, 400)
+    }
     if (action === 'list') {
       const { data, error } = await supabase
         .from('home_logo_carousel_items')
         .select(
-          'id,event_code,name,logo_url,link_url,active,sort_order,show_in_running_crews,show_in_organizations,created_at,updated_at',
+          'id,event_code,carousel_kind,name,logo_url,link_url,active,sort_order,show_in_races,show_in_running_crews,show_in_organizations,created_at,updated_at',
         )
         .eq('event_code', 'SR26')
+        .eq('carousel_kind', carouselKind)
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: true })
       if (error) throw error
-      return json({ rows: data ?? [] })
+      return json({ rows: data ?? [], carousel_kind: carouselKind })
+    }
+
+    if (action === 'setRaceReuse') {
+      const id = typeof body?.id === 'string' ? body.id : ''
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id))
+        return json({ error: 'Identificador de logo no válido.' }, 400)
+      if (typeof body?.enabled !== 'boolean')
+        return json({ error: 'Indica si la marca debe aparecer en Carreras aliadas.' }, 400)
+      const { data, error } = await supabase
+        .from('home_logo_carousel_items')
+        .update({ show_in_races: body.enabled, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .eq('event_code', 'SR26')
+        .eq('carousel_kind', 'brand')
+        .select('id,show_in_races')
+        .maybeSingle()
+      if (error) throw error
+      if (!data) return json({ error: 'No encontramos esta marca.' }, 404)
+      return json({ ok: true })
     }
 
     if (action === 'save') {
@@ -94,8 +118,15 @@ Deno.serve(async (req: Request) => {
         link_url: linkUrl || null,
         active: values.active !== false,
         sort_order: Number.isFinite(Number(values.sort_order)) ? Number(values.sort_order) : 0,
-        show_in_running_crews: values.show_in_running_crews === true,
-        show_in_organizations: values.show_in_organizations === true,
+        // Legacy production editors do not send this flag; preserve linked brands
+        // instead of silently disconnecting them on an unrelated edit.
+        ...(carouselKind === 'race'
+          ? { show_in_races: false }
+          : typeof values.show_in_races === 'boolean'
+            ? { show_in_races: values.show_in_races }
+            : {}),
+        show_in_running_crews: carouselKind === 'brand' && values.show_in_running_crews === true,
+        show_in_organizations: carouselKind === 'brand' && values.show_in_organizations === true,
         updated_at: new Date().toISOString(),
       }
 
@@ -105,11 +136,12 @@ Deno.serve(async (req: Request) => {
           .update(payload)
           .eq('id', values.id)
           .eq('event_code', 'SR26')
+          .eq('carousel_kind', carouselKind)
         if (error) throw error
       } else {
         const { error } = await supabase
           .from('home_logo_carousel_items')
-          .insert({ ...payload, event_code: 'SR26' })
+          .insert({ ...payload, event_code: 'SR26', carousel_kind: carouselKind })
         if (error) throw error
       }
       return json({ ok: true })
@@ -122,6 +154,7 @@ Deno.serve(async (req: Request) => {
         .delete()
         .eq('id', body.id)
         .eq('event_code', 'SR26')
+        .eq('carousel_kind', carouselKind)
       if (error) throw error
       return json({ ok: true })
     }

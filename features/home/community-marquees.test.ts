@@ -1,6 +1,10 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { organizationMarqueeItems, runningCrewMarqueeItems } from './community-marquees.ts'
+import {
+  alliedRaceMarqueeItems,
+  organizationMarqueeItems,
+  runningCrewMarqueeItems,
+} from './community-marquees.ts'
 import type { CommunityLogo, HomeLogoCarouselItem } from './data.ts'
 
 const logos: CommunityLogo[] = [
@@ -37,6 +41,7 @@ const allies: HomeLogoCarouselItem[] = [
     link_url: 'https://crew.example',
     active: true,
     sort_order: 0,
+    show_in_races: false,
     show_in_running_crews: true,
     show_in_organizations: false,
   },
@@ -47,6 +52,7 @@ const allies: HomeLogoCarouselItem[] = [
     link_url: 'https://organizer.example',
     active: true,
     sort_order: 1,
+    show_in_races: false,
     show_in_running_crews: false,
     show_in_organizations: true,
   },
@@ -57,6 +63,7 @@ const allies: HomeLogoCarouselItem[] = [
     link_url: null,
     active: false,
     sort_order: 3,
+    show_in_races: false,
     show_in_running_crews: true,
     show_in_organizations: true,
   },
@@ -122,4 +129,42 @@ test('each inclusion flag is independent and inactive allies stay hidden', () =>
     organizationMarqueeItems([], allies).map(({ id }) => id),
     ['ally-ally-org'],
   )
+})
+
+test('races reuse the same brand logo without duplicating a stored record', () => {
+  const source = allies[0]
+  assert.ok(source)
+  const reusable = { ...source, show_in_races: true }
+  const result = alliedRaceMarqueeItems([], [reusable])
+  assert.equal(result.length, 1)
+  assert.equal(result[0]?.id, 'ally-ally-crew')
+  assert.equal(result[0]?.logo_url, reusable.logo_url)
+  assert.equal(result[0]?.website, reusable.link_url)
+})
+
+test('races skip inactive brands and deduplicate native race names or images', () => {
+  const source = allies[0]
+  assert.ok(source)
+  const reusable = { ...source, show_in_races: true }
+  const native = { ...reusable, id: 'race-1', show_in_races: false, sort_order: 0 }
+  assert.deepEqual(
+    alliedRaceMarqueeItems([native], [reusable]).map(({ id }) => id),
+    ['race-1'],
+  )
+  assert.deepEqual(alliedRaceMarqueeItems([], [{ ...reusable, active: false }]), [])
+})
+
+test('race flag does not add logos to crews or organizations', () => {
+  const source = allies[0]
+  assert.ok(source)
+  const onlyRace = {
+    ...source,
+    show_in_races: true,
+    show_in_running_crews: false,
+    show_in_organizations: false,
+  }
+  assert.ok(onlyRace)
+  assert.equal(alliedRaceMarqueeItems([], [onlyRace]).length, 1)
+  assert.deepEqual(runningCrewMarqueeItems([], [onlyRace]), [])
+  assert.deepEqual(organizationMarqueeItems([], [onlyRace]), [])
 })
