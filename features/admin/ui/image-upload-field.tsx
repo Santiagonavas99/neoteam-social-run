@@ -27,10 +27,12 @@ export async function uploadAdminImage(blob: Blob, mime: UploadImageMime): Promi
 export function useImageUpload({
   successText,
   onUploaded,
+  onFileSelected,
   setFeedback,
 }: {
   successText: string
   onUploaded: (url: string) => void
+  onFileSelected?: (file: File) => void
   setFeedback: (value: FeedbackValue) => void
 }) {
   const [uploading, setUploading] = useState(false)
@@ -40,6 +42,7 @@ export function useImageUpload({
     const input = event.currentTarget
     const file = input.files?.[0]
     if (!file) return
+    onFileSelected?.(file)
     setUploading(true)
     setFeedback(null)
     setUploadFeedback(null)
