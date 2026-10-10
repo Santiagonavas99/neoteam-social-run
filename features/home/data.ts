@@ -52,7 +52,9 @@ export async function getHomeLogoCarouselItems(
     ) {
       if (kind === 'race') return []
       filterKind = false
-      ;({ data, error } = await query(columns, false))
+      const fallback = await query(columns, false)
+      data = fallback.data
+      error = fallback.error
     }
 
     // Keep existing allies visible while the optional reuse migration is pending.
