@@ -157,14 +157,14 @@ export function LogosView({
     }
   }
 
-  function blankLogo(): LogoItem {
+  function blankLogo(nextOrder?: number): LogoItem {
     return {
       id: `new-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       name: '',
       logo_url: '',
       link_url: '',
       active: true,
-      sort_order: rows.length,
+      sort_order: nextOrder ?? Math.max(-1, ...rows.map((row) => row.sort_order)) + 1,
       show_in_races: false,
       show_in_running_crews: false,
       show_in_organizations: false,
@@ -197,7 +197,7 @@ export function LogosView({
           ...(isNew(values) ? {} : { id: values.id }),
         },
       })
-      setEditor(addAnother && isNew(values) ? blankLogo() : null)
+      setEditor(addAnother && isNew(values) ? blankLogo(values.sort_order + 1) : null)
       setFeedback({
         kind: 'success',
         text: raceMode
