@@ -148,6 +148,77 @@ Deno.serve(async (req: Request) => {
         return json({ error: 'Tu usuario no tiene acceso a esta sección.' }, 403)
     }
 
+    // Live presence is admin-only, derived from the verified cookie session.
+    // Never accept user names, roles or session IDs from the browser.
+    if (action === 'presencePing' || action === 'presenceLeave') {
+      const tabId = body?.tabId
+      if (
+        typeof tabId !== 'string' ||
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(tabId)
+      ) {
+        return json({ error: 'Identificador de pestaña no válido.' }, 400)
+      }
+      if (action === 'presenceLeave') {
+        const { error } = await supabase
+          .from('admin_online_tabs')
+          .delete()
+          .eq('session_id', session.id)
+          .eq('tab_id', tabId)
+        if (error) throw error
+        return json({ ok: true })
+      }
+      const now = new Date().toISOString()
+      if (body?.active === true) {
+        const { error } = await supabase.from('admin_online_tabs').upsert(
+          {
+            session_id: session.id,
+            tab_id: tabId,
+            user_id: session.userId,
+            last_seen_at: now,
+            last_active_at: now,
+          },
+          { onConflict: 'session_id,tab_id' },
+        )
+        if (error) throw error
+      } else {
+        // Heartbeats keep the connection fresh without faking user activity.
+        const { error } = await supabase
+          .from('admin_online_tabs')
+          .update({ last_seen_at: now })
+          .eq('session_id', session.id)
+          .eq('tab_id', tabId)
+        if (error) throw error
+      }
+      return json({ ok: true })
+    }
+
+    if (action === 'presenceList') {
+      const now = Date.now()
+      const { data, error } = await supabase
+        .from('admin_online_tabs')
+        .select('user_id,last_active_at,admin_users!inner(name,role,active)')
+        .gt('last_seen_at', new Date(now - 75_000).toISOString())
+        .gt('last_active_at', new Date(now - 120_000).toISOString())
+        .eq('admin_users.active', true)
+        .eq('admin_users.role', 'admin')
+        .order('last_active_at', { ascending: false })
+        .limit(200)
+      if (error) throw error
+
+      // One person can have multiple browser tabs; present each admin once.
+      const unique = new Map<string, { id: string; name: string; lastActiveAt: string }>()
+      for (const row of data ?? []) {
+        const member = row.admin_users
+        if (!member?.name || unique.has(row.user_id)) continue
+        unique.set(row.user_id, {
+          id: row.user_id,
+          name: member.name,
+          lastActiveAt: row.last_active_at,
+        })
+      }
+      return json({ online: [...unique.values()] })
+    }
+
     // Only authenticated administrators can read or change the registration deadline.
     if (action === 'getRegistrationSettings' || action === 'saveRegistrationSettings') {
       if (action === 'saveRegistrationSettings') {

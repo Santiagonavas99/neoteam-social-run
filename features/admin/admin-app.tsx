@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { AdminPresenceTracker } from './auth/admin-presence-tracker'
 import { AuthScreen } from './auth/auth-screen'
 import { useAdminSession } from './auth/use-admin-session'
 import { CheckinView } from './checkin/checkin-view'
@@ -25,33 +26,37 @@ export function AdminApp({ enableLegacyWebpMigration }: { enableLegacyWebpMigrat
   const section = allowed.find((item) => item.id === picked)?.id ?? allowed[0]?.id ?? 'checkin'
 
   return (
-    <AdminShell
-      sections={allowed}
-      section={section}
-      onNavigate={setSection}
-      onSignOut={() => void session.signOut()}
-    >
-      {section === 'checkin' ? (
-        <CheckinView />
-      ) : section === 'registration-settings' ? (
-        <RegistrationSettingsView />
-      ) : section === 'home-order' ? (
-        <HomeOrderView />
-      ) : section === 'logos' ? (
-        <LogosView enableLegacyWebpMigration={enableLegacyWebpMigration} />
-      ) : section === 'team' ? (
-        <TeamView />
-      ) : section === 'participants' ? (
-        <ParticipantsView />
-      ) : section === 'email-queue' ? (
-        <PendingEmailsView />
-      ) : section === 'groups' || section === 'brands' ? (
-        <CommunityView key={section} resource={section} />
-      ) : section === 'dynamics' ? (
-        <DynamicsView />
-      ) : (
-        <OverviewView navigate={setSection} />
-      )}
-    </AdminShell>
+    <>
+      {session.role === 'admin' ? <AdminPresenceTracker /> : null}
+      <AdminShell
+        sections={allowed}
+        section={section}
+        onNavigate={setSection}
+        onSignOut={() => void session.signOut()}
+        showPresence={session.role === 'admin'}
+      >
+        {section === 'checkin' ? (
+          <CheckinView />
+        ) : section === 'registration-settings' ? (
+          <RegistrationSettingsView />
+        ) : section === 'home-order' ? (
+          <HomeOrderView />
+        ) : section === 'logos' ? (
+          <LogosView enableLegacyWebpMigration={enableLegacyWebpMigration} />
+        ) : section === 'team' ? (
+          <TeamView />
+        ) : section === 'participants' ? (
+          <ParticipantsView />
+        ) : section === 'email-queue' ? (
+          <PendingEmailsView />
+        ) : section === 'groups' || section === 'brands' ? (
+          <CommunityView key={section} resource={section} />
+        ) : section === 'dynamics' ? (
+          <DynamicsView />
+        ) : (
+          <OverviewView navigate={setSection} />
+        )}
+      </AdminShell>
+    </>
   )
 }

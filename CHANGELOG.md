@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.33.0] - 2026-10-09
+
+### Added
+
+- **Administradores conectados:** nuevo indicador privado en Overview con nombres de administradores autenticados, cantidad en línea y última actividad; se refresca cada 20 segundos.
+- **Desconexión automática:** presencia temporal por pestaña, con cierre inmediato al salir u ocultar el panel cuando el navegador lo permite; expira al perder el heartbeat o tras 2 minutos de inactividad.
+- **Privacidad:** el servidor deriva la identidad de una sesión verificada, no de datos enviados por el navegador. Los visitantes públicos y personal de check-in no aparecen en el listado; no se muestra correo ni se expone la tabla con claves públicas.
+
+
 ## [0.32.4] - 2026-10-09
 
 ### Fixed
