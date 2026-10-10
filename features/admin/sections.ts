@@ -19,6 +19,7 @@ export type AdminSection =
   | 'metrics'
   | 'home-order'
   | 'logos'
+  | 'race-logos'
   | 'participants'
   | 'registration-settings'
   | 'email-queue'
@@ -102,8 +103,15 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
   },
   {
     id: 'logos',
-    label: 'Carrusel logos',
-    description: 'Sube, ordena y publica los logos de la cinta horizontal de la Home.',
+    label: 'Biblioteca de logos',
+    description: 'Gestiona logos compartidos entre marcas, carreras, crews y organizaciones.',
+    icon: GalleryHorizontal,
+    group: 'content',
+  },
+  {
+    id: 'race-logos',
+    label: 'Carreras aliadas',
+    description: 'Reutiliza logos existentes o añade nuevas carreras desde la biblioteca.',
     icon: GalleryHorizontal,
     group: 'content',
   },

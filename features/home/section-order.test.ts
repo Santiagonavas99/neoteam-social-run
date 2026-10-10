@@ -67,3 +67,16 @@ test('ignores unknown keys and invalid order values', () => {
 
   assert.deepEqual(ordered, defaultHomeSectionOrder)
 })
+
+test('places allied races after allied brands by default, with independent visibility', () => {
+  const sections = normalizeHomeSectionOrder([])
+  const keys = sections.map((row) => row.section_key)
+  assert.equal(keys.indexOf('races'), keys.indexOf('allies') + 1)
+  assert.equal(keys.indexOf('running_crews'), keys.indexOf('races') + 1)
+
+  const hidden = normalizeHomeSectionOrder([
+    { section_key: 'races', sort_order: 12, visible: false },
+  ])
+  assert.equal(hidden.find((row) => row.section_key === 'races')?.visible, false)
+  assert.equal(hidden.at(-1)?.section_key, 'races')
+})

@@ -59,6 +59,7 @@ const HOME_SECTION_KEYS = new Set([
   'steps',
   'numbers',
   'allies',
+  'races',
   'running_crews',
   'organizations',
   'agenda',

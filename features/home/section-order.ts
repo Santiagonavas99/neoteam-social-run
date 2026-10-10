@@ -3,6 +3,7 @@ export type HomeSectionKey =
   | 'steps'
   | 'numbers'
   | 'allies'
+  | 'races'
   | 'running_crews'
   | 'organizations'
   | 'agenda'
@@ -22,6 +23,7 @@ export const defaultHomeSectionOrder: HomeSectionOrder[] = [
   { section_key: 'steps', sort_order: 2, visible: true },
   { section_key: 'numbers', sort_order: 2, visible: true },
   { section_key: 'allies', sort_order: 3, visible: true },
+  { section_key: 'races', sort_order: 4, visible: true },
   { section_key: 'running_crews', sort_order: 4, visible: true },
   { section_key: 'organizations', sort_order: 5, visible: true },
   { section_key: 'agenda', sort_order: 6, visible: true },
@@ -47,6 +49,10 @@ export const homeSectionMeta: Record<HomeSectionKey, { label: string; descriptio
   allies: {
     label: 'Marcas aliadas',
     description: 'Cinta principal de logos aliados.',
+  },
+  races: {
+    label: 'Carreras aliadas',
+    description: 'Carrusel independiente con las carreras que acompañan el evento.',
   },
   running_crews: {
     label: 'Running crews',

@@ -1,6 +1,16 @@
 'use client'
 
-import { FileDown, ListFilter, Mail, Pencil, Printer, Trash2, UserCheck, Users } from 'lucide-react'
+import {
+  ChevronDown,
+  FileDown,
+  ListFilter,
+  Mail,
+  Pencil,
+  Printer,
+  Trash2,
+  UserCheck,
+  Users,
+} from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import type { ParticipantProfile } from '@/lib/participant-profile'
 import { callAdmin } from '../api'
@@ -71,6 +81,7 @@ export function ParticipantsView() {
   const [gender, setGender] = useState('')
   const [emailStatus, setEmailStatus] = useState('')
   const [sort, setSort] = useState('newest')
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const [groups, setGroups] = useState<ParticipantGroupOption[]>([])
   const [editing, setEditing] = useState<Participant | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
@@ -305,6 +316,8 @@ export function ParticipantsView() {
     ]),
   ]
 
+  const extraFilterCount =
+    [crew, gender, emailStatus].filter(Boolean).length + Number(sort !== 'newest')
   const pageCount = Math.max(1, Math.ceil(data.count / data.pageSize))
   const rangeStart = data.count ? (data.page - 1) * data.pageSize + 1 : 0
   const rangeEnd = data.count ? Math.min(rangeStart + data.rows.length - 1, data.count) : 0
@@ -350,14 +363,14 @@ export function ParticipantsView() {
       {!loading && totalParticipants > 0 && (
         <fieldset>
           <legend className="sr-only">Filtrar por estado</legend>
-          <div className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:px-0">
+          <div className="-mx-4 mb-2 flex snap-x snap-proximity gap-2 overflow-x-auto overscroll-x-contain px-4 pb-2 touch-pan-x [-webkit-overflow-scrolling:touch] md:mx-0 md:mb-4 md:flex-wrap md:pb-0 md:px-0">
             {chips.map(([id, label]) => (
               <button
                 key={id}
                 type="button"
                 aria-pressed={status === id}
                 onClick={() => updateStatus(id ?? '')}
-                className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 ${
+                className={`inline-flex min-h-11 shrink-0 snap-start items-center rounded-full border px-4 ${
                   status === id
                     ? 'border-neo-text bg-neo-text text-neo-bg'
                     : 'border-neo-border bg-neo-surface text-neo-text-secondary'
@@ -367,12 +380,35 @@ export function ParticipantsView() {
               </button>
             ))}
           </div>
+          <p className="m-0 mb-3 text-[11px] text-neo-text-secondary md:hidden">
+            Desliza para ver más estados
+          </p>
         </fieldset>
       )}
       <div className="mb-4 rounded-card border border-neo-border bg-neo-surface p-3 md:p-4">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <p className="m-0 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-neo-text-secondary">
+        <div className="flex flex-wrap items-center justify-between gap-2 md:mb-3">
+          <button
+            type="button"
+            className="inline-flex min-h-11 items-center gap-2 text-xs font-bold uppercase tracking-[0.08em] text-neo-text md:hidden"
+            aria-expanded={filtersOpen}
+            aria-controls="participants-extra-filters"
+            onClick={() => setFiltersOpen((open) => !open)}
+          >
+            <ListFilter aria-hidden className="size-4 shrink-0" />
+            Filtrar y ordenar
+            {extraFilterCount > 0 && (
+              <span className="rounded-full bg-neo-accent-soft px-2 py-0.5 text-xs text-neo-accent-text">
+                {extraFilterCount}
+              </span>
+            )}
+            <ChevronDown
+              aria-hidden
+              className={`size-4 transition-transform ${filtersOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+          <p className="m-0 hidden items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-neo-text-secondary md:flex">
             <ListFilter aria-hidden className="size-4" /> Filtrar y ordenar
+            {extraFilterCount > 0 && <span>· {extraFilterCount} activos</span>}
           </p>
           <button
             type="button"
@@ -383,7 +419,10 @@ export function ParticipantsView() {
             Limpiar filtros
           </button>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div
+          id="participants-extra-filters"
+          className={`${filtersOpen ? 'grid' : 'hidden'} mt-3 gap-3 md:mt-0 md:grid md:grid-cols-2 xl:grid-cols-4`}
+        >
           <label className="flex flex-col gap-1 text-xs font-bold text-neo-text-secondary">
             Running crew
             <select

@@ -2,6 +2,7 @@ import { Footer } from '@/components/footer'
 import { SiteHeader } from '@/components/site-header'
 import { SocialRail } from '@/components/social-rail'
 import {
+  alliedRaceMarqueeItems,
   organizationMarqueeItems,
   runningCrewMarqueeItems,
 } from '@/features/home/community-marquees'
@@ -31,13 +32,15 @@ export const dynamic = 'force-dynamic'
 const numberedSections = new Set(['story', 'agenda', 'community', 'raffle', 'final'])
 
 export default async function Home() {
-  const [logoItems, community, registered, sectionOrder, registrationSettings] = await Promise.all([
-    getHomeLogoCarouselItems(),
-    getHomeCommunity(),
-    getRegisteredCount(),
-    getHomeSectionOrder(),
-    getRegistrationSettings(),
-  ])
+  const [logoItems, raceItems, community, registered, sectionOrder, registrationSettings] =
+    await Promise.all([
+      getHomeLogoCarouselItems('brand'),
+      getHomeLogoCarouselItems('race'),
+      getHomeCommunity(),
+      getRegisteredCount(),
+      getHomeSectionOrder(),
+      getRegistrationSettings(),
+    ])
 
   const otherBrands = community.brands.filter((brand) => brand.type !== 'organizer')
   const visibleSections = sectionOrder.filter((section) => section.visible)
@@ -57,6 +60,14 @@ export default async function Home() {
         return <Numbers key={section_key} registered={registered} brands={logoItems.length} />
       case 'allies':
         return <LogoMarquee key={section_key} items={logoItems} />
+      case 'races':
+        return (
+          <LogoMarquee
+            key={section_key}
+            items={alliedRaceMarqueeItems(raceItems, logoItems)}
+            title="Carreras aliadas"
+          />
+        )
       case 'running_crews':
         return (
           <LogoMarquee
