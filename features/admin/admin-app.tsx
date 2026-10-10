@@ -43,6 +43,8 @@ export function AdminApp({ enableLegacyWebpMigration }: { enableLegacyWebpMigrat
           <HomeOrderView />
         ) : section === 'logos' ? (
           <LogosView enableLegacyWebpMigration={enableLegacyWebpMigration} />
+        ) : section === 'race-logos' ? (
+          <LogosView kind="race" enableLegacyWebpMigration={false} />
         ) : section === 'team' ? (
           <TeamView />
         ) : section === 'participants' ? (
