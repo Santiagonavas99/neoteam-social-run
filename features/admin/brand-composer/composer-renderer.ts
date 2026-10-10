@@ -7,10 +7,17 @@ import {
   logoSlots,
 } from './composer-layout'
 import type { ComposerBrand } from './composer-library'
+import { templateLogoSlots, type LogoZone, type TemplateColumns } from './composer-template'
 
 export type ComposerSettings = {
   format: CompositionFormat
+  mode: 'free' | 'template'
   layout: CompositionLayout
+  zone: LogoZone
+  columns: TemplateColumns
+  gap: number
+  padding: number
+  radius: number
   scale: number
   overlay: number
   tiles: boolean
@@ -172,7 +179,17 @@ export async function renderComposition(
     ctx.shadowBlur = 0
   }
 
-  const slots = logoSlots(width, height, settings.brands.length, settings.layout, settings.scale)
+  const slots =
+    settings.mode === 'template'
+      ? templateLogoSlots(
+          width,
+          height,
+          settings.brands.length,
+          settings.zone,
+          settings.columns,
+          settings.gap,
+        )
+      : logoSlots(width, height, settings.brands.length, settings.layout, settings.scale)
   const assets = await Promise.allSettled(settings.brands.map((brand) => asset(brand.src)))
   const missing: string[] = []
   for (let i = 0; i < settings.brands.length; i++) {
@@ -186,7 +203,14 @@ export async function renderComposition(
       ctx.shadowColor = 'rgba(0,0,0,0.2)'
       ctx.shadowBlur = Math.round(Math.min(width, height) * 0.025)
       ctx.shadowOffsetY = 3
-      rounded(ctx, rect.x, rect.y, rect.width, rect.height, Math.min(20, rect.height * 0.14))
+      rounded(
+        ctx,
+        rect.x,
+        rect.y,
+        rect.width,
+        rect.height,
+        settings.mode === 'template' ? rect.height * settings.radius : Math.min(20, rect.height * 0.14),
+      )
       ctx.fillStyle = '#ffffff'
       ctx.fill()
       ctx.restore()
@@ -207,7 +231,10 @@ export async function renderComposition(
       ctx.restore()
       continue
     }
-    const inset = settings.tiles ? 0.13 : 0.04
+    const inset =
+      settings.mode === 'template'
+        ? Math.max(0, Math.min(0.3, settings.padding))
+        : settings.tiles ? 0.13 : 0.04
     const inner = {
       x: rect.x + rect.width * inset,
       y: rect.y + rect.height * inset,
@@ -217,7 +244,20 @@ export async function renderComposition(
     const size = dimensions(outcome.value)
     if (size.width > 0 && size.height > 0) {
       const fit = containRect(size.width, size.height, inner)
-      ctx.drawImage(outcome.value, fit.x, fit.y, fit.width, fit.height)
+      if (settings.mode === 'template') {
+        const factor = Math.max(0.55, Math.min(1, settings.scale))
+        const outWidth = fit.width * factor
+        const outHeight = fit.height * factor
+        ctx.drawImage(
+          outcome.value,
+          fit.x + (fit.width - outWidth) / 2,
+          fit.y + (fit.height - outHeight) / 2,
+          outWidth,
+          outHeight,
+        )
+      } else {
+        ctx.drawImage(outcome.value, fit.x, fit.y, fit.width, fit.height)
+      }
     } else {
       missing.push(brand.name)
     }
