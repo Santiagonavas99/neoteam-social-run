@@ -46,8 +46,7 @@ export function TemplateZoneOverlay({ zone, onChange, canvasRef }: Props) {
 
   return (
     <div
-      role="group"
-      aria-label="Área de logos. Arrastra para moverla o usa la esquina inferior derecha para cambiar su tamaño."
+      aria-hidden="true"
       onPointerDown={start}
       onPointerMove={move}
       onPointerUp={end}
