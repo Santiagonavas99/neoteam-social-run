@@ -1,7 +1,14 @@
 'use client'
 
 import {
-  ArrowDown, ArrowUp, Download, ImagePlus, Layers3, RefreshCw, Search, X,
+  ArrowDown,
+  ArrowUp,
+  Download,
+  ImagePlus,
+  Layers3,
+  RefreshCw,
+  Search,
+  X,
 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { callAdmin, callLogos } from '../api'
@@ -11,13 +18,13 @@ import { Feedback, Logo } from '../ui/admin-ui'
 import { LoadingState } from '../ui/loading-state'
 import { useAdminData } from '../ui/use-admin-data'
 import {
-  compositionFormats,
-  compositionLayouts,
   type CompositionFormat,
   type CompositionLayout,
+  compositionFormats,
+  compositionLayouts,
 } from './composer-layout'
-import { composerBrands, type ComposerBrand } from './composer-library'
-import { exportComposition, renderComposition, type ComposerSettings } from './composer-renderer'
+import { type ComposerBrand, composerBrands } from './composer-library'
+import { type ComposerSettings, exportComposition, renderComposition } from './composer-renderer'
 
 type Source = { brands: CommunityRecord[]; logos: LogoItem[] }
 const initial: Source = { brands: [], logos: [] }
@@ -63,28 +70,49 @@ export function BrandComposerView() {
   const requestRef = useRef(0)
 
   // Uploaded files never leave the browser. Replace and revoke object URLs promptly.
-  useEffect(() => () => {
-    if (background) URL.revokeObjectURL(background)
-  }, [background])
+  useEffect(
+    () => () => {
+      if (background) URL.revokeObjectURL(background)
+    },
+    [background],
+  )
   const uploadedLogos = useRef(new Set<string>())
-  useEffect(() => () => {
-    for (const url of uploadedLogos.current) URL.revokeObjectURL(url)
-  }, [])
+  useEffect(
+    () => () => {
+      for (const url of uploadedLogos.current) URL.revokeObjectURL(url)
+    },
+    [],
+  )
 
   const chosen = useMemo(
-    () => selectedIds
-      .map((id) => library.find((brand) => brand.id === id))
-      .filter((brand): brand is ComposerBrand => Boolean(brand))
-      .map((brand) => ({ ...brand, src: overrides[brand.id] ?? brand.src })),
+    () =>
+      selectedIds
+        .map((id) => library.find((brand) => brand.id === id))
+        .filter((brand): brand is ComposerBrand => Boolean(brand))
+        .map((brand) => ({ ...brand, src: overrides[brand.id] ?? brand.src })),
     [library, overrides, selectedIds],
   )
   const chosenIds = useMemo(() => new Set(selectedIds), [selectedIds])
-  const available = useMemo(() => library.filter((brand) =>
-    brand.name.toLocaleLowerCase('es').includes(query.trim().toLocaleLowerCase('es')),
-  ), [library, query])
-  const settings = useMemo<ComposerSettings>(() => ({
-    format, layout, scale, overlay, tiles, title, backgroundUrl: background, brands: chosen,
-  }), [format, layout, scale, overlay, tiles, title, background, chosen])
+  const available = useMemo(
+    () =>
+      library.filter((brand) =>
+        brand.name.toLocaleLowerCase('es').includes(query.trim().toLocaleLowerCase('es')),
+      ),
+    [library, query],
+  )
+  const settings = useMemo<ComposerSettings>(
+    () => ({
+      format,
+      layout,
+      scale,
+      overlay,
+      tiles,
+      title,
+      backgroundUrl: background,
+      brands: chosen,
+    }),
+    [format, layout, scale, overlay, tiles, title, background, chosen],
+  )
   const output = compositionFormats[format]
 
   useEffect(() => {
@@ -121,9 +149,9 @@ export function BrandComposerView() {
   }, [settings])
 
   function toggle(id: string) {
-    setSelectedIds((previous) => previous.includes(id)
-      ? previous.filter((value) => value !== id)
-      : [...previous, id])
+    setSelectedIds((previous) =>
+      previous.includes(id) ? previous.filter((value) => value !== id) : [...previous, id],
+    )
   }
 
   function reorder(id: string, amount: -1 | 1) {
@@ -176,7 +204,9 @@ export function BrandComposerView() {
       const canvas = document.createElement('canvas')
       const errors = await renderComposition(canvas, settings)
       if (errors.length) {
-        throw new Error(`No se pudieron cargar: ${errors.join(', ')}. Puedes reemplazar esos logos con PNG/JPG desde la lista de marcas.`)
+        throw new Error(
+          `No se pudieron cargar: ${errors.join(', ')}. Puedes reemplazar esos logos con PNG/JPG desde la lista de marcas.`,
+        )
       }
       const blob = await exportComposition(canvas, mime)
       const fileUrl = URL.createObjectURL(blob)
@@ -187,7 +217,10 @@ export function BrandComposerView() {
       anchor.click()
       anchor.remove()
       window.setTimeout(() => URL.revokeObjectURL(fileUrl), 30_000)
-      setFeedback({ kind: 'success', text: `Imagen exportada: ${output.width} × ${output.height} píxeles.` })
+      setFeedback({
+        kind: 'success',
+        text: `Imagen exportada: ${output.width} × ${output.height} píxeles.`,
+      })
     } catch (error) {
       onError(error)
     } finally {
@@ -202,13 +235,20 @@ export function BrandComposerView() {
           <p className="m-0 text-xs font-bold tracking-[0.16em] text-neo-accent-text uppercase">
             NeoTeam · Estudio creativo
           </p>
-          <h2 className="m-0 mt-1 text-2xl font-black tracking-tight">Compositor de marcas aliadas</h2>
+          <h2 className="m-0 mt-1 text-2xl font-black tracking-tight">
+            Compositor de marcas aliadas
+          </h2>
           <p className="m-0 mt-2 max-w-[65ch] text-sm text-neo-text-secondary">
-            Combina una imagen de fondo con los logos que ya aparecen en la web.
-            Previsualiza y exporta una pieza lista para compartir, sin modificar el carrusel.
+            Combina una imagen de fondo con los logos que ya aparecen en la web. Previsualiza y
+            exporta una pieza lista para compartir, sin modificar el carrusel.
           </p>
         </div>
-        <button type="button" className="button button-secondary" onClick={() => void reload()} disabled={loading}>
+        <button
+          type="button"
+          className="button button-secondary"
+          onClick={() => void reload()}
+          disabled={loading}
+        >
           <RefreshCw aria-hidden className="size-4" /> Actualizar logos
         </button>
       </header>
@@ -238,19 +278,28 @@ export function BrandComposerView() {
             {background && (
               <div className="mt-2 flex items-center justify-between gap-2 text-xs">
                 <span className="min-w-0 truncate text-neo-text-secondary">{backgroundName}</span>
-                <button type="button" className="text-link" onClick={() => {
-                  setBackground(null)
-                  setBackgroundName('')
-                }}>
+                <button
+                  type="button"
+                  className="text-link"
+                  onClick={() => {
+                    setBackground(null)
+                    setBackgroundName('')
+                  }}
+                >
                   <X aria-hidden className="size-3.5" /> Quitar
                 </button>
               </div>
             )}
             <label className="mt-4 block text-sm font-semibold">
               Formato de salida
-              <select value={format} onChange={(event) => setFormat(event.target.value as CompositionFormat)}>
+              <select
+                value={format}
+                onChange={(event) => setFormat(event.target.value as CompositionFormat)}
+              >
                 {Object.entries(compositionFormats).map(([key, item]) => (
-                  <option key={key} value={key}>{item.label} · {item.width} × {item.height}</option>
+                  <option key={key} value={key}>
+                    {item.label} · {item.width} × {item.height}
+                  </option>
                 ))}
               </select>
             </label>
@@ -287,12 +336,16 @@ export function BrandComposerView() {
               <LoadingState>Cargando biblioteca…</LoadingState>
             ) : !library.length ? (
               <p className="mt-3 text-sm text-neo-text-secondary">
-                Todavía no hay logos de marcas publicados. Añádelos primero en Marcas o Carrusel logos.
+                Todavía no hay logos de marcas publicados. Añádelos primero en Marcas o Carrusel
+                logos.
               </p>
             ) : (
               <div className="mt-3 max-h-76 overflow-y-auto rounded-control border border-neo-border">
                 {available.map((brand) => (
-                  <label key={brand.id} className="flex cursor-pointer items-center gap-3 border-b border-neo-border px-3 py-2 last:border-b-0 hover:bg-neo-muted-bg">
+                  <label
+                    key={brand.id}
+                    className="flex cursor-pointer items-center gap-3 border-b border-neo-border px-3 py-2 last:border-b-0 hover:bg-neo-muted-bg"
+                  >
                     <input
                       type="checkbox"
                       className="size-4 shrink-0"
@@ -300,10 +353,14 @@ export function BrandComposerView() {
                       onChange={() => toggle(brand.id)}
                     />
                     <Logo url={brand.src} name={brand.name} />
-                    <span className="min-w-0 flex-1 truncate text-sm font-semibold">{brand.name}</span>
+                    <span className="min-w-0 flex-1 truncate text-sm font-semibold">
+                      {brand.name}
+                    </span>
                   </label>
                 ))}
-                {!available.length && <p className="p-3 text-sm text-neo-text-secondary">Sin coincidencias.</p>}
+                {!available.length && (
+                  <p className="p-3 text-sm text-neo-text-secondary">Sin coincidencias.</p>
+                )}
               </div>
             )}
             {chosen.length > 0 && (
@@ -313,9 +370,14 @@ export function BrandComposerView() {
                 </summary>
                 <ol className="mt-3 grid gap-2">
                   {chosen.map((brand, index) => (
-                    <li key={brand.id} className="flex min-w-0 items-center gap-2 rounded-control bg-neo-surface px-2 py-1.5">
+                    <li
+                      key={brand.id}
+                      className="flex min-w-0 items-center gap-2 rounded-control bg-neo-surface px-2 py-1.5"
+                    >
                       <span className="w-5 text-xs text-neo-text-secondary">{index + 1}</span>
-                      <span className="min-w-0 flex-1 truncate text-xs font-semibold">{brand.name}</span>
+                      <span className="min-w-0 flex-1 truncate text-xs font-semibold">
+                        {brand.name}
+                      </span>
                       <label className="cursor-pointer text-xs font-medium text-neo-accent-text">
                         {overrides[brand.id] ? 'Logo local' : 'Reemplazar'}
                         <input
@@ -328,10 +390,22 @@ export function BrandComposerView() {
                           }}
                         />
                       </label>
-                      <button aria-label={`Subir ${brand.name}`} type="button" disabled={index === 0} onClick={() => reorder(brand.id, -1)} className="p-1 disabled:opacity-30">
+                      <button
+                        aria-label={`Subir ${brand.name}`}
+                        type="button"
+                        disabled={index === 0}
+                        onClick={() => reorder(brand.id, -1)}
+                        className="p-1 disabled:opacity-30"
+                      >
                         <ArrowUp aria-hidden className="size-4" />
                       </button>
-                      <button aria-label={`Bajar ${brand.name}`} type="button" disabled={index === chosen.length - 1} onClick={() => reorder(brand.id, 1)} className="p-1 disabled:opacity-30">
+                      <button
+                        aria-label={`Bajar ${brand.name}`}
+                        type="button"
+                        disabled={index === chosen.length - 1}
+                        onClick={() => reorder(brand.id, 1)}
+                        className="p-1 disabled:opacity-30"
+                      >
                         <ArrowDown aria-hidden className="size-4" />
                       </button>
                     </li>
@@ -346,9 +420,14 @@ export function BrandComposerView() {
             <div className="mt-4 grid gap-4">
               <label className="block text-sm font-semibold">
                 Distribución
-                <select value={layout} onChange={(event) => setLayout(event.target.value as CompositionLayout)}>
+                <select
+                  value={layout}
+                  onChange={(event) => setLayout(event.target.value as CompositionLayout)}
+                >
                   {Object.entries(compositionLayouts).map(([key, label]) => (
-                    <option key={key} value={key}>{label}</option>
+                    <option key={key} value={key}>
+                      {label}
+                    </option>
                   ))}
                 </select>
               </label>
@@ -356,7 +435,10 @@ export function BrandComposerView() {
                 Tamaño de los logos · {Math.round(scale * 100)} %
                 <input
                   className="mt-2 w-full accent-neo-accent-text"
-                  type="range" min="0.55" max="1" step="0.05"
+                  type="range"
+                  min="0.55"
+                  max="1"
+                  step="0.05"
                   value={scale}
                   onChange={(event) => setScale(Number(event.target.value))}
                 />
@@ -365,18 +447,31 @@ export function BrandComposerView() {
                 Oscurecer imagen base · {Math.round(overlay * 100)} %
                 <input
                   className="mt-2 w-full accent-neo-accent-text"
-                  type="range" min="0" max="0.65" step="0.05"
+                  type="range"
+                  min="0"
+                  max="0.65"
+                  step="0.05"
                   value={overlay}
                   onChange={(event) => setOverlay(Number(event.target.value))}
                 />
               </label>
               <label className="flex items-center gap-3 text-sm font-semibold">
-                <input className="size-4" type="checkbox" checked={tiles} onChange={(event) => setTiles(event.target.checked)} />
+                <input
+                  className="size-4"
+                  type="checkbox"
+                  checked={tiles}
+                  onChange={(event) => setTiles(event.target.checked)}
+                />
                 Tarjetas blancas detrás de los logos
               </label>
               <label className="block text-sm font-semibold">
                 Titular opcional
-                <input maxLength={48} value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Ej. MARCAS ALIADAS" />
+                <input
+                  maxLength={48}
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  placeholder="Ej. MARCAS ALIADAS"
+                />
               </label>
             </div>
           </section>
@@ -403,21 +498,27 @@ export function BrandComposerView() {
               role="img"
               aria-label="Vista previa de la composición con el fondo y las marcas elegidas"
               className="block h-auto w-auto max-w-full rounded-sm shadow-xl"
-              style={{ maxHeight: 'min(62vh, 720px)', aspectRatio: `${output.width} / ${output.height}` }}
+              style={{
+                maxHeight: 'min(62vh, 720px)',
+                aspectRatio: `${output.width} / ${output.height}`,
+              }}
               width={output.width}
               height={output.height}
             />
           </div>
           {missing.length > 0 && (
             <p role="status" className="m-0 text-xs text-neo-danger">
-              No se pudieron cargar estos archivos: {missing.join(', ')}.
-              Reemplázalos desde «Orden y reemplazo de logos» antes de exportar.
+              No se pudieron cargar estos archivos: {missing.join(', ')}. Reemplázalos desde «Orden
+              y reemplazo de logos» antes de exportar.
             </p>
           )}
           <div className="flex flex-wrap items-center gap-3">
             <label className="min-w-32 flex-1 text-sm font-semibold">
               Archivo
-              <select value={mime} onChange={(event) => setMime(event.target.value as 'image/png' | 'image/jpeg')}>
+              <select
+                value={mime}
+                onChange={(event) => setMime(event.target.value as 'image/png' | 'image/jpeg')}
+              >
                 <option value="image/png">PNG · alta calidad</option>
                 <option value="image/jpeg">JPG · liviano</option>
               </select>
@@ -433,8 +534,8 @@ export function BrandComposerView() {
             </button>
           </div>
           <p className="m-0 text-xs leading-relaxed text-neo-text-secondary">
-            Tu fondo y los cambios de esta composición permanecen en este navegador.
-            Exportar no modifica los logos publicados en NeoTeam.
+            Tu fondo y los cambios de esta composición permanecen en este navegador. Exportar no
+            modifica los logos publicados en NeoTeam.
           </p>
         </section>
       </div>
