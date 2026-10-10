@@ -28,6 +28,8 @@ export function LogosView({
   kind?: 'brand' | 'race'
 }) {
   const raceMode = kind === 'race'
+  const [raceApiReady, setRaceApiReady] = useState(false)
+  const canEdit = !raceMode || raceApiReady
   const [editor, setEditor] = useState<LogoItem | null>(null)
   const [busy, setBusy] = useState(false)
   const [feedback, setFeedback] = useState<FeedbackValue>(null)
@@ -57,8 +59,10 @@ export function LogosView({
     // Older deployed edge functions ignore carousel_kind; fail closed rather than
     // accidentally allowing race editors to modify the brands carousel.
     if (raceMode && response.carousel_kind !== 'race') {
+      setRaceApiReady(false)
       throw new Error('Actualiza la función admin-logos para gestionar Carreras aliadas.')
     }
+    if (raceMode) setRaceApiReady(true)
     return response.rows ?? []
   }, [kind, raceMode])
   const { data: rows, loading, reload } = useAdminData(load, [], onLoadError)
@@ -125,6 +129,7 @@ export function LogosView({
   }
 
   function addLogo() {
+    if (!canEdit) return
     setFeedback(null)
     setConfirmingId(null)
     setEditor({
@@ -140,6 +145,7 @@ export function LogosView({
   }
 
   async function save(values: LogoItem) {
+    if (!canEdit) return
     setBusy(true)
     setFeedback(null)
     try {
@@ -172,6 +178,7 @@ export function LogosView({
   }
 
   async function remove(row: LogoItem) {
+    if (!canEdit) return
     if (confirmingId !== row.id) {
       setConfirmingId(row.id)
       return
@@ -235,7 +242,7 @@ export function LogosView({
             type="button"
             className="button"
             onClick={addLogo}
-            disabled={busy || !!editor || migrationLocked}
+            disabled={!canEdit || busy || !!editor || migrationLocked}
           >
             <Plus aria-hidden className="size-4 shrink-0" />
             {raceMode ? 'Añadir carrera' : 'Añadir logo'}
@@ -296,7 +303,12 @@ export function LogosView({
           }
           action={
             !editor && (
-              <button type="button" className="button" onClick={addLogo}>
+              <button
+                type="button"
+                className="button"
+                onClick={addLogo}
+                disabled={!canEdit}
+              >
                 <Plus aria-hidden className="size-4 shrink-0" />
                 {raceMode ? 'Añadir primera carrera' : 'Añadir primer logo'}
               </button>
