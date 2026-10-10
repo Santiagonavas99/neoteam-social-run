@@ -15,29 +15,45 @@ function normalizedName(name: string) {
     .toLocaleLowerCase('es')
 }
 
-/** Source of truth is the existing admin library, including the Home logo carousel. */
+function hasImage(value: string | null | undefined): value is string {
+  if (!value?.trim()) return false
+  // An invalid relative path such as /neoteam-logo.png cannot be drawn by Canvas
+  // unless it actually exists. Stored partner logos use full public Storage URLs.
+  return /^(https?:\/\/|blob:|data:image\/)/i.test(value.trim())
+}
+
+/**
+ * The Home's "Marcas aliadas" marquee uses ALL active home_logo_carousel_items,
+ * independently of show_in_organizations. That flag only opts into a different
+ * Home strip, so it must NEVER filter this library.
+ *
+ * Prioritize the marquee's canonical logos over duplicate brand records.
+ * Exclude organizers (NeoTeam), which are not allied sponsor marks.
+ */
 export function composerBrands(brands: CommunityRecord[], logos: LogoItem[]): ComposerBrand[] {
   const items: ComposerBrand[] = []
   const names = new Set<string>()
-  const sortedBrands = brands
-    .filter((item) => item.active && item.show_on_home && item.logo_url)
-    .sort((a, b) => a.sort_order - b.sort_order)
   const sortedLogos = logos
-    .filter((item) => item.active && item.show_in_organizations && Boolean(item.logo_url))
+    .filter((item) => item.active && hasImage(item.logo_url))
+    .sort((a, b) => a.sort_order - b.sort_order)
+  const sortedBrands = brands
+    .filter(
+      (item) =>
+        item.active && item.show_on_home && item.type !== 'organizer' && hasImage(item.logo_url),
+    )
     .sort((a, b) => a.sort_order - b.sort_order)
 
-  for (const brand of sortedBrands) {
-    const name = normalizedName(brand.name)
-    if (!name || names.has(name)) continue
-    names.add(name)
-    if (!brand.logo_url) continue
-    items.push({ id: `brand:${brand.id}`, name: brand.name, src: brand.logo_url, origin: 'brands' })
-  }
   for (const logo of sortedLogos) {
     const name = normalizedName(logo.name)
     if (!name || names.has(name)) continue
     names.add(name)
     items.push({ id: `logo:${logo.id}`, name: logo.name, src: logo.logo_url, origin: 'logos' })
+  }
+  for (const brand of sortedBrands) {
+    const name = normalizedName(brand.name)
+    if (!name || names.has(name) || !brand.logo_url) continue
+    names.add(name)
+    items.push({ id: `brand:${brand.id}`, name: brand.name, src: brand.logo_url, origin: 'brands' })
   }
   return items
 }
