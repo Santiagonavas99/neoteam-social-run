@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { AdminPresenceTracker } from './auth/admin-presence-tracker'
 import { AuthScreen } from './auth/auth-screen'
 import { useAdminSession } from './auth/use-admin-session'
+import { BrandComposerView } from './brand-composer/brand-composer-view'
 import { CheckinView } from './checkin/checkin-view'
 import { CommunityView } from './community/community-view'
 import { DynamicsView } from './dynamics/dynamics-view'
@@ -41,6 +42,8 @@ export function AdminApp({ enableLegacyWebpMigration }: { enableLegacyWebpMigrat
           <RegistrationSettingsView />
         ) : section === 'home-order' ? (
           <HomeOrderView />
+        ) : section === 'brand-composer' ? (
+          <BrandComposerView />
         ) : section === 'logos' ? (
           <LogosView enableLegacyWebpMigration={enableLegacyWebpMigration} />
         ) : section === 'team' ? (
