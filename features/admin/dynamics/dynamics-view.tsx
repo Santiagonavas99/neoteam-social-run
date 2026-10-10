@@ -18,6 +18,7 @@ import { GameControlPanel } from './game-control-panel'
 import { ParticipationPanel } from './participation-panel'
 import { Ranking } from './ranking'
 import { useDynamics } from './use-dynamics'
+import styles from './dynamics-tabs.module.css'
 
 type Category = 'raffles' | 'stands' | 'instant'
 type DetailTab = 'preparar' | 'en-vivo' | 'resultados'
@@ -235,22 +236,14 @@ export function DynamicsView() {
               </div>
               <StatusBadge status={selected.status} label={dynamicStates[selected.status]} />
             </div>
-            <nav
-              className="mt-6 grid max-w-xl grid-cols-3 gap-1 rounded-control bg-neo-muted-bg p-1"
-              aria-label="Secciones de la dinámica"
-            >
+            <nav className={styles.tabs} aria-label="Secciones de la dinámica">
               {(Object.keys(tabLabels) as DetailTab[]).map((item) => (
                 <button
                   type="button"
                   key={item}
                   aria-current={tab === item ? 'page' : undefined}
                   onClick={() => chooseTab(item, selected)}
-                  className={
-                    'min-h-11 rounded-control px-2 text-sm font-bold transition-colors ' +
-                    (tab === item
-                      ? 'bg-neo-text text-neo-surface'
-                      : 'text-neo-text-secondary hover:bg-neo-surface')
-                  }
+                  className={styles.tab}
                 >
                   {tabLabels[item]}
                 </button>
