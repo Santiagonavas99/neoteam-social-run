@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { demoGame } from './game-state.ts'
 import { canAdvanceDemo, gameScene, REVEAL_SUSPENSE_MS } from './game-scene.ts'
+import { demoGame } from './game-state.ts'
 
 const stamp = Date.parse('2026-10-09T12:00:00Z')
 const time = new Date(stamp).toISOString()
@@ -12,10 +12,9 @@ test('ready, countdown and anticipation present no participant names', () => {
     kind: 'countdown',
     remaining: 3,
   })
-  assert.deepEqual(
-    gameScene({ ...demoGame, phase: 'countdown', updatedAt: time }, stamp + 3100),
-    { kind: 'anticipation' },
-  )
+  assert.deepEqual(gameScene({ ...demoGame, phase: 'countdown', updatedAt: time }, stamp + 3100), {
+    kind: 'anticipation',
+  })
 })
 
 test('a live winner remains out of the displayed scene during suspense', () => {
@@ -33,7 +32,12 @@ test('a live winner remains out of the displayed scene during suspense', () => {
 })
 
 test('prior winners remain shown while the next one builds suspense', () => {
-  const game = { ...demoGame, updatedAt: time, shownCount: 2, winners: demoGame.winners.slice(0, 2) }
+  const game = {
+    ...demoGame,
+    updatedAt: time,
+    shownCount: 2,
+    winners: demoGame.winners.slice(0, 2),
+  }
   const scene = gameScene(game, stamp + 1000)
   assert.deepEqual(scene, {
     kind: 'suspense',
@@ -46,9 +50,8 @@ test('prior winners remain shown while the next one builds suspense', () => {
 test('no unapproved winners are rendered, including in finished scenes', () => {
   const scene = gameScene({ ...demoGame, phase: 'finished', shownCount: 1 }, stamp)
   assert.deepEqual(scene, { kind: 'finished', winners: demoGame.winners.slice(0, 1) })
-  assert.deepEqual(
-    gameScene({ ...demoGame, phase: 'reveal', shownCount: 0, winners: [] }, stamp),
-    { kind: 'drawn' },
-  )
+  assert.deepEqual(gameScene({ ...demoGame, phase: 'reveal', shownCount: 0, winners: [] }, stamp), {
+    kind: 'drawn',
+  })
   assert.deepEqual(gameScene({ ...demoGame, type: 'qr' }, stamp), { kind: 'activity' })
 })
