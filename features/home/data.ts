@@ -9,6 +9,8 @@ import {
 const errorText = (error: unknown) =>
   typeof error === 'object' && error !== null && 'message' in error ? String(error.message) : error
 
+export type HomeLogoCarouselKind = 'brand' | 'race'
+
 export type HomeLogoCarouselItem = {
   id: string
   name: string
@@ -20,20 +22,38 @@ export type HomeLogoCarouselItem = {
   show_in_organizations: boolean
 }
 
-export async function getHomeLogoCarouselItems(): Promise<HomeLogoCarouselItem[]> {
+export async function getHomeLogoCarouselItems(
+  kind: HomeLogoCarouselKind = 'brand',
+): Promise<HomeLogoCarouselItem[]> {
   try {
     const supabase = createServerSupabaseClient()
     const baseColumns = 'id,name,logo_url,link_url,active,sort_order'
-    const query = (columns: string) =>
-      supabase
+    const query = (columns: string, filterKind = true) => {
+      const request = supabase
         .from('home_logo_carousel_items')
         .select(columns)
         .eq('event_code', 'SR26')
         .eq('active', true)
         .order('sort_order', { ascending: true })
         .order('created_at', { ascending: true })
+      return filterKind ? request.eq('carousel_kind', kind) : request
+    }
 
-    let { data, error } = await query(`${baseColumns},show_in_running_crews,show_in_organizations`)
+    const columns = `${baseColumns},show_in_running_crews,show_in_organizations`
+    let { data, error } = await query(columns)
+    let filterKind = true
+
+    // Preserve the existing brands while the new carousel migration is pending.
+    // Races must never fall back to the brand list.
+    if (
+      error &&
+      ['42703', 'PGRST204'].includes(error.code) &&
+      /carousel_kind/.test(error.message)
+    ) {
+      if (kind === 'race') return []
+      filterKind = false
+      ;({ data, error } = await query(columns, false))
+    }
 
     // Keep existing allies visible while the optional reuse migration is pending.
     if (
@@ -41,7 +61,7 @@ export async function getHomeLogoCarouselItems(): Promise<HomeLogoCarouselItem[]
       ['42703', 'PGRST204'].includes(error.code) &&
       /show_in_running_crews|show_in_organizations/.test(error.message)
     ) {
-      const fallback = await query(baseColumns)
+      const fallback = await query(baseColumns, filterKind)
       data = fallback.data
       error = fallback.error
     }
