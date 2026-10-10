@@ -17,7 +17,8 @@ export function safePublicComposerImageUrl(src: string | null): string | null {
       url.hash ||
       !url.href.startsWith(PUBLIC_STORAGE) ||
       !/\.(png|jpe?g|webp)$/i.test(url.pathname)
-    ) return null
+    )
+      return null
     return url.href
   } catch {
     return null
