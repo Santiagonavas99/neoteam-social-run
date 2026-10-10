@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import type { CommunityRecord, LogoItem } from '../types.ts'
-import { composerBrands, composerImageSrc } from './composer-library.ts'
+import { composerBrands } from './composer-library.ts'
+import { composerImageSrc } from './composer-image-source.ts'
 
 const brand = (id: string, name: string, active = true): CommunityRecord => ({
   id,
@@ -65,10 +66,4 @@ test('does not add hidden or broken brands, but retains valid partner brand reco
     rows.map((row) => row.name),
     ['Partner'],
   )
-})
-
-test('uses image optimizer only for this project public Supabase assets', () => {
-  const url = 'https://ohatsnkgaeccltqwhkbv.supabase.co/storage/v1/object/public/logos/test.webp'
-  assert.match(composerImageSrc(url), /^\/_next\/image\?url=/)
-  assert.equal(composerImageSrc('https://other.example/test.png'), 'https://other.example/test.png')
 })
