@@ -19,21 +19,23 @@ export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onD
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [syncUnavailable, setSyncUnavailable] = useState(false)
 
   const refresh = useCallback(async () => {
     const result = await callAdmin('dynamicData', { operation: 'stageStatus', id: dynamic.id })
     setStage(result.stage ?? { phase: 'ready', shown_count: 0 })
+    setSyncUnavailable(false)
   }, [dynamic.id])
 
   useEffect(() => {
     if (dynamic.type !== 'raffle' || !['open', 'completed'].includes(dynamic.status)) return
-    void refresh().catch(() => setError('No pudimos conectar con la pantalla de juego.'))
-    const poll = window.setInterval(() => void refresh().catch(() => undefined), 2000)
+    void refresh().catch(() => setSyncUnavailable(true))
+    const poll = window.setInterval(() => void refresh().catch(() => setSyncUnavailable(true)), 2000)
     return () => window.clearInterval(poll)
   }, [dynamic.type, dynamic.status, refresh])
 
   async function command(action: 'ready' | 'countdown' | 'drawn' | 'next' | 'finish') {
-    if (busy) return
+    if (busy || !stage || syncUnavailable) return
     setBusy(true)
     setError('')
     setNotice('')
@@ -58,6 +60,7 @@ export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onD
   const total = dynamic.winners_count ?? 0
   const shown = stage?.shown_count ?? 0
   const action = gamePrimaryAction(dynamic.status, stage, total)
+  const stageReady = stage !== null && !syncUnavailable
 
   const labels = {
     countdown: 'Iniciar cuenta atrás',
@@ -108,6 +111,13 @@ export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onD
           {notice}
         </p>
       )}
+      {isRaffle && active && !stageReady && (
+        <p role="status" className="mt-4 max-w-xl text-sm text-neo-text-secondary">
+          La pantalla de juego aún no está conectada en este entorno. Los controles en vivo
+          estarán disponibles cuando se active el servicio. Puedes probar el modo ensayo
+          desde «Más opciones».
+        </p>
+      )}
 
       {isRaffle && (
         <div className="mt-6">
@@ -119,7 +129,7 @@ export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onD
             <button
               type="button"
               className="button min-h-14 w-full justify-center text-base sm:w-auto"
-              disabled={busy}
+              disabled={busy || !stageReady}
               onClick={primary}
             >
               {action === 'draw' ? (
@@ -181,7 +191,7 @@ export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onD
                     <button
                       type="button"
                       className="text-link text-left text-sm"
-                      disabled={busy}
+                      disabled={busy || !stageReady}
                       onClick={onDraw}
                     >
                       <Dices aria-hidden className="size-4" /> Sortear sin cuenta atrás
@@ -190,7 +200,7 @@ export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onD
                   <button
                     type="button"
                     className="text-link text-left text-sm"
-                    disabled={busy}
+                    disabled={busy || !stageReady}
                     onClick={() => {
                       if (
                         window.confirm(
