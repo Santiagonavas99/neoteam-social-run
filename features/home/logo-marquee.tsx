@@ -126,11 +126,7 @@ export function LogoMarquee({
       </div>
       <div className="logo-marquee-viewport reveal overflow-hidden py-2">
         <div
-          className={
-            shouldAnimate
-              ? 'logo-marquee-track flex w-max'
-              : 'flex w-full justify-center'
-          }
+          className={shouldAnimate ? 'logo-marquee-track flex w-max' : 'flex w-full justify-center'}
           style={{ animationDuration: `${repeatedItems.length * 5}s` }}
         >
           {group(false)}
