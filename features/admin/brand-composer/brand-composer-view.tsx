@@ -435,7 +435,8 @@ export function BrandComposerView() {
             <h3 className="m-0 text-base font-bold">03 · Composición</h3>
             <p className="m-0 mt-1 text-xs text-neo-text-secondary">La plantilla adaptable respeta el arte de fondo, sin tapar título ni fecha.</p>
             <div className="mt-4 grid gap-4">
-              <div className="grid grid-cols-2 gap-2" role="group" aria-label="Modo de composición">
+              <fieldset className="grid grid-cols-2 gap-2">
+                <legend className="sr-only">Modo de composición</legend>
                 <button
                   type="button"
                   aria-pressed={mode === 'template'}
@@ -452,7 +453,7 @@ export function BrandComposerView() {
                 >
                   Modo libre
                 </button>
-              </div>
+              </fieldset>
               {mode === 'template' && (
                 <div className="grid gap-4 rounded-control border border-neo-border bg-neo-muted-bg p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
