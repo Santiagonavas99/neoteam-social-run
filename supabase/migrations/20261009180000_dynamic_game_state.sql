@@ -59,6 +59,10 @@ begin
     select * into g from public.dynamic_game_state
     where dynamic_id = d.id for update;
     if not found or g.phase <> 'reveal' then raise exception 'game_not_revealing'; end if;
+    -- Do not allow a second operator/API call to skip the current reveal animation.
+    if g.shown_count > 0 and g.updated_at > clock_timestamp() - interval '3200 milliseconds' then
+      raise exception 'game_reveal_wait';
+    end if;
     update public.dynamic_game_state
     set shown_count = least(g.shown_count + 1, v_total), updated_at = now()
     where dynamic_id = d.id;
@@ -71,6 +75,9 @@ begin
     where dynamic_id = d.id for update;
     if not found or g.phase <> 'reveal' or g.shown_count < v_total then
       raise exception 'game_reveal_remaining';
+    end if;
+    if g.shown_count > 0 and g.updated_at > clock_timestamp() - interval '3200 milliseconds' then
+      raise exception 'game_reveal_wait';
     end if;
     update public.dynamic_game_state set phase = 'finished', updated_at = now()
     where dynamic_id = d.id;
@@ -114,7 +121,13 @@ select jsonb_build_object(
       and d.status = 'completed'
       and g.phase in ('reveal','finished')
       and (dp.metadata->>'rank') ~ '^[0-9]+$'
-      and (dp.metadata->>'rank')::int <= g.shown_count
+      and (dp.metadata->>'rank')::int <= case
+        -- The public endpoint must not expose the current name in network responses
+        -- while the projected stage is still building suspense.
+        when g.phase = 'reveal' and g.updated_at > clock_timestamp() - interval '3200 milliseconds'
+          then greatest(g.shown_count - 1, 0)
+        else g.shown_count
+      end
   ), '[]'::jsonb)
 )
 from public.dynamics d

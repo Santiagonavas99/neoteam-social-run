@@ -55,3 +55,18 @@ test('no unapproved winners are rendered, including in finished scenes', () => {
   })
   assert.deepEqual(gameScene({ ...demoGame, type: 'qr' }, stamp), { kind: 'activity' })
 })
+
+test('public payload cannot reveal a name before the suspense deadline', () => {
+  const waiting = { ...demoGame, updatedAt: time, shownCount: 1, winners: [] }
+  assert.deepEqual(gameScene(waiting, stamp + 1000), {
+    kind: 'suspense',
+    rank: 1,
+    previous: [],
+  })
+  // Even with a slow network response, never reveal a name that was not authorized by the API.
+  assert.deepEqual(gameScene(waiting, stamp + REVEAL_SUSPENSE_MS + 1000), {
+    kind: 'suspense',
+    rank: 1,
+    previous: [],
+  })
+})

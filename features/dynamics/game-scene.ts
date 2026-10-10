@@ -25,17 +25,16 @@ export function gameScene(game: PublicGame, now: number): GameScene {
 
   const winners = game.winners.slice(0, game.shownCount)
   if (game.phase === 'finished') return { kind: 'finished', winners }
-  if (winners.length === 0) return { kind: 'drawn' }
+  if (game.shownCount === 0) return { kind: 'drawn' }
 
-  const winner = winners.at(-1)
-  if (!winner) return { kind: 'drawn' }
-  const previous = winners.slice(0, -1)
-
-  // The operator has authorized the next reveal, but the name stays outside
-  // the rendered DOM until the deterministic suspense window ends.
+  // Public API withholds the current winner until suspense is over.
+  // Keep the reveal scene even when that name is not yet in the payload.
+  const previous = winners.filter((winner) => winner.rank < game.shownCount)
   if (elapsed < REVEAL_SUSPENSE_MS) {
-    return { kind: 'suspense', rank: winner.rank, previous }
+    return { kind: 'suspense', rank: game.shownCount, previous }
   }
+  const winner = winners.find((item) => item.rank === game.shownCount)
+  if (!winner) return { kind: 'suspense', rank: game.shownCount, previous }
   return { kind: 'winner', winner, previous }
 }
 

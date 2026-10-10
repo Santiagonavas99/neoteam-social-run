@@ -46,7 +46,16 @@ begin
   assert (public.public_dynamic_game(v_dynamic)->'winners') = '[]'::jsonb, 'ready to reveal';
   perform public.dynamic_game_command(v_dynamic,v_event,'next');
   v_data := public.public_dynamic_game(v_dynamic);
-  assert v_data->'winners'->0->>'name' = 'Ana Ríos', 'first winner revealed';
+  assert v_data->'winners' = '[]'::jsonb, 'winner name stays private during suspense';
+  begin
+    perform public.dynamic_game_command(v_dynamic,v_event,'finish');
+    v_failed := false;
+  exception when others then v_failed := sqlerrm = 'game_reveal_wait'; end;
+  assert v_failed, 'cannot finish while the final winner is still hidden';
+  update public.dynamic_game_state
+    set updated_at = now() - interval '4 seconds' where dynamic_id = v_dynamic;
+  v_data := public.public_dynamic_game(v_dynamic);
+  assert v_data->'winners'->0->>'name' = 'Ana Ríos', 'first winner revealed after suspense';
   assert not v_data::text like '%SECRET_DOC%', 'documents never projected';
   assert not v_data::text like '%SECRET_EMAIL%', 'emails never projected';
   perform public.dynamic_game_command(v_dynamic,v_event,'finish');

@@ -559,6 +559,7 @@ Deno.serve(async (req: Request) => {
             game_no_winners: ['Este sorteo no tiene ganadores todavía.', 409],
             game_not_revealing: ['Primero prepara la revelación de ganadores.', 409],
             game_reveal_remaining: ['Revela todos los ganadores antes de finalizar.', 409],
+            game_reveal_wait: ['El público está descubriendo al ganador. Espera un momento.', 409],
             game_invalid_command: ['Acción inválida.', 400],
           })
           if (known) return known
