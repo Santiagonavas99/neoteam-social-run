@@ -303,12 +303,7 @@ export function LogosView({
           }
           action={
             !editor && (
-              <button
-                type="button"
-                className="button"
-                onClick={addLogo}
-                disabled={!canEdit}
-              >
+              <button type="button" className="button" onClick={addLogo} disabled={!canEdit}>
                 <Plus aria-hidden className="size-4 shrink-0" />
                 {raceMode ? 'Añadir primera carrera' : 'Añadir primer logo'}
               </button>
