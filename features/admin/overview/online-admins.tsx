@@ -79,7 +79,9 @@ export function OnlineAdmins() {
       }}
     >
       <summary className="flex min-h-11 cursor-pointer list-none items-center rounded-full px-2 outline-none transition-colors hover:bg-neo-muted-bg focus-visible:ring-2 focus-visible:ring-neo-accent-text [&::-webkit-details-marker]:hidden">
-        <span className="sr-only">Administradores conectados: {count ?? 'consultando'}. Ver detalles</span>
+        <span className="sr-only">
+          Administradores conectados: {count ?? 'consultando'}. Ver detalles
+        </span>
         {count !== null && count > 0 ? (
           <span aria-hidden="true" className="flex items-center -space-x-2">
             {rows.slice(0, 4).map((user) => (
@@ -109,7 +111,10 @@ export function OnlineAdmins() {
           </span>
         )}
         {count !== null && (
-          <span aria-hidden="true" className="ml-2 hidden text-xs font-semibold text-neo-text-secondary sm:inline">
+          <span
+            aria-hidden="true"
+            className="ml-2 hidden text-xs font-semibold text-neo-text-secondary sm:inline"
+          >
             {count} en línea
           </span>
         )}
@@ -123,7 +128,10 @@ export function OnlineAdmins() {
               {count === null ? 'Sincronizando…' : `${count} en línea · actualización automática`}
             </p>
           </div>
-          <span className={`size-2 rounded-full ${error ? 'bg-neo-warning' : 'bg-neo-accent'}`} aria-hidden="true" />
+          <span
+            className={`size-2 rounded-full ${error ? 'bg-neo-warning' : 'bg-neo-accent'}`}
+            aria-hidden="true"
+          />
         </div>
         {!loaded ? (
           <p role="status" className="m-0 px-1 py-4 text-sm text-neo-text-secondary">
@@ -141,7 +149,10 @@ export function OnlineAdmins() {
           <ul className="m-0 max-h-72 list-none space-y-1 overflow-y-auto p-0">
             {rows.map((user) => (
               <li key={user.id} className="flex items-center gap-3 rounded-control px-1 py-2">
-                <span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-full bg-neo-accent-soft text-xs font-bold text-neo-accent-text">
+                <span
+                  aria-hidden="true"
+                  className="grid size-9 shrink-0 place-items-center rounded-full bg-neo-accent-soft text-xs font-bold text-neo-accent-text"
+                >
                   {initials(user.name)}
                 </span>
                 <div className="min-w-0 flex-1">
