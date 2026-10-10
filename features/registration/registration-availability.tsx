@@ -1,6 +1,6 @@
 'use client'
 
-import { Clock3, QrCode } from 'lucide-react'
+import { QrCode } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { cardClass, linkClass } from './form-ui'
@@ -77,13 +77,7 @@ export function RegistrationAvailability({
 
   return (
     <div className="min-w-0">
-      <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-neo-accent-text">
-        <Clock3 aria-hidden className="size-4 shrink-0" />
-        {settings.deadline
-          ? `Cierre de inscripciones: ${registrationDeadlineLabel(settings.deadline)} (Colombia)`
-          : 'Inscripciones abiertas · sin fecha límite'}
-      </p>
-      <RegistrationForm />
+      <RegistrationForm deadline={settings.deadline} />
     </div>
   )
 }
