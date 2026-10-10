@@ -57,12 +57,3 @@ export function composerBrands(brands: CommunityRecord[], logos: LogoItem[]): Co
   }
   return items
 }
-
-/** Maps only known, public Supabase images through Next's same-origin image optimizer. */
-export function composerImageSrc(src: string) {
-  const prefix = 'https://ohatsnkgaeccltqwhkbv.supabase.co/storage/v1/object/public/'
-  if (src.startsWith(prefix)) {
-    return `/_next/image?url=${encodeURIComponent(src)}&w=640&q=75`
-  }
-  return src
-}
