@@ -401,7 +401,7 @@ export function RegistrationForm({ deadline }: { deadline: string | null }) {
         ))}
       </ol>
 
-      <p className="mt-5 mb-0 flex items-start gap-2 text-xs leading-relaxed font-semibold text-neo-accent-text sm:text-sm">
+      <p className="mt-10 mb-0 flex items-start gap-2 text-xs leading-relaxed font-semibold text-neo-accent-text sm:mt-12 sm:text-sm">
         <Clock3 aria-hidden className="mt-0.5 size-4 shrink-0" />
         <span>
           {deadline
