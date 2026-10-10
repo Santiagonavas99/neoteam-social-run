@@ -2,6 +2,7 @@ import { Footer } from '@/components/footer'
 import { SiteHeader } from '@/components/site-header'
 import { SocialRail } from '@/components/social-rail'
 import {
+  alliedRaceMarqueeItems,
   organizationMarqueeItems,
   runningCrewMarqueeItems,
 } from '@/features/home/community-marquees'
@@ -60,7 +61,13 @@ export default async function Home() {
       case 'allies':
         return <LogoMarquee key={section_key} items={logoItems} />
       case 'races':
-        return <LogoMarquee key={section_key} items={raceItems} title="Carreras aliadas" />
+        return (
+          <LogoMarquee
+            key={section_key}
+            items={alliedRaceMarqueeItems(raceItems, logoItems)}
+            title="Carreras aliadas"
+          />
+        )
       case 'running_crews':
         return (
           <LogoMarquee
