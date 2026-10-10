@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.33.1] - 2026-10-10
+
+### Added
+
+- **Compositor de marcas aliadas (MVP):** a private admin visual editor that reuses visible sponsor/partner logos from Marcas and the Home carousel, deduplicates names, and arranges them automatically over a chosen local background image.
+- **Social formats and downloads:** 1:1, 4:5, 3:4, 9:16 and 16:9; bottom strip, mosaic and centered layouts; size, background darkening, white logo tiles, optional title and logo ordering.
+- **Real browser exports:** live Canvas preview and downloadable PNG/JPG at the exact selected pixel resolution. Failing third-party logo sources are reported rather than silently omitted; admins can replace them with local PNG/JPG/WebP for the current composition.
+- **No database changes:** the composer never edits the published brand library. The original background and temporary logo overrides remain local to the editor session.
+
+
 ## [0.33.0] - 2026-10-09
 
 ### Added
