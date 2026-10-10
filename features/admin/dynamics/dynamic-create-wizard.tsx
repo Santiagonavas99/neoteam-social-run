@@ -67,7 +67,11 @@ export function DynamicCreateWizard({
     event.preventDefault()
     if (step < totalSteps) {
       if (step === 2 && !stepTwoValid) {
-        setError(type === 'challenge' ? 'Explica qué debe completar el corredor (mínimo 10 caracteres).' : 'Revisa el nombre y el premio.')
+        setError(
+          type === 'challenge'
+            ? 'Explica qué debe completar el corredor (mínimo 10 caracteres).'
+            : 'Revisa el nombre y el premio.',
+        )
         return
       }
       setError('')
@@ -120,22 +124,26 @@ export function DynamicCreateWizard({
             {step === 1
               ? '¿Qué quieres organizar?'
               : step === 2
-                ? (type === 'challenge' ? 'Define la meta del reto' : 'Dale identidad')
+                ? type === 'challenge'
+                  ? 'Define la meta del reto'
+                  : 'Dale identidad'
                 : step === 3
-                  ? (type === 'challenge' ? 'Cómo se valida el reto' : '¿Quién puede participar?')
+                  ? type === 'challenge'
+                    ? 'Cómo se valida el reto'
+                    : '¿Quién puede participar?'
                   : 'Revisa antes de guardar'}
           </h2>
           <p className="m-0 mt-1 text-sm text-neo-text-secondary">
             {step === 1
               ? 'Elige una experiencia. Después podrás modificar sus reglas.'
               : step === 2
-                ? (type === 'challenge'
+                ? type === 'challenge'
                   ? 'Explica exactamente qué debe lograr el corredor.'
-                  : 'Solo te pedimos lo necesario para dejarla en borrador.')
+                  : 'Solo te pedimos lo necesario para dejarla en borrador.'
                 : step === 3
-                  ? (type === 'challenge'
+                  ? type === 'challenge'
                     ? 'El personal valida el reto con el QR del corredor.'
-                    : 'Define las condiciones básicas; la activación se hace después.')
+                    : 'Define las condiciones básicas; la activación se hace después.'
                   : 'Comprueba las reglas. El reto no se activará todavía.'}
           </p>
         </div>
@@ -183,11 +191,17 @@ export function DynamicCreateWizard({
               maxLength={120}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder={type === 'challenge' ? 'Ej. Completa el circuito de 200 metros' : 'Ej. Pack Hidratación'}
+              placeholder={
+                type === 'challenge'
+                  ? 'Ej. Completa el circuito de 200 metros'
+                  : 'Ej. Pack Hidratación'
+              }
             />
           </label>
           <label className="sm:col-span-2">
-            {type === 'challenge' ? '¿Qué debe hacer el corredor para completar el reto? *' : 'Descripción (opcional)'}
+            {type === 'challenge'
+              ? '¿Qué debe hacer el corredor para completar el reto? *'
+              : 'Descripción (opcional)'}
             <textarea
               rows={type === 'challenge' ? 4 : 2}
               required={type === 'challenge'}
@@ -195,9 +209,11 @@ export function DynamicCreateWizard({
               maxLength={1000}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder={type === 'challenge'
-                ? 'Ej. Completa el circuito de 200 m. El personal comprueba que terminó y escanea su pase.'
-                : '¿Cómo funciona?'}
+              placeholder={
+                type === 'challenge'
+                  ? 'Ej. Completa el circuito de 200 m. El personal comprueba que terminó y escanea su pase.'
+                  : '¿Cómo funciona?'
+              }
             />
             {type === 'challenge' && (
               <small>Estas son las instrucciones que verá el equipo cuando gestione el reto.</small>
@@ -248,16 +264,17 @@ export function DynamicCreateWizard({
           {type === 'challenge' && (
             <>
               <div className="rounded-card border border-neo-accent-border bg-neo-accent-soft p-4">
-                <p className="m-0 font-bold text-neo-accent-text">Validación por el equipo con QR</p>
+                <p className="m-0 font-bold text-neo-accent-text">
+                  Validación por el equipo con QR
+                </p>
                 <p className="m-0 mt-2 text-sm text-neo-text-secondary">
-                  Cuando el corredor complete el reto, el personal abre «En vivo»,
-                  escanea su pase y registra una participación. Solo se admite una
-                  validación por persona.
+                  Cuando el corredor complete el reto, el personal abre «En vivo», escanea su pase y
+                  registra una participación. Solo se admite una validación por persona.
                 </p>
                 <p className="m-0 mt-2 text-xs text-neo-text-secondary">
-                  Importante: este módulo aún no cronometra carreras ni ordena
-                  corredores por tiempo. Si el reto es «el más rápido», registra
-                  los tiempos y el ganador por separado.
+                  Importante: este módulo aún no cronometra carreras ni ordena corredores por
+                  tiempo. Si el reto es «el más rápido», registra los tiempos y el ganador por
+                  separado.
                 </p>
               </div>
               <label>
@@ -329,17 +346,37 @@ export function DynamicCreateWizard({
               {description.trim()}
             </p>
             <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
-              <div><dt className="text-neo-text-secondary">Validación</dt><dd className="m-0 font-bold">Personal · escaneo QR</dd></div>
-              <div><dt className="text-neo-text-secondary">Participaciones</dt><dd className="m-0 font-bold">Una por corredor</dd></div>
-              <div><dt className="text-neo-text-secondary">Puntos</dt><dd className="m-0 font-bold">{points} por completar</dd></div>
-              <div><dt className="text-neo-text-secondary">Check-in requerido</dt><dd className="m-0 font-bold">{requiresCheckin ? 'Sí' : 'No'}</dd></div>
-              <div><dt className="text-neo-text-secondary">Patrocinador</dt><dd className="m-0 font-bold">{brands.find((brand) => brand.id === sponsor)?.name ?? 'Sin patrocinador'}</dd></div>
-              <div><dt className="text-neo-text-secondary">Estado al guardar</dt><dd className="m-0 font-bold">Borrador</dd></div>
+              <div>
+                <dt className="text-neo-text-secondary">Validación</dt>
+                <dd className="m-0 font-bold">Personal   escaneo QR</dd>
+              </div>
+              <div>
+                <dt className="text-neo-text-secondary">Participaciones</dt>
+                <dd className="m-0 font-bold">Una por corredor</dd>
+              </div>
+              <div>
+                <dt className="text-neo-text-secondary">Puntos</dt>
+                <dd className="m-0 font-bold">{points} por completar</dd>
+              </div>
+              <div>
+                <dt className="text-neo-text-secondary">Check-in requerido</dt>
+                <dd className="m-0 font-bold">{requiresCheckin ? 'Sí' : 'No'}</dd>
+              </div>
+              <div>
+                <dt className="text-neo-text-secondary">Patrocinador</dt>
+                <dd className="m-0 font-bold">
+                  {brands.find((brand) => brand.id === sponsor)?.name ?? 'Sin patrocinador'}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-neo-text-secondary">Estado al guardar</dt>
+                <dd className="m-0 font-bold">Borrador</dd>
+              </div>
             </dl>
           </div>
           <p className="m-0 text-sm text-neo-text-secondary">
-            Después de guardar, abre «Preparación» para revisar y activar. Luego usa
-            «En vivo» para escanear a quienes hayan completado el reto.
+            Después de guardar, abre «Preparación» para revisar y activar. Luego usa «En vivo» para
+            escanear a quienes hayan completado el reto.
           </p>
         </div>
       )}
@@ -364,7 +401,11 @@ export function DynamicCreateWizard({
         )}
         <button type="submit" className="button" disabled={busy || (step >= 2 && !stepTwoValid)}>
           {step === totalSteps
-            ? (busy ? 'Guardando…' : type === 'challenge' ? 'Guardar reto como borrador' : 'Guardar borrador')
+            ? busy
+              ? 'Guardando…'
+              : type === 'challenge'
+                ? 'Guardar reto como borrador'
+                : 'Guardar borrador'
             : 'Continuar'}
           {step < totalSteps && <ArrowRight aria-hidden className="size-4" />}
         </button>

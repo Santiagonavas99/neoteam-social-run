@@ -29,23 +29,34 @@
   font-size: 13px;
   font-weight: 750;
   line-height: 1.3;
-  transition: background 150ms ease, border-color 150ms ease;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease;
 }
-.tab:hover { border-color: var(--neo-border-strong); color: var(--neo-text); }
+.tab:hover {
+  border-color: var(--neo-border-strong);
+  color: var(--neo-text);
+}
 .tab[aria-current="page"] {
   background: var(--neo-surface);
   color: var(--neo-text);
   border-color: var(--neo-border-strong);
 }
-.tab[data-kind="preparar"][aria-current="page"] { box-shadow: inset 0 -3px 0 var(--neo-warning); }
+.tab[data-kind="preparar"][aria-current="page"] {
+  box-shadow: inset 0 -3px 0 var(--neo-warning);
+}
 .tab[data-kind="en-vivo"][aria-current="page"] {
   border-color: var(--neo-accent-border);
   background: var(--neo-accent-soft);
   color: var(--neo-accent-text);
   box-shadow: inset 0 -3px 0 var(--neo-accent-text);
 }
-.tab[data-kind="resultados"][aria-current="page"] { box-shadow: inset 0 -3px 0 var(--neo-accent); }
-.tab:focus-visible, .playAction:focus-visible, .screenLink:focus-visible {
+.tab[data-kind="resultados"][aria-current="page"] {
+  box-shadow: inset 0 -3px 0 var(--neo-accent);
+}
+.tab:focus-visible,
+.playAction:focus-visible,
+.screenLink:focus-visible {
   outline: 2px solid var(--neo-accent-text);
   outline-offset: 3px;
 }
@@ -61,13 +72,17 @@
   background: var(--neo-muted-bg);
   color: var(--neo-text);
 }
-.sectionIntro[data-kind="preparar"] { border-left: 4px solid var(--neo-warning); }
+.sectionIntro[data-kind="preparar"] {
+  border-left: 4px solid var(--neo-warning);
+}
 .sectionIntro[data-kind="en-vivo"] {
   border-color: var(--neo-accent-border);
   border-left: 4px solid var(--neo-accent-text);
   background: var(--neo-accent-soft);
 }
-.sectionIntro[data-kind="resultados"] { border-left: 4px solid var(--neo-accent); }
+.sectionIntro[data-kind="resultados"] {
+  border-left: 4px solid var(--neo-accent);
+}
 .overviewStat {
   min-width: 0;
   padding: 16px;
@@ -80,7 +95,9 @@
   border-color: var(--neo-accent-border);
   box-shadow: inset 4px 0 0 var(--neo-accent-text);
 }
-.overviewStat[data-status="completed"] { opacity: 0.82; }
+.overviewStat[data-status="completed"] {
+  opacity: 0.82;
+}
 .dynamicCard {
   position: relative;
   display: flex;
@@ -100,7 +117,9 @@
 }
 .dynamicCard[data-status="completed"],
 .dynamicCard[data-status="closed"],
-.dynamicCard[data-status="cancelled"] { opacity: 0.84; }
+.dynamicCard[data-status="cancelled"] {
+  opacity: 0.84;
+}
 .cardKind {
   display: inline-flex;
   align-items: center;
@@ -111,8 +130,12 @@
   color: var(--neo-accent-text);
 }
 .dynamicCard[data-type="challenge"] .cardKind,
-.dynamicCard[data-type="checkpoint"] .cardKind { color: var(--neo-warning); }
-.dynamicCard[data-type="instant_win"] .cardKind { color: var(--neo-text); }
+.dynamicCard[data-type="checkpoint"] .cardKind {
+  color: var(--neo-warning);
+}
+.dynamicCard[data-type="instant_win"] .cardKind {
+  color: var(--neo-text);
+}
 .liveMarker {
   display: inline-flex;
   align-items: center;
@@ -147,7 +170,9 @@
   font-weight: 850;
   cursor: pointer;
 }
-.playAction:hover { filter: brightness(1.1); }
+.playAction:hover {
+  filter: brightness(1.1);
+}
 .screenLink {
   display: inline-flex;
   align-items: center;
@@ -170,12 +195,32 @@
   border-radius: var(--radius-card);
   background: var(--neo-accent-soft);
 }
-.scanPanel > button { align-self: flex-start; }
-@media (max-width: 480px) {
-  .tab { flex: 1 1 0; min-width: 0; padding: 10px 7px; gap: 5px; font-size: 12px; }
-  .sectionIntro { padding: 16px; }
-  .overviewStat { padding: 12px; }
-  .dynamicCard { padding: 18px; }
-  .scanPanel > button { width: 100%; }
+.scanPanel > button {
+  align-self: flex-start;
 }
-@media (prefers-reduced-motion: reduce) { .tab { transition: none; } }
+@media (max-width: 480px) {
+  .tab {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 10px 7px;
+    gap: 5px;
+    font-size: 12px;
+  }
+  .sectionIntro {
+    padding: 16px;
+  }
+  .overviewStat {
+    padding: 12px;
+  }
+  .dynamicCard {
+    padding: 18px;
+  }
+  .scanPanel > button {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tab {
+    transition: none;
+  }
+}

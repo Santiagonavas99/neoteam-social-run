@@ -304,9 +304,13 @@ export function DynamicsView() {
               <div>
                 <h4 className="m-0 font-black">
                   {tab === 'preparar'
-                    ? selectedNeedsRules ? 'Falta definir cómo se completa este reto' : 'Todo listo para preparar'
+                    ? selectedNeedsRules
+                      ? 'Falta definir cómo se completa este reto'
+                      : 'Todo listo para preparar'
                     : tab === 'en-vivo'
-                      ? selected.status === 'draft' ? 'Primero debes activar la dinámica' : 'Zona de ejecución'
+                      ? selected.status === 'draft'
+                        ? 'Primero debes activar la dinámica'
+                        : 'Zona de ejecución'
                       : 'Resultados y seguimiento'}
                 </h4>
                 <p className="m-0 mt-1 text-sm text-neo-text-secondary">
@@ -360,7 +364,14 @@ export function DynamicsView() {
                   <div className="grid grid-cols-3 gap-2 sm:gap-3">
                     {[
                       ['Participaciones', String(selected.participations_count ?? 0)],
-                      [selected.type === 'raffle' ? 'Ganadores' : 'Completados', String(selected.type === 'raffle' ? (selected.winners_count ?? 0) : (selected.participations_count ?? 0))],
+                      [
+                        selected.type === 'raffle' ? 'Ganadores' : 'Completados',
+                        String(
+                          selected.type === 'raffle'
+                            ? (selected.winners_count ?? 0)
+                            : (selected.participations_count ?? 0),
+                        ),
+                      ],
                       ['Check-in', selected.requires_checkin ? 'Sí' : 'No'],
                     ].map(([title, value]) => (
                       <div
@@ -377,7 +388,9 @@ export function DynamicsView() {
                       <>
                         <div className="max-w-lg">
                           <p className="m-0 font-bold">
-                            {selectedNeedsRules ? 'Termina la configuración primero' : 'Lista para activar'}
+                            {selectedNeedsRules
+                              ? 'Termina la configuración primero'
+                              : 'Lista para activar'}
                           </p>
                           <p className="m-0 mt-1 text-xs text-neo-text-secondary">
                             {selectedNeedsRules
@@ -412,7 +425,11 @@ export function DynamicsView() {
                             : 'Esta dinámica ya tiene un estado registrado.'}
                         </p>
                         {selected.status === 'open' && (
-                          <button className="button" type="button" onClick={() => chooseTab('en-vivo', selected)}>
+                          <button
+                            className="button"
+                            type="button"
+                            onClick={() => chooseTab('en-vivo', selected)}
+                          >
                             <Play aria-hidden className="size-4" /> PLAY · En vivo
                           </button>
                         )}
@@ -455,7 +472,9 @@ export function DynamicsView() {
                 <div className={styles.scanPanel}>
                   <div>
                     <h4 className="m-0 text-lg font-black">
-                      {selected.type === 'challenge' ? 'Validar reto completado' : 'Registrar participación'}
+                      {selected.type === 'challenge'
+                        ? 'Validar reto completado'
+                        : 'Registrar participación'}
                     </h4>
                     <p className="m-0 mt-1 max-w-lg text-sm text-neo-text-secondary">
                       {selected.type === 'challenge'
@@ -480,8 +499,12 @@ export function DynamicsView() {
               {selected.type !== 'raffle' && (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="rounded-card border border-neo-border bg-neo-surface p-5">
-                    <p className="m-0 text-sm text-neo-text-secondary">Participaciones registradas</p>
-                    <p className="m-0 mt-2 text-3xl font-black tabular-nums">{selected.participations_count ?? 0}</p>
+                    <p className="m-0 text-sm text-neo-text-secondary">
+                      Participaciones registradas
+                    </p>
+                    <p className="m-0 mt-2 text-3xl font-black tabular-nums">
+                      {selected.participations_count ?? 0}
+                    </p>
                   </div>
                   <div className="rounded-card border border-neo-border bg-neo-surface p-5">
                     <p className="m-0 text-sm text-neo-text-secondary">Estado</p>
@@ -522,7 +545,9 @@ export function DynamicsView() {
             ].map((item) => (
               <div key={item.status} data-status={item.status} className={styles.overviewStat}>
                 <p className="m-0 text-xs text-neo-text-secondary">{item.label}</p>
-                <p className="m-0 mt-1 text-2xl font-black tabular-nums sm:text-3xl">{item.count}</p>
+                <p className="m-0 mt-1 text-2xl font-black tabular-nums sm:text-3xl">
+                  {item.count}
+                </p>
               </div>
             ))}
           </div>
@@ -607,11 +632,18 @@ export function DynamicsView() {
                         onClick={() => open(row)}
                       >
                         {isOpen ? (
-                          <><Play aria-hidden className="size-5" /> PLAY · Abrir control</>
+                          <>
+                            <Play aria-hidden className="size-5" /> PLAY · Abrir control
+                          </>
                         ) : isDraft ? (
-                          <><Settings2 aria-hidden className="size-4" /> {row.type === 'challenge' ? 'Configurar reto' : 'Preparar dinámica'}</>
+                          <>
+                            <Settings2 aria-hidden className="size-4" />{' '}
+                            {row.type === 'challenge' ? 'Configurar reto' : 'Preparar dinámica'}
+                          </>
                         ) : (
-                          <><Trophy aria-hidden className="size-4" /> Ver resultados</>
+                          <>
+                            <Trophy aria-hidden className="size-4" /> Ver resultados
+                          </>
                         )}
                       </button>
                       {isOpen && (
