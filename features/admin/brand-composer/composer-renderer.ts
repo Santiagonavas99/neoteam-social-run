@@ -5,7 +5,8 @@ import {
   containRect,
   logoSlots,
 } from './composer-layout'
-import { type ComposerBrand, composerImageSrc } from './composer-library'
+import { composerImageSrc } from './composer-image-source'
+import type { ComposerBrand } from './composer-library'
 
 export type ComposerSettings = {
   format: CompositionFormat
@@ -46,9 +47,9 @@ async function decodeImage(blob: Blob): Promise<CanvasImageSource> {
 function asset(src: string) {
   let promise = cache.get(src)
   if (!promise) {
-    promise = fetch(src, { credentials: 'omit', cache: 'force-cache' })
+    promise = fetch(src, { credentials: 'same-origin', cache: 'force-cache' })
       .then((response) => {
-        if (!response.ok) throw new Error('No disponible')
+        if (!response.ok) throw new Error(`No disponible (${response.status})`)
         return response.blob()
       })
       .then(decodeImage)
