@@ -42,9 +42,16 @@ export function AdminApp({ enableLegacyWebpMigration }: { enableLegacyWebpMigrat
         ) : section === 'home-order' ? (
           <HomeOrderView />
         ) : section === 'logos' ? (
-          <LogosView enableLegacyWebpMigration={enableLegacyWebpMigration} />
+          <LogosView
+            enableLegacyWebpMigration={enableLegacyWebpMigration}
+            onNavigateKind={(kind) => setSection(kind === 'brand' ? 'logos' : 'race-logos')}
+          />
         ) : section === 'race-logos' ? (
-          <LogosView kind="race" enableLegacyWebpMigration={false} />
+          <LogosView
+            kind="race"
+            enableLegacyWebpMigration={false}
+            onNavigateKind={(kind) => setSection(kind === 'brand' ? 'logos' : 'race-logos')}
+          />
         ) : section === 'team' ? (
           <TeamView />
         ) : section === 'participants' ? (
