@@ -66,17 +66,17 @@ test('rejects invalid output and propagates clipboard permission errors', async 
     },
   }
   await assert.rejects(
-    copyPngToClipboard(
-      async () => new Blob(['jpeg'], { type: 'image/jpeg' }),
-      clipboard,
-      Item,
-    ),
+    copyPngToClipboard(async () => new Blob(['jpeg'], { type: 'image/jpeg' }), clipboard, Item),
     /PNG/,
   )
   await assert.rejects(
     copyPngToClipboard(
       async () => new Blob(['png'], { type: 'image/png' }),
-      { async write() { throw new Error('NotAllowedError') } },
+      {
+        async write() {
+          throw new Error('NotAllowedError')
+        },
+      },
       Item,
     ),
     /NotAllowedError/,
