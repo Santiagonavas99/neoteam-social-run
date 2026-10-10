@@ -63,6 +63,7 @@ const allies: HomeLogoCarouselItem[] = [
     link_url: null,
     active: false,
     sort_order: 3,
+    show_in_races: false,
     show_in_running_crews: true,
     show_in_organizations: true,
   },
@@ -131,8 +132,9 @@ test('each inclusion flag is independent and inactive allies stay hidden', () =>
 })
 
 test('races reuse the same brand logo without duplicating a stored record', () => {
-  const reusable = { ...allies[0], show_in_races: true }
-  assert.ok(reusable)
+  const source = allies[0]
+  assert.ok(source)
+  const reusable = { ...source, show_in_races: true }
   const result = alliedRaceMarqueeItems([], [reusable])
   assert.equal(result.length, 1)
   assert.equal(result[0]?.id, 'ally-ally-crew')
@@ -155,8 +157,10 @@ test('races skip inactive brands and deduplicate native race names or images', (
 })
 
 test('race flag does not add logos to crews or organizations', () => {
+  const source = allies[0]
+  assert.ok(source)
   const onlyRace = {
-    ...allies[0],
+    ...source,
     show_in_races: true,
     show_in_running_crews: false,
     show_in_organizations: false,
