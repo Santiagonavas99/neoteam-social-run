@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Improved
 
+- **Copiar imagen:** botón junto a Exportar que copia la composición final como PNG al portapapeles, incluyendo solo los logos seleccionados, fondo y distribución, sin guía de edición. Compatible con el flujo de permisos de Chrome/Safari, con mensajes claros cuando el navegador bloquea el acceso.
 - **Plantillas adaptables en el compositor:** imagen base fija + zona de logos editable sobre la vista previa, distribución automática para 4, 6, 12, 16, 17 o más marcas, columnas manuales y personalización de separación, margen interno y esquinas. El modo libre sigue disponible y la guía no aparece en la imagen exportada.
 
 
