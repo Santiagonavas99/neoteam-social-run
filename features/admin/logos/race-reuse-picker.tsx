@@ -36,7 +36,7 @@ export function RaceReusePicker({
   const visible = showAll || search.trim() ? filtered : filtered.slice(0, 6)
 
   async function toggle(brand: LogoItem) {
-    if (busy || pendingId || !brand.active) return
+    if (busy || pendingId || (!brand.active && !brand.show_in_races)) return
     setPendingId(brand.id)
     try {
       await onToggle(brand, !brand.show_in_races)
@@ -98,7 +98,7 @@ export function RaceReusePicker({
           <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
             {visible.map((brand) => {
               const selected = brand.show_in_races === true
-              const disabled = !brand.active || busy || pendingId !== null
+              const disabled = (!brand.active && !selected) || busy || pendingId !== null
               return (
                 <div
                   key={brand.id}
