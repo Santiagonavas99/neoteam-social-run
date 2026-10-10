@@ -31,8 +31,9 @@ export const dynamic = 'force-dynamic'
 const numberedSections = new Set(['story', 'agenda', 'community', 'raffle', 'final'])
 
 export default async function Home() {
-  const [logoItems, community, registered, sectionOrder, registrationSettings] = await Promise.all([
-    getHomeLogoCarouselItems(),
+  const [logoItems, raceItems, community, registered, sectionOrder, registrationSettings] = await Promise.all([
+    getHomeLogoCarouselItems('brand'),
+    getHomeLogoCarouselItems('race'),
     getHomeCommunity(),
     getRegisteredCount(),
     getHomeSectionOrder(),
@@ -57,6 +58,8 @@ export default async function Home() {
         return <Numbers key={section_key} registered={registered} brands={logoItems.length} />
       case 'allies':
         return <LogoMarquee key={section_key} items={logoItems} />
+      case 'races':
+        return <LogoMarquee key={section_key} items={raceItems} title="Carreras aliadas" />
       case 'running_crews':
         return (
           <LogoMarquee
