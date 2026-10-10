@@ -30,7 +30,10 @@ export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onD
   useEffect(() => {
     if (dynamic.type !== 'raffle' || !['open', 'completed'].includes(dynamic.status)) return
     void refresh().catch(() => setSyncUnavailable(true))
-    const poll = window.setInterval(() => void refresh().catch(() => setSyncUnavailable(true)), 2000)
+    const poll = window.setInterval(
+      () => void refresh().catch(() => setSyncUnavailable(true)),
+      2000,
+    )
     return () => window.clearInterval(poll)
   }, [dynamic.type, dynamic.status, refresh])
 
@@ -113,9 +116,9 @@ export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onD
       )}
       {isRaffle && active && !stageReady && (
         <p role="status" className="mt-4 max-w-xl text-sm text-neo-text-secondary">
-          La pantalla de juego aún no está conectada en este entorno. Los controles en vivo
-          estarán disponibles cuando se active el servicio. Puedes probar el modo ensayo
-          desde «Más opciones».
+          La pantalla de juego aún no está conectada en este entorno. Los controles en vivo estarán
+          disponibles cuando se active el servicio. Puedes probar el modo ensayo desde «Más
+          opciones».
         </p>
       )}
 
