@@ -143,8 +143,9 @@ test('races reuse the same brand logo without duplicating a stored record', () =
 })
 
 test('races skip inactive brands and deduplicate native race names or images', () => {
-  const reusable = { ...allies[0], show_in_races: true }
-  assert.ok(reusable)
+  const source = allies[0]
+  assert.ok(source)
+  const reusable = { ...source, show_in_races: true }
   const native = { ...reusable, id: 'race-1', show_in_races: false, sort_order: 0 }
   assert.deepEqual(
     alliedRaceMarqueeItems([native], [reusable]).map(({ id }) => id),
