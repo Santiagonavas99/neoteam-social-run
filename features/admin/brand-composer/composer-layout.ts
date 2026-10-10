@@ -37,7 +37,8 @@ export function logoSlots(
 
   const margin = Math.round(Math.min(width, height) * 0.045)
   const areaWidth = width - margin * 2
-  const areaTop = layout === 'bottom' ? height * 0.58 : layout === 'center' ? height * 0.245 : height * 0.17
+  const areaTop =
+    layout === 'bottom' ? height * 0.58 : layout === 'center' ? height * 0.245 : height * 0.17
   const areaHeight = (layout === 'bottom' ? 0.36 : layout === 'center' ? 0.53 : 0.7) * height
   const rows =
     layout === 'bottom'
@@ -56,7 +57,7 @@ export function logoSlots(
     const row = Math.floor(index / columns)
     const column = index % columns
     const itemsInRow = Math.min(columns, count - row * columns)
-    const centeredOffset = (columns - itemsInRow) * (cellW + gap) / 2
+    const centeredOffset = ((columns - itemsInRow) * (cellW + gap)) / 2
     return {
       x: Math.round(margin + centeredOffset + column * (cellW + gap) + (cellW - tileW) / 2),
       y: Math.round(areaTop + row * (cellH + gap) + (cellH - tileH) / 2),
