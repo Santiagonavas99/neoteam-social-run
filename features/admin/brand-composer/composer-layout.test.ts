@@ -1,16 +1,18 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
+  type CompositionFormat,
+  type CompositionLayout,
   compositionFormats,
   containRect,
   logoSlots,
-  type CompositionFormat,
-  type CompositionLayout,
 } from './composer-layout.ts'
 
 test('all supported social formats have the expected export dimensions', () => {
   assert.deepEqual(
-    Object.fromEntries(Object.entries(compositionFormats).map(([key, value]) => [key, [value.width, value.height]])),
+    Object.fromEntries(
+      Object.entries(compositionFormats).map(([key, value]) => [key, [value.width, value.height]]),
+    ),
     {
       square: [1080, 1080],
       portrait: [1080, 1350],
@@ -33,8 +35,11 @@ test('17 allied brands fit within every format and layout without overlap', () =
         assert.ok(a.x >= 0 && a.y >= 0 && a.width > 0 && a.height > 0, format)
         assert.ok(a.x + a.width <= width && a.y + a.height <= height, format)
         for (const b of tiles.slice(i + 1)) {
-          const overlap = a.x < b.x + b.width && b.x < a.x + a.width
-            && a.y < b.y + b.height && b.y < a.y + a.height
+          const overlap =
+            a.x < b.x + b.width &&
+            b.x < a.x + a.width &&
+            a.y < b.y + b.height &&
+            b.y < a.y + a.height
           assert.equal(overlap, false, `${format} ${layout}: logos overlap`)
         }
       }
