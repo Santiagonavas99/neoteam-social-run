@@ -66,9 +66,10 @@ export function BrandComposerView() {
   useEffect(() => () => {
     if (background) URL.revokeObjectURL(background)
   }, [background])
+  const uploadedLogos = useRef(new Set<string>())
   useEffect(() => () => {
-    for (const url of Object.values(overrides)) URL.revokeObjectURL(url)
-  }, [overrides])
+    for (const url of uploadedLogos.current) URL.revokeObjectURL(url)
+  }, [])
 
   const chosen = useMemo(
     () => selectedIds
@@ -158,7 +159,9 @@ export function BrandComposerView() {
   function overrideLogo(id: string, file?: File) {
     if (!file || !fileValid(file)) return
     setFeedback(null)
-    setOverrides((previous) => ({ ...previous, [id]: URL.createObjectURL(file) }))
+    const url = URL.createObjectURL(file)
+    uploadedLogos.current.add(url)
+    setOverrides((previous) => ({ ...previous, [id]: url }))
   }
 
   async function download() {
