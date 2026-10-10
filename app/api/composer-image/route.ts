@@ -26,7 +26,10 @@ export async function GET(request: Request): Promise<Response> {
     }
     const mime = upstream.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase()
     if (!mime || !allowedTypes.has(mime)) {
-      return new Response('El archivo no es una imagen compatible.', { status: 415, headers: noStore })
+      return new Response('El archivo no es una imagen compatible.', {
+        status: 415,
+        headers: noStore,
+      })
     }
     const size = Number(upstream.headers.get('content-length') ?? 0)
     if (size > maxBytes) {
@@ -34,7 +37,10 @@ export async function GET(request: Request): Promise<Response> {
     }
     const bytes = await upstream.arrayBuffer()
     if (!bytes.byteLength || bytes.byteLength > maxBytes) {
-      return new Response('La imagen está vacía o supera el límite.', { status: 413, headers: noStore })
+      return new Response('La imagen está vacía o supera el límite.', {
+        status: 413,
+        headers: noStore,
+      })
     }
     return new Response(bytes, {
       status: 200,
