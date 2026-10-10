@@ -19,6 +19,7 @@ export type AdminSection =
   | 'metrics'
   | 'home-order'
   | 'logos'
+  | 'race-logos'
   | 'participants'
   | 'registration-settings'
   | 'email-queue'
@@ -102,8 +103,15 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
   },
   {
     id: 'logos',
-    label: 'Carrusel logos',
+    label: 'Marcas aliadas',
     description: 'Sube, ordena y publica los logos de la cinta horizontal de la Home.',
+    icon: GalleryHorizontal,
+    group: 'content',
+  },
+  {
+    id: 'race-logos',
+    label: 'Carreras aliadas',
+    description: 'Sube y organiza los logos de las carreras aliadas del evento.',
     icon: GalleryHorizontal,
     group: 'content',
   },
