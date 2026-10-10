@@ -131,6 +131,7 @@ export type AdminResponse<Row = unknown> = {
   deadline?: string | null
   registrationOpen?: boolean
   rows?: Row[]
+  carousel_kind?: 'brand' | 'race'
   online?: Row[]
   metrics?: Metrics
   url?: string
