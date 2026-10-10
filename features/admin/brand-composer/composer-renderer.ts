@@ -1,11 +1,11 @@
 import {
+  type CompositionFormat,
+  type CompositionLayout,
   compositionFormats,
   containRect,
   logoSlots,
-  type CompositionFormat,
-  type CompositionLayout,
 } from './composer-layout'
-import { composerImageSrc, type ComposerBrand } from './composer-library'
+import { type ComposerBrand, composerImageSrc } from './composer-library'
 
 export type ComposerSettings = {
   format: CompositionFormat
@@ -154,7 +154,9 @@ export async function renderComposition(
   }
 
   const slots = logoSlots(width, height, settings.brands.length, settings.layout, settings.scale)
-  const assets = await Promise.allSettled(settings.brands.map((brand) => asset(composerImageSrc(brand.src))))
+  const assets = await Promise.allSettled(
+    settings.brands.map((brand) => asset(composerImageSrc(brand.src))),
+  )
   const missing: string[] = []
   for (let i = 0; i < settings.brands.length; i++) {
     const brand = settings.brands[i]
@@ -194,7 +196,10 @@ export async function renderComposition(
   return missing
 }
 
-export async function exportComposition(canvas: HTMLCanvasElement, mime: 'image/png' | 'image/jpeg') {
+export async function exportComposition(
+  canvas: HTMLCanvasElement,
+  mime: 'image/png' | 'image/jpeg',
+) {
   return new Promise<Blob>((resolve, reject) => {
     try {
       canvas.toBlob(
