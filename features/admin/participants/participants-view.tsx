@@ -1,6 +1,16 @@
 'use client'
 
-import { ChevronDown, FileDown, ListFilter, Mail, Pencil, Printer, Trash2, UserCheck, Users } from 'lucide-react'
+import {
+  ChevronDown,
+  FileDown,
+  ListFilter,
+  Mail,
+  Pencil,
+  Printer,
+  Trash2,
+  UserCheck,
+  Users,
+} from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import type { ParticipantProfile } from '@/lib/participant-profile'
 import { callAdmin } from '../api'
@@ -306,7 +316,8 @@ export function ParticipantsView() {
     ]),
   ]
 
-  const extraFilterCount = [crew, gender, emailStatus].filter(Boolean).length + Number(sort !== 'newest')
+  const extraFilterCount =
+    [crew, gender, emailStatus].filter(Boolean).length + Number(sort !== 'newest')
   const pageCount = Math.max(1, Math.ceil(data.count / data.pageSize))
   const rangeStart = data.count ? (data.page - 1) * data.pageSize + 1 : 0
   const rangeEnd = data.count ? Math.min(rangeStart + data.rows.length - 1, data.count) : 0
@@ -369,7 +380,9 @@ export function ParticipantsView() {
               </button>
             ))}
           </div>
-          <p className="m-0 mb-3 text-[11px] text-neo-text-secondary md:hidden">Desliza para ver más estados</p>
+          <p className="m-0 mb-3 text-[11px] text-neo-text-secondary md:hidden">
+            Desliza para ver más estados
+          </p>
         </fieldset>
       )}
       <div className="mb-4 rounded-card border border-neo-border bg-neo-surface p-3 md:p-4">
@@ -388,7 +401,10 @@ export function ParticipantsView() {
                 {extraFilterCount}
               </span>
             )}
-            <ChevronDown aria-hidden className={`size-4 transition-transform ${filtersOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown
+              aria-hidden
+              className={`size-4 transition-transform ${filtersOpen ? 'rotate-180' : ''}`}
+            />
           </button>
           <p className="m-0 hidden items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-neo-text-secondary md:flex">
             <ListFilter aria-hidden className="size-4" /> Filtrar y ordenar
