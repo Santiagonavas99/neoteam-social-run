@@ -7,7 +7,7 @@ import {
   logoSlots,
 } from './composer-layout'
 import type { ComposerBrand } from './composer-library'
-import { templateLogoSlots, type LogoZone, type TemplateColumns } from './composer-template'
+import { type LogoZone, type TemplateColumns, templateLogoSlots } from './composer-template'
 
 export type ComposerSettings = {
   format: CompositionFormat
@@ -209,7 +209,9 @@ export async function renderComposition(
         rect.y,
         rect.width,
         rect.height,
-        settings.mode === 'template' ? rect.height * settings.radius : Math.min(20, rect.height * 0.14),
+        settings.mode === 'template'
+          ? rect.height * settings.radius
+          : Math.min(20, rect.height * 0.14),
       )
       ctx.fillStyle = '#ffffff'
       ctx.fill()
@@ -234,7 +236,9 @@ export async function renderComposition(
     const inset =
       settings.mode === 'template'
         ? Math.max(0, Math.min(0.3, settings.padding))
-        : settings.tiles ? 0.13 : 0.04
+        : settings.tiles
+          ? 0.13
+          : 0.04
     const inner = {
       x: rect.x + rect.width * inset,
       y: rect.y + rect.height * inset,
