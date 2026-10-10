@@ -150,10 +150,7 @@ test('races skip inactive brands and deduplicate native race names or images', (
     alliedRaceMarqueeItems([native], [reusable]).map(({ id }) => id),
     ['race-1'],
   )
-  assert.deepEqual(
-    alliedRaceMarqueeItems([], [{ ...reusable, active: false }]),
-    [],
-  )
+  assert.deepEqual(alliedRaceMarqueeItems([], [{ ...reusable, active: false }]), [])
 })
 
 test('race flag does not add logos to crews or organizations', () => {
