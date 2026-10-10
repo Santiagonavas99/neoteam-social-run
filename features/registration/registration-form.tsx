@@ -6,7 +6,6 @@ import type { FormEvent, ReactNode } from 'react'
 import { useActionState, useEffect, useRef, useState } from 'react'
 import { type RegistrationState, registerParticipant } from './actions'
 import { CalendarButton } from './calendar-button'
-import { registrationDeadlineLabel } from './registration-deadline'
 import { CommunityConnect } from './community-connect'
 import {
   CheckboxField,
@@ -21,6 +20,7 @@ import {
 } from './form-ui'
 import { splitFullName } from './full-name'
 import { PassCard } from './pass-card'
+import { registrationDeadlineLabel } from './registration-deadline'
 import motion from './registration-motion.module.css'
 import { RUNNING_GROUP_OPTIONS } from './running-groups'
 import { Streamers } from './streamers'
