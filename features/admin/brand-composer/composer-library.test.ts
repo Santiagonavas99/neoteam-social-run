@@ -2,7 +2,6 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import type { CommunityRecord, LogoItem } from '../types.ts'
 import { composerBrands } from './composer-library.ts'
-import { composerImageSrc } from './composer-image-source.ts'
 
 const brand = (id: string, name: string, active = true): CommunityRecord => ({
   id,
