@@ -73,7 +73,7 @@ export function BrandComposerView() {
   const [showGuide, setShowGuide] = useState(true)
   const [layout, setLayout] = useState<CompositionLayout>('grid')
   const [scale, setScale] = useState(0.92)
-  const [overlay, setOverlay] = useState(0.15)
+  const [overlay, setOverlay] = useState(0)
   const [tiles, setTiles] = useState(true)
   const [title, setTitle] = useState('')
   const [mime, setMime] = useState<'image/png' | 'image/jpeg'>('image/png')
