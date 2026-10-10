@@ -31,14 +31,15 @@ export const dynamic = 'force-dynamic'
 const numberedSections = new Set(['story', 'agenda', 'community', 'raffle', 'final'])
 
 export default async function Home() {
-  const [logoItems, raceItems, community, registered, sectionOrder, registrationSettings] = await Promise.all([
-    getHomeLogoCarouselItems('brand'),
-    getHomeLogoCarouselItems('race'),
-    getHomeCommunity(),
-    getRegisteredCount(),
-    getHomeSectionOrder(),
-    getRegistrationSettings(),
-  ])
+  const [logoItems, raceItems, community, registered, sectionOrder, registrationSettings] =
+    await Promise.all([
+      getHomeLogoCarouselItems('brand'),
+      getHomeLogoCarouselItems('race'),
+      getHomeCommunity(),
+      getRegisteredCount(),
+      getHomeSectionOrder(),
+      getRegistrationSettings(),
+    ])
 
   const otherBrands = community.brands.filter((brand) => brand.type !== 'organizer')
   const visibleSections = sectionOrder.filter((section) => section.visible)
