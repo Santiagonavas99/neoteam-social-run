@@ -1,5 +1,6 @@
 'use client'
 
+import { REVEAL_SUSPENSE_MS } from '@/features/dynamics/game-scene'
 import { ArrowUpRight, Dices, Eye, MonitorPlay, Play, RotateCcw, Trophy } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
@@ -20,6 +21,7 @@ export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onD
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const [syncUnavailable, setSyncUnavailable] = useState(false)
+  const [now, setNow] = useState(() => Date.now())
 
   const refresh = useCallback(async () => {
     const result = await callAdmin('dynamicData', { operation: 'stageStatus', id: dynamic.id })
@@ -36,6 +38,11 @@ export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onD
     )
     return () => window.clearInterval(poll)
   }, [dynamic.type, dynamic.status, refresh])
+
+  useEffect(() => {
+    const clock = window.setInterval(() => setNow(Date.now()), 250)
+    return () => window.clearInterval(clock)
+  }, [])
 
   async function command(action: 'ready' | 'countdown' | 'drawn' | 'next' | 'finish') {
     if (busy || !stage || syncUnavailable) return
@@ -64,6 +71,12 @@ export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onD
   const shown = stage?.shown_count ?? 0
   const action = gamePrimaryAction(dynamic.status, stage, total)
   const stageReady = stage !== null && !syncUnavailable
+  const lastRevealAt = stage?.updated_at ? Date.parse(stage.updated_at) : Number.NaN
+  const revealAnimating =
+    phase === 'reveal' &&
+    shown > 0 &&
+    Number.isFinite(lastRevealAt) &&
+    now - lastRevealAt < REVEAL_SUSPENSE_MS
 
   const labels = {
     countdown: 'Iniciar cuenta atrás',
@@ -132,7 +145,7 @@ export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onD
             <button
               type="button"
               className="button min-h-14 w-full justify-center text-base sm:w-auto"
-              disabled={busy || !stageReady}
+              disabled={busy || !stageReady || revealAnimating}
               onClick={primary}
             >
               {action === 'draw' ? (
@@ -149,6 +162,11 @@ export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onD
           ) : (
             <p className="m-0 rounded-control bg-neo-success-bg p-4 text-sm font-bold">
               Presentación terminada. Los resultados siguen guardados.
+            </p>
+          )}
+          {revealAnimating && (
+            <p className="m-0 mt-3 text-sm font-semibold text-neo-accent-text">
+              El público está descubriendo al ganador…
             </p>
           )}
           {dynamic.status === 'completed' && phase === 'reveal' && (
