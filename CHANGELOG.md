@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.34.0] - 2026-10-10
+
+### Added
+
+- **Acceso al administrador:** fondo AeroShards de React Bits, con movimiento turquesa tenue detrás del formulario de correo y código. Solo aparece antes de iniciar sesión; el panel interno no cambia.
+- **Accesibilidad y compatibilidad:** el efecto se carga únicamente en navegadores con WebGPU y movimiento permitido; en los demás se muestra el fondo oscuro de siempre, sin bloquear el acceso.
+
 ## [0.33.0] - 2026-10-09
 
 ### Added
