@@ -262,7 +262,7 @@ export function BrandComposerView() {
             <p className="m-0 mt-1 text-xs text-neo-text-secondary">
               Selecciona una foto base o utiliza el fondo NeoTeam predeterminado.
             </p>
-            <label className="mt-4 flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-control border border-dashed border-neo-border-strong px-3 py-3 text-sm font-semibold hover:bg-neo-muted-bg">
+            <label className="check-label mt-4 flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-control border border-dashed border-neo-border-strong px-3 py-3 text-sm font-semibold hover:bg-neo-muted-bg">
               <ImagePlus aria-hidden className="size-4" />
               {background ? 'Cambiar imagen base' : 'Subir imagen base'}
               <input
@@ -310,7 +310,7 @@ export function BrandComposerView() {
               <div>
                 <h3 className="m-0 text-base font-bold">02 · Elegir marcas</h3>
                 <p className="m-0 mt-1 text-xs text-neo-text-secondary">
-                  {readableSize(chosen.length)} en la composición
+                  {readableSize(chosen.length)} elegidas · {library.length} disponibles
                 </p>
               </div>
               <button
@@ -322,16 +322,17 @@ export function BrandComposerView() {
                 Añadir todas
               </button>
             </div>
-            <label className="mt-3 flex items-center gap-2 rounded-control border border-neo-border px-3">
+            <div className="mt-3 flex items-center gap-2 rounded-control border border-neo-border px-3">
               <Search aria-hidden className="size-4 shrink-0 text-neo-text-secondary" />
               <input
                 type="search"
+                aria-label="Buscar marcas aliadas"
                 className="min-w-0 flex-1 border-0! bg-transparent! p-2!"
                 placeholder="Buscar una marca…"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
               />
-            </label>
+            </div>
             {loading ? (
               <LoadingState>Cargando biblioteca…</LoadingState>
             ) : !library.length ? (
@@ -344,7 +345,7 @@ export function BrandComposerView() {
                 {available.map((brand) => (
                   <label
                     key={brand.id}
-                    className="flex cursor-pointer items-center gap-3 border-b border-neo-border px-3 py-2 last:border-b-0 hover:bg-neo-muted-bg"
+                    className="check-label flex cursor-pointer items-center gap-3 border-b border-neo-border px-3 py-2 last:border-b-0 hover:bg-neo-muted-bg"
                   >
                     <input
                       type="checkbox"
