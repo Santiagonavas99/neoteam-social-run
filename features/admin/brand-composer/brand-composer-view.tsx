@@ -18,13 +18,13 @@ import type { CommunityRecord, LogoItem } from '../types'
 import { Feedback, Logo } from '../ui/admin-ui'
 import { LoadingState } from '../ui/loading-state'
 import { useAdminData } from '../ui/use-admin-data'
+import { copyPngToClipboard } from './composer-clipboard'
 import {
   type CompositionFormat,
   type CompositionLayout,
   compositionFormats,
   compositionLayouts,
 } from './composer-layout'
-import { copyPngToClipboard } from './composer-clipboard'
 import { type ComposerBrand, composerBrands } from './composer-library'
 import { type ComposerSettings, exportComposition, renderComposition } from './composer-renderer'
 import {
