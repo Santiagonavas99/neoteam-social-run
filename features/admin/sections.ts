@@ -103,15 +103,15 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
   },
   {
     id: 'logos',
-    label: 'Marcas aliadas',
-    description: 'Sube, ordena y publica los logos de la cinta horizontal de la Home.',
+    label: 'Biblioteca de logos',
+    description: 'Gestiona logos compartidos entre marcas, carreras, crews y organizaciones.',
     icon: GalleryHorizontal,
     group: 'content',
   },
   {
     id: 'race-logos',
     label: 'Carreras aliadas',
-    description: 'Sube y organiza los logos de las carreras aliadas del evento.',
+    description: 'Reutiliza logos existentes o añade nuevas carreras desde la biblioteca.',
     icon: GalleryHorizontal,
     group: 'content',
   },
