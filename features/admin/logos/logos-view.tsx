@@ -20,7 +20,14 @@ import {
 import { LogoForm } from './logo-form'
 import { canOfferLegacyWebpMigration } from './migration-guards'
 
-export function LogosView({ enableLegacyWebpMigration }: { enableLegacyWebpMigration: boolean }) {
+export function LogosView({
+  enableLegacyWebpMigration,
+  kind = 'brand',
+}: {
+  enableLegacyWebpMigration: boolean
+  kind?: 'brand' | 'race'
+}) {
+  const raceMode = kind === 'race'
   const [editor, setEditor] = useState<LogoItem | null>(null)
   const [busy, setBusy] = useState(false)
   const [feedback, setFeedback] = useState<FeedbackValue>(null)
@@ -32,6 +39,7 @@ export function LogosView({ enableLegacyWebpMigration }: { enableLegacyWebpMigra
   const [migrationProgress, setMigrationProgress] = useState<MigrationProgress | null>(null)
   const migrationLocked = previewingMigration || migrating || pendingMigration !== null
   const showMigrationButton =
+    !raceMode &&
     canOfferLegacyWebpMigration(enableLegacyWebpMigration, migrationCount) &&
     pendingMigration === null &&
     !migrating
@@ -44,11 +52,19 @@ export function LogosView({ enableLegacyWebpMigration }: { enableLegacyWebpMigra
     (error: unknown) => fail(error, 'No pudimos cargar los logos.'),
     [fail],
   )
-  const load = useCallback(async () => (await callLogos<LogoItem>('list')).rows ?? [], [])
+  const load = useCallback(async () => {
+    const response = await callLogos<LogoItem>('list', { carousel_kind: kind })
+    // Older deployed edge functions ignore carousel_kind; fail closed rather than
+    // accidentally allowing race editors to modify the brands carousel.
+    if (raceMode && response.carousel_kind !== 'race') {
+      throw new Error('Actualiza la función admin-logos para gestionar Carreras aliadas.')
+    }
+    return response.rows ?? []
+  }, [kind, raceMode])
   const { data: rows, loading, reload } = useAdminData(load, [], onLoadError)
 
   useEffect(() => {
-    if (!enableLegacyWebpMigration) return
+    if (!enableLegacyWebpMigration || raceMode) return
     let active = true
     void listExistingImageCandidates()
       .then((candidates) => {
@@ -60,7 +76,7 @@ export function LogosView({ enableLegacyWebpMigration }: { enableLegacyWebpMigra
     return () => {
       active = false
     }
-  }, [enableLegacyWebpMigration, fail])
+  }, [enableLegacyWebpMigration, fail, raceMode])
 
   async function previewExistingImages() {
     setPreviewingMigration(true)
@@ -128,6 +144,7 @@ export function LogosView({ enableLegacyWebpMigration }: { enableLegacyWebpMigra
     setFeedback(null)
     try {
       await callLogos('save', {
+        carousel_kind: kind,
         values: {
           name: values.name,
           logo_url: values.logo_url,
@@ -142,7 +159,9 @@ export function LogosView({ enableLegacyWebpMigration }: { enableLegacyWebpMigra
       setEditor(null)
       setFeedback({
         kind: 'success',
-        text: 'Logo guardado. La cinta de la Home ya usa esta configuración.',
+        text: raceMode
+          ? 'Carrera guardada. Ya está configurada para su carrusel en la Home.'
+          : 'Logo guardado. La cinta de la Home ya usa esta configuración.',
       })
       await reload()
     } catch (error) {
@@ -160,7 +179,7 @@ export function LogosView({ enableLegacyWebpMigration }: { enableLegacyWebpMigra
     setBusy(true)
     setFeedback(null)
     try {
-      await callLogos('delete', { id: row.id })
+      await callLogos('delete', { id: row.id, carousel_kind: kind })
       setConfirmingId(null)
       if (editor?.id === row.id) setEditor(null)
       setFeedback({ kind: 'success', text: `${row.name} eliminado del carrusel.` })
@@ -173,17 +192,27 @@ export function LogosView({ enableLegacyWebpMigration }: { enableLegacyWebpMigra
   }
 
   const form = (row: LogoItem) => (
-    <LogoForm key={row.id} row={row} busy={busy} onSave={save} onCancel={() => setEditor(null)} />
+    <LogoForm
+      key={row.id}
+      row={row}
+      busy={busy}
+      kind={kind}
+      onSave={save}
+      onCancel={() => setEditor(null)}
+    />
   )
 
   return (
     <section aria-busy={loading}>
       <div className="mb-5 flex flex-col gap-3 md:mb-6 md:flex-row md:items-start md:justify-between">
         <div>
-          <h2 className="m-0 mb-1 text-[21px] font-bold tracking-[-0.035em]">Logos de la cinta</h2>
+          <h2 className="m-0 mb-1 text-[21px] font-bold tracking-[-0.035em]">
+            {raceMode ? 'Carreras aliadas' : 'Logos de marcas aliadas'}
+          </h2>
           <p className="m-0 max-w-[60ch] text-sm text-neo-text-secondary">
-            Sube cada logo una sola vez. La web duplica la lista automáticamente para crear el
-            movimiento infinito.
+            {raceMode
+              ? 'Gestiona aquí las carreras aliadas, con su logo, enlace, posición y visibilidad. No se mezclan con las marcas.'
+              : 'Sube cada logo una sola vez. La web duplica la lista automáticamente para crear el movimiento infinito.'}
           </p>
         </div>
         <div className="flex items-center gap-2 md:shrink-0 [&>.button]:flex-1 md:[&>.button]:flex-none">
@@ -209,7 +238,7 @@ export function LogosView({ enableLegacyWebpMigration }: { enableLegacyWebpMigra
             disabled={busy || !!editor || migrationLocked}
           >
             <Plus aria-hidden className="size-4 shrink-0" />
-            Añadir logo
+            {raceMode ? 'Añadir carrera' : 'Añadir logo'}
           </button>
         </div>
       </div>
@@ -259,13 +288,17 @@ export function LogosView({ enableLegacyWebpMigration }: { enableLegacyWebpMigra
       ) : !rows.length ? (
         <EmptyState
           icon={ImagePlus}
-          title="Añade los logos del carrusel"
-          text="Sube imágenes horizontales de marcas, aliados o patrocinadores. Se mostrarán en una cinta continua en la Home."
+          title={raceMode ? 'Añade carreras aliadas' : 'Añade los logos del carrusel'}
+          text={
+            raceMode
+              ? 'Sube el logo de cada carrera. Su carrusel aparecerá en la Home cuando haya carreras visibles.'
+              : 'Sube imágenes horizontales de marcas, aliados o patrocinadores. Se mostrarán en una cinta continua en la Home.'
+          }
           action={
             !editor && (
               <button type="button" className="button" onClick={addLogo}>
                 <Plus aria-hidden className="size-4 shrink-0" />
-                Añadir primer logo
+                {raceMode ? 'Añadir primera carrera' : 'Añadir primer logo'}
               </button>
             )
           }
