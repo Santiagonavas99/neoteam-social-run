@@ -28,7 +28,8 @@ export function composerBrands(
     const name = normalizedName(brand.name)
     if (!name || names.has(name)) continue
     names.add(name)
-    items.push({ id: `brand:${brand.id}`, name: brand.name, src: brand.logo_url!, origin: 'brands' })
+    if (!brand.logo_url) continue
+    items.push({ id: `brand:${brand.id}`, name: brand.name, src: brand.logo_url, origin: 'brands' })
   }
   for (const logo of sortedLogos) {
     const name = normalizedName(logo.name)
