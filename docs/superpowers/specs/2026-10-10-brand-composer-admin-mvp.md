@@ -32,3 +32,11 @@ No hay persistencia de plantillas ni un editor drag-and-drop. Las piezas se cons
 - Se sustituye el uso de `/_next/image` para exportación por `/api/composer-image`, que solo permite imágenes públicas de Storage NeoTeam (WebP/JPG/PNG); preserva la transparencia y rechaza redirects, URLs externas y archivos muy grandes.
 - En el render se incluye `credentials: 'same-origin'` para preservar cookies de los previews protegidos, fallback CORS al original si no responde la ruta local y advertencia explícita por logo que falle.
 - Pruebas de seguridad del proxy: no URLs privadas, dominios arbitrarios ni extensiones no soportadas.
+
+## Mejora: plantilla adaptable (10/oct)
+- **Modo plantilla** por defecto: preset `Marcas Aliadas · Vertical` para el arte 3:4 aportado. El usuario sube el fondo limpio; no se incrusta una imagen ajena en el código. Zona normalizada por defecto: X 7 %, Y 41 %, ancho 86 %, alto 40 %; puede moverse/agrandarse directamente en la vista previa o mediante sliders accesibles.
+- **Modo libre** conserva la distribución anterior en mosaico, franja inferior y centro.
+- Grilla auto: 4→2×2; 6→3×2; 8→4×2; 9→3×3; 12→4×3; 16→4×4; 17–20→5 columnas. Control opcional de 2–6 columnas, separación, padding dentro de tarjeta, esquinas redondeadas y tarjetas blancas.
+- El algoritmo calcula posiciones en píxeles del archivo final, por lo que la vista previa y la exportación siempre usan el mismo layout. El contorno cian de la zona solo es guía UI, nunca parte del JPG/PNG.
+- Tests puros comprueban límites, ausencia de solapamientos y repartos en 3:4, 4:5, story y horizontal.
+- No migraciones, no cambios de base de datos, no cambios al carrusel publicado.
