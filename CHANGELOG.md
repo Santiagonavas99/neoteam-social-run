@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Improved
+
+- **Plantillas adaptables en el compositor:** imagen base fija + zona de logos editable sobre la vista previa, distribución automática para 4, 6, 12, 16, 17 o más marcas, columnas manuales y personalización de separación, margen interno y esquinas. El modo libre sigue disponible y la guía no aparece en la imagen exportada.
+
+
 ## [0.33.1] - 2026-10-10
 
 ### Added
