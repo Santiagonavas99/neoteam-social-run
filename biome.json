@@ -57,9 +57,7 @@
   },
   "overrides": [
     {
-      "includes": [
-        "features/admin/**"
-      ],
+      "includes": ["features/admin/**"],
       "linter": {
         "rules": {
           "a11y": {
@@ -69,9 +67,7 @@
       }
     },
     {
-      "includes": [
-        "app/home-v2.css"
-      ],
+      "includes": ["app/home-v2.css"],
       "linter": {
         "rules": {
           "style": {
