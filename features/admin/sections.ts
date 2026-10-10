@@ -4,6 +4,7 @@ import {
   GalleryHorizontal,
   LayoutDashboard,
   ListOrdered,
+  Layers3,
   type LucideIcon,
   Mail,
   Tag,
@@ -19,6 +20,7 @@ export type AdminSection =
   | 'metrics'
   | 'home-order'
   | 'logos'
+  | 'brand-composer'
   | 'participants'
   | 'registration-settings'
   | 'email-queue'
@@ -98,6 +100,13 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     label: 'Orden de la Home',
     description: 'Ordena las secciones y muestra u oculta las que necesites.',
     icon: ListOrdered,
+    group: 'content',
+  },
+  {
+    id: 'brand-composer',
+    label: 'Compositor de marcas',
+    description: 'Crea piezas con logos aliados y exporta PNG o JPG.',
+    icon: Layers3,
     group: 'content',
   },
   {
