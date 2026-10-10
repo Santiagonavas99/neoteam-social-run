@@ -5,10 +5,12 @@
  */
 export function copyPngToClipboard(
   createPng: () => Promise<Blob>,
-  clipboard: Pick<Clipboard, 'write'> | undefined =
-    typeof navigator === 'undefined' ? undefined : navigator.clipboard,
-  ClipboardItemType: typeof ClipboardItem | undefined =
-    typeof ClipboardItem === 'undefined' ? undefined : ClipboardItem,
+  clipboard: Pick<Clipboard, 'write'> | undefined = typeof navigator === 'undefined'
+    ? undefined
+    : navigator.clipboard,
+  ClipboardItemType: typeof ClipboardItem | undefined = typeof ClipboardItem === 'undefined'
+    ? undefined
+    : ClipboardItem,
 ): Promise<void> {
   if (!clipboard?.write || !ClipboardItemType) {
     return Promise.reject(
