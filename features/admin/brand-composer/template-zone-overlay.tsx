@@ -1,7 +1,7 @@
 'use client'
 
 import { type PointerEvent, type RefObject, useRef } from 'react'
-import { moveLogoZone, type LogoZone } from './composer-template'
+import { type LogoZone, moveLogoZone } from './composer-template'
 
 type Props = {
   zone: LogoZone
