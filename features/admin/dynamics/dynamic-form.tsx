@@ -27,11 +27,14 @@ export function DynamicForm({
     : [...dynamicFormTypes, row.type]
   const raffle = values.type === 'raffle'
   const instantWin = values.type === 'instant_win'
+  const challenge = values.type === 'challenge'
 
   return (
     <EditorForm
       title={isNew(row) ? 'Nueva dinámica' : `Editar ${row.name}`}
-      hint="Configura cómo participa la gente y qué gana."
+      hint={challenge
+        ? 'Explica qué debe completar el corredor. El personal verifica y registra el resultado con QR.'
+        : 'Configura cómo participa la gente y qué gana.'}
       legend="Datos de la dinámica"
       submitLabel="Guardar dinámica"
       busy={busy}
@@ -61,13 +64,21 @@ export function DynamicForm({
         </select>
       </label>
       <label className="col-span-full">
-        Descripción
+        {challenge ? '¿Qué debe hacer el corredor para completar el reto? *' : 'Descripción'}
         <textarea
-          rows={2}
+          rows={challenge ? 4 : 2}
+          required={challenge}
+          minLength={challenge ? 10 : undefined}
+          maxLength={1000}
           value={values.description ?? ''}
-          placeholder="Qué debe hacer el corredor."
+          placeholder={challenge
+            ? 'Ej. Realiza el recorrido. El personal verifica que terminó y escanea su pase.'
+            : 'Qué debe hacer el corredor.'}
           onChange={(e) => update('description', e.target.value)}
         />
+        {challenge && (
+          <small>El reto se confirma con un escaneo por corredor. Esta versión no mide tiempos ni calcula el más rápido automáticamente.</small>
+        )}
       </label>
       <label>
         Estado
@@ -79,6 +90,13 @@ export function DynamicForm({
         </select>
         <small>Borrador no recibe participaciones; actívala para escanear o sortear.</small>
       </label>
+      {challenge && (
+        <p className="col-span-full m-0 rounded-control border border-neo-accent-border bg-neo-accent-soft p-4 text-sm text-neo-text-secondary">
+          <strong className="text-neo-accent-text">Cómo funcionará:</strong> al completar el reto,
+          el personal entra en «En vivo» y escanea el QR del corredor. Cada persona puede
+          registrar la finalización una sola vez.
+        </p>
+      )}
       {!raffle && (
         <label>
           Puntos
