@@ -348,7 +348,7 @@ export function DynamicCreateWizard({
             <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
               <div>
                 <dt className="text-neo-text-secondary">Validación</dt>
-                <dd className="m-0 font-bold">Personal   escaneo QR</dd>
+                <dd className="m-0 font-bold">Personal · escaneo QR</dd>
               </div>
               <div>
                 <dt className="text-neo-text-secondary">Participaciones</dt>
