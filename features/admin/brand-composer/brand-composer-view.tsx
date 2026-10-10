@@ -3,6 +3,7 @@
 import {
   ArrowDown,
   ArrowUp,
+  Copy,
   Download,
   ImagePlus,
   Layers3,
@@ -23,6 +24,7 @@ import {
   compositionFormats,
   compositionLayouts,
 } from './composer-layout'
+import { copyPngToClipboard } from './composer-clipboard'
 import { type ComposerBrand, composerBrands } from './composer-library'
 import { type ComposerSettings, exportComposition, renderComposition } from './composer-renderer'
 import {
@@ -79,6 +81,7 @@ export function BrandComposerView() {
   const [mime, setMime] = useState<'image/png' | 'image/jpeg'>('image/png')
   const [rendering, setRendering] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [copying, setCopying] = useState(false)
   const [missing, setMissing] = useState<string[]>([])
   const previewRef = useRef<HTMLCanvasElement>(null)
   const requestRef = useRef(0)
@@ -231,19 +234,23 @@ export function BrandComposerView() {
     setOverrides((previous) => ({ ...previous, [id]: url }))
   }
 
+  async function createImage(mimeType: 'image/png' | 'image/jpeg') {
+    const canvas = document.createElement('canvas')
+    const errors = await renderComposition(canvas, settings)
+    if (errors.length) {
+      throw new Error(
+        `No se pudieron cargar: ${errors.join(', ')}. Puedes reemplazar esos logos con PNG/JPG desde la lista de marcas.`,
+      )
+    }
+    return exportComposition(canvas, mimeType)
+  }
+
   async function download() {
-    if (!chosen.length || exporting) return
+    if (!chosen.length || exporting || copying) return
     setExporting(true)
     setFeedback(null)
     try {
-      const canvas = document.createElement('canvas')
-      const errors = await renderComposition(canvas, settings)
-      if (errors.length) {
-        throw new Error(
-          `No se pudieron cargar: ${errors.join(', ')}. Puedes reemplazar esos logos con PNG/JPG desde la lista de marcas.`,
-        )
-      }
-      const blob = await exportComposition(canvas, mime)
+      const blob = await createImage(mime)
       const fileUrl = URL.createObjectURL(blob)
       const anchor = document.createElement('a')
       anchor.href = fileUrl
@@ -260,6 +267,35 @@ export function BrandComposerView() {
       onError(error)
     } finally {
       setExporting(false)
+    }
+  }
+
+  async function copyImage() {
+    if (!chosen.length || copying || exporting) return
+    setCopying(true)
+    setFeedback(null)
+    try {
+      // ClipboardItem receives a PNG promise before the first await so Safari
+      // keeps the user gesture even while the final canvas is being rendered.
+      await copyPngToClipboard(() => createImage('image/png'))
+      setFeedback({
+        kind: 'success',
+        text: `Imagen copiada al portapapeles con ${readableSize(chosen.length)} (${output.width} × ${output.height} px). Pégala con ⌘V o Ctrl+V.`,
+      })
+    } catch (error) {
+      if (
+        error instanceof DOMException &&
+        (error.name === 'NotAllowedError' || error.name === 'SecurityError')
+      ) {
+        setFeedback({
+          kind: 'error',
+          text: 'Tu navegador bloqueó el acceso al portapapeles. Permite copiar imágenes o utiliza «Exportar imagen».',
+        })
+      } else {
+        onError(error)
+      }
+    } finally {
+      setCopying(false)
     }
   }
 
@@ -721,8 +757,21 @@ export function BrandComposerView() {
             </label>
             <button
               type="button"
-              className="button mt-auto min-h-12 flex-2 justify-center"
-              disabled={!chosen.length || loading || rendering || exporting || missing.length > 0}
+              className="button button-secondary mt-auto min-h-12 min-w-32 flex-1 justify-center"
+              disabled={
+                !chosen.length || loading || rendering || copying || exporting || missing.length > 0
+              }
+              onClick={() => void copyImage()}
+            >
+              <Copy aria-hidden className="size-4" />
+              {copying ? 'Copiando…' : 'Copiar imagen'}
+            </button>
+            <button
+              type="button"
+              className="button mt-auto min-h-12 min-w-32 flex-1 justify-center"
+              disabled={
+                !chosen.length || loading || rendering || exporting || copying || missing.length > 0
+              }
               onClick={() => void download()}
             >
               <Download aria-hidden className="size-4" />
