@@ -27,7 +27,8 @@ export function gameScene(game: PublicGame, now: number): GameScene {
   if (game.phase === 'finished') return { kind: 'finished', winners }
   if (winners.length === 0) return { kind: 'drawn' }
 
-  const winner = winners[winners.length - 1]
+  const winner = winners.at(-1)
+  if (!winner) return { kind: 'drawn' }
   const previous = winners.slice(0, -1)
 
   // The operator has authorized the next reveal, but the name stays outside
