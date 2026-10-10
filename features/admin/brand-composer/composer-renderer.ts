@@ -199,7 +199,7 @@ export async function exportComposition(canvas: HTMLCanvasElement, mime: 'image/
     try {
       canvas.toBlob(
         (blob) => {
-          if (!blob || !blob.size || blob.type !== mime) {
+          if (!blob?.size || blob.type !== mime) {
             reject(new Error('Tu navegador no pudo generar este formato de imagen.'))
             return
           }
