@@ -17,8 +17,8 @@ test('combines visible brands and allied carousel logos without duplicate names'
     [logo('3', 'CAFÉ NORTE'), logo('4', 'Marca nueva'), logo('5', 'Solo crew', false)],
   )
   assert.deepEqual(rows.map((item) => item.name), ['Café Norte', 'Marca nueva'])
-  assert.equal(rows[0].origin, 'brands')
-  assert.equal(rows[1].origin, 'logos')
+  assert.equal(rows[0]?.origin, 'brands')
+  assert.equal(rows[1]?.origin, 'logos')
 })
 
 test('uses image optimizer only for this project public Supabase assets', () => {
