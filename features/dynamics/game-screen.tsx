@@ -2,9 +2,9 @@
 
 import { Expand, RotateCcw, Trophy, Users } from 'lucide-react'
 import { type CSSProperties, useCallback, useEffect, useState } from 'react'
-import { canAdvanceDemo, gameScene, type GameScene } from './game-scene'
-import { demoGame, type PublicGame } from './game-state'
+import { canAdvanceDemo, type GameScene, gameScene } from './game-scene'
 import styles from './game-screen.module.css'
+import { demoGame, type PublicGame } from './game-state'
 
 const CONFETTI = Array.from({ length: 30 }, (_, index) => ({
   left: `${(index * 37 + 11) % 100}%`,
@@ -69,7 +69,9 @@ function RaffleScene({ scene, game }: { scene: GameScene; game: PublicGame }) {
     return (
       <div className={styles.scene}>
         <p className={styles.stageLabel}>La suerte está por decidirse</p>
-        <h2 className={styles.heroText}>¿QUIÉN <span className={styles.heroAccent}>GANA?</span></h2>
+        <h2 className={styles.heroText}>
+          ¿QUIÉN <span className={styles.heroAccent}>GANA?</span>
+        </h2>
         <p className={styles.subcopy}>Atentos… el próximo ganador podría estar aquí.</p>
       </div>
     )
@@ -127,8 +129,12 @@ function RaffleScene({ scene, game }: { scene: GameScene; game: PublicGame }) {
         <Confetti id={`${scene.winner.rank}-${game.updatedAt}`} />
         <p className={styles.stageLabel}>¡Tenemos ganador!</p>
         <h2 className={styles.winnerTitle}>GANADOR #{scene.winner.rank}</h2>
-        <p className={styles.winnerName} aria-live="polite">{scene.winner.name}</p>
-        <p className={styles.progress}>{game.shownCount} de {game.winnerCount} revelados</p>
+        <p className={styles.winnerName} aria-live="polite">
+          {scene.winner.name}
+        </p>
+        <p className={styles.progress}>
+          {game.shownCount} de {game.winnerCount} revelados
+        </p>
         <WinnerHistory winners={scene.previous} />
       </div>
     )
