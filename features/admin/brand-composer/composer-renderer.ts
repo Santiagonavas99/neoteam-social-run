@@ -44,19 +44,37 @@ async function decodeImage(blob: Blob): Promise<CanvasImageSource> {
   })
 }
 
+async function loadAsset(src: string): Promise<CanvasImageSource> {
+  // First use our same-origin proxy; if deployment protection or the proxy
+  // fails, try the original public Storage URL with browser CORS as backup.
+  const preferred = composerImageSrc(src)
+  const candidates = preferred === src ? [src] : [preferred, src]
+  let lastError: unknown
+
+  for (const candidate of candidates) {
+    try {
+      const response = await fetch(candidate, {
+        credentials: 'same-origin',
+        cache: 'force-cache',
+      })
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const blob = await response.blob()
+      if (!blob.type.startsWith('image/')) throw new Error('El servidor no devolvió una imagen.')
+      return await decodeImage(blob)
+    } catch (error) {
+      lastError = error
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error('Imagen no disponible.')
+}
+
 function asset(src: string) {
   let promise = cache.get(src)
   if (!promise) {
-    promise = fetch(src, { credentials: 'same-origin', cache: 'force-cache' })
-      .then((response) => {
-        if (!response.ok) throw new Error(`No disponible (${response.status})`)
-        return response.blob()
-      })
-      .then(decodeImage)
-      .catch((error: unknown) => {
-        cache.delete(src)
-        throw error
-      })
+    promise = loadAsset(src).catch((error: unknown) => {
+      cache.delete(src)
+      throw error
+    })
     cache.set(src, promise)
   }
   return promise
@@ -155,9 +173,7 @@ export async function renderComposition(
   }
 
   const slots = logoSlots(width, height, settings.brands.length, settings.layout, settings.scale)
-  const assets = await Promise.allSettled(
-    settings.brands.map((brand) => asset(composerImageSrc(brand.src))),
-  )
+  const assets = await Promise.allSettled(settings.brands.map((brand) => asset(brand.src)))
   const missing: string[] = []
   for (let i = 0; i < settings.brands.length; i++) {
     const brand = settings.brands[i]
@@ -177,6 +193,18 @@ export async function renderComposition(
     }
     if (outcome.status === 'rejected') {
       missing.push(brand.name)
+      // A failed image must not look like an intentionally empty white tile.
+      ctx.save()
+      ctx.strokeStyle = '#e66a68'
+      ctx.lineWidth = Math.max(2, width * 0.002)
+      rounded(ctx, rect.x, rect.y, rect.width, rect.height, Math.min(20, rect.height * 0.14))
+      ctx.stroke()
+      ctx.fillStyle = '#9b2626'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.font = `700 ${Math.max(12, Math.min(24, rect.width / 10))}px Arial, sans-serif`
+      ctx.fillText('SIN LOGO', rect.x + rect.width / 2, rect.y + rect.height / 2, rect.width * 0.9)
+      ctx.restore()
       continue
     }
     const inset = settings.tiles ? 0.13 : 0.04
