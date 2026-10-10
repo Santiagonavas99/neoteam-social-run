@@ -33,8 +33,14 @@ test('Marcas aliadas includes all active carousel logos regardless of organizati
   assert.equal(rows.length, 17)
   assert.equal(rows[0]?.name, 'Aliado 1')
   assert.equal(rows[16]?.name, 'Aliado 17')
-  assert.equal(rows.some((row) => row.name === 'NeoTeam'), false)
-  assert.equal(rows.every((row) => row.origin === 'logos'), true)
+  assert.equal(
+    rows.some((row) => row.name === 'NeoTeam'),
+    false,
+  )
+  assert.equal(
+    rows.every((row) => row.origin === 'logos'),
+    true,
+  )
 })
 
 test('deduplicates by normalized name and prefers original carousel logo', () => {
@@ -42,7 +48,10 @@ test('deduplicates by normalized name and prefers original carousel logo', () =>
     [brand('1', 'Café Norte'), brand('2', 'Oculta', false)],
     [logo('3', 'CAFÉ NORTE'), logo('4', 'Marca nueva'), logo('5', 'Solo crew', false)],
   )
-  assert.deepEqual(rows.map((item) => item.name), ['CAFÉ NORTE', 'Marca nueva', 'Solo crew'])
+  assert.deepEqual(
+    rows.map((item) => item.name),
+    ['CAFÉ NORTE', 'Marca nueva', 'Solo crew'],
+  )
   assert.equal(rows[0]?.origin, 'logos')
   assert.equal(rows[0]?.src, 'https://example.com/3.png')
 })
@@ -52,7 +61,10 @@ test('does not add hidden or broken brands, but retains valid partner brand reco
   const missing = { ...brand('missing', 'No foto'), logo_url: null }
   const inactive = { ...logo('bad', 'Inactivo'), active: false }
   const rows = composerBrands([organizer, missing, brand('partner', 'Partner')], [inactive])
-  assert.deepEqual(rows.map((row) => row.name), ['Partner'])
+  assert.deepEqual(
+    rows.map((row) => row.name),
+    ['Partner'],
+  )
 })
 
 test('uses image optimizer only for this project public Supabase assets', () => {
