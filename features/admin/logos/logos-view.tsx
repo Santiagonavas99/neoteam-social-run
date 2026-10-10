@@ -253,7 +253,7 @@ export function LogosView({
             className={raceMode ? 'button button-secondary' : 'button'}
             aria-pressed={!raceMode}
             onClick={() => onNavigateKind('brand')}
-            disabled={busy || migrationLocked}
+            disabled={busy || !!editor || migrationLocked}
           >
             Marcas aliadas
           </button>
@@ -262,7 +262,7 @@ export function LogosView({
             className={raceMode ? 'button' : 'button button-secondary'}
             aria-pressed={raceMode}
             onClick={() => onNavigateKind('race')}
-            disabled={busy || migrationLocked}
+            disabled={busy || !!editor || migrationLocked}
           >
             Carreras aliadas
           </button>
