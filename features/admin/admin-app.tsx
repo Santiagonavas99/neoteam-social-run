@@ -33,6 +33,7 @@ export function AdminApp({ enableLegacyWebpMigration }: { enableLegacyWebpMigrat
         section={section}
         onNavigate={setSection}
         onSignOut={() => void session.signOut()}
+        showPresence={session.role === 'admin'}
       >
         {section === 'checkin' ? (
           <CheckinView />
