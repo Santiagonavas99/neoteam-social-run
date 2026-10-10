@@ -17,9 +17,9 @@ const CONFETTI = Array.from({ length: 30 }, (_, index) => ({
 function Confetti({ id }: { id: string }) {
   return (
     <div className={styles.particles} key={id} aria-hidden="true">
-      {CONFETTI.map((piece, index) => (
+      {CONFETTI.map((piece) => (
         <i
-          key={index}
+          key={`${piece.left}-${piece.tilt}`}
           className={styles.particle}
           style={
             {
@@ -79,11 +79,7 @@ function RaffleScene({ scene, game }: { scene: GameScene; game: PublicGame }) {
     return (
       <div className={styles.scene}>
         <p className={styles.stageLabel}>Todo se decide en</p>
-        <span
-          key={scene.remaining}
-          className={styles.countNumber}
-          aria-label={`${scene.remaining}`}
-        >
+        <span key={scene.remaining} className={styles.countNumber}>
           {scene.remaining}
         </span>
         <div className={styles.countBar} aria-hidden="true" />
@@ -209,7 +205,7 @@ export function GameScreen({ id, demo }: { id: string; demo: boolean }) {
   }, [demo, refresh])
 
   useEffect(() => {
-    const clock = window.setInterval(() => setNow(Date.now()), 80)
+    const clock = window.setInterval(() => setNow(Date.now()), 125)
     return () => window.clearInterval(clock)
   }, [])
 
@@ -225,7 +221,8 @@ export function GameScreen({ id, demo }: { id: string; demo: boolean }) {
         winners: demoGame.winners.slice(0, demoCount),
       }
     : game
-  const demoCanAdvance = current ? canAdvanceDemo(current, now) : false
+  const demoCanAdvance =
+    rehearsalPhase !== 'countdown' && current ? canAdvanceDemo(current, now) : false
 
   function startOrAdvanceDemo() {
     if (!demo || !current || !demoCanAdvance) return
