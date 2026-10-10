@@ -18,6 +18,7 @@ export type HomeLogoCarouselItem = {
   link_url: string | null
   active: boolean
   sort_order: number
+  show_in_races: boolean
   show_in_running_crews: boolean
   show_in_organizations: boolean
 }
@@ -39,7 +40,7 @@ export async function getHomeLogoCarouselItems(
       return filterKind ? request.eq('carousel_kind', kind) : request
     }
 
-    const columns = `${baseColumns},show_in_running_crews,show_in_organizations`
+    const columns = `${baseColumns},show_in_races,show_in_running_crews,show_in_organizations`
     let { data, error } = await query(columns)
     let filterKind = true
 
@@ -61,7 +62,7 @@ export async function getHomeLogoCarouselItems(
     if (
       error &&
       ['42703', 'PGRST204'].includes(error.code) &&
-      /show_in_running_crews|show_in_organizations/.test(error.message)
+      /show_in_races|show_in_running_crews|show_in_organizations/.test(error.message)
     ) {
       const fallback = await query(baseColumns, filterKind)
       data = fallback.data
@@ -71,6 +72,7 @@ export async function getHomeLogoCarouselItems(
     if (error) throw error
     return ((data ?? []) as unknown as HomeLogoCarouselItem[]).map((item) => ({
       ...item,
+      show_in_races: item.show_in_races === true,
       show_in_running_crews: item.show_in_running_crews === true,
       show_in_organizations: item.show_in_organizations === true,
     }))
