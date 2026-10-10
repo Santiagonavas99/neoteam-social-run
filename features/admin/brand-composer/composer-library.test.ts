@@ -20,6 +20,7 @@ const logo = (id: string, name: string, shown = false): LogoItem => ({
   sort_order: 0,
   show_in_organizations: shown,
   show_in_running_crews: false,
+  show_in_races: false,
 })
 
 test('Marcas aliadas includes all active carousel logos regardless of organization flag', () => {
