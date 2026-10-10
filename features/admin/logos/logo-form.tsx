@@ -10,15 +10,17 @@ export function LogoForm({
   busy: listBusy,
   onSave,
   onCancel,
+  kind = 'brand',
 }: {
   row: LogoItem
   busy: boolean
   onSave: (row: LogoItem) => Promise<void>
   onCancel: () => void
+  kind?: 'brand' | 'race'
 }) {
   const newRecord = isNew(row)
   const { values, update, busy, feedback, setFeedback, submit } = useEditor(row, onSave, (logo) => {
-    if (!logo.name.trim()) return 'Escribe el nombre del club o marca antes de guardar.'
+    if (!logo.name.trim()) return kind === 'race' ? 'Escribe el nombre de la carrera.' : 'Escribe el nombre del club o marca antes de guardar.'
     return logo.logo_url ? null : 'Sube una imagen antes de guardar el logo.'
   })
   const { uploading, upload, uploadFeedback } = useImageUpload({
@@ -42,15 +44,15 @@ export function LogoForm({
       <FormStep
         number="01"
         title="¿De quién es este logo?"
-        description="Escribe el nombre del club, marca u organización."
+        description={kind === 'race' ? 'Escribe el nombre oficial de la carrera.' : 'Escribe el nombre del club, marca u organización.'}
       />
       <label className="col-span-full">
-        Nombre del club, marca u organización *
+        {kind === 'race' ? 'Nombre de la carrera *' : 'Nombre del club, marca u organización *'}
         <input
           required
           maxLength={120}
           autoComplete="organization"
-          placeholder="Ej. Neo Team Running Club"
+          placeholder={kind === 'race' ? 'Ej. Media Maratón de Cali' : 'Ej. Neo Team Running Club'}
           value={values.name}
           onChange={(event) => update('name', event.target.value)}
         />
@@ -74,7 +76,7 @@ export function LogoForm({
       <FormStep
         number="03"
         title="Dónde mostrarlo"
-        description="Puedes utilizar el mismo logo en varias cintas."
+        description={kind === 'race' ? 'Controla si esta carrera aparece en su carrusel.' : 'Puedes utilizar el mismo logo en varias cintas.'}
       />
       <div className="col-span-full grid gap-4 rounded-xl border border-neo-border bg-neo-bg p-4">
         <label className="check-label">
@@ -83,8 +85,10 @@ export function LogoForm({
             checked={values.active}
             onChange={(event) => update('active', event.target.checked)}
           />
-          Mostrar en el carrusel principal
+          {kind === 'race' ? 'Mostrar en Carreras aliadas' : 'Mostrar en Marcas aliadas'}
         </label>
+        {kind === 'brand' && (
+          <>
         <label className="check-label">
           <input
             type="checkbox"
@@ -104,6 +108,8 @@ export function LogoForm({
         <small className="font-normal text-neo-text-secondary">
           Se reutiliza la misma imagen; no crea registros adicionales.
         </small>
+          </>
+        )}
       </div>
 
       <details
