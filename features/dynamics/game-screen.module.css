@@ -14,7 +14,8 @@
   position: absolute;
   z-index: -1;
   inset: 0;
-  background-image: linear-gradient(to right, rgb(3 248 246 / 4%) 1px, transparent 1px),
+  background-image:
+    linear-gradient(to right, rgb(3 248 246 / 4%) 1px, transparent 1px),
     linear-gradient(to bottom, rgb(3 248 246 / 4%) 1px, transparent 1px);
   background-size: 64px 64px;
   content: "";
@@ -32,7 +33,9 @@
   aspect-ratio: 1;
   border: 1px solid rgb(3 248 246 / 10%);
   border-radius: 50%;
-  box-shadow: 0 0 0 65px rgb(3 248 246 / 2%), 0 0 0 130px rgb(3 248 246 / 1%);
+  box-shadow:
+    0 0 0 65px rgb(3 248 246 / 2%),
+    0 0 0 130px rgb(3 248 246 / 1%);
   content: "";
   transform: translateX(-50%);
   pointer-events: none;
@@ -221,7 +224,9 @@
   padding: clamp(16px, 3.4vw, 43px) clamp(15px, 3vw, 54px);
   border: 1px solid rgb(3 248 246 / 33%);
   border-radius: 22px;
-  box-shadow: inset 0 0 65px rgb(3 248 246 / 5%), 0 0 90px rgb(3 248 246 / 8%);
+  box-shadow:
+    inset 0 0 65px rgb(3 248 246 / 5%),
+    0 0 90px rgb(3 248 246 / 8%);
   background: rgb(3 248 246 / 4%);
   transform: skewX(-3deg);
 }
@@ -434,58 +439,130 @@
 }
 
 @keyframes live {
-  50% { opacity: 0.45; box-shadow: 0 0 8px rgb(3 248 246 / 30%); }
+  50% {
+    opacity: 0.45;
+    box-shadow: 0 0 8px rgb(3 248 246 / 30%);
+  }
 }
 
 @keyframes numberHit {
-  from { opacity: 0; transform: scale(1.35); filter: blur(14px); }
-  to { opacity: 1; transform: scale(1); filter: blur(0); }
+  from {
+    opacity: 0;
+    transform: scale(1.35);
+    filter: blur(14px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
 }
 
 @keyframes countdownSweep {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 
 @keyframes slotShake {
-  from { transform: translateY(-10px); opacity: 0.45; }
-  to { transform: translateY(10px); opacity: 1; }
+  from {
+    transform: translateY(-10px);
+    opacity: 0.45;
+  }
+  to {
+    transform: translateY(10px);
+    opacity: 1;
+  }
 }
 
 @keyframes winnerReveal {
-  from { opacity: 0; transform: translateY(50px) scale(0.83); filter: blur(14px); }
-  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.83);
+    filter: blur(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
 }
 
 @keyframes haloIn {
-  from { opacity: 0; transform: scale(0.5); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes confettiDrop {
-  0% { opacity: 0; transform: translateY(0) rotate(var(--tilt)) scale(0.6); }
-  12% { opacity: 1; }
-  100% { opacity: 0; transform: translateY(103vh) rotate(720deg) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateY(0) rotate(var(--tilt)) scale(0.6);
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(103vh) rotate(720deg) scale(1);
+  }
 }
 
 @media (max-width: 640px) {
-  .main { padding: 35px 0 24px; }
-  .stage::after { top: 32%; width: 105vw; }
-  .brand { letter-spacing: 0.08em; }
-  .fullscreen { padding-inline: 10px; font-size: 11px; }
-  .heroText { font-size: clamp(49px, 15vw, 83px); }
-  .winnerTitle { font-size: clamp(61px, 17vw, 92px); }
-  .winnerName { font-size: clamp(36px, 10vw, 64px); }
-  .slot span { font-size: clamp(53px, 16vw, 80px); }
-  .demoBar { width: 100%; gap: 8px; }
-  .demoPrimary { flex: 1; }
-  .footer { gap: 8px; }
+  .main {
+    padding: 35px 0 24px;
+  }
+  .stage::after {
+    top: 32%;
+    width: 105vw;
+  }
+  .brand {
+    letter-spacing: 0.08em;
+  }
+  .fullscreen {
+    padding-inline: 10px;
+    font-size: 11px;
+  }
+  .heroText {
+    font-size: clamp(49px, 15vw, 83px);
+  }
+  .winnerTitle {
+    font-size: clamp(61px, 17vw, 92px);
+  }
+  .winnerName {
+    font-size: clamp(36px, 10vw, 64px);
+  }
+  .slot span {
+    font-size: clamp(53px, 16vw, 80px);
+  }
+  .demoBar {
+    width: 100%;
+    gap: 8px;
+  }
+  .demoPrimary {
+    flex: 1;
+  }
+  .footer {
+    gap: 8px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .stage *, .stage *::before, .stage *::after {
+  .stage *,
+  .stage *::before,
+  .stage *::after {
     animation: none;
     transition: none;
   }
-  .slot span { filter: none; }
+  .slot span {
+    filter: none;
+  }
 }
