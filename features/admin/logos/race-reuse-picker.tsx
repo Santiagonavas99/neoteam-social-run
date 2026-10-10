@@ -54,7 +54,9 @@ export function RaceReusePicker({
         <div>
           <div className="mb-2 flex items-center gap-2 text-neo-accent-text">
             <Link2 aria-hidden className="size-4" />
-            <span className="text-xs font-bold uppercase tracking-[0.12em]">Biblioteca compartida</span>
+            <span className="text-xs font-bold uppercase tracking-[0.12em]">
+              Biblioteca compartida
+            </span>
           </div>
           <h3 className="m-0 text-lg font-bold">Usar logos que ya subiste</h3>
           <p className="m-0 mt-1 max-w-[65ch] text-sm text-neo-text-secondary">
@@ -83,7 +85,9 @@ export function RaceReusePicker({
       </div>
 
       {loading ? (
-        <p className="text-sm text-neo-text-secondary" role="status">Cargando biblioteca de logos…</p>
+        <p className="text-sm text-neo-text-secondary" role="status">
+          Cargando biblioteca de logos…
+        </p>
       ) : brands.length === 0 ? (
         <div className="rounded-xl bg-neo-muted-bg p-4 text-sm">
           Todavía no tienes logos de marcas. Sube uno y podrás reutilizarlo aquí.
@@ -92,7 +96,9 @@ export function RaceReusePicker({
           </button>
         </div>
       ) : filtered.length === 0 ? (
-        <p className="text-sm text-neo-text-secondary">No hay logos que coincidan con esa búsqueda.</p>
+        <p className="text-sm text-neo-text-secondary">
+          No hay logos que coincidan con esa búsqueda.
+        </p>
       ) : (
         <>
           <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
@@ -106,9 +112,15 @@ export function RaceReusePicker({
                 >
                   <Logo url={brand.logo_url} name={brand.name} />
                   <div className="min-w-0 flex-1">
-                    <p className="m-0 truncate text-sm font-semibold" title={brand.name}>{brand.name}</p>
+                    <p className="m-0 truncate text-sm font-semibold" title={brand.name}>
+                      {brand.name}
+                    </p>
                     <p className="m-0 text-xs text-neo-text-secondary">
-                      {brand.active ? (selected ? 'Visible en carreras' : 'Disponible') : 'Marca oculta'}
+                      {brand.active
+                        ? selected
+                          ? 'Visible en carreras'
+                          : 'Disponible'
+                        : 'Marca oculta'}
                     </p>
                   </div>
                   <button
@@ -122,7 +134,9 @@ export function RaceReusePicker({
                     disabled={disabled}
                     aria-pressed={selected}
                     aria-label={`${selected ? 'Quitar' : 'Añadir'} ${brand.name} ${selected ? 'de' : 'a'} Carreras aliadas`}
-                    title={!brand.active ? 'Activa primero esta marca en Marcas aliadas' : undefined}
+                    title={
+                      !brand.active ? 'Activa primero esta marca en Marcas aliadas' : undefined
+                    }
                   >
                     {pendingId === brand.id ? 'Guardando…' : selected ? 'Quitar' : 'Añadir'}
                   </button>
@@ -131,11 +145,7 @@ export function RaceReusePicker({
             })}
           </div>
           {!showAll && !search.trim() && filtered.length > visible.length && (
-            <button
-              type="button"
-              className="text-link mt-4"
-              onClick={() => setShowAll(true)}
-            >
+            <button type="button" className="text-link mt-4" onClick={() => setShowAll(true)}>
               Ver los {filtered.length} logos disponibles
             </button>
           )}
@@ -147,8 +157,8 @@ export function RaceReusePicker({
         </>
       )}
       <p className="mb-0 mt-3 text-xs text-neo-text-secondary">
-        Si una marca está oculta, actívala primero desde Marcas aliadas. Así evitamos mostrar
-        logos que están desactivados.
+        Si una marca está oculta, actívala primero desde Marcas aliadas. Así evitamos mostrar logos
+        que están desactivados.
       </p>
     </section>
   )
