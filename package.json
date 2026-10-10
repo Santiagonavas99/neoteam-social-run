@@ -8,14 +8,14 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/format-template.cjs",
+    "build": "next build",
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "test": "node --experimental-strip-types --no-warnings=ExperimentalWarning --test \"**/*.test.ts\"",
-    "ci:check": "node scripts/format-template.cjs",
+    "ci:check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "test:db": "bash scripts/test-db.sh"
   },
   "dependencies": {
