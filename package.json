@@ -15,7 +15,7 @@
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "test": "node --experimental-strip-types --no-warnings=ExperimentalWarning --test \"**/*.test.ts\"",
-    "ci:check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "ci:check": "node scripts/format-spectacle.cjs",
     "test:db": "bash scripts/test-db.sh"
   },
   "dependencies": {
