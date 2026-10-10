@@ -18,14 +18,17 @@ import {
   migrateExistingImages,
 } from './existing-image-migration'
 import { LogoForm } from './logo-form'
+import { RaceReusePicker } from './race-reuse-picker'
 import { canOfferLegacyWebpMigration } from './migration-guards'
 
 export function LogosView({
   enableLegacyWebpMigration,
   kind = 'brand',
+  onNavigateKind,
 }: {
   enableLegacyWebpMigration: boolean
   kind?: 'brand' | 'race'
+  onNavigateKind?: (kind: 'brand' | 'race') => void
 }) {
   const raceMode = kind === 'race'
   const [raceApiReady, setRaceApiReady] = useState(false)
@@ -66,6 +69,32 @@ export function LogosView({
     return response.rows ?? []
   }, [kind, raceMode])
   const { data: rows, loading, reload } = useAdminData(load, [], onLoadError)
+  const loadBrands = useCallback(async () => {
+    if (!raceMode) return [] as LogoItem[]
+    const response = await callLogos<LogoItem>('list', { carousel_kind: 'brand' })
+    return response.rows ?? []
+  }, [raceMode])
+  const reusableBrands = useAdminData(loadBrands, [], onLoadError)
+
+  async function toggleRaceReuse(brand: LogoItem, enabled: boolean) {
+    if (!canEdit) return
+    setBusy(true)
+    setFeedback(null)
+    try {
+      await callLogos('setRaceReuse', { id: brand.id, enabled })
+      await reusableBrands.reload()
+      setFeedback({
+        kind: 'success',
+        text: enabled
+          ? `${brand.name} ahora aparece también en Carreras aliadas.`
+          : `${brand.name} ya no aparece en Carreras aliadas.`,
+      })
+    } catch (error) {
+      fail(error, 'No pudimos actualizar los carruseles de esta marca.')
+    } finally {
+      setBusy(false)
+    }
+  }
 
   useEffect(() => {
     if (!enableLegacyWebpMigration || raceMode) return
@@ -213,6 +242,28 @@ export function LogosView({
 
   return (
     <section aria-busy={loading}>
+      {onNavigateKind && (
+        <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label="Catálogo de logos">
+          <button
+            type="button"
+            className={raceMode ? 'button button-secondary' : 'button'}
+            aria-pressed={!raceMode}
+            onClick={() => onNavigateKind('brand')}
+            disabled={busy || migrationLocked}
+          >
+            Marcas aliadas
+          </button>
+          <button
+            type="button"
+            className={raceMode ? 'button' : 'button button-secondary'}
+            aria-pressed={raceMode}
+            onClick={() => onNavigateKind('race')}
+            disabled={busy || migrationLocked}
+          >
+            Carreras aliadas
+          </button>
+        </div>
+      )}
       <div className="mb-5 flex flex-col gap-3 md:mb-6 md:flex-row md:items-start md:justify-between">
         <div>
           <h2 className="m-0 mb-1 text-[21px] font-bold tracking-[-0.035em]">
@@ -220,7 +271,7 @@ export function LogosView({
           </h2>
           <p className="m-0 max-w-[60ch] text-sm text-neo-text-secondary">
             {raceMode
-              ? 'Gestiona aquí las carreras aliadas, con su logo, enlace, posición y visibilidad. No se mezclan con las marcas.'
+              ? 'Reutiliza marcas existentes en un clic o añade nuevas carreras con su logo propio. Todo se gestiona desde la misma biblioteca.'
               : 'Sube cada logo una sola vez. La web duplica la lista automáticamente para crear el movimiento infinito.'}
           </p>
         </div>
@@ -290,6 +341,24 @@ export function LogosView({
         </p>
       )}
 
+      {raceMode && (
+        <RaceReusePicker
+          brands={reusableBrands.data}
+          loading={reusableBrands.loading}
+          busy={busy || !canEdit || !!editor || migrationLocked}
+          onToggle={toggleRaceReuse}
+          onGoToBrands={() => onNavigateKind?.('brand')}
+        />
+      )}
+
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <h3 className="m-0 text-base font-bold">
+          {raceMode ? 'Carreras con logo propio' : 'Logos registrados'}
+        </h3>
+        <span className="text-xs text-neo-text-secondary">
+          {rows.length} {raceMode ? 'carreras propias' : 'marcas'}
+        </span>
+      </div>
       {editor && isNew(editor) && form(editor)}
 
       {loading ? (
@@ -300,7 +369,7 @@ export function LogosView({
           title={raceMode ? 'Añade carreras aliadas' : 'Añade los logos del carrusel'}
           text={
             raceMode
-              ? 'Sube el logo de cada carrera. Su carrusel aparecerá en la Home cuando haya carreras visibles.'
+              ? 'También puedes crear carreras con logo propio; las marcas que selecciones arriba se reutilizan automáticamente.'
               : 'Sube imágenes horizontales de marcas, aliados o patrocinadores. Se mostrarán en una cinta continua en la Home.'
           }
           action={
@@ -334,6 +403,11 @@ export function LogosView({
                       {row.link_url && <LinkIcon aria-hidden className="size-3.5 shrink-0" />}
                       {row.link_url || 'Sin enlace'}
                     </small>
+                    {!raceMode && row.show_in_races && (
+                      <small className="rounded-full bg-neo-muted-bg px-2 py-1 font-semibold text-neo-text">
+                        También en Carreras aliadas
+                      </small>
+                    )}
                   </>
                 }
                 actions={
