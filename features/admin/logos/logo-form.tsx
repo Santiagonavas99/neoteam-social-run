@@ -104,6 +104,14 @@ export function LogoForm({
             <label className="check-label">
               <input
                 type="checkbox"
+                checked={values.show_in_races}
+                onChange={(event) => update('show_in_races', event.target.checked)}
+              />
+              También en Carreras aliadas
+            </label>
+            <label className="check-label">
+              <input
+                type="checkbox"
                 checked={values.show_in_running_crews}
                 onChange={(event) => update('show_in_running_crews', event.target.checked)}
               />
