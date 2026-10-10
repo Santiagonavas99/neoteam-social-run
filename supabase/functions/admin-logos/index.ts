@@ -69,7 +69,7 @@ Deno.serve(async (req: Request) => {
       const { data, error } = await supabase
         .from('home_logo_carousel_items')
         .select(
-          'id,event_code,carousel_kind,name,logo_url,link_url,active,sort_order,show_in_running_crews,show_in_organizations,created_at,updated_at',
+          'id,event_code,carousel_kind,name,logo_url,link_url,active,sort_order,show_in_races,show_in_running_crews,show_in_organizations,created_at,updated_at',
         )
         .eq('event_code', 'SR26')
         .eq('carousel_kind', carouselKind)
@@ -77,6 +77,25 @@ Deno.serve(async (req: Request) => {
         .order('created_at', { ascending: true })
       if (error) throw error
       return json({ rows: data ?? [], carousel_kind: carouselKind })
+    }
+
+    if (action === 'setRaceReuse') {
+      const id = typeof body?.id === 'string' ? body.id : ''
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id))
+        return json({ error: 'Identificador de logo no válido.' }, 400)
+      if (typeof body?.enabled !== 'boolean')
+        return json({ error: 'Indica si la marca debe aparecer en Carreras aliadas.' }, 400)
+      const { data, error } = await supabase
+        .from('home_logo_carousel_items')
+        .update({ show_in_races: body.enabled, updated_at: new Date().toISOString() })
+        .eq('id', id)
+        .eq('event_code', 'SR26')
+        .eq('carousel_kind', 'brand')
+        .select('id,show_in_races')
+        .maybeSingle()
+      if (error) throw error
+      if (!data) return json({ error: 'No encontramos esta marca.' }, 404)
+      return json({ ok: true })
     }
 
     if (action === 'save') {
@@ -99,6 +118,7 @@ Deno.serve(async (req: Request) => {
         link_url: linkUrl || null,
         active: values.active !== false,
         sort_order: Number.isFinite(Number(values.sort_order)) ? Number(values.sort_order) : 0,
+        show_in_races: carouselKind === 'brand' && values.show_in_races === true,
         show_in_running_crews: carouselKind === 'brand' && values.show_in_running_crews === true,
         show_in_organizations: carouselKind === 'brand' && values.show_in_organizations === true,
         updated_at: new Date().toISOString(),
