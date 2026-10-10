@@ -14,5 +14,9 @@ try {
   console.log('SPECTACLE_BIOME_ERROR|' + String(error.stderr ?? error.message).slice(0, 4000))
 }
 for (const path of files) {
-  console.log('SPECTACLE_FILE|' + path + '|' + readFileSync(path).toString('base64'))
+  const encoded = readFileSync(path).toString('base64')
+  const total = Math.ceil(encoded.length / 1100)
+  for (let i = 0; i < total; i++) {
+    console.log('SPECTACLE_CHUNK|' + path + '|' + i + '|' + total + '|' + encoded.slice(i * 1100, (i + 1) * 1100))
+  }
 }
