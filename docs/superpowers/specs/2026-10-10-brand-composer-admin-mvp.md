@@ -9,7 +9,7 @@ Añadir un editor gráfico dentro del panel de administración de NeoTeam para c
 - Las imágenes base y las sustituciones puntuales se cargan en memoria mediante `URL.createObjectURL` y no se suben ni se guardan en Supabase.
 - Motor `composer-layout.ts`: dimensiones, áreas y distribución sin dependencias de React; pruebas sobre 17 marcas para todos los formatos y layouts.
 - Motor `composer-renderer.ts`: mismo canvas de exportación para preview/descarga; carga de imágenes validada, `cover` del fondo, `contain` de logos sin deformarlos y tarjetas blancas opcionales.
-- Los logos de Storage público de NeoTeam se obtienen mediante el optimizador de Next (URL mismo origen) para evitar errores de CORS; otros orígenes usan CORS. Si un logo externo no autoriza CORS, el usuario debe reemplazarlo localmente; no se exporta una pieza incompleta.
+- Los logos de Storage público de NeoTeam se obtienen mediante una ruta de imágenes de origen propio, con lista cerrada de dominios/rutas/extensiones, límite de tamaño y sin redirecciones. Si esa ruta falla, el navegador intenta el URL público original con CORS. No se exporta una pieza incompleta; los fallos se marcan visiblemente.
 - Interfaz: 01 Fondo/formato, 02 Selección de marcas, 03 Composición, previsualización y exportación.
 - Dimensiones soportadas: 1080x1080, 1080x1350, 1080x1440, 1080x1920 y 1920x1080.
 - Orden manual simple, selección múltiple y búsqueda. Formatos PNG/JPG; JPG con calidad 0.94.
@@ -26,3 +26,9 @@ No hay persistencia de plantillas ni un editor drag-and-drop. Las piezas se cons
 5. Simular un logo remoto bloqueado por CORS y reemplazarlo temporalmente.
 6. Verificar que editar la composición no afecta Marcas ni Carrusel logos en producción.
 7. Comprobar Safari/iOS y desktop en preview.
+
+## Corrección 10/oct (logos en blanco)
+- La biblioteca de las 17 marcas sí carga; los fallos se encontraban al convertir las imágenes públicas para Canvas. Los thumbs de `next/image` no comparten el mismo requisito de lectura de píxeles.
+- Se sustituye el uso de `/_next/image` para exportación por `/api/composer-image`, que solo permite imágenes públicas de Storage NeoTeam (WebP/JPG/PNG); preserva la transparencia y rechaza redirects, URLs externas y archivos muy grandes.
+- En el render se incluye `credentials: 'same-origin'` para preservar cookies de los previews protegidos, fallback CORS al original si no responde la ruta local y advertencia explícita por logo que falle.
+- Pruebas de seguridad del proxy: no URLs privadas, dominios arbitrarios ni extensiones no soportadas.
