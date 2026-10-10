@@ -1,3 +1,4 @@
+import { composerImageSrc } from './composer-image-source'
 import {
   type CompositionFormat,
   type CompositionLayout,
@@ -5,7 +6,6 @@ import {
   containRect,
   logoSlots,
 } from './composer-layout'
-import { composerImageSrc } from './composer-image-source'
 import type { ComposerBrand } from './composer-library'
 
 export type ComposerSettings = {
