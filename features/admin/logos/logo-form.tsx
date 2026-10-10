@@ -1,9 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { isNew, type LogoItem } from '../types'
 import { EditorForm, useEditor } from '../ui/editor-form'
 import { FormStep } from '../ui/form-step'
 import { ImageUploadField, useImageUpload } from '../ui/image-upload-field'
+import { nameFromLogoFilename } from './logo-name'
 
 export function LogoForm({
   row,
@@ -14,22 +16,32 @@ export function LogoForm({
 }: {
   row: LogoItem
   busy: boolean
-  onSave: (row: LogoItem) => Promise<void>
+  onSave: (row: LogoItem, addAnother?: boolean) => Promise<void>
   onCancel: () => void
   kind?: 'brand' | 'race'
 }) {
   const newRecord = isNew(row)
-  const { values, update, busy, feedback, setFeedback, submit } = useEditor(row, onSave, (logo) => {
+  const [addAnother, setAddAnother] = useState(false)
+  const { values, update, busy, feedback, setFeedback, submit } = useEditor(
+    row,
+    (next) => onSave(next, newRecord && addAnother),
+    (logo) => {
     if (!logo.name.trim()) {
       return kind === 'race'
         ? 'Escribe el nombre de la carrera.'
         : 'Escribe el nombre del club o marca antes de guardar.'
     }
     return logo.logo_url ? null : 'Sube una imagen antes de guardar el logo.'
-  })
+    },
+  )
   const { uploading, upload, uploadFeedback } = useImageUpload({
     successText: 'Imagen subida. Guarda el logo para publicarlo.',
     onUploaded: (url) => update('logo_url', url),
+    onFileSelected: (file) => {
+      if (!newRecord || values.name.trim()) return
+      const suggestion = nameFromLogoFilename(file.name)
+      if (suggestion) update('name', suggestion)
+    },
     setFeedback,
   })
 
@@ -163,8 +175,18 @@ export function LogoForm({
           </label>
         </div>
       </details>
+      {newRecord && (
+        <label className="check-label col-span-full">
+          <input
+            type="checkbox"
+            checked={addAnother}
+            onChange={(event) => setAddAnother(event.target.checked)}
+          />
+          Guardar y seguir añadiendo logos
+        </label>
+      )}
       <p className="col-span-full mb-0 text-center text-xs text-neo-text-secondary">
-        Al terminar, pulsa <strong>Guardar</strong> para publicar el logo.
+        Si el archivo tiene un nombre reconocible, lo sugerimos automáticamente y puedes editarlo.
       </p>
     </EditorForm>
   )
