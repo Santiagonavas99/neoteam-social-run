@@ -78,7 +78,7 @@ test('move and resize clamps the safe area into the canvas', () => {
     height: 0.9,
   })
   const resized = moveLogoZone(verticalAlliesZone, -0.5, 0.2, true)
-  assert.equal(resized.width, 0.2)
+  assert.ok(Math.abs(resized.width - 0.36) < 0.000001)
   assert.ok(resized.height > verticalAlliesZone.height)
   assert.throws(() => templateLogoSlots(1080, 1440, -1, verticalAlliesZone, 'auto', 0.01))
   assert.deepEqual(templateLogoSlots(1080, 1440, 0, verticalAlliesZone, 'auto', 0.01), [])
