@@ -1,14 +1,31 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const AeroShards = dynamic(() => import('./vendor/AeroShards'), { ssr: false })
 
+type LoginPalette = {
+  backgroundColor: string
+  shardColor: string
+  accentColor: string
+}
+
 export function LoginBackground() {
+  const backgroundRef = useRef<HTMLDivElement>(null)
   const [enabled, setEnabled] = useState(false)
+  const [palette, setPalette] = useState<LoginPalette | null>(null)
 
   useEffect(() => {
+    const root = backgroundRef.current
+    if (!root) return
+    const css = getComputedStyle(root)
+    setPalette({
+      backgroundColor: css.getPropertyValue('--neo-bg').trim(),
+      shardColor: css.getPropertyValue('--neo-accent-dark').trim(),
+      accentColor: css.getPropertyValue('--neo-accent-text').trim(),
+    })
+
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const update = () => setEnabled('gpu' in navigator && !motion.matches)
     update()
@@ -17,13 +34,15 @@ export function LoginBackground() {
   }, [])
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-neo-bg">
-      {enabled ? (
+    <div
+      ref={backgroundRef}
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 -z-10 overflow-hidden bg-neo-bg"
+    >
+      {enabled && palette ? (
         <div className="absolute inset-0 opacity-60">
           <AeroShards
-            backgroundColor="#080f0e"
-            shardColor="#077271"
-            accentColor="#24fdfa"
+            {...palette}
             placement="full"
             flow="stream"
             material="satin"
