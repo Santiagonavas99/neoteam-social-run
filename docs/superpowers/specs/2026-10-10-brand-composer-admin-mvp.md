@@ -40,3 +40,10 @@ No hay persistencia de plantillas ni un editor drag-and-drop. Las piezas se cons
 - El algoritmo calcula posiciones en píxeles del archivo final, por lo que la vista previa y la exportación siempre usan el mismo layout. El contorno cian de la zona solo es guía UI, nunca parte del JPG/PNG.
 - Tests puros comprueban límites, ausencia de solapamientos y repartos en 3:4, 4:5, story y horizontal.
 - No migraciones, no cambios de base de datos, no cambios al carrusel publicado.
+
+## Copiar imagen al portapapeles (10/oct)
+- Botón secundario «Copiar imagen» junto a «Exportar imagen». Siempre usa PNG aunque el selector de descarga esté en JPG, porque los navegadores aceptan PNG para el portapapeles.
+- Renderiza el Canvas final a resolución nativa con los logos realmente seleccionados. La zona de edición es una superposición UI y no se copia.
+- Se crea `ClipboardItem({'image/png': Promise<Blob>})` y se llama a `navigator.clipboard.write` en la misma activación del clic para mantener compatibilidad con Safari. Si faltan logos, se cancela la copia como en la exportación.
+- En caso de falta de soporte o permiso denegado, muestra error y permite seguir usando la descarga; nunca se reemplaza una imagen por texto en el portapapeles.
+- La acción no envía ni guarda datos en el servidor y no altera registros existentes.
