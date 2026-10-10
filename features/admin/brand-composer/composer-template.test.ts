@@ -4,15 +4,22 @@ import {
   clampLogoZone,
   moveLogoZone,
   recommendedColumns,
+  type TemplateColumns,
   templateLogoSlots,
   verticalAlliesZone,
-  type TemplateColumns,
 } from './composer-template.ts'
 
 test('adaptive template chooses the agreed distribution for changing brands', () => {
   const expectations: [number, number, number][] = [
-    [1, 1, 1], [4, 2, 2], [6, 3, 2], [8, 4, 2],
-    [9, 3, 3], [12, 4, 3], [16, 4, 4], [17, 5, 4], [24, 5, 5],
+    [1, 1, 1],
+    [4, 2, 2],
+    [6, 3, 2],
+    [8, 4, 2],
+    [9, 3, 3],
+    [12, 4, 3],
+    [16, 4, 4],
+    [17, 5, 4],
+    [24, 5, 5],
   ]
   for (const [count, columns, rows] of expectations) {
     assert.equal(recommendedColumns(count), columns)
@@ -23,7 +30,12 @@ test('adaptive template chooses the agreed distribution for changing brands', ()
 })
 
 test('cards stay inside the reserved area without overlapping for 1–80 logos', () => {
-  const formats: [number, number][] = [[1080, 1440], [1080, 1920], [1080, 1350], [1920, 1080]]
+  const formats: [number, number][] = [
+    [1080, 1440],
+    [1080, 1920],
+    [1080, 1350],
+    [1920, 1080],
+  ]
   const modes: TemplateColumns[] = ['auto', 2, 3, 4, 5]
   for (const [width, height] of formats) {
     for (const columns of modes) {
@@ -40,8 +52,11 @@ test('cards stay inside the reserved area without overlapping for 1–80 logos',
           assert.ok(a.x + a.width <= right && a.y + a.height <= bottom)
           for (const b of slots.slice(i + 1)) {
             if (!b) continue
-            const overlaps: boolean = a.x < b.x + b.width && b.x < a.x + a.width &&
-              a.y < b.y + b.height && b.y < a.y + a.height
+            const overlaps: boolean =
+              a.x < b.x + b.width &&
+              b.x < a.x + a.width &&
+              a.y < b.y + b.height &&
+              b.y < a.y + a.height
             assert.equal(overlaps, false, `${width}x${height}, ${count}, ${columns}`)
           }
         }
