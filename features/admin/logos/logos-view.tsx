@@ -157,12 +157,9 @@ export function LogosView({
     }
   }
 
-  function addLogo() {
-    if (!canEdit) return
-    setFeedback(null)
-    setConfirmingId(null)
-    setEditor({
-      id: `new-${Date.now()}`,
+  function blankLogo(): LogoItem {
+    return {
+      id: `new-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       name: '',
       logo_url: '',
       link_url: '',
@@ -171,10 +168,17 @@ export function LogosView({
       show_in_races: false,
       show_in_running_crews: false,
       show_in_organizations: false,
-    })
+    }
   }
 
-  async function save(values: LogoItem) {
+  function addLogo() {
+    if (!canEdit) return
+    setFeedback(null)
+    setConfirmingId(null)
+    setEditor(blankLogo())
+  }
+
+  async function save(values: LogoItem, addAnother = false) {
     if (!canEdit) return
     setBusy(true)
     setFeedback(null)
@@ -193,7 +197,7 @@ export function LogosView({
           ...(isNew(values) ? {} : { id: values.id }),
         },
       })
-      setEditor(null)
+      setEditor(addAnother && isNew(values) ? blankLogo() : null)
       setFeedback({
         kind: 'success',
         text: raceMode
