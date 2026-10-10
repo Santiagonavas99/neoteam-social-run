@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { type ReactNode, useRef } from 'react'
 import { BrandLink } from '@/components/brand-link'
 import { useThemeChoice } from '@/components/use-theme-choice'
+import { OnlineAdmins } from '../overview/online-admins'
 import { type AdminSection, type AdminSectionInfo, sectionGroups, sectionInfo } from '../sections'
 import { ThemeSwitch } from './theme-switch'
 
@@ -54,12 +55,14 @@ export function AdminShell({
   section,
   onNavigate,
   onSignOut,
+  showPresence = false,
   children,
 }: {
   sections: AdminSectionInfo[]
   section: AdminSection
   onNavigate: (section: AdminSection) => void
   onSignOut: () => void
+  showPresence?: boolean
   children: ReactNode
 }) {
   const current = sectionInfo(section)
@@ -128,11 +131,14 @@ export function AdminShell({
       </aside>
 
       <main className="mx-auto w-full min-w-0 max-w-[1440px] px-4 pt-5 pb-28 md:px-10 md:pt-10 md:pb-16">
-        <header className="mb-5 md:mb-8">
-          <h1 className="m-0 text-2xl font-extrabold leading-tight tracking-[-0.04em] md:text-[34px]">
-            {current.label}
-          </h1>
-          <p className="m-0 mt-1 text-sm text-neo-text-secondary">{current.description}</p>
+        <header className="mb-5 flex items-start justify-between gap-3 md:mb-8">
+          <div className="min-w-0 flex-1">
+            <h1 className="m-0 text-2xl font-extrabold leading-tight tracking-[-0.04em] md:text-[34px]">
+              {current.label}
+            </h1>
+            <p className="m-0 mt-1 text-sm text-neo-text-secondary">{current.description}</p>
+          </div>
+          {showPresence && <OnlineAdmins />}
         </header>
         {children}
       </main>
