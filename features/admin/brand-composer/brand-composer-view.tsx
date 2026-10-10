@@ -132,7 +132,11 @@ export function BrandComposerView() {
       const next = index + amount
       if (index < 0 || next < 0 || next >= previous.length) return previous
       const result = [...previous]
-      ;[result[index], result[next]] = [result[next], result[index]]
+      const first = result[index]
+      const second = result[next]
+      if (!first || !second) return previous
+      result[index] = second
+      result[next] = first
       return result
     })
   }
