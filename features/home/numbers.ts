@@ -1,5 +1,5 @@
 // Show a minimum public count until actual registrations exceed it.
-export const RUNNER_COUNT_FLOOR = 50
+export const RUNNER_COUNT_FLOOR = 80
 
 export const runnersShown = (registered: number | null) =>
   Math.max(RUNNER_COUNT_FLOOR, registered ?? 0)

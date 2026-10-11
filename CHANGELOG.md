@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.35.0] - 2026-10-10
+
+### Changed
+
+- **Landing más rápida:** la página principal vuelve a servirse desde la caché de Vercel y se regenera como mucho una vez por minuto, en lugar de consultar la base de datos en cada visita. El estado de las inscripciones (abiertas o cerradas) sigue al día en el navegador.
+- **Contador de corredores:** arranca en +80 y el número real de inscritos se actualiza una vez al día.
+
 ## [0.34.0] - 2026-10-10
 
 ### Added

@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import {
   defaultHomeSectionOrder,
@@ -139,13 +140,21 @@ export async function getHomeSectionOrder(): Promise<HomeSectionOrder[]> {
   }
 }
 
-// Only the aggregate: registrations stay unreadable to the publishable key.
-export async function getRegisteredCount(): Promise<number | null> {
-  try {
-    const supabase = createServerSupabaseClient()
-    const { data, error } = await supabase.rpc('social_run_registered_count')
+// Only the aggregate: registrations stay unreadable to the publishable key. Refreshed once a
+// day; it throws on failure so an error is never cached.
+const fetchRegisteredCount = unstable_cache(
+  async () => {
+    const { data, error } = await createServerSupabaseClient().rpc('social_run_registered_count')
     if (error) throw error
     return typeof data === 'number' ? data : null
+  },
+  ['registered-count'],
+  { revalidate: 86_400 },
+)
+
+export async function getRegisteredCount(): Promise<number | null> {
+  try {
+    return await fetchRegisteredCount()
   } catch (error) {
     console.error('Registered count fallback', errorText(error))
     return null
