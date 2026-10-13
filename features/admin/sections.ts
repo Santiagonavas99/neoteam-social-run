@@ -2,6 +2,7 @@ import {
   CalendarClock,
   Flag,
   GalleryHorizontal,
+  Layers3,
   LayoutDashboard,
   ListOrdered,
   type LucideIcon,
@@ -19,6 +20,7 @@ export type AdminSection =
   | 'metrics'
   | 'home-order'
   | 'logos'
+  | 'brand-composer'
   | 'race-logos'
   | 'participants'
   | 'registration-settings'
@@ -99,6 +101,13 @@ export const adminSections: [AdminSectionInfo, ...AdminSectionInfo[]] = [
     label: 'Orden de la Home',
     description: 'Ordena las secciones y muestra u oculta las que necesites.',
     icon: ListOrdered,
+    group: 'content',
+  },
+  {
+    id: 'brand-composer',
+    label: 'Compositor de marcas',
+    description: 'Crea piezas adaptables con logos aliados para exportar en PNG o JPG.',
+    icon: Layers3,
     group: 'content',
   },
   {

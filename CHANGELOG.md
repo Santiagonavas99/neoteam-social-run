@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.35.1] - 2026-10-13
+
+### Added
+
+- **Compositor de marcas aliadas:** editor privado que reutiliza los logos disponibles de NeoTeam y permite componer piezas con imágenes base propias.
+- **Plantilla adaptable:** zona central movible y redimensionable, distribución automática para distintas cantidades de marcas y controles de tarjetas, separación y márgenes. El modo libre sigue disponible.
+- **Exportar y copiar:** vista previa en Canvas con descarga PNG/JPG y botón «Copiar imagen» para enviar la composición final en PNG al portapapeles sin guías de edición.
+- **Formatos para redes:** 1:1, 4:5, 3:4, 9:16 y 16:9; sin cambios en las marcas guardadas ni en la base de datos.
+
 ## [0.35.0] - 2026-10-10
 
 ### Changed
