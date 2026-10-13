@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   ClipboardCheck,
   ClipboardList,
+  MonitorPlay,
   Play,
   Plus,
   Settings2,
