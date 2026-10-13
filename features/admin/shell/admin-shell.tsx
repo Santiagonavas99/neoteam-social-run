@@ -80,7 +80,6 @@ export function AdminShell({
 }) {
   const current = sectionInfo(section)
   const primarySections = sections.filter((item) => item.primary)
-  const moreSections = sections.filter((item) => !item.primary)
   const menu = useRef<HTMLDialogElement>(null)
   const [theme, setTheme] = useThemeChoice()
 
