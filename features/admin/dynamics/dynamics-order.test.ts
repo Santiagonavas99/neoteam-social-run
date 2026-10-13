@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import type { DynamicRow } from '../types'
-import { challengeNeedsRules, groupDynamicsByPhase, orderDynamicsByStatus } from './dynamics-order.ts'
+import {
+  challengeNeedsRules,
+  groupDynamicsByPhase,
+  orderDynamicsByStatus,
+} from './dynamics-order.ts'
 
 function row(id: string, status: DynamicRow['status']): DynamicRow {
   return {
@@ -43,12 +47,20 @@ test('a challenge without clear instructions must be configured before activatio
 })
 
 test('status sections are ordered and never duplicate a dynamic', () => {
-  const rows = [row('done', 'completed'), row('draft', 'draft'), row('open', 'open'), row('closed', 'closed')]
+  const rows = [
+    row('done', 'completed'),
+    row('draft', 'draft'),
+    row('open', 'open'),
+    row('closed', 'closed'),
+  ]
   const groups = groupDynamicsByPhase(orderDynamicsByStatus(rows))
-  assert.deepEqual(groups.map((group) => [group.id, group.rows.map((item) => item.id)]), [
-    ['open', ['open']],
-    ['draft', ['draft']],
-    ['finished', ['done', 'closed']],
-  ])
+  assert.deepEqual(
+    groups.map((group) => [group.id, group.rows.map((item) => item.id)]),
+    [
+      ['open', ['open']],
+      ['draft', ['draft']],
+      ['finished', ['done', 'closed']],
+    ],
+  )
   assert.deepEqual(groupDynamicsByPhase([]), [])
 })

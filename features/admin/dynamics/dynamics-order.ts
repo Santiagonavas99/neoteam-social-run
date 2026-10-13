@@ -38,9 +38,7 @@ export function groupDynamicsByPhase(rows: DynamicRow[]): DynamicPhaseGroup[] {
     .map((group) => ({
       ...group,
       rows: rows.filter((row) =>
-        group.id === 'finished'
-          ? !['open', 'draft'].includes(row.status)
-          : row.status === group.id,
+        group.id === 'finished' ? !['open', 'draft'].includes(row.status) : row.status === group.id,
       ),
     }))
     .filter((group) => group.rows.length > 0)
