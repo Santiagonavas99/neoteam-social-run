@@ -7,22 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Improved
-
-- **Copiar imagen:** botón junto a Exportar que copia la composición final como PNG al portapapeles, incluyendo solo los logos seleccionados, fondo y distribución, sin guía de edición. Compatible con el flujo de permisos de Chrome/Safari, con mensajes claros cuando el navegador bloquea el acceso.
-- **Plantillas adaptables en el compositor:** imagen base fija + zona de logos editable sobre la vista previa, distribución automática para 4, 6, 12, 16, 17 o más marcas, columnas manuales y personalización de separación, margen interno y esquinas. El modo libre sigue disponible y la guía no aparece en la imagen exportada.
-
-
-## [0.33.1] - 2026-10-10
+## [0.35.1] - 2026-10-13
 
 ### Added
 
-- **Compositor de marcas aliadas (MVP):** a private admin visual editor that reuses visible sponsor/partner logos from Marcas and the Home carousel, deduplicates names, and arranges them automatically over a chosen local background image.
-- **Social formats and downloads:** 1:1, 4:5, 3:4, 9:16 and 16:9; bottom strip, mosaic and centered layouts; size, background darkening, white logo tiles, optional title and logo ordering.
-- **Real browser exports:** live Canvas preview and downloadable PNG/JPG at the exact selected pixel resolution. Failing third-party logo sources are reported rather than silently omitted; admins can replace them with local PNG/JPG/WebP for the current composition.
-- **No database changes:** the composer never edits the published brand library. The original background and temporary logo overrides remain local to the editor session.
+- **Compositor de marcas aliadas:** editor privado que reutiliza los logos disponibles de NeoTeam y permite componer piezas con imágenes base propias.
+- **Plantilla adaptable:** zona central movible y redimensionable, distribución automática para distintas cantidades de marcas y controles de tarjetas, separación y márgenes. El modo libre sigue disponible.
+- **Exportar y copiar:** vista previa en Canvas con descarga PNG/JPG y botón «Copiar imagen» para enviar la composición final en PNG al portapapeles sin guías de edición.
+- **Formatos para redes:** 1:1, 4:5, 3:4, 9:16 y 16:9; sin cambios en las marcas guardadas ni en la base de datos.
 
+## [0.35.0] - 2026-10-10
 
+### Changed
+
+- **Landing más rápida:** la página principal vuelve a servirse desde la caché de Vercel y se regenera como mucho una vez por minuto, en lugar de consultar la base de datos en cada visita. El estado de las inscripciones (abiertas o cerradas) sigue al día en el navegador.
+- **Contador de corredores:** arranca en +80 y el número real de inscritos se actualiza una vez al día.
+
+## [0.34.0] - 2026-10-10
+
+### Added
+
+- **Acceso al administrador:** fondo AeroShards de React Bits, con movimiento turquesa tenue detrás del formulario de correo y código. Solo aparece antes de iniciar sesión; el panel interno no cambia.
+- **Accesibilidad y compatibilidad:** el efecto se carga únicamente en navegadores con WebGPU y movimiento permitido; en los demás se muestra el fondo oscuro de siempre, sin bloquear el acceso.
 
 ## [0.33.0] - 2026-10-09
 

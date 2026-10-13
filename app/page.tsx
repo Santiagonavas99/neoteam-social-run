@@ -25,9 +25,10 @@ import { Story } from '@/features/home/sections/story'
 import { LandingRegistrationProvider } from '@/features/registration/landing-registration-status'
 import { getRegistrationSettings } from '@/features/registration/registration-settings'
 
-// Render the live registration state on each request; participant and carousel data use
-// their own caching, but the registration deadline must never be rendered from a stale ISR page.
-export const dynamic = 'force-dynamic'
+// Served from the CDN and rebuilt at most once a minute. Cached HTML is safe for the CTA:
+// the deadline is evaluated client-side with the live clock and LandingRegistrationProvider
+// refetches /api/registration-status on mount, so a manual close shows up right after paint.
+export const revalidate = 60
 
 const numberedSections = new Set(['story', 'agenda', 'community', 'raffle', 'final'])
 

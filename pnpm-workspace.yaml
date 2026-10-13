@@ -1,0 +1,7 @@
+packages:
+  - .
+
+# Browser-only shader: the transitive Node adapters need no native build scripts.
+allowBuilds:
+  '@vgpu/adapter-node': false
+  webgpu: false
