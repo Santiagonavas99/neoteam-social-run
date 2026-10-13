@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed · 2026-10-13
-- **Panel sin barra lateral:** la navegación principal ahora va en la parte superior, con un menú para todos los módulos que conserva la navegación y los permisos por rol.
+- **Navegación conservada:** se mantiene la barra lateral original del panel y su navegación móvil, sin alterar módulos ni permisos.
 - **Dinámicas visualmente más claras:** tarjetas neutras, sin degradados ni etiquetas redundantes, y PLAY compacto. Las activas tienen un acento discreto.
 - **Orden por estado:** bloques «Activas», «Por preparar» y «Finalizadas», con contador y búsqueda/categoría compartidas.
 
