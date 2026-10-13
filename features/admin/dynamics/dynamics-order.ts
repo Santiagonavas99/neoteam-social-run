@@ -19,3 +19,29 @@ export function orderDynamicsByStatus(rows: DynamicRow[]): DynamicRow[] {
 export function challengeNeedsRules(row: Pick<DynamicRow, 'type' | 'description'>): boolean {
   return row.type === 'challenge' && (row.description?.trim().length ?? 0) < 10
 }
+
+export type DynamicPhaseGroup = {
+  id: 'open' | 'draft' | 'finished'
+  title: string
+  description: string
+  rows: DynamicRow[]
+}
+
+/** Visual grouping after category/search filtering, without altering source rows. */
+export function groupDynamicsByPhase(rows: DynamicRow[]): DynamicPhaseGroup[] {
+  const definitions: Array<Pick<DynamicPhaseGroup, 'id' | 'title' | 'description'>> = [
+    { id: 'open', title: 'Activas', description: 'Listas para ejecutar' },
+    { id: 'draft', title: 'Por preparar', description: 'Configura antes de activar' },
+    { id: 'finished', title: 'Finalizadas', description: 'Consulta su historial' },
+  ]
+  return definitions
+    .map((group) => ({
+      ...group,
+      rows: rows.filter((row) =>
+        group.id === 'finished'
+          ? !['open', 'draft'].includes(row.status)
+          : row.status === group.id,
+      ),
+    }))
+    .filter((group) => group.rows.length > 0)
+}

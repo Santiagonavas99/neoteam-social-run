@@ -2,16 +2,12 @@
 
 import {
   ArrowLeft,
-  ArrowUpRight,
   ClipboardCheck,
   ClipboardList,
-  Dices,
-  Gift,
   MonitorPlay,
   Play,
   Plus,
   Settings2,
-  Target,
   Trash2,
   Trophy,
   Zap,
@@ -29,7 +25,8 @@ import { useAdminData } from '../ui/use-admin-data'
 import { DrawResult } from './draw-result'
 import { DynamicCreateWizard } from './dynamic-create-wizard'
 import { DynamicForm } from './dynamic-form'
-import { challengeNeedsRules, orderDynamicsByStatus } from './dynamics-order'
+import { DynamicCard } from './dynamic-card'
+import { challengeNeedsRules, groupDynamicsByPhase, orderDynamicsByStatus } from './dynamics-order'
 import styles from './dynamics-tabs.module.css'
 import { GameControlPanel } from './game-control-panel'
 import { ParticipationPanel } from './participation-panel'
@@ -48,12 +45,6 @@ const tabIcons = {
   'en-vivo': MonitorPlay,
   resultados: Trophy,
 }
-const typeIcons = {
-  raffle: Dices,
-  challenge: Target,
-  instant_win: Gift,
-}
-
 const categoryTypes: Record<Category, string[]> = {
   raffles: ['raffle'],
   stands: ['qr', 'checkpoint', 'challenge', 'trivia', 'mission', 'voting', 'points'],
@@ -113,6 +104,7 @@ export function DynamicsView() {
         matchesQuery([row.name, row.description, row.prize, dynamicTypes[row.type]], query),
     ),
   )
+  const grouped = groupDynamicsByPhase(visible)
   const selectedNeedsRules = selected ? challengeNeedsRules(selected) : false
   const drafts = rows.filter((row) => row.status === 'draft')
   const counts = {
@@ -583,84 +575,25 @@ export function DynamicsView() {
           {loading ? (
             <LoadingState>Cargando dinámicas…</LoadingState>
           ) : visible.length ? (
-            <div className="grid gap-3 lg:grid-cols-2">
-              {visible.map((row) => {
-                const TypeIcon = typeIcons[row.type as keyof typeof typeIcons] ?? Zap
-                const isOpen = row.status === 'open'
-                const isDraft = row.status === 'draft'
-                return (
-                  <article
-                    key={row.id}
-                    data-status={row.status}
-                    data-type={row.type}
-                    className={styles.dynamicCard}
-                  >
+            <div className="flex flex-col gap-8">
+              {grouped.map((group) => (
+                <section key={group.id} aria-label={group.title} className="flex flex-col gap-3">
+                  <div className={styles.groupHeading}>
                     <div>
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <span className={styles.cardKind}>
-                          <TypeIcon aria-hidden className="size-4" />
-                          {dynamicTypes[row.type]}
-                        </span>
-                        <StatusBadge status={row.status} label={dynamicStates[row.status]} />
-                      </div>
-                      {isOpen && (
-                        <p className={styles.liveMarker}>
-                          <Play aria-hidden className="size-3.5" /> EN VIVO · LISTA PARA EJECUTAR
-                        </p>
-                      )}
-                      <h3 className="m-0 mt-3 text-xl font-black tracking-tight break-words">
-                        {row.name}
-                      </h3>
-                      <p className="m-0 mt-1 line-clamp-2 text-sm text-neo-text-secondary">
-                        {row.prize || row.description || 'Actividad del Social Run'}
+                      <h3 className="m-0 text-lg font-black">{group.title}</h3>
+                      <p className="m-0 mt-1 text-xs text-neo-text-secondary">
+                        {group.description}
                       </p>
-                      {isDraft && challengeNeedsRules(row) && (
-                        <p className="m-0 mt-3 text-xs font-bold text-neo-warning">
-                          Falta explicar cómo se completa este reto
-                        </p>
-                      )}
-                      <div className="mt-4 flex flex-wrap gap-3 text-xs font-semibold text-neo-text-secondary">
-                        <span>{row.participations_count ?? 0} participaciones</span>
-                        {row.type === 'raffle' && <span>{row.winner_count} premios</span>}
-                        <span>{row.requires_checkin ? 'Requiere check-in' : 'Sin check-in'}</span>
-                      </div>
                     </div>
-                    <div className={styles.cardActions}>
-                      <button
-                        type="button"
-                        className={isOpen ? styles.playAction : 'button w-full justify-center'}
-                        onClick={() => open(row)}
-                      >
-                        {isOpen ? (
-                          <>
-                            <Play aria-hidden className="size-5" /> PLAY · Abrir control
-                          </>
-                        ) : isDraft ? (
-                          <>
-                            <Settings2 aria-hidden className="size-4" />{' '}
-                            {row.type === 'challenge' ? 'Configurar reto' : 'Preparar dinámica'}
-                          </>
-                        ) : (
-                          <>
-                            <Trophy aria-hidden className="size-4" /> Ver resultados
-                          </>
-                        )}
-                      </button>
-                      {isOpen && (
-                        <a
-                          href={`/juego/${row.id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={styles.screenLink}
-                        >
-                          <MonitorPlay aria-hidden className="size-4" /> Pantalla pública
-                          <ArrowUpRight aria-hidden className="size-3.5" />
-                        </a>
-                      )}
-                    </div>
-                  </article>
-                )
-              })}
+                    <span className={styles.groupCount}>{group.rows.length}</span>
+                  </div>
+                  <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
+                    {group.rows.map((row) => (
+                      <DynamicCard key={row.id} row={row} onOpen={() => open(row)} />
+                    ))}
+                  </div>
+                </section>
+              ))}
             </div>
           ) : query ? (
             <NoMatches onClear={() => setQuery('')} />

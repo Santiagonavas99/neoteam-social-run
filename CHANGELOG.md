@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed · 2026-10-13
+- **Navegación conservada:** se mantiene la barra lateral original del panel y su navegación móvil, sin alterar módulos ni permisos.
+- **Dinámicas visualmente más claras:** tarjetas neutras, sin degradados ni etiquetas redundantes, y PLAY compacto. Las activas tienen un acento discreto.
+- **Orden por estado:** bloques «Activas», «Por preparar» y «Finalizadas», con contador y búsqueda/categoría compartidas.
+
+
 ### Changed · 2026-10-10
 - **Dinámicas UX:** tarjetas activas primero y destacadas, acceso PLAY directo al control y acceso rápido a la pantalla pública.
 - **Flujo de operación:** Preparación, En vivo y Resultados con estilos y explicaciones diferenciadas.
