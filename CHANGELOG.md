@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed · 2026-10-13
+- **Dinámicas V2:** pantalla pública para sorteos con revelación progresiva y datos protegidos; panel de control de evento.
+- **Operación más clara:** dinámicas agrupadas en Activas, Por preparar y Finalizadas, tarjetas sobrias y botón de control compacto; navegación lateral conservada.
+- **Retos guiados:** configuración en cuatro pasos con validación por QR, puntos, check-in y revisión antes de activar. Sin cronómetro ni clasificación automática.
+
+
 ## [0.35.1] - 2026-10-13
 
 ### Added
