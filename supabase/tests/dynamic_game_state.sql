@@ -12,7 +12,7 @@ create table public.dynamic_participations(
  registration_id uuid references public.registrations(id),
  status text, metadata jsonb default '{}'::jsonb
 );
-\ir ../migrations/20261009180000_dynamic_game_state.sql
+\ir ../migrations/20261013232028_dynamic_game_state.sql
 do $$
 declare
   v_event uuid := '11111111-1111-4111-8111-111111111111';
