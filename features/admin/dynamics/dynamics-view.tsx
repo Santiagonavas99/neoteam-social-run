@@ -24,10 +24,10 @@ import { EmptyState, NoMatches } from '../ui/empty-state'
 import { LoadingState } from '../ui/loading-state'
 import { useAdminData } from '../ui/use-admin-data'
 import { DrawResult } from './draw-result'
+import { duplicateDynamic } from './duplicate-dynamic'
 import { DynamicCard } from './dynamic-card'
 import { DynamicCreateWizard } from './dynamic-create-wizard'
 import { DynamicForm } from './dynamic-form'
-import { duplicateDynamic } from './duplicate-dynamic'
 import { challengeNeedsRules, groupDynamicsByPhase, orderDynamicsByStatus } from './dynamics-order'
 import styles from './dynamics-tabs.module.css'
 import { GameControlPanel } from './game-control-panel'
@@ -638,10 +638,10 @@ export function DynamicsView() {
                   <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
                     {group.rows.map((row) => (
                       <DynamicCard
-                         key={row.id}
-                         row={row}
-                         onOpen={() => open(row)}
-                         onRepeat={() => repeat(row)}
+                        key={row.id}
+                        row={row}
+                        onOpen={() => open(row)}
+                        onRepeat={() => repeat(row)}
                        />
                     ))}
                   </div>
