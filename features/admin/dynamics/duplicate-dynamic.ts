@@ -5,7 +5,11 @@ export function duplicateDynamic(row: DynamicRow): DynamicRow {
   const suffix = ' (copia)'
   return {
     id: 'new-repeat-' + Date.now(),
-    name: row.name.trim().slice(0, 120 - suffix.length).trimEnd() + suffix,
+    name:
+      row.name
+        .trim()
+        .slice(0, 120 - suffix.length)
+        .trimEnd() + suffix,
     description: row.description ?? '',
     type: row.type,
     status: 'draft',
