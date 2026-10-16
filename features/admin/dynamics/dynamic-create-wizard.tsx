@@ -367,7 +367,8 @@ export function DynamicCreateWizard({
               <div>
                 <dt className="text-neo-text-secondary">Patrocinador</dt>
                 <dd className="m-0 font-bold">
-                  {sponsorOptions.find((item) => item.value === sponsor)?.name ?? 'Sin patrocinador'}
+                  {sponsorOptions.find((item) => item.value === sponsor)?.name ??
+                    'Sin patrocinador'}
                 </dd>
               </div>
               <div>
