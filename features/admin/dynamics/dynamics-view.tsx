@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   ClipboardCheck,
   ClipboardList,
+  Copy,
   MonitorPlay,
   Play,
   Plus,
@@ -13,10 +14,10 @@ import {
   Zap,
 } from 'lucide-react'
 import { useCallback, useState } from 'react'
-import { callAdmin } from '../api'
+import { callAdmin, callLogos } from '../api'
 import { matchesQuery } from '../filter'
 import { dynamicStates, dynamicTypes, raffleGenders } from '../labels'
-import type { CommunityRecord, DynamicRow } from '../types'
+import type { CommunityRecord, DynamicRow, LogoItem } from '../types'
 import { Feedback, StatusBadge } from '../ui/admin-ui'
 import { ConfirmPanel } from '../ui/confirm-panel'
 import { EmptyState, NoMatches } from '../ui/empty-state'
@@ -26,6 +27,7 @@ import { DrawResult } from './draw-result'
 import { DynamicCard } from './dynamic-card'
 import { DynamicCreateWizard } from './dynamic-create-wizard'
 import { DynamicForm } from './dynamic-form'
+import { duplicateDynamic } from './duplicate-dynamic'
 import { challengeNeedsRules, groupDynamicsByPhase, orderDynamicsByStatus } from './dynamics-order'
 import styles from './dynamics-tabs.module.css'
 import { GameControlPanel } from './game-control-panel'
@@ -88,14 +90,20 @@ export function DynamicsView() {
     [],
   )
   const sponsors = useAdminData<CommunityRecord[]>(loadBrands, [], dynamics.onError)
+  const loadLogos = useCallback(
+    async () => (await callLogos<LogoItem>('list', { carousel_kind: 'brand' })).rows ?? [],
+    [],
+  )
+  const sponsorLogos = useAdminData<LogoItem[]>(loadLogos, [], dynamics.onError)
   const [category, setCategory] = useState<Category>('raffles')
   const [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [tab, setTab] = useState<DetailTab>('preparar')
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [creating, setCreating] = useState(false)
+  const [duplicate, setDuplicate] = useState<DynamicRow | null>(null)
   const [scanning, setScanning] = useState(false)
-  const loading = dynamics.loading || sponsors.loading
+  const loading = dynamics.loading || sponsors.loading || sponsorLogos.loading
   const selected = rows.find((row) => row.id === selectedId) ?? null
   const visible = orderDynamicsByStatus(
     rows.filter(
@@ -116,7 +124,20 @@ export function DynamicsView() {
   async function save(row: DynamicRow) {
     await dynamics.save(row)
     setCreating(false)
+    setDuplicate(null)
     setSettingsOpen(false)
+  }
+
+  function repeat(row: DynamicRow) {
+    setDuplicate(duplicateDynamic(row))
+    setSelectedId(null)
+    setCreating(false)
+    setTab('preparar')
+    setSettingsOpen(false)
+    setScanning(false)
+    dynamics.setEditor(null)
+    dynamics.setWinners(null)
+    dynamics.setFeedback(null)
   }
 
   function open(row: DynamicRow, target?: DetailTab) {
@@ -219,7 +240,7 @@ export function DynamicsView() {
             Identifica lo que está activo, abre el control con PLAY y prepara el resto sin perderte.
           </p>
         </div>
-        {!selected && !creating && (
+        {!selected && !creating && !duplicate && (
           <button
             type="button"
             className="button"
@@ -234,9 +255,26 @@ export function DynamicsView() {
       <Feedback value={feedback} />
       {confirmationPanel}
 
-      {creating ? (
+      {duplicate ? (
+        <div>
+          <button type="button" className="text-link mb-4" onClick={() => setDuplicate(null)}>
+            <ArrowLeft aria-hidden className="size-4" /> Volver a dinámicas
+          </button>
+          <DynamicForm
+            key={duplicate.id}
+            row={duplicate}
+            cloneMode
+            brands={sponsors.data}
+            logos={sponsorLogos.data}
+            dynamics={rows}
+            onSave={save}
+            onCancel={() => setDuplicate(null)}
+          />
+        </div>
+      ) : creating ? (
         <DynamicCreateWizard
           brands={sponsors.data}
+          logos={sponsorLogos.data}
           dynamics={rows}
           onSave={save}
           onCancel={() => setCreating(false)}
@@ -347,6 +385,7 @@ export function DynamicsView() {
                   key={selected.id}
                   row={editor?.id === selected.id ? editor : selected}
                   brands={sponsors.data}
+                  logos={sponsorLogos.data}
                   dynamics={rows}
                   onSave={save}
                   onCancel={() => setSettingsOpen(false)}
@@ -488,6 +527,15 @@ export function DynamicsView() {
 
           {tab === 'resultados' && (
             <>
+              {(selected.status === 'completed' || selected.status === 'closed') && (
+                <button
+                  type="button"
+                  className="button button-secondary self-start"
+                  onClick={() => repeat(selected)}
+                >
+                  <Copy aria-hidden className="size-4" /> Repetir dinámica
+                </button>
+              )}
               {selected.type !== 'raffle' && (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="rounded-card border border-neo-border bg-neo-surface p-5">
@@ -589,7 +637,12 @@ export function DynamicsView() {
                   </div>
                   <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
                     {group.rows.map((row) => (
-                      <DynamicCard key={row.id} row={row} onOpen={() => open(row)} />
+                      <DynamicCard
+                         key={row.id}
+                         row={row}
+                         onOpen={() => open(row)}
+                         onRepeat={() => repeat(row)}
+                       />
                     ))}
                   </div>
                 </section>
