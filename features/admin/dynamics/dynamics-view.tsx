@@ -642,7 +642,7 @@ export function DynamicsView() {
                         row={row}
                         onOpen={() => open(row)}
                         onRepeat={() => repeat(row)}
-                       />
+                      />
                     ))}
                   </div>
                 </section>
