@@ -10,8 +10,8 @@ import {
 } from '../types'
 import { EditorForm, useEditor } from '../ui/editor-form'
 import { LabelOptions } from '../ui/label-options'
-import { percentToProbability, probabilityToPercent } from './probability'
 import { dynamicSponsorOptions, dynamicSponsorValue, sponsorFields } from './dynamic-sponsors'
+import { percentToProbability, probabilityToPercent } from './probability'
 
 export function DynamicForm({
   row,
