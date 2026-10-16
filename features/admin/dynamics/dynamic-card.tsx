@@ -1,6 +1,6 @@
 'use client'
 
-import { Dices, Gift, MonitorPlay, Play, Settings2, Target, Trophy, Zap } from 'lucide-react'
+import { Copy, Dices, Gift, MonitorPlay, Play, Settings2, Target, Trophy, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { dynamicStates, dynamicTypes } from '../labels'
 import type { DynamicRow } from '../types'
@@ -14,7 +14,15 @@ const typeIcons = {
   instant_win: Gift,
 }
 
-export function DynamicCard({ row, onOpen }: { row: DynamicRow; onOpen: () => void }) {
+export function DynamicCard({
+  row,
+  onOpen,
+  onRepeat,
+}: {
+  row: DynamicRow
+  onOpen: () => void
+  onRepeat: () => void
+}) {
   const TypeIcon = typeIcons[row.type as keyof typeof typeIcons] ?? Zap
   const active = row.status === 'open'
   const draft = row.status === 'draft'
@@ -66,6 +74,11 @@ export function DynamicCard({ row, onOpen }: { row: DynamicRow; onOpen: () => vo
             </>
           )}
         </button>
+        {(row.status === 'completed' || row.status === 'closed') && (
+          <button type="button" className={styles.secondaryAction} onClick={onRepeat}>
+            <Copy aria-hidden className="size-4" /> Repetir
+          </button>
+        )}
         {active && (
           <Link
             href={`/juego/${row.id}`}
