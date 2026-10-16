@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.36.0] - 2026-10-15
+
+### Added
+- **Repetir dinámicas finalizadas:** permite preparar una nueva edición independiente sin arrastrar ganadores, participaciones ni requisitos vinculados a actividades antiguas.
+- **Patrocinadores desde Marcas Aliadas:** reutiliza el catálogo de logos del panel y mantiene compatibilidad con las marcas anteriores, sin crear registros duplicados.
+
 ### Changed · 2026-10-13
 - **Dinámicas V2:** pantalla pública para sorteos con revelación progresiva y datos protegidos; panel de control de evento.
 - **Operación más clara:** dinámicas agrupadas en Activas, Por preparar y Finalizadas, tarjetas sobrias y botón de control compacto; navegación lateral conservada.
