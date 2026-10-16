@@ -2,7 +2,8 @@
 
 import { ArrowLeft, ArrowRight, Dices, Gift, ScanLine, Target } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
-import type { CommunityRecord, DynamicRow, DynamicType } from '../types'
+import type { CommunityRecord, DynamicRow, DynamicType, LogoItem } from '../types'
+import { dynamicSponsorOptions, sponsorFields } from './dynamic-sponsors'
 
 const options: { type: DynamicType; name: string; description: string; icon: typeof Dices }[] = [
   {
@@ -33,11 +34,13 @@ const options: { type: DynamicType; name: string; description: string; icon: typ
 
 export function DynamicCreateWizard({
   brands,
+  logos,
   dynamics,
   onSave,
   onCancel,
 }: {
   brands: CommunityRecord[]
+  logos: LogoItem[]
   dynamics: DynamicRow[]
   onSave: (row: DynamicRow) => Promise<void>
   onCancel: () => void
@@ -54,6 +57,7 @@ export function DynamicCreateWizard({
   const [eligibleDynamic, setEligibleDynamic] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const sponsorOptions = dynamicSponsorOptions(brands, logos)
 
   // Reto has its own review step so the validation method is explicit.
   const totalSteps = type === 'challenge' ? 4 : 3
@@ -82,6 +86,14 @@ export function DynamicCreateWizard({
     setBusy(true)
     setError('')
     try {
+      const config =
+        type === 'raffle'
+          ? { exclude_winners: true }
+          : type === 'instant_win'
+            ? { win_probability: 0.1 }
+            : type === 'challenge'
+              ? { validation_method: 'staff_scan' }
+              : {}
       await onSave({
         id: 'new-' + Date.now(),
         name: name.trim(),
@@ -91,17 +103,9 @@ export function DynamicCreateWizard({
         prize: hasPrize ? prize.trim() : '',
         winner_count: hasPrize ? count : 1,
         points: hasPrize ? 0 : points,
-        sponsor_brand_id: sponsor || null,
+        ...sponsorFields(sponsor, config),
         eligibility_dynamic_id: type === 'raffle' ? eligibleDynamic || null : null,
         requires_checkin: requiresCheckin,
-        config:
-          type === 'raffle'
-            ? { exclude_winners: true }
-            : type === 'instant_win'
-              ? { win_probability: 0.1 }
-              : type === 'challenge'
-                ? { validation_method: 'staff_scan' }
-                : {},
       })
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'No pudimos guardar la dinámica.')
@@ -317,13 +321,11 @@ export function DynamicCreateWizard({
             Patrocinador (opcional)
             <select value={sponsor} onChange={(e) => setSponsor(e.target.value)}>
               <option value="">Sin patrocinador</option>
-              {brands
-                .filter((brand) => brand.active)
-                .map((brand) => (
-                  <option key={brand.id} value={brand.id}>
-                    {brand.name}
-                  </option>
-                ))}
+              {sponsorOptions.map((item) => (
+                <option key={item.value} value={item.value}>
+                  {item.name}
+                </option>
+              ))}
             </select>
           </label>
           {type !== 'challenge' && (
@@ -365,7 +367,7 @@ export function DynamicCreateWizard({
               <div>
                 <dt className="text-neo-text-secondary">Patrocinador</dt>
                 <dd className="m-0 font-bold">
-                  {brands.find((brand) => brand.id === sponsor)?.name ?? 'Sin patrocinador'}
+                  {sponsorOptions.find((item) => item.value === sponsor)?.name ?? 'Sin patrocinador'}
                 </dd>
               </div>
               <div>
