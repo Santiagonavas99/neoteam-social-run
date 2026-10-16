@@ -1,22 +1,27 @@
 'use client'
 
 import { dynamicFormTypes, dynamicStates, dynamicTypes, raffleGenders } from '../labels'
-import { type CommunityRecord, type DynamicRow, type DynamicType, isNew } from '../types'
+import { type CommunityRecord, type DynamicRow, type DynamicType, isNew, type LogoItem } from '../types'
 import { EditorForm, useEditor } from '../ui/editor-form'
 import { LabelOptions } from '../ui/label-options'
 import { percentToProbability, probabilityToPercent } from './probability'
+import { dynamicSponsorOptions, dynamicSponsorValue, sponsorFields } from './dynamic-sponsors'
 
 export function DynamicForm({
   row,
   brands,
+  logos,
   dynamics,
   onSave,
   onCancel,
   onDelete,
+  cloneMode = false,
 }: {
   row: DynamicRow
   brands: CommunityRecord[]
+  logos: LogoItem[]
   dynamics: DynamicRow[]
+  cloneMode?: boolean
   onSave: (row: DynamicRow) => Promise<void>
   onCancel: () => void
   onDelete?: () => void
@@ -28,10 +33,12 @@ export function DynamicForm({
   const raffle = values.type === 'raffle'
   const instantWin = values.type === 'instant_win'
   const challenge = values.type === 'challenge'
+  const selectedSponsor = dynamicSponsorValue(values)
+  const sponsorOptions = dynamicSponsorOptions(brands, logos, selectedSponsor)
 
   return (
     <EditorForm
-      title={isNew(row) ? 'Nueva dinámica' : `Editar ${row.name}`}
+      title={cloneMode ? 'Repetir dinámica' : isNew(row) ? 'Nueva dinámica' : `Editar ${row.name}`}
       hint={
         challenge
           ? 'Explica qué debe completar el corredor. El personal verifica y registra el resultado con QR.'
@@ -87,8 +94,15 @@ export function DynamicForm({
           </small>
         )}
       </label>
-      <label>
-        Estado
+      {cloneMode && (
+        <p className="col-span-full m-0 rounded-control bg-neo-muted-bg p-4 text-sm text-neo-text-secondary">
+          Esta copia será un borrador sin resultados anteriores. Revisa las reglas y vuelve a
+          seleccionar la actividad requerida, si aplica, antes de activarla.
+        </p>
+      )}
+      {!cloneMode && (
+        <label>
+          Estado
         <select
           value={values.status}
           onChange={(e) => update('status', e.target.value as DynamicRow['status'])}
@@ -96,7 +110,8 @@ export function DynamicForm({
           <LabelOptions labels={dynamicStates} />
         </select>
         <small>Borrador no recibe participaciones; actívala para escanear o sortear.</small>
-      </label>
+        </label>
+      )}
       {challenge && (
         <p className="col-span-full m-0 rounded-control border border-neo-accent-border bg-neo-accent-soft p-4 text-sm text-neo-text-secondary">
           <strong className="text-neo-accent-text">Cómo funcionará:</strong> al completar el reto,
@@ -205,17 +220,19 @@ export function DynamicForm({
       <label className="col-span-full">
         Marca patrocinadora
         <select
-          value={values.sponsor_brand_id ?? ''}
-          onChange={(e) => update('sponsor_brand_id', e.target.value || null)}
+          value={selectedSponsor}
+          onChange={(e) => {
+            const fields = sponsorFields(e.target.value, values.config)
+            update('sponsor_brand_id', fields.sponsor_brand_id)
+            update('config', fields.config)
+          }}
         >
           <option value="">Sin patrocinador</option>
-          {brands
-            .filter((brand) => brand.active || brand.id === values.sponsor_brand_id)
-            .map((brand) => (
-              <option key={brand.id} value={brand.id}>
-                {brand.name}
-              </option>
-            ))}
+          {sponsorOptions.map((item) => (
+            <option key={item.value} value={item.value}>
+              {item.name}
+            </option>
+          ))}
         </select>
       </label>
       <label className="check-label col-span-full">
