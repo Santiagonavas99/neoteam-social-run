@@ -1,7 +1,13 @@
 'use client'
 
 import { dynamicFormTypes, dynamicStates, dynamicTypes, raffleGenders } from '../labels'
-import { type CommunityRecord, type DynamicRow, type DynamicType, isNew, type LogoItem } from '../types'
+import {
+  type CommunityRecord,
+  type DynamicRow,
+  type DynamicType,
+  isNew,
+  type LogoItem,
+} from '../types'
 import { EditorForm, useEditor } from '../ui/editor-form'
 import { LabelOptions } from '../ui/label-options'
 import { percentToProbability, probabilityToPercent } from './probability'
@@ -103,13 +109,13 @@ export function DynamicForm({
       {!cloneMode && (
         <label>
           Estado
-        <select
-          value={values.status}
-          onChange={(e) => update('status', e.target.value as DynamicRow['status'])}
-        >
-          <LabelOptions labels={dynamicStates} />
-        </select>
-        <small>Borrador no recibe participaciones; actívala para escanear o sortear.</small>
+          <select
+            value={values.status}
+            onChange={(e) => update('status', e.target.value as DynamicRow['status'])}
+          >
+            <LabelOptions labels={dynamicStates} />
+          </select>
+          <small>Borrador no recibe participaciones; actívala para escanear o sortear.</small>
         </label>
       )}
       {challenge && (
