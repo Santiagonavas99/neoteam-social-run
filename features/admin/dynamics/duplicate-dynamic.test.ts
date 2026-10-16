@@ -5,12 +5,20 @@ import { duplicateDynamic } from './duplicate-dynamic.ts'
 
 test('repeating a completed dynamic copies editable rules into an independent draft', () => {
   const original: DynamicRow = {
-    id: 'old', name: 'Gran rifa final', description: 'Premio', type: 'raffle',
-    status: 'completed', sponsor_brand_id: null, prize: 'Camiseta',
-    winner_count: 2, points: 0, requires_checkin: true,
+    id: 'old',
+    name: 'Gran rifa final',
+    description: 'Premio',
+    type: 'raffle',
+    status: 'completed',
+    sponsor_brand_id: null,
+    prize: 'Camiseta',
+    winner_count: 2,
+    points: 0,
+    requires_checkin: true,
     eligibility_dynamic_id: 'previous-challenge',
     config: { exclude_winners: true, sponsor_logo_id: 'ally-logo' },
-    participations_count: 350, winners_count: 2,
+    participations_count: 350,
+    winners_count: 2,
   }
   const repeat = duplicateDynamic(original)
   assert.ok(repeat.id.startsWith('new-'))
