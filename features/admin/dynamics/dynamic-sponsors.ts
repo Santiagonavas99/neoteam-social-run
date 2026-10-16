@@ -3,7 +3,11 @@ import type { CommunityRecord, DynamicRow, LogoItem } from '../types'
 export type DynamicSponsor = { value: string; name: string }
 
 function normalizedName(name: string): string {
-  return name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLocaleLowerCase('es')
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLocaleLowerCase('es')
 }
 
 /** Prefer canonical allied logos and preserve older brand references. */
@@ -53,9 +57,8 @@ export function sponsorFields(
     return { sponsor_brand_id: null, config: { ...config, sponsor_logo_id: selection.slice(5) } }
   }
   return {
-    sponsor_brand_id: selection.startsWith('brand:') && selection.length > 6
-      ? selection.slice(6)
-      : null,
+    sponsor_brand_id:
+      selection.startsWith('brand:') && selection.length > 6 ? selection.slice(6) : null,
     config,
   }
 }
