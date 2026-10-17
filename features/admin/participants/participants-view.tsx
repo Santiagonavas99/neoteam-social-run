@@ -30,6 +30,7 @@ import { ListToolbar } from '../ui/list-toolbar'
 import { LoadingState } from '../ui/loading-state'
 import { useAdminData } from '../ui/use-admin-data'
 import { backupListCsv, backupListFileName } from './backup-list'
+import { shouldRequestCheckinException } from './checkin-deadline'
 import { pageCorrection } from './pagination'
 import { ParticipantEditor } from './participant-editor'
 import { printableRegistrationsHtml } from './print-list'
@@ -87,6 +88,8 @@ export function ParticipantsView() {
   const [busy, setBusy] = useState<string | null>(null)
   const [feedback, setFeedback] = useState<FeedbackValue>(null)
   const [confirmation, setConfirmation] = useState<Participant | null>(null)
+  const [exceptionFor, setExceptionFor] = useState<Participant | null>(null)
+  const [exceptionReason, setExceptionReason] = useState('')
   const [downloading, setDownloading] = useState(false)
   const [printing, setPrinting] = useState(false)
 
@@ -205,6 +208,14 @@ export function ParticipantsView() {
   }
 
   async function changeAttendance(row: Participant, next: string) {
+    if (shouldRequestCheckinException(next)) {
+      if (row.status === 'registered' || row.status === 'no_show') {
+        setExceptionFor(row)
+        setExceptionReason('')
+        setFeedback(null)
+      }
+      return
+    }
     setBusy(row.id)
     setFeedback(null)
     try {
@@ -217,6 +228,30 @@ export function ParticipantsView() {
         kind: 'success',
         text: `${row.first_name}: ${participantStates[next]}.`,
       })
+      await reload()
+    } catch (error) {
+      onError(error)
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  async function confirmCheckinException() {
+    if (!exceptionFor || exceptionReason.trim().length < 10) return
+    const row = exceptionFor
+    setBusy(row.id)
+    setFeedback(null)
+    try {
+      await callAdmin('adminCheckinException', {
+        participantId: row.id,
+        reason: exceptionReason.trim(),
+      })
+      setFeedback({
+        kind: 'success',
+        text: `Check-in excepcional de ${fullName(row)} registrado con auditoría.`,
+      })
+      setExceptionFor(null)
+      setExceptionReason('')
       await reload()
     } catch (error) {
       onError(error)
@@ -499,6 +534,57 @@ export function ParticipantsView() {
         </div>
       </div>
       <Feedback value={feedback} />
+      {exceptionFor && (
+        <section
+          aria-labelledby="exception-title"
+          className="mb-4 flex flex-col gap-3 rounded-card border border-neo-border bg-neo-surface p-4 sm:p-5"
+        >
+          <div>
+            <h3 id="exception-title" className="m-0 text-base font-bold">
+              Check-in excepcional · {fullName(exceptionFor)}
+            </h3>
+            <p className="m-0 mt-2 text-sm text-neo-text-secondary">
+              El check-in cerró el domingo 18 a las 8:00 a. m. (Colombia).
+              Solo administradores pueden registrar una llegada excepcional. El motivo,
+              la hora y la cuenta responsable quedarán auditados.
+            </p>
+          </div>
+          <label htmlFor="checkin-exception-reason" className="text-sm font-semibold">
+            Motivo obligatorio de la excepción
+          </label>
+          <textarea
+            id="checkin-exception-reason"
+            rows={3}
+            maxLength={400}
+            value={exceptionReason}
+            onChange={(event) => setExceptionReason(event.currentTarget.value)}
+            disabled={!!busy}
+            placeholder="Por ejemplo: llegada verificada presencialmente por coordinación."
+            className="w-full"
+          />
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="button"
+              onClick={() => void confirmCheckinException()}
+              disabled={!!busy || exceptionReason.trim().length < 10}
+            >
+              {busy ? 'Registrando…' : 'Confirmar excepción'}
+            </button>
+            <button
+              type="button"
+              className="button button-secondary"
+              disabled={!!busy}
+              onClick={() => {
+                setExceptionFor(null)
+                setExceptionReason('')
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+        </section>
+      )}
       {confirmation && (
         <ConfirmPanel
           kind="delete"
@@ -593,7 +679,7 @@ export function ParticipantsView() {
                           <Pencil aria-hidden className="size-4 shrink-0" />
                           {editing?.id === row.id ? 'Cerrar edición' : 'Editar datos'}
                         </button>
-                        {state === 'registered' && (
+                        {(state === 'registered' || state === 'no_show') && (
                           <button
                             type="button"
                             className="button button-small"
@@ -601,7 +687,7 @@ export function ParticipantsView() {
                             disabled={!!busy}
                           >
                             <UserCheck aria-hidden className="size-4 shrink-0" />
-                            {busy === row.id ? 'Guardando…' : 'Check-in'}
+                            {busy === row.id ? 'Guardando…' : 'Check-in / excepción'}
                           </button>
                         )}
                         {state !== 'cancelled' && (
