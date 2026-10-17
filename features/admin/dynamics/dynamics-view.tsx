@@ -647,7 +647,6 @@ export function DynamicsView() {
                     )}
                   </div>
                 )}
-
             </>
           )}
 
