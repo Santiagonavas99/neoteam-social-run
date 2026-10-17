@@ -28,6 +28,7 @@ import { duplicateDynamic } from './duplicate-dynamic'
 import { DynamicCard } from './dynamic-card'
 import { DynamicCreateWizard } from './dynamic-create-wizard'
 import { DynamicForm } from './dynamic-form'
+import { MobileDynamicsHome } from './mobile-dynamics-home'
 import { challengeNeedsRules, groupDynamicsByPhase, orderDynamicsByStatus } from './dynamics-order'
 import styles from './dynamics-tabs.module.css'
 import { GameControlPanel } from './game-control-panel'
@@ -577,6 +578,8 @@ export function DynamicsView() {
         </>
       ) : (
         <>
+          <MobileDynamicsHome rows={rows} query={query} onQueryChange={setQuery} onOpen={open} />
+          <div className="hidden flex-col gap-5 md:flex">
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
             {[
               { label: 'Activas', count: counts.open, status: 'open' },
@@ -678,6 +681,7 @@ export function DynamicsView() {
               </div>
             </details>
           )}
+          </div>
         </>
       )}
     </section>
