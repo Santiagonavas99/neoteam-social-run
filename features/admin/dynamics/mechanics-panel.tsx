@@ -274,7 +274,7 @@ function MechanicsPanel({ dynamic, resultsOnly = false }: MechanicsProps) {
       )}
       {kind === 'wheel' && (
         <div className="space-y-4">
-          <div className={"mx-auto flex size-48 items-center justify-center rounded-full border-8" + (busy ? " motion-safe:animate-spin" : "")} border-neo-border-strong bg-neo-accent-soft text-center shadow-lg">
+          <div className={'mx-auto flex size-48 items-center justify-center rounded-full border-8 border-neo-border-strong bg-neo-accent-soft text-center shadow-lg' + (busy ? ' motion-safe:animate-spin' : '')}>
             <div className="px-4">
               <p className="m-0 text-xs font-bold tracking-widest uppercase">Social Run</p>
               <strong className="mt-2 block text-xl">RULETA</strong>
