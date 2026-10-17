@@ -16,15 +16,15 @@ export function rankTimes<T extends TimedScore>(runs: T[], direction: 'min' | 'm
     .sort((a, b) =>
       (direction === 'min' ? a.elapsed_ms - b.elapsed_ms : b.elapsed_ms - a.elapsed_ms) ||
       a.id.localeCompare(b.id))
-  return sorted.map((run,index) => ({
+  return sorted.map((run) => ({
     run,
     place: sorted.findIndex((item) => item.elapsed_ms === run.elapsed_ms) + 1,
     tied: sorted.some((item) => item.id !== run.id && item.elapsed_ms === run.elapsed_ms),
   }))
 }
 
-export function remainingStock(
-  prizes: Array<{id: string;quantity: number}>,
+export function remainingStock<T extends { id: string; quantity: number }>(
+  prizes: T[],
   spins: Array<{prize_key:string | null}>,
 ) {
   return prizes.map((prize) => ({
