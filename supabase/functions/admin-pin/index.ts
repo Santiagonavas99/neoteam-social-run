@@ -572,7 +572,7 @@ Deno.serve(async (req: Request) => {
           return data?.id ?? null
         }
 
-        if (['timedAction','timedResults','wheelSpin','wheelResults','triviaAnswer','triviaResults'].includes(operation)) {
+        if (['timedAction','timedResults','timedFinalize','wheelSpin','wheelResults','triviaAnswer','triviaResults'].includes(operation)) {
           const dynamic = await checkedDynamic(body?.id)
           if (!dynamic) return json({ error: 'Dinámica no encontrada.' }, 404)
           if (operation === 'timedResults') {
@@ -582,6 +582,24 @@ Deno.serve(async (req: Request) => {
               .eq('dynamic_id', dynamic.id).order('created_at', { ascending: true })
             if (error) throw error
             return json({ ok: true, timedRuns: data ?? [] })
+          }
+
+          if (operation === 'timedFinalize') {
+            const { data, error } = await supabase.rpc('dynamic_timed_finalize', {
+              p_event_id: event.id, p_dynamic_id: dynamic.id,
+            })
+            const known = mechanicError(error)
+            if (known) return known
+            if (error && error.message?.includes('mechanic_tie_unresolved'))
+              return json({ error: 'Hay un empate en el límite de premios. Resuelve el desempate antes de cerrar.' }, 409)
+            if (error && error.message?.includes('mechanic_unfinished_runs'))
+              return json({ error: 'Finaliza todos los cronómetros antes de cerrar la clasificación.' }, 409)
+            if (error && error.message?.includes('mechanic_finalize_individual_only'))
+              return json({ error: 'Los relevos requieren confirmar manualmente la entrega de cortesías por equipo.' }, 409)
+            if (error && error.message?.includes('mechanic_no_results'))
+              return json({ error: 'No hay tiempos finalizados.' }, 409)
+            if (error) throw error
+            return json({ ok: true, finalized: data })
           }
           if (operation === 'wheelResults') {
             const { data, error } = await supabase.from('dynamic_wheel_spins')
