@@ -105,8 +105,7 @@ export function DynamicForm({
         />
       </label>
       {challenge && (
-        <>
-          <label>
+        <label>
             Modalidad del reto
             <select
               value={
@@ -128,11 +127,9 @@ export function DynamicForm({
         </>
       )}
       {raffle && (
-        <div className="col-span-full">
-          <p id="prize-mode-label" className="m-0 mb-2 text-sm font-semibold">
-            Modalidad
-          </p>
-          <div role="group" aria-labelledby="prize-mode-label" className="grid grid-cols-2 gap-2">
+        <fieldset className="col-span-full min-w-0">
+          <legend className="mb-2 text-sm font-semibold">Modalidad</legend>
+          <div className="grid grid-cols-2 gap-2">
             {[
               { value: 'raffle', label: 'Rifa' },
               { value: 'wheel', label: 'Ruleta' },
@@ -162,7 +159,7 @@ export function DynamicForm({
               )
             })}
           </div>
-        </div>
+        </fieldset>
       )}
       {wheel && (
         <div className="col-span-full grid gap-3 rounded-control border border-neo-border p-4">
@@ -279,7 +276,10 @@ export function DynamicForm({
                         ...values.config,
                         wheel_prizes: wheelPrizes.map((item, itemIndex) =>
                           itemIndex === index
-                            ? { ...item, weight: Math.max(1, Math.floor(Number(e.target.value) || 1)) }
+                            ? {
+                                ...item,
+                                weight: Math.max(1, Math.floor(Number(e.target.value) || 1)),
+                              }
                             : item,
                         ),
                         pending_review: true,
@@ -288,7 +288,9 @@ export function DynamicForm({
                   />
                 </label>
               ))}
-              <small>Todos los pesos iguales dan la misma oportunidad a cada premio disponible.</small>
+              <small>
+                Todos los pesos iguales dan la misma oportunidad a cada premio disponible.
+              </small>
             </div>
           </details>
         </div>
