@@ -81,7 +81,11 @@ export function DynamicCard({
           </button>
         )}
         {active && (
-          <button type="button" className={`${styles.screenLink} hidden md:inline-flex`} onClick={onPreview}>
+          <button
+            type="button"
+            className={`${styles.screenLink} hidden md:inline-flex`}
+            onClick={onPreview}
+          >
             <MonitorPlay aria-hidden className="size-4" /> Pantalla pública
           </button>
         )}
