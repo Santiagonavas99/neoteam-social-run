@@ -1,6 +1,7 @@
 // @ts-nocheck
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { CHECKIN_CLOSED_MESSAGE, isCheckinClosed } from '../_shared/checkin-window.ts'
 import { codeEmail, sendEmail } from '../_shared/email.ts'
 import {
   CODE_MAX_ATTEMPTS,
@@ -21,7 +22,6 @@ import {
   participantLookup,
   participantPayload,
 } from '../_shared/participants.ts'
-import { CHECKIN_CLOSED_MESSAGE, isCheckinClosed } from '../_shared/checkin-window.ts'
 import { sendPassEmail } from '../_shared/pass-email.ts'
 import { handlePassEmailQueue } from '../_shared/pass-email-queue.ts'
 import { fromProxy, sha256 } from '../_shared/proxy.ts'
@@ -1349,7 +1349,7 @@ Deno.serve(async (req: Request) => {
       })
       if (known) return known
       if (error) throw error
-      if (data === 'not_found') return json({ error: 'Participante no encontrado.', 404)
+      if (data === 'not_found') return json({ error: 'Participante no encontrado.' }, 404)
       if (data === 'not_allowed')
         return json({ error: 'Este participante no permite check-in.' }, 409)
       if (data === 'already_checked_in')
