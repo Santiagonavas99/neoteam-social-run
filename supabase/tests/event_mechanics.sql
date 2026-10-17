@@ -74,6 +74,33 @@ begin
  end;
  assert failed,'duplicate runner is rejected';
 
+ -- Tie at the cut-off must block prize allocation.
+ x:=public.dynamic_timed_command(ev,d,'start',b);
+ v_run_id:=(x->>'id')::uuid;
+ x:=public.dynamic_timed_command(p_event_id=>ev,p_dynamic_id=>d,p_command=>'finish',p_run_id=>v_run_id);
+ x:=public.dynamic_timed_command(p_event_id=>ev,p_dynamic_id=>d,p_command=>'correct',
+   p_run_id=>v_run_id,p_correct_ms=>12730,p_reason=>'tie simulation',p_actor=>'qa');
+ begin
+   perform public.dynamic_timed_finalize(ev,d);
+   failed:=false;
+ exception when others then failed:=sqlerrm='mechanic_tie_unresolved';
+ end;
+ assert failed,'ties crossing prize boundary must be resolved';
+ x:=public.dynamic_timed_command(p_event_id=>ev,p_dynamic_id=>d,p_command=>'correct',
+   p_run_id=>v_run_id,p_correct_ms=>11000,p_reason=>'tie resolved by official review',p_actor=>'qa');
+ x:=public.dynamic_timed_finalize(ev,d);
+ assert (x->>'winners')::integer=1,'only the champion wins';
+ assert (select status from public.dynamics where id=d)='completed','ranking finalized';
+ assert (select count(*) from public.dynamic_participations where dynamic_id=d and status='winner')=1,
+   'prize is reflected in event historical results';
+ begin
+   perform public.dynamic_timed_finalize(ev,d);
+   failed:=false;
+ exception when others then failed:=sqlerrm='mechanic_not_open';
+ end;
+ assert failed,'a finalized ranking cannot be executed again';
+
+
  insert into public.dynamics(event_id,name,type,status,requires_checkin,config,prize,winner_count)
  values(ev,'Test relay','challenge','open',false,
  '{"challenge_mode":"team_relay","pending_review":false}','reward',2) returning id into team;
