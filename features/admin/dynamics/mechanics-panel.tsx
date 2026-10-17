@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { callAdmin } from '../api'
+import { ScanStation } from '../ui/scan-station'
 import type { DynamicRow, TimedRun, TriviaAnswer, WheelSpin } from '../types'
 
 type Kind = 'timed' | 'wheel' | 'trivia'
@@ -43,6 +44,7 @@ function MechanicsPanel({ dynamic, resultsOnly = false }: MechanicsProps) {
   const [code, setCode] = useState('')
   const [teamName, setTeamName] = useState('')
   const [teamCodes, setTeamCodes] = useState('')
+  const [cameraOpen, setCameraOpen] = useState(false)
   const [choice, setChoice] = useState<number | null>(null)
   const [timed, setTimed] = useState<TimedRun[]>([])
   const [spins, setSpins] = useState<WheelSpin[]>([])
@@ -145,6 +147,34 @@ function MechanicsPanel({ dynamic, resultsOnly = false }: MechanicsProps) {
           {configured ? 'Esta actividad debe estar activa para operar.' :
             'Antes de activarla, confirma las reglas, preguntas y premios en Preparación.'}
         </p>
+      )}
+      {!resultsOnly && active && (
+        <div className="mb-4">
+          <button type="button" className="button button-secondary w-full"
+            onClick={() => setCameraOpen((value) => !value)}>
+            {cameraOpen ? 'Cerrar cámara' : 'Escanear QR con cámara'}
+          </button>
+          {cameraOpen && (
+            <div className="mt-3">
+              <ScanStation
+                inputId={'mechanic-code-' + dynamic.id}
+                title="Escanear participante"
+                helper={isTeam ? 'Escanea los QR de cada integrante y después inicia el cronómetro.' :
+                  'El QR se captura aquí. Confirma la operación principal para registrar el resultado.'}
+                onCode={async (scanned) => {
+                  if (isTeam && kind === 'timed') {
+                    const current = teamCodes.split(',').map((value) => value.trim()).filter(Boolean)
+                    if (current.includes(scanned)) return { tone: 'warning', headline: 'Código ya capturado' }
+                    setTeamCodes([...current,scanned].join(', '))
+                    return { tone: 'success', headline: 'Integrante añadido', detail: 'Escanea el siguiente o inicia el relevo.' }
+                  }
+                  setCode(scanned)
+                  return { tone: 'success', headline: 'QR capturado', detail: 'Ya puedes confirmar la actividad.' }
+                }}
+              />
+            </div>
+          )}
+        </div>
       )}
       {error && <p role="alert" className="my-3 text-sm text-neo-danger">{error}</p>}
       {message && <p role="status" className="my-3 text-sm text-neo-accent-text">{message}</p>}
@@ -257,7 +287,7 @@ function MechanicsPanel({ dynamic, resultsOnly = false }: MechanicsProps) {
       )}
       {kind === 'wheel' && (
         <div className="space-y-4">
-          <div className="mx-auto flex size-48 items-center justify-center rounded-full border-8 border-neo-border-strong bg-neo-accent-soft text-center shadow-lg">
+          <div className={"mx-auto flex size-48 items-center justify-center rounded-full border-8" + (busy ? " motion-safe:animate-spin" : "")} border-neo-border-strong bg-neo-accent-soft text-center shadow-lg">
             <div className="px-4">
               <p className="m-0 text-xs font-bold tracking-widest uppercase">Social Run</p>
               <strong className="mt-2 block text-xl">RULETA</strong>
