@@ -261,6 +261,60 @@ grant execute on function public.dynamic_timed_command(uuid,uuid,text,uuid,uuid[
 grant execute on function public.dynamic_wheel_spin(uuid,uuid,uuid) to service_role;
 grant execute on function public.dynamic_trivia_answer(uuid,uuid,uuid,integer) to service_role;
 
+
+-- Finalize only individual timed rankings. No tied prize-boundary or unfinished run can be awarded.
+create or replace function public.dynamic_timed_finalize(
+  p_event_id uuid,p_dynamic_id uuid
+) returns jsonb language plpgsql security invoker set search_path = '' as $
+declare
+  d record; v_mode text; v_total integer; v_awards integer; v_cutoff bigint;
+  v_next bigint; v_winners integer;
+begin
+  select * into d from public.dynamics where id=p_dynamic_id and event_id=p_event_id for update;
+  if not found then raise exception 'mechanic_not_found'; end if;
+  v_mode:=d.config->>'challenge_mode';
+  if d.type<>'challenge' or v_mode not in ('timed_max','timed_min') then
+    raise exception 'mechanic_finalize_individual_only';
+  end if;
+  if d.status<>'open' then raise exception 'mechanic_not_open'; end if;
+  if d.config->>'pending_review'='true' then raise exception 'mechanic_not_reviewed'; end if;
+  if exists(select 1 from public.dynamic_timed_runs where dynamic_id=p_dynamic_id and status<>'finished') then
+    raise exception 'mechanic_unfinished_runs';
+  end if;
+  select count(*) into v_total from public.dynamic_timed_runs where dynamic_id=p_dynamic_id and status='finished';
+  if v_total=0 then raise exception 'mechanic_no_results'; end if;
+  v_awards:=least(v_total,d.winner_count);
+  -- Ordering is deterministic, but a tie touching the award boundary requires a real tie-break.
+  if v_mode='timed_min' then
+    select elapsed_ms into v_cutoff from public.dynamic_timed_runs
+      where dynamic_id=p_dynamic_id and status='finished' order by elapsed_ms asc,id asc offset v_awards-1 limit 1;
+    select elapsed_ms into v_next from public.dynamic_timed_runs
+      where dynamic_id=p_dynamic_id and status='finished' order by elapsed_ms asc,id asc offset v_awards limit 1;
+  else
+    select elapsed_ms into v_cutoff from public.dynamic_timed_runs
+      where dynamic_id=p_dynamic_id and status='finished' order by elapsed_ms desc,id asc offset v_awards-1 limit 1;
+    select elapsed_ms into v_next from public.dynamic_timed_runs
+      where dynamic_id=p_dynamic_id and status='finished' order by elapsed_ms desc,id asc offset v_awards limit 1;
+  end if;
+  if v_next is not null and v_next=v_cutoff then raise exception 'mechanic_tie_unresolved'; end if;
+  insert into public.dynamic_participations(dynamic_id,registration_id,status,points_awarded,metadata,completed_at)
+  select p_dynamic_id, result.registration_id,'winner',0,
+    jsonb_build_object('mechanic','timed','rank',result.rn,'time_ms',result.elapsed_ms),now()
+  from (
+    select registration_id,elapsed_ms,
+      row_number() over (order by
+        case when v_mode='timed_min' then elapsed_ms else -elapsed_ms end asc,id asc) rn
+    from public.dynamic_timed_runs where dynamic_id=p_dynamic_id and status='finished'
+  ) result where result.rn<=v_awards
+  on conflict(dynamic_id,registration_id) do nothing;
+  get diagnostics v_winners=row_count;
+  if v_winners<>v_awards then raise exception 'mechanic_award_conflict'; end if;
+  update public.dynamics set status='completed',updated_at=now() where id=p_dynamic_id;
+  return jsonb_build_object('winners',v_winners,'completed',true);
+end $;
+revoke all on function public.dynamic_timed_finalize(uuid,uuid) from public,anon,authenticated;
+grant execute on function public.dynamic_timed_finalize(uuid,uuid) to service_role;
+
 -- Preserve all 15 drafts and historical results. Only annotate identified drafts.
 update public.dynamics set
   config=jsonb_set(config,'{challenge_mode}','"timed_max"'::jsonb,true)
@@ -277,3 +331,13 @@ update public.dynamics set
      'social-run-2026-10-18-highforce-ruleta');
 -- Prize quantities and trivia correct answers must be confirmed in the admin.
 -- pending_review remains true; no activation is performed.
+
+-- Unambiguous single-prize stocks, still pending final staff review.
+update public.dynamics set config=jsonb_set(config,'{wheel_prizes}',
+ '[{"id":"prendas","label":"Prenda HIGHFORCE","quantity":2,"weight":1}]'::jsonb,true)
+ where status='draft' and config->>'social_run_plan_key'='social-run-2026-10-18-highforce-ruleta'
+ and config->'wheel_prizes' is null;
+update public.dynamics set config=jsonb_set(config,'{wheel_prizes}',
+ '[{"id":"inscripcion","label":"Inscripción 10K de la Luz","quantity":1,"weight":1}]'::jsonb,true)
+ where status='draft' and config->>'social_run_plan_key'='social-run-2026-10-18-juancho-ruleta'
+ and config->'wheel_prizes' is null;
