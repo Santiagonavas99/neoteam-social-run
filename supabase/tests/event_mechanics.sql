@@ -16,7 +16,8 @@ create table public.dynamics (
  requires_checkin boolean not null default true,
  winner_count integer not null default 1,
  prize text,
- config jsonb not null default '{}'
+ config jsonb not null default '{}',
+ updated_at timestamptz not null default now()
 );
 create table public.dynamic_participations (
  id uuid primary key default gen_random_uuid(),
