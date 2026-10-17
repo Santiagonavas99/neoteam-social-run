@@ -812,6 +812,8 @@ Deno.serve(async (req: Request) => {
               || values.type === 'trivia' || wheel
             if (special && config.pending_review !== false)
               return json({ error: 'Confirma primero las reglas de esta dinámica.' }, 400)
+            if (config.mechanic === 'ruleta_pendiente')
+              return json({ error: 'Configura la modalidad ruleta antes de activarla.' }, 400)
             if (wheel && (!Array.isArray(config.wheel_prizes) || !config.wheel_prizes.length))
               return json({ error: 'Agrega premios reales a la ruleta antes de activarla.' }, 400)
             if (values.type === 'trivia' &&
@@ -836,6 +838,33 @@ Deno.serve(async (req: Request) => {
               return json({ error: 'Probabilidad de ruleta inválida.' }, 400)
             config.wheel_probability = chance
           }
+
+          if (typeof values.id === 'string' && /^[0-9a-f-]{36}$/i.test(values.id)) {
+            const { data: previous, error: previousError } = await supabase.from('dynamics')
+              .select('type,config,prize,winner_count')
+              .eq('event_id',event.id).eq('id',values.id).maybeSingle()
+            if (previousError) throw previousError
+            if (previous) {
+              const [timedRuns, wheelSpins, triviaAttempts] = await Promise.all([
+                supabase.from('dynamic_timed_runs').select('id',{ count:'exact',head:true }).eq('dynamic_id',values.id),
+                supabase.from('dynamic_wheel_spins').select('id',{ count:'exact',head:true }).eq('dynamic_id',values.id),
+                supabase.from('dynamic_trivia_answers').select('id',{ count:'exact',head:true }).eq('dynamic_id',values.id),
+              ])
+              for (const result of [timedRuns,wheelSpins,triviaAttempts]) if (result.error) throw result.error
+              if ((timedRuns.count ?? 0)+(wheelSpins.count ?? 0)+(triviaAttempts.count ?? 0)>0) {
+                const importantKeys = ['challenge_mode','mechanic','wheel_prizes','wheel_probability',
+                  'trivia_question','trivia_options','trivia_correct_index','pending_review','exclude_winners']
+                const changedRules = importantKeys.some((key) =>
+                  JSON.stringify(previous.config?.[key] ?? null) !== JSON.stringify(config[key] ?? null))
+                if (changedRules || previous.type !== values.type ||
+                  previous.prize !== (typeof values.prize==='string' ? values.prize.trim().slice(0,240) : '') ||
+                  previous.winner_count !== Math.max(1,Math.floor(Number(values.winner_count)||1))) {
+                  return json({ error: 'No puedes cambiar reglas, premios o cantidades después de registrar participaciones. Crea una copia para repetir.' }, 409)
+                }
+              }
+            }
+          }
+
           const safeValues = {
             name,
             description:
