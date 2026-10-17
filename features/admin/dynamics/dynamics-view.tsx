@@ -207,14 +207,7 @@ export function DynamicsView() {
           : 'en-vivo')
     writeMobileUrl(row.id, nextTab)
     setSelectedId(row.id)
-    setTab(
-      target ??
-        (row.status === 'draft'
-          ? 'preparar'
-          : row.status === 'completed'
-            ? 'resultados'
-            : 'en-vivo'),
-    )
+    setTab(nextTab)
     setCreating(false)
     setScanning(
       nextTab === 'en-vivo' &&
@@ -648,6 +641,24 @@ export function DynamicsView() {
                   ) : (
                     <ParticipationPanel dynamic={selected} onClose={() => setScanning(false)} />
                   )}
+                </div>
+              )}
+              {selected.type !== 'raffle' && selected.status === 'open' && (
+                <div className="flex flex-wrap gap-3 md:hidden">
+                  <button
+                    type="button"
+                    className="button button-secondary"
+                    onClick={() => setPreview({ id: selected.id, rehearsal: false })}
+                  >
+                    <MonitorPlay aria-hidden className="size-4" /> Vista pública
+                  </button>
+                  <button
+                    type="button"
+                    className="button button-secondary"
+                    onClick={() => setPreview({ id: selected.id, rehearsal: true })}
+                  >
+                    Ensayo
+                  </button>
                 </div>
               )}
             </>
