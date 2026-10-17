@@ -1,7 +1,6 @@
 'use client'
 
 import { Copy, Dices, Gift, MonitorPlay, Play, Settings2, Target, Trophy, Zap } from 'lucide-react'
-import Link from 'next/link'
 import { dynamicStates, dynamicTypes } from '../labels'
 import type { DynamicRow } from '../types'
 import { StatusBadge } from '../ui/admin-ui'
@@ -18,10 +17,12 @@ export function DynamicCard({
   row,
   onOpen,
   onRepeat,
+  onPreview,
 }: {
   row: DynamicRow
   onOpen: () => void
   onRepeat: () => void
+  onPreview: () => void
 }) {
   const TypeIcon = typeIcons[row.type as keyof typeof typeIcons] ?? Zap
   const active = row.status === 'open'
@@ -80,14 +81,13 @@ export function DynamicCard({
           </button>
         )}
         {active && (
-          <Link
-            href={`/juego/${row.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.screenLink}
+          <button
+            type="button"
+            className={`${styles.screenLink} hidden md:inline-flex`}
+            onClick={onPreview}
           >
             <MonitorPlay aria-hidden className="size-4" /> Pantalla pública
-          </Link>
+          </button>
         )}
       </div>
     </article>

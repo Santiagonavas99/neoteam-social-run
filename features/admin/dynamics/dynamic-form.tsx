@@ -39,17 +39,27 @@ export function DynamicForm({
   const raffle = values.type === 'raffle'
   const instantWin = values.type === 'instant_win'
   const challenge = values.type === 'challenge'
+  const trivia = values.type === 'trivia'
+  const wheel = raffle && ['wheel', 'ruleta_pendiente'].includes(String(values.config?.mechanic))
+  const special =
+    wheel ||
+    trivia ||
+    (challenge &&
+      ['timed_max', 'timed_min', 'team_relay'].includes(String(values.config?.challenge_mode)))
+  const wheelPrizes = (
+    Array.isArray(values.config?.wheel_prizes) ? values.config.wheel_prizes : []
+  ) as Array<{ id: string; label: string; quantity: number; weight: number }>
+  const triviaOptions = (
+    Array.isArray(values.config?.trivia_options) ? values.config.trivia_options : []
+  ) as string[]
+
   const selectedSponsor = dynamicSponsorValue(values)
   const sponsorOptions = dynamicSponsorOptions(brands, logos, selectedSponsor)
 
   return (
     <EditorForm
       title={cloneMode ? 'Repetir dinámica' : isNew(row) ? 'Nueva dinámica' : `Editar ${row.name}`}
-      hint={
-        challenge
-          ? 'Explica qué debe completar el corredor. El personal verifica y registra el resultado con QR.'
-          : 'Configura cómo participa la gente y qué gana.'
-      }
+      hint="Datos, premios y participación."
       legend="Datos de la dinámica"
       submitLabel="Guardar dinámica"
       busy={busy}
@@ -93,13 +103,289 @@ export function DynamicForm({
           }
           onChange={(e) => update('description', e.target.value)}
         />
-        {challenge && (
-          <small>
-            El reto se confirma con un escaneo por corredor. Esta versión no mide tiempos ni calcula
-            el más rápido automáticamente.
-          </small>
-        )}
       </label>
+      {challenge && (
+        <label>
+          Modalidad del reto
+          <select
+            value={
+              typeof values.config?.challenge_mode === 'string'
+                ? values.config.challenge_mode
+                : 'completion'
+            }
+            onChange={(e) => update('config', { ...values.config, challenge_mode: e.target.value })}
+          >
+            <option value="completion">Completar actividad (QR)</option>
+            <option value="timed_max">Resistencia: gana el mayor tiempo</option>
+            <option value="timed_min">Velocidad: gana el menor tiempo</option>
+            <option value="team_relay">Relevos por equipos: menor tiempo</option>
+          </select>
+        </label>
+      )}
+      {raffle && (
+        <fieldset className="col-span-full min-w-0">
+          <legend className="mb-2 text-sm font-semibold">Modalidad</legend>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { value: 'raffle', label: 'Rifa' },
+              { value: 'wheel', label: 'Ruleta' },
+            ].map((option) => {
+              const selected = (wheel ? 'wheel' : 'raffle') === option.value
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={selected}
+                  className={`min-h-12 rounded-control border px-3 text-sm font-bold transition-colors ${
+                    selected
+                      ? 'border-neo-accent-text bg-neo-accent-soft text-neo-text'
+                      : 'border-neo-border bg-neo-muted-bg text-neo-text-secondary'
+                  }`}
+                  onClick={() => {
+                    if (selected) return
+                    update('config', {
+                      ...values.config,
+                      mechanic: option.value,
+                      pending_review: option.value === 'wheel',
+                    })
+                  }}
+                >
+                  {option.label}
+                </button>
+              )
+            })}
+          </div>
+        </fieldset>
+      )}
+      {wheel && (
+        <div className="col-span-full grid gap-3 rounded-control border border-neo-border p-4">
+          <h3 className="m-0 text-base font-bold">Premios de la ruleta</h3>
+          {wheelPrizes.map((prize, index) => (
+            <div
+              key={prize.id}
+              className="grid grid-cols-[minmax(0,1fr)_92px] gap-3 rounded-control bg-neo-muted-bg p-3"
+            >
+              <label className="min-w-0">
+                Premio
+                <input
+                  value={prize.label}
+                  maxLength={100}
+                  onChange={(e) =>
+                    update('config', {
+                      ...values.config,
+                      wheel_prizes: wheelPrizes.map((x, i) =>
+                        i === index ? { ...x, label: e.target.value } : x,
+                      ),
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Cantidad
+                <input
+                  type="number"
+                  min={1}
+                  max={500}
+                  value={prize.quantity}
+                  onChange={(e) =>
+                    update('config', {
+                      ...values.config,
+                      wheel_prizes: wheelPrizes.map((x, i) =>
+                        i === index
+                          ? { ...x, quantity: Math.max(1, Math.floor(Number(e.target.value) || 1)) }
+                          : x,
+                      ),
+                    })
+                  }
+                />
+              </label>
+
+              <button
+                type="button"
+                className="text-link col-span-2 self-start"
+                onClick={() =>
+                  update('config', {
+                    ...values.config,
+                    wheel_prizes: wheelPrizes.filter((_, i) => i !== index),
+                    pending_review: true,
+                  })
+                }
+              >
+                Quitar premio
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            className="button button-secondary"
+            disabled={wheelPrizes.length >= 20}
+            onClick={() =>
+              update('config', {
+                ...values.config,
+                pending_review: true,
+                wheel_prizes: [
+                  ...wheelPrizes,
+                  {
+                    id: 'slot-' + Math.random().toString(36).slice(2, 10),
+                    label: '',
+                    quantity: 1,
+                    weight: 1,
+                  },
+                ],
+              })
+            }
+          >
+            Añadir premio
+          </button>
+          <details className="rounded-control border border-neo-border p-3">
+            <summary className="cursor-pointer text-sm font-semibold text-neo-text-secondary">
+              Ajustes de probabilidad
+            </summary>
+            <div className="mt-3 grid gap-3">
+              <label>
+                Probabilidad de ganar (%)
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={Math.round(Number(values.config?.wheel_probability ?? 1) * 100)}
+                  onChange={(e) =>
+                    update('config', {
+                      ...values.config,
+                      wheel_probability: Math.min(1, Math.max(0, Number(e.target.value) / 100)),
+                      pending_review: true,
+                    })
+                  }
+                />
+              </label>
+              {wheelPrizes.map((prize, index) => (
+                <label key={prize.id}>
+                  Peso · {prize.label || `Premio ${index + 1}`}
+                  <input
+                    type="number"
+                    min={1}
+                    max={1000}
+                    value={prize.weight}
+                    onChange={(e) =>
+                      update('config', {
+                        ...values.config,
+                        wheel_prizes: wheelPrizes.map((item, itemIndex) =>
+                          itemIndex === index
+                            ? {
+                                ...item,
+                                weight: Math.max(1, Math.floor(Number(e.target.value) || 1)),
+                              }
+                            : item,
+                        ),
+                        pending_review: true,
+                      })
+                    }
+                  />
+                </label>
+              ))}
+              <small>
+                Todos los pesos iguales dan la misma oportunidad a cada premio disponible.
+              </small>
+            </div>
+          </details>
+        </div>
+      )}
+      {trivia && (
+        <div className="col-span-full grid gap-3 rounded-control border border-neo-border p-4">
+          <h3 className="m-0 font-bold">Pregunta y respuesta verificada</h3>
+          <label>
+            Pregunta
+            <textarea
+              rows={2}
+              maxLength={300}
+              value={String(values.config?.trivia_question ?? '')}
+              onChange={(e) =>
+                update('config', {
+                  ...values.config,
+                  trivia_question: e.target.value,
+                  pending_review: true,
+                })
+              }
+            />
+          </label>
+          {Array.from({ length: Math.max(2, triviaOptions.length) }, (_, index) => (
+            <label key={String.fromCharCode(65 + index)}>
+              Opción {String.fromCharCode(65 + index)}
+              <input
+                value={triviaOptions[index] ?? ''}
+                maxLength={150}
+                onChange={(e) =>
+                  update('config', {
+                    ...values.config,
+                    pending_review: true,
+                    trivia_options: Array.from(
+                      { length: Math.max(2, triviaOptions.length) },
+                      (_, i) => (i === index ? e.target.value : (triviaOptions[i] ?? '')),
+                    ),
+                  })
+                }
+              />
+            </label>
+          ))}
+          {triviaOptions.length < 8 && (
+            <button
+              type="button"
+              className="button button-secondary"
+              onClick={() =>
+                update('config', {
+                  ...values.config,
+                  trivia_options: [...triviaOptions, ''],
+                  pending_review: true,
+                })
+              }
+            >
+              Añadir opción
+            </button>
+          )}
+          <label>
+            Respuesta correcta (confirmada por organización)
+            <select
+              value={
+                typeof values.config?.trivia_correct_index === 'number'
+                  ? values.config.trivia_correct_index
+                  : ''
+              }
+              onChange={(e) =>
+                update('config', {
+                  ...values.config,
+                  trivia_correct_index: Number(e.target.value),
+                  pending_review: true,
+                })
+              }
+            >
+              <option value="">Seleccionar respuesta</option>
+              {triviaOptions.map((option, index) => (
+                <option key={String.fromCharCode(65 + index)} value={index}>
+                  {String.fromCharCode(65 + index)}. {option}
+                </option>
+              ))}
+            </select>
+          </label>
+          <p className="m-0 text-xs text-neo-text-secondary">
+            El primer participante que acierte recibe el premio hasta completar el número de
+            ganadores. Una respuesta por QR.
+          </p>
+        </div>
+      )}
+      {special && (
+        <label className="check-label col-span-full rounded-control border border-neo-accent-border bg-neo-accent-soft p-4">
+          <input
+            type="checkbox"
+            checked={values.config?.pending_review === false}
+            onChange={(e) =>
+              update('config', { ...values.config, pending_review: !e.target.checked })
+            }
+          />
+          Confirmo que revisé reglas, condiciones, respuestas correctas y cantidades de premios. La
+          actividad puede activarse.
+        </label>
+      )}
       {cloneMode && (
         <p className="col-span-full m-0 rounded-control bg-neo-muted-bg p-4 text-sm text-neo-text-secondary">
           Esta copia será un borrador sin resultados anteriores. Revisa las reglas y vuelve a
@@ -115,16 +401,9 @@ export function DynamicForm({
           >
             <LabelOptions labels={dynamicStates} />
           </select>
-          <small>Borrador no recibe participaciones; actívala para escanear o sortear.</small>
         </label>
       )}
-      {challenge && (
-        <p className="col-span-full m-0 rounded-control border border-neo-accent-border bg-neo-accent-soft p-4 text-sm text-neo-text-secondary">
-          <strong className="text-neo-accent-text">Cómo funcionará:</strong> al completar el reto,
-          el personal entra en «En vivo» y escanea el QR del corredor. Cada persona puede registrar
-          la finalización una sola vez.
-        </p>
-      )}
+
       {!raffle && (
         <label>
           Puntos
@@ -138,13 +417,13 @@ export function DynamicForm({
           />
         </label>
       )}
-      {(raffle || instantWin) && (
+      {((raffle && !wheel) || instantWin || trivia || challenge) && (
         <>
           <label>
             Premio
             <input
               value={values.prize ?? ''}
-              required
+              required={!challenge}
               maxLength={240}
               onChange={(e) => update('prize', e.target.value)}
             />
@@ -182,7 +461,7 @@ export function DynamicForm({
           />
         </label>
       )}
-      {raffle && (
+      {raffle && !wheel && (
         <>
           <label>
             Categoría
@@ -205,7 +484,7 @@ export function DynamicForm({
           </label>
         </>
       )}
-      {raffle && (
+      {raffle && !wheel && (
         <label className="col-span-full">
           Participan quienes completaron
           <select

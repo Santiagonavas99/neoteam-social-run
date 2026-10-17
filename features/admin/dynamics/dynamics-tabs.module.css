@@ -238,6 +238,10 @@
   .dynamicCard {
     padding: 18px;
   }
+  .scanPanel {
+    gap: 12px;
+    padding: 12px;
+  }
   .scanPanel > button {
     width: 100%;
   }
