@@ -165,6 +165,7 @@ export type AdminResponse<Row = unknown> = {
   ranking?: RankedRunner[]
   alreadyCompleted?: boolean
   timedRun?: TimedRun
+  finalized?: { winners: number; completed: boolean }
   timedRuns?: TimedRun[]
   wheelSpins?: WheelSpin[]
   triviaAnswers?: TriviaAnswer[]
