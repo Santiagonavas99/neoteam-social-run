@@ -201,11 +201,7 @@ export function GameControlPanel({
               Más opciones <span aria-hidden>⌄</span>
             </summary>
             <div className="mt-3 flex min-w-56 flex-col gap-3 rounded-control border border-neo-border bg-neo-muted-bg p-4 sm:absolute sm:right-0 sm:z-10 sm:shadow-lg">
-              <button
-                type="button"
-                className="text-link text-sm"
-                onClick={() => onPreview(true)}
-              >
+              <button type="button" className="text-link text-sm" onClick={() => onPreview(true)}>
                 Ensayar aquí con datos ficticios <ArrowUpRight aria-hidden className="size-4" />
               </button>
               {isRaffle && active && (

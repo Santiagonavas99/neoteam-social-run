@@ -169,7 +169,12 @@ export type AdminResponse<Row = unknown> = {
   timedRuns?: TimedRun[]
   wheelSpins?: WheelSpin[]
   triviaAnswers?: TriviaAnswer[]
-  mechanicResult?: { already_played: boolean; won: boolean; prize?: string | null; correct?: boolean }
+  mechanicResult?: {
+    already_played: boolean
+    won: boolean
+    prize?: string | null
+    correct?: boolean
+  }
   won?: boolean
   prize?: string | null
 }

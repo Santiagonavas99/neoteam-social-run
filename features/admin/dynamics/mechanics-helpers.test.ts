@@ -10,25 +10,46 @@ test('clock formatter handles centiseconds and long durations', () => {
 })
 
 const scores = [
-  {id:'a',elapsed_ms:30000,status:'finished' as const},
-  {id:'b',elapsed_ms:20000,status:'finished' as const},
-  {id:'c',elapsed_ms:30000,status:'finished' as const},
-  {id:'d',elapsed_ms:800,status:'running' as const},
+  { id: 'a', elapsed_ms: 30000, status: 'finished' as const },
+  { id: 'b', elapsed_ms: 20000, status: 'finished' as const },
+  { id: 'c', elapsed_ms: 30000, status: 'finished' as const },
+  { id: 'd', elapsed_ms: 800, status: 'running' as const },
 ]
 
 test('resistance chooses highest, speed chooses lowest, ties share position', () => {
-  const resistance = rankTimes(scores,'max')
-  assert.deepEqual(resistance.map((x) => [x.run.id,x.place,x.tied]),
-    [['a',1,true],['c',1,true],['b',3,false]])
-  const speed = rankTimes(scores,'min')
-  assert.deepEqual(speed.map((x) => [x.run.id,x.place]),
-    [['b',1],['a',2],['c',2]])
-  assert.deepEqual(scores.map((x)=>x.id),['a','b','c','d'])
+  const resistance = rankTimes(scores, 'max')
+  assert.deepEqual(
+    resistance.map((x) => [x.run.id, x.place, x.tied]),
+    [
+      ['a', 1, true],
+      ['c', 1, true],
+      ['b', 3, false],
+    ],
+  )
+  const speed = rankTimes(scores, 'min')
+  assert.deepEqual(
+    speed.map((x) => [x.run.id, x.place]),
+    [
+      ['b', 1],
+      ['a', 2],
+      ['c', 2],
+    ],
+  )
+  assert.deepEqual(
+    scores.map((x) => x.id),
+    ['a', 'b', 'c', 'd'],
+  )
 })
 
 test('remaining inventory never goes below zero', () => {
-  assert.deepEqual(remainingStock(
-    [{id:'media',quantity:2},{id:'inscripcion',quantity:1}],
-    [{prize_key:'media'},{prize_key:'media'},{prize_key:'media'},{prize_key:null}],
-  ).map((p) => p.remaining),[0,1])
+  assert.deepEqual(
+    remainingStock(
+      [
+        { id: 'media', quantity: 2 },
+        { id: 'inscripcion', quantity: 1 },
+      ],
+      [{ prize_key: 'media' }, { prize_key: 'media' }, { prize_key: 'media' }, { prize_key: null }],
+    ).map((p) => p.remaining),
+    [0, 1],
+  )
 })

@@ -31,8 +31,8 @@ import { DynamicForm } from './dynamic-form'
 import { challengeNeedsRules, groupDynamicsByPhase, orderDynamicsByStatus } from './dynamics-order'
 import styles from './dynamics-tabs.module.css'
 import { GameControlPanel } from './game-control-panel'
+import { MechanicsPanel, mechanicKind } from './mechanics-panel'
 import { MobileDynamicsHome } from './mobile-dynamics-home'
-import { mechanicKind, MechanicsPanel } from './mechanics-panel'
 import { ParticipationPanel } from './participation-panel'
 import { Ranking } from './ranking'
 import { useDynamics } from './use-dynamics'
@@ -201,11 +201,7 @@ export function DynamicsView() {
   function open(row: DynamicRow, target?: DetailTab) {
     const nextTab =
       target ??
-      (row.status === 'draft'
-        ? 'preparar'
-        : row.status === 'completed'
-          ? 'resultados'
-          : 'en-vivo')
+      (row.status === 'draft' ? 'preparar' : row.status === 'completed' ? 'resultados' : 'en-vivo')
     writeMobileUrl(row.id, nextTab)
     setSelectedId(row.id)
     setTab(nextTab)
@@ -329,9 +325,7 @@ export function DynamicsView() {
           className="fixed inset-0 z-50 flex flex-col bg-neo-surface"
         >
           <div className="flex min-h-16 items-center justify-between gap-3 border-b border-neo-border px-4">
-            <strong className="text-sm">
-              Vista pública {preview.rehearsal ? '· Ensayo' : ''}
-            </strong>
+            <strong className="text-sm">Vista pública {preview.rehearsal ? '· Ensayo' : ''}</strong>
             <button
               type="button"
               className="button button-secondary min-h-11"
@@ -388,11 +382,13 @@ export function DynamicsView() {
                   if (next) open(next, 'en-vivo')
                 }}
               >
-                {rows.filter((row) => row.status === 'open').map((row) => (
-                  <option key={row.id} value={row.id}>
-                    {row.name}
-                  </option>
-                ))}
+                {rows
+                  .filter((row) => row.status === 'open')
+                  .map((row) => (
+                    <option key={row.id} value={row.id}>
+                      {row.name}
+                    </option>
+                  ))}
               </select>
             </label>
           )}
@@ -613,62 +609,77 @@ export function DynamicsView() {
 
           {tab === 'en-vivo' && (
             <>
-              {mechanicKind(selected) && <MechanicsPanel key={selected.id} dynamic={selected} onUpdated={dynamics.reload} />}
-              {!mechanicKind(selected) && <div className={selected.type === 'raffle' ? '' : 'hidden md:block'}>
-                <GameControlPanel
-                  key={selected.id}
-                  dynamic={selected}
-                  onDraw={() => void dynamics.askDraw(selected)}
-                  onPreview={(rehearsal) => setPreview({ id: selected.id, rehearsal })}
-                />
-              </div>}
-              {!mechanicKind(selected) && selected.type !== 'raffle' && selected.status === 'open' && (
-                <div className={styles.scanPanel}>
-                  <div>
-                    <h4 className="m-0 text-lg font-black">
-                      {selected.type === 'challenge'
-                        ? 'Validar reto completado'
-                        : 'Registrar participación'}
-                    </h4>
-                    <p className="m-0 mt-1 max-w-lg text-sm text-neo-text-secondary">
-                      {selected.type === 'challenge'
-                        ? 'Cuando el personal confirme que el corredor completó el reto, escanea su pase. Un registro por corredor.'
-                        : 'Escanea el QR del corredor para registrar su participación.'}
-                    </p>
+              {mechanicKind(selected) && (
+                <MechanicsPanel key={selected.id} dynamic={selected} onUpdated={dynamics.reload} />
+              )}
+              {!mechanicKind(selected) && (
+                <div className={selected.type === 'raffle' ? '' : 'hidden md:block'}>
+                  <GameControlPanel
+                    key={selected.id}
+                    dynamic={selected}
+                    onDraw={() => void dynamics.askDraw(selected)}
+                    onPreview={(rehearsal) => setPreview({ id: selected.id, rehearsal })}
+                  />
+                </div>
+              )}
+              {!mechanicKind(selected) &&
+                selected.type !== 'raffle' &&
+                selected.status === 'open' && (
+                  <div className={styles.scanPanel}>
+                    <div>
+                      <h4 className="m-0 text-lg font-black">
+                        {selected.type === 'challenge'
+                          ? 'Validar reto completado'
+                          : 'Registrar participación'}
+                      </h4>
+                      <p className="m-0 mt-1 max-w-lg text-sm text-neo-text-secondary">
+                        {selected.type === 'challenge'
+                          ? 'Cuando el personal confirme que el corredor completó el reto, escanea su pase. Un registro por corredor.'
+                          : 'Escanea el QR del corredor para registrar su participación.'}
+                      </p>
+                    </div>
+                    {!scanning ? (
+                      <button type="button" className="button" onClick={() => setScanning(true)}>
+                        <Play aria-hidden className="size-4" /> PLAY · Abrir escáner
+                      </button>
+                    ) : (
+                      <ParticipationPanel dynamic={selected} onClose={() => setScanning(false)} />
+                    )}
                   </div>
-                  {!scanning ? (
-                    <button type="button" className="button" onClick={() => setScanning(true)}>
-                      <Play aria-hidden className="size-4" /> PLAY · Abrir escáner
+                )}
+              {!mechanicKind(selected) &&
+                selected.type !== 'raffle' &&
+                selected.status === 'open' && (
+                  <div className="flex flex-wrap gap-3 md:hidden">
+                    <button
+                      type="button"
+                      className="button button-secondary"
+                      onClick={() => setPreview({ id: selected.id, rehearsal: false })}
+                    >
+                      <MonitorPlay aria-hidden className="size-4" /> Vista pública
                     </button>
-                  ) : (
-                    <ParticipationPanel dynamic={selected} onClose={() => setScanning(false)} />
-                  )}
-                </div>
-              )}
-              {!mechanicKind(selected) && selected.type !== 'raffle' && selected.status === 'open' && (
-                <div className="flex flex-wrap gap-3 md:hidden">
-                  <button
-                    type="button"
-                    className="button button-secondary"
-                    onClick={() => setPreview({ id: selected.id, rehearsal: false })}
-                  >
-                    <MonitorPlay aria-hidden className="size-4" /> Vista pública
-                  </button>
-                  <button
-                    type="button"
-                    className="button button-secondary"
-                    onClick={() => setPreview({ id: selected.id, rehearsal: true })}
-                  >
-                    Ensayo
-                  </button>
-                </div>
-              )}
+                    <button
+                      type="button"
+                      className="button button-secondary"
+                      onClick={() => setPreview({ id: selected.id, rehearsal: true })}
+                    >
+                      Ensayo
+                    </button>
+                  </div>
+                )}
             </>
           )}
 
           {tab === 'resultados' && (
             <>
-              {mechanicKind(selected) && <MechanicsPanel key={selected.id} dynamic={selected} resultsOnly onUpdated={dynamics.reload} />}
+              {mechanicKind(selected) && (
+                <MechanicsPanel
+                  key={selected.id}
+                  dynamic={selected}
+                  resultsOnly
+                  onUpdated={dynamics.reload}
+                />
+              )}
               {(selected.status === 'completed' || selected.status === 'closed') && (
                 <button
                   type="button"
@@ -694,26 +705,27 @@ export function DynamicsView() {
                   </div>
                 </div>
               )}
-              {!mechanicKind(selected) && (winners?.row.id === selected.id ? (
-                <DrawResult
-                  name={selected.name}
-                  winners={winners.list}
-                  reveal={false}
-                  busy={busy || !!confirmation}
-                  onAbsent={(winner, place) =>
-                    dynamics.setConfirmation({ row: selected, winner, place, action: 'redraw' })
-                  }
-                  onClose={() => dynamics.setWinners(null)}
-                />
-              ) : (
-                <p className="rounded-card border border-neo-border bg-neo-surface p-6 text-sm text-neo-text-secondary">
-                  {selected.status === 'completed' && selected.type === 'raffle'
-                    ? 'Cargando ganadores…'
-                    : selected.type !== 'raffle'
-                      ? 'Los registros de finalización se contabilizan arriba. Esta versión no determina posiciones ni cronometra automáticamente.'
-                      : 'Los resultados aparecerán aquí cuando termine la dinámica.'}
-                </p>
-              ))}
+              {!mechanicKind(selected) &&
+                (winners?.row.id === selected.id ? (
+                  <DrawResult
+                    name={selected.name}
+                    winners={winners.list}
+                    reveal={false}
+                    busy={busy || !!confirmation}
+                    onAbsent={(winner, place) =>
+                      dynamics.setConfirmation({ row: selected, winner, place, action: 'redraw' })
+                    }
+                    onClose={() => dynamics.setWinners(null)}
+                  />
+                ) : (
+                  <p className="rounded-card border border-neo-border bg-neo-surface p-6 text-sm text-neo-text-secondary">
+                    {selected.status === 'completed' && selected.type === 'raffle'
+                      ? 'Cargando ganadores…'
+                      : selected.type !== 'raffle'
+                        ? 'Los registros de finalización se contabilizan arriba. Esta versión no determina posiciones ni cronometra automáticamente.'
+                        : 'Los resultados aparecerán aquí cuando termine la dinámica.'}
+                  </p>
+                ))}
             </>
           )}
         </>

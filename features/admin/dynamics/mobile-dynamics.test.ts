@@ -3,11 +3,7 @@ import { test } from 'node:test'
 import type { DynamicRow } from '../types'
 import { filterMobileDynamics, phaseForStatus } from './mobile-dynamics'
 
-const row = (
-  name: string,
-  type: DynamicRow['type'],
-  status: DynamicRow['status'],
-): DynamicRow => ({
+const row = (name: string, type: DynamicRow['type'], status: DynamicRow['status']): DynamicRow => ({
   id: name,
   name,
   type,

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { dynamicTypes } from '../labels'
 import type { DynamicRow, LogoItem } from '../types'
-import { filterMobileDynamics, mobilePhaseLabels, type MobilePhase } from './mobile-dynamics'
+import { filterMobileDynamics, type MobilePhase, mobilePhaseLabels } from './mobile-dynamics'
 
 const phases: MobilePhase[] = ['en-vivo', 'preparar', 'resultados']
 

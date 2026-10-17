@@ -522,7 +522,6 @@ Deno.serve(async (req: Request) => {
             .map((entry: { registrations: unknown }) => participantPayload(entry.registrations))
         }
 
-
         // Event-day mechanics are admin-only. IDs are scoped to SR26 before every read.
         const mechanicError = (error: { message?: string } | null) => {
           if (!error) return null
@@ -543,9 +542,11 @@ Deno.serve(async (req: Request) => {
             mechanic_run_not_found: 'No encontramos ese intento.',
             mechanic_not_running: 'Este cronómetro no está corriendo.',
             mechanic_not_paused: 'Este cronómetro no está pausado.',
-            mechanic_invalid_correction: 'Introduce un tiempo válido y un motivo de 8 caracteres como mínimo.',
+            mechanic_invalid_correction:
+              'Introduce un tiempo válido y un motivo de 8 caracteres como mínimo.',
             mechanic_duration_limit: 'Tiempo superior al máximo permitido (12 horas).',
-            mechanic_configuration_missing: 'Completa la configuración de premios o respuestas antes de continuar.',
+            mechanic_configuration_missing:
+              'Completa la configuración de premios o respuestas antes de continuar.',
             mechanic_prior_winner: 'Este corredor ya ganó otro premio y está excluido.',
           }
           const known = Object.keys(messages).find((key) => code.includes(key))
@@ -553,11 +554,13 @@ Deno.serve(async (req: Request) => {
         }
 
         async function checkedDynamic(id: unknown) {
-          if (typeof id !== 'string' || !/^[0-9a-f-]{36}$/i.test(id))
-            return null
-          const { data, error } = await supabase.from('dynamics')
+          if (typeof id !== 'string' || !/^[0-9a-f-]{36}$/i.test(id)) return null
+          const { data, error } = await supabase
+            .from('dynamics')
             .select('id,type,status,config,winner_count')
-            .eq('id', id).eq('event_id', event.id).maybeSingle()
+            .eq('id', id)
+            .eq('event_id', event.id)
+            .maybeSingle()
           if (error) throw error
           return data
         }
@@ -566,57 +569,99 @@ Deno.serve(async (req: Request) => {
           const code = normalizeParticipantCode(raw)
           if (!code) return null
           const [column, key] = participantLookup(code)
-          const { data, error } = await supabase.from('registrations').select('id')
-            .eq('event_id', event.id).eq(column, key).maybeSingle()
+          const { data, error } = await supabase
+            .from('registrations')
+            .select('id')
+            .eq('event_id', event.id)
+            .eq(column, key)
+            .maybeSingle()
           if (error) throw error
           return data?.id ?? null
         }
 
-        if (['timedAction','timedResults','timedFinalize','wheelSpin','wheelResults','triviaAnswer','triviaResults'].includes(operation)) {
+        if (
+          [
+            'timedAction',
+            'timedResults',
+            'timedFinalize',
+            'wheelSpin',
+            'wheelResults',
+            'triviaAnswer',
+            'triviaResults',
+          ].includes(operation)
+        ) {
           const dynamic = await checkedDynamic(body?.id)
           if (!dynamic) return json({ error: 'Dinámica no encontrada.' }, 404)
           if (operation === 'timedResults') {
             if (dynamic.type !== 'challenge') return json({ error: 'No es un reto.' }, 400)
-            const { data, error } = await supabase.from('dynamic_timed_runs')
-              .select('id,status,elapsed_ms,running_at,team_name,registration_id,member_ids,registrations(first_name,last_name,registration_code)')
-              .eq('dynamic_id', dynamic.id).order('created_at', { ascending: true })
+            const { data, error } = await supabase
+              .from('dynamic_timed_runs')
+              .select(
+                'id,status,elapsed_ms,running_at,team_name,registration_id,member_ids,registrations(first_name,last_name,registration_code)',
+              )
+              .eq('dynamic_id', dynamic.id)
+              .order('created_at', { ascending: true })
             if (error) throw error
             return json({ ok: true, timedRuns: data ?? [] })
           }
 
           if (operation === 'timedFinalize') {
             const { data, error } = await supabase.rpc('dynamic_timed_finalize', {
-              p_event_id: event.id, p_dynamic_id: dynamic.id,
+              p_event_id: event.id,
+              p_dynamic_id: dynamic.id,
             })
             const known = mechanicError(error)
             if (known) return known
             if (error && error.message?.includes('mechanic_tie_unresolved'))
-              return json({ error: 'Hay un empate en el límite de premios. Resuelve el desempate antes de cerrar.' }, 409)
+              return json(
+                {
+                  error:
+                    'Hay un empate en el límite de premios. Resuelve el desempate antes de cerrar.',
+                },
+                409,
+              )
             if (error && error.message?.includes('mechanic_unfinished_runs'))
-              return json({ error: 'Finaliza todos los cronómetros antes de cerrar la clasificación.' }, 409)
+              return json(
+                { error: 'Finaliza todos los cronómetros antes de cerrar la clasificación.' },
+                409,
+              )
             if (error && error.message?.includes('mechanic_finalize_individual_only'))
-              return json({ error: 'Los relevos requieren confirmar manualmente la entrega de cortesías por equipo.' }, 409)
+              return json(
+                {
+                  error:
+                    'Los relevos requieren confirmar manualmente la entrega de cortesías por equipo.',
+                },
+                409,
+              )
             if (error && error.message?.includes('mechanic_no_results'))
               return json({ error: 'No hay tiempos finalizados.' }, 409)
             if (error) throw error
             return json({ ok: true, finalized: data })
           }
           if (operation === 'wheelResults') {
-            const { data, error } = await supabase.from('dynamic_wheel_spins')
-              .select('prize_key,prize_label,created_at,registrations(first_name,last_name,registration_code)')
-              .eq('dynamic_id',dynamic.id).order('created_at',{ ascending: false })
+            const { data, error } = await supabase
+              .from('dynamic_wheel_spins')
+              .select(
+                'prize_key,prize_label,created_at,registrations(first_name,last_name,registration_code)',
+              )
+              .eq('dynamic_id', dynamic.id)
+              .order('created_at', { ascending: false })
             if (error) throw error
             return json({ ok: true, wheelSpins: data ?? [] })
           }
           if (operation === 'triviaResults') {
-            const { data, error } = await supabase.from('dynamic_trivia_answers')
-              .select('correct,won,choice_index,created_at,registrations(first_name,last_name,registration_code)')
-              .eq('dynamic_id',dynamic.id).order('created_at',{ ascending: false })
+            const { data, error } = await supabase
+              .from('dynamic_trivia_answers')
+              .select(
+                'correct,won,choice_index,created_at,registrations(first_name,last_name,registration_code)',
+              )
+              .eq('dynamic_id', dynamic.id)
+              .order('created_at', { ascending: false })
             if (error) throw error
             return json({ ok: true, triviaAnswers: data ?? [] })
           }
           if (operation === 'timedAction') {
-            if (!['start','pause','resume','finish','correct'].includes(body?.command))
+            if (!['start', 'pause', 'resume', 'finish', 'correct'].includes(body?.command))
               return json({ error: 'Acción de cronómetro inválida.' }, 400)
             let participantId: string | null = null
             const memberIds: string[] = []
@@ -635,11 +680,15 @@ Deno.serve(async (req: Request) => {
             if (body.command === 'correct' && (!Number.isSafeInteger(correctMs) || correctMs < 0))
               return json({ error: 'Tiempo corregido inválido.' }, 400)
             const { data, error } = await supabase.rpc('dynamic_timed_command', {
-              p_event_id: event.id, p_dynamic_id: dynamic.id, p_command: body.command,
-              p_registration_id: participantId, p_member_ids: memberIds,
-              p_team_name: typeof body.teamName==='string' ? body.teamName.slice(0,80) : null,
-              p_run_id: typeof body.runId==='string' ? body.runId : null,
-              p_correct_ms: correctMs, p_reason: typeof body.reason==='string' ? body.reason.slice(0,500) : null,
+              p_event_id: event.id,
+              p_dynamic_id: dynamic.id,
+              p_command: body.command,
+              p_registration_id: participantId,
+              p_member_ids: memberIds,
+              p_team_name: typeof body.teamName === 'string' ? body.teamName.slice(0, 80) : null,
+              p_run_id: typeof body.runId === 'string' ? body.runId : null,
+              p_correct_ms: correctMs,
+              p_reason: typeof body.reason === 'string' ? body.reason.slice(0, 500) : null,
               p_actor: String(session?.userId ?? session?.id ?? 'admin'),
             })
             const known = mechanicError(error)
@@ -651,7 +700,9 @@ Deno.serve(async (req: Request) => {
           if (!registrationId) return json({ error: 'QR o código no encontrado.' }, 404)
           if (operation === 'wheelSpin') {
             const { data, error } = await supabase.rpc('dynamic_wheel_spin', {
-              p_event_id:event.id,p_dynamic_id:dynamic.id,p_registration_id:registrationId,
+              p_event_id: event.id,
+              p_dynamic_id: dynamic.id,
+              p_registration_id: registrationId,
             })
             const known = mechanicError(error)
             if (known) return known
@@ -659,10 +710,12 @@ Deno.serve(async (req: Request) => {
             return json({ ok: true, mechanicResult: data })
           }
           const choice = Number(body.choice)
-          if (!Number.isSafeInteger(choice) || choice<0 || choice>7)
+          if (!Number.isSafeInteger(choice) || choice < 0 || choice > 7)
             return json({ error: 'Selecciona una respuesta válida.' }, 400)
           const { data, error } = await supabase.rpc('dynamic_trivia_answer', {
-            p_event_id:event.id,p_dynamic_id:dynamic.id,p_registration_id:registrationId,
+            p_event_id: event.id,
+            p_dynamic_id: dynamic.id,
+            p_registration_id: registrationId,
             p_choice: choice,
           })
           const known = mechanicError(error)
@@ -821,35 +874,65 @@ Deno.serve(async (req: Request) => {
             config.exclude_winners = config.exclude_winners === true
           }
 
-
           // Reject incomplete event-day mechanics before a draft can be activated.
           if (values.status === 'open') {
             const mode = String(config.challenge_mode ?? '')
             const wheel = config.mechanic === 'wheel' || config.mechanic === 'ruleta_pendiente'
-            const special = (values.type === 'challenge' && ['timed_max','timed_min','team_relay'].includes(mode))
-              || values.type === 'trivia' || wheel
+            const special =
+              (values.type === 'challenge' &&
+                ['timed_max', 'timed_min', 'team_relay'].includes(mode)) ||
+              values.type === 'trivia' ||
+              wheel
             if (special && config.pending_review !== false)
               return json({ error: 'Confirma primero las reglas de esta dinámica.' }, 400)
             if (config.mechanic === 'ruleta_pendiente')
               return json({ error: 'Configura la modalidad ruleta antes de activarla.' }, 400)
             if (wheel && (!Array.isArray(config.wheel_prizes) || !config.wheel_prizes.length))
               return json({ error: 'Agrega premios reales a la ruleta antes de activarla.' }, 400)
-            if (values.type === 'trivia' &&
-              (!String(config.trivia_question ?? '').trim() || !Array.isArray(config.trivia_options)
-                || config.trivia_options.length < 2 || !Number.isInteger(config.trivia_correct_index)
-                || config.trivia_correct_index < 0 || config.trivia_correct_index >= config.trivia_options.length))
-              return json({ error: 'Completa la pregunta, opciones y respuesta correcta antes de activarla.' }, 400)
+            if (
+              values.type === 'trivia' &&
+              (!String(config.trivia_question ?? '').trim() ||
+                !Array.isArray(config.trivia_options) ||
+                config.trivia_options.length < 2 ||
+                !Number.isInteger(config.trivia_correct_index) ||
+                config.trivia_correct_index < 0 ||
+                config.trivia_correct_index >= config.trivia_options.length)
+            )
+              return json(
+                {
+                  error: 'Completa la pregunta, opciones y respuesta correcta antes de activarla.',
+                },
+                400,
+              )
           }
           if (config.mechanic === 'wheel') {
             const prizes = config.wheel_prizes
-            if (prizes !== undefined && (!Array.isArray(prizes) || prizes.length > 20 ||
-              prizes.some((item: Record<string, unknown>) => !item || typeof item.id !== 'string' ||
-                !/^[a-zA-Z0-9_-]{1,60}$/.test(item.id) || typeof item.label !== 'string' ||
-                !item.label.trim() || item.label.length > 100 ||
-                !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 500 ||
-                !Number.isFinite(item.weight) || item.weight <= 0 || item.weight > 1000) ||
-              new Set(prizes.map((item: Record<string, unknown>) => item.id)).size !== prizes.length)) {
-              return json({ error: 'Revisa las cantidades y pesos de los premios de la ruleta.' }, 400)
+            if (
+              prizes !== undefined &&
+              (!Array.isArray(prizes) ||
+                prizes.length > 20 ||
+                prizes.some(
+                  (item: Record<string, unknown>) =>
+                    !item ||
+                    typeof item.id !== 'string' ||
+                    !/^[a-zA-Z0-9_-]{1,60}$/.test(item.id) ||
+                    typeof item.label !== 'string' ||
+                    !item.label.trim() ||
+                    item.label.length > 100 ||
+                    !Number.isInteger(item.quantity) ||
+                    item.quantity < 1 ||
+                    item.quantity > 500 ||
+                    !Number.isFinite(item.weight) ||
+                    item.weight <= 0 ||
+                    item.weight > 1000,
+                ) ||
+                new Set(prizes.map((item: Record<string, unknown>) => item.id)).size !==
+                  prizes.length)
+            ) {
+              return json(
+                { error: 'Revisa las cantidades y pesos de los premios de la ruleta.' },
+                400,
+              )
             }
             const chance = Number(config.wheel_probability ?? 1)
             if (!Number.isFinite(chance) || chance < 0 || chance > 1)
@@ -858,26 +941,65 @@ Deno.serve(async (req: Request) => {
           }
 
           if (typeof values.id === 'string' && /^[0-9a-f-]{36}$/i.test(values.id)) {
-            const { data: previous, error: previousError } = await supabase.from('dynamics')
+            const { data: previous, error: previousError } = await supabase
+              .from('dynamics')
               .select('type,config,prize,winner_count')
-              .eq('event_id',event.id).eq('id',values.id).maybeSingle()
+              .eq('event_id', event.id)
+              .eq('id', values.id)
+              .maybeSingle()
             if (previousError) throw previousError
             if (previous) {
               const [timedRuns, wheelSpins, triviaAttempts] = await Promise.all([
-                supabase.from('dynamic_timed_runs').select('id',{ count:'exact',head:true }).eq('dynamic_id',values.id),
-                supabase.from('dynamic_wheel_spins').select('id',{ count:'exact',head:true }).eq('dynamic_id',values.id),
-                supabase.from('dynamic_trivia_answers').select('id',{ count:'exact',head:true }).eq('dynamic_id',values.id),
+                supabase
+                  .from('dynamic_timed_runs')
+                  .select('id', { count: 'exact', head: true })
+                  .eq('dynamic_id', values.id),
+                supabase
+                  .from('dynamic_wheel_spins')
+                  .select('id', { count: 'exact', head: true })
+                  .eq('dynamic_id', values.id),
+                supabase
+                  .from('dynamic_trivia_answers')
+                  .select('id', { count: 'exact', head: true })
+                  .eq('dynamic_id', values.id),
               ])
-              for (const result of [timedRuns,wheelSpins,triviaAttempts]) if (result.error) throw result.error
-              if ((timedRuns.count ?? 0)+(wheelSpins.count ?? 0)+(triviaAttempts.count ?? 0)>0) {
-                const importantKeys = ['challenge_mode','mechanic','wheel_prizes','wheel_probability',
-                  'trivia_question','trivia_options','trivia_correct_index','pending_review','exclude_winners']
-                const changedRules = importantKeys.some((key) =>
-                  JSON.stringify(previous.config?.[key] ?? null) !== JSON.stringify(config[key] ?? null))
-                if (changedRules || previous.type !== values.type ||
-                  previous.prize !== (typeof values.prize==='string' ? values.prize.trim().slice(0,240) : '') ||
-                  previous.winner_count !== Math.max(1,Math.floor(Number(values.winner_count)||1))) {
-                  return json({ error: 'No puedes cambiar reglas, premios o cantidades después de registrar participaciones. Crea una copia para repetir.' }, 409)
+              for (const result of [timedRuns, wheelSpins, triviaAttempts])
+                if (result.error) throw result.error
+              if (
+                (timedRuns.count ?? 0) + (wheelSpins.count ?? 0) + (triviaAttempts.count ?? 0) >
+                0
+              ) {
+                const importantKeys = [
+                  'challenge_mode',
+                  'mechanic',
+                  'wheel_prizes',
+                  'wheel_probability',
+                  'trivia_question',
+                  'trivia_options',
+                  'trivia_correct_index',
+                  'pending_review',
+                  'exclude_winners',
+                ]
+                const changedRules = importantKeys.some(
+                  (key) =>
+                    JSON.stringify(previous.config?.[key] ?? null) !==
+                    JSON.stringify(config[key] ?? null),
+                )
+                if (
+                  changedRules ||
+                  previous.type !== values.type ||
+                  previous.prize !==
+                    (typeof values.prize === 'string' ? values.prize.trim().slice(0, 240) : '') ||
+                  previous.winner_count !==
+                    Math.max(1, Math.floor(Number(values.winner_count) || 1))
+                ) {
+                  return json(
+                    {
+                      error:
+                        'No puedes cambiar reglas, premios o cantidades después de registrar participaciones. Crea una copia para repetir.',
+                    },
+                    409,
+                  )
                 }
               }
             }
@@ -965,8 +1087,16 @@ Deno.serve(async (req: Request) => {
             )
           if (dynamic.type === 'raffle')
             return json({ error: 'Los sorteos se ejecutan con el botón Sortear.' }, 400)
-          if (dynamic.type === 'trivia' || ['timed_max','timed_min','team_relay'].includes(String(dynamic.config?.challenge_mode))) {
-            return json({ error: 'Usa el control específico de cronómetro o trivia para esta actividad.' }, 400)
+          if (
+            dynamic.type === 'trivia' ||
+            ['timed_max', 'timed_min', 'team_relay'].includes(
+              String(dynamic.config?.challenge_mode),
+            )
+          ) {
+            return json(
+              { error: 'Usa el control específico de cronómetro o trivia para esta actividad.' },
+              400,
+            )
           }
 
           const value = normalizeParticipantCode(body?.code)
@@ -1050,10 +1180,12 @@ Deno.serve(async (req: Request) => {
         }
 
         if (operation === 'draw') {
-
           const wheel = await checkedDynamic(body?.id)
           if (wheel?.config?.mechanic === 'wheel' || wheel?.config?.mechanic === 'ruleta_pendiente')
-            return json({ error: 'La ruleta utiliza su propio mecanismo de premios y no un sorteo.' }, 400)
+            return json(
+              { error: 'La ruleta utiliza su propio mecanismo de premios y no un sorteo.' },
+              400,
+            )
           if (typeof body?.id !== 'string' || !body.id)
             return json({ error: 'Dinámica no válida.' }, 400)
           const { data: drawn, error: drawError } = await supabase.rpc('draw_dynamic', {
