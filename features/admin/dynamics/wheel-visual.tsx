@@ -98,7 +98,7 @@ export function WheelVisual({
       window.clearTimeout(start)
       window.clearTimeout(end)
     }
-  }, [spin?.id, sectors])
+  }, [spin?.id])
 
   const accessible = prizes
     .filter((prize) => prize.remaining > 0)
