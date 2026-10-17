@@ -106,25 +106,23 @@ export function DynamicForm({
       </label>
       {challenge && (
         <label>
-            Modalidad del reto
-            <select
-              value={
-                typeof values.config?.challenge_mode === 'string'
-                  ? values.config.challenge_mode
-                  : 'completion'
-              }
-              onChange={(e) =>
-                update('config', { ...values.config, challenge_mode: e.target.value })
-              }
-            >
-              <option value="completion">Completar actividad (QR)</option>
-              <option value="timed_max">Resistencia: gana el mayor tiempo</option>
-              <option value="timed_min">Velocidad: gana el menor tiempo</option>
-              <option value="team_relay">Relevos por equipos: menor tiempo</option>
-            </select>
-          </label>
-
-        </>
+          Modalidad del reto
+          <select
+            value={
+              typeof values.config?.challenge_mode === 'string'
+                ? values.config.challenge_mode
+                : 'completion'
+            }
+            onChange={(e) =>
+              update('config', { ...values.config, challenge_mode: e.target.value })
+            }
+          >
+            <option value="completion">Completar actividad (QR)</option>
+            <option value="timed_max">Resistencia: gana el mayor tiempo</option>
+            <option value="timed_min">Velocidad: gana el menor tiempo</option>
+            <option value="team_relay">Relevos por equipos: menor tiempo</option>
+          </select>
+        </label>
       )}
       {raffle && (
         <fieldset className="col-span-full min-w-0">
