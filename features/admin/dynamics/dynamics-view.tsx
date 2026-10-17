@@ -613,7 +613,7 @@ export function DynamicsView() {
 
           {tab === 'en-vivo' && (
             <>
-              {mechanicKind(selected) && <MechanicsPanel key={selected.id} dynamic={selected} />}
+              {mechanicKind(selected) && <MechanicsPanel key={selected.id} dynamic={selected} onUpdated={dynamics.reload} />}
               {!mechanicKind(selected) && <div className={selected.type === 'raffle' ? '' : 'hidden md:block'}>
                 <GameControlPanel
                   key={selected.id}
@@ -668,7 +668,7 @@ export function DynamicsView() {
 
           {tab === 'resultados' && (
             <>
-              {mechanicKind(selected) && <MechanicsPanel key={selected.id} dynamic={selected} resultsOnly />}
+              {mechanicKind(selected) && <MechanicsPanel key={selected.id} dynamic={selected} resultsOnly onUpdated={dynamics.reload} />}
               {(selected.status === 'completed' || selected.status === 'closed') && (
                 <button
                   type="button"
