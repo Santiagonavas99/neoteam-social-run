@@ -185,7 +185,7 @@ export function GameControlPanel({
         </div>
       )}
 
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-neo-border pt-5">
+      <div className="mt-6 hidden flex-wrap items-center justify-between gap-3 border-t border-neo-border pt-5 md:flex">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <MonitorPlay aria-hidden className="size-4 text-neo-accent-text" />
           <span>Pantalla para proyectar</span>
