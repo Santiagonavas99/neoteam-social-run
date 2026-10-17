@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import type { DynamicRow } from '../types'
-import { filterMobileDynamics, phaseForStatus } from './mobile-dynamics'
+import { filterMobileDynamics, phaseForStatus } from './mobile-dynamics.ts'
 
 const row = (name: string, type: DynamicRow['type'], status: DynamicRow['status']): DynamicRow => ({
   id: name,
