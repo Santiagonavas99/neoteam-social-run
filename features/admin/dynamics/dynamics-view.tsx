@@ -322,7 +322,7 @@ export function DynamicsView() {
           role="dialog"
           aria-modal="true"
           aria-label="Vista pública de la dinámica"
-          className="fixed inset-0 z-50 flex flex-col bg-neo-surface"
+          className="fixed inset-0 z-50 hidden flex-col bg-neo-surface md:flex"
         >
           <div className="flex min-h-16 items-center justify-between gap-3 border-b border-neo-border px-4">
             <strong className="text-sm">Vista pública {preview.rehearsal ? '· Ensayo' : ''}</strong>
@@ -647,26 +647,7 @@ export function DynamicsView() {
                     )}
                   </div>
                 )}
-              {!mechanicKind(selected) &&
-                selected.type !== 'raffle' &&
-                selected.status === 'open' && (
-                  <div className="flex flex-wrap gap-3 md:hidden">
-                    <button
-                      type="button"
-                      className="button button-secondary"
-                      onClick={() => setPreview({ id: selected.id, rehearsal: false })}
-                    >
-                      <MonitorPlay aria-hidden className="size-4" /> Vista pública
-                    </button>
-                    <button
-                      type="button"
-                      className="button button-secondary"
-                      onClick={() => setPreview({ id: selected.id, rehearsal: true })}
-                    >
-                      Ensayo
-                    </button>
-                  </div>
-                )}
+
             </>
           )}
 
