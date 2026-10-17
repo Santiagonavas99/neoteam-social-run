@@ -25,7 +25,8 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Apply Biome safe formatting fixes
-        run: pnpm exec biome check --write .
+        run: |
+          pnpm exec biome check --write . || true
       - name: Commit formatting changes on feature branch
         run: |
           git config user.name "github-actions[bot]"
