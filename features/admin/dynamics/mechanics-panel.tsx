@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { callAdmin } from '../api'
 import { ScanStation } from '../ui/scan-station'
+import { formatElapsed, rankTimes, remainingStock } from './mechanics-helpers'
 import type { DynamicRow, TimedRun, TriviaAnswer, WheelSpin } from '../types'
 
 type Kind = 'timed' | 'wheel' | 'trivia'
@@ -14,17 +15,6 @@ export function mechanicKind(row: DynamicRow): Kind | null {
     ['timed_max','timed_min','team_relay'].includes(String(row.config?.challenge_mode))) return 'timed'
   if (row.type === 'raffle' && ['wheel','ruleta_pendiente'].includes(String(row.config?.mechanic))) return 'wheel'
   return null
-}
-
-export function formatElapsed(ms: number): string {
-  const centis = Math.floor(Math.max(0, ms) / 10)
-  const secs = Math.floor(centis / 100)
-  const hours = Math.floor(secs / 3600)
-  const minutes = Math.floor((secs % 3600) / 60)
-  const seconds = secs % 60
-  return (hours ? String(hours).padStart(2,'0') + ':' : '') +
-    String(minutes).padStart(2,'0') + ':' +
-    String(seconds).padStart(2,'0') + '.' + String(centis % 100).padStart(2,'0')
 }
 
 function participantName(registrations?: { first_name: string; last_name: string } | null) {
@@ -83,8 +73,7 @@ function MechanicsPanel({ dynamic, resultsOnly = false }: MechanicsProps) {
     return () => window.clearInterval(handle)
   }, [kind, resultsOnly, timed])
 
-  const ranking = useMemo(() => timed.filter((row) => row.status === 'finished')
-    .sort((a,b) => (isFastest ? a.elapsed_ms - b.elapsed_ms : b.elapsed_ms - a.elapsed_ms) || a.id.localeCompare(b.id)), [timed, isFastest])
+  const ranking = useMemo(() => rankTimes(timed, isFastest ? 'min' : 'max'), [timed, isFastest])
 
   async function operate(operation: string, extra: Record<string, unknown>) {
     if (busy) return
@@ -120,6 +109,7 @@ function MechanicsPanel({ dynamic, resultsOnly = false }: MechanicsProps) {
   const wheelPrizes = Array.isArray(dynamic.config?.wheel_prizes)
     ? dynamic.config.wheel_prizes as Array<{ id: string; label: string; quantity: number; weight: number }>
     : []
+  const wheelStock = remainingStock(wheelPrizes, spins)
   const options = Array.isArray(dynamic.config?.trivia_options) ?
     dynamic.config.trivia_options.filter((x): x is string => typeof x === 'string') : []
 
@@ -232,10 +222,7 @@ function MechanicsPanel({ dynamic, resultsOnly = false }: MechanicsProps) {
           <h4 className="m-0 text-base font-bold">Clasificación automática</h4>
           {ranking.length ? (
             <ol className="space-y-2">
-              {ranking.map((run,index) => {
-                const previous = ranking[index-1]
-                const tied = !!previous && previous.elapsed_ms === run.elapsed_ms
-                const place = tied ? ranking.findIndex((r) => r.elapsed_ms === run.elapsed_ms)+1 : index+1
+              {ranking.map(({run,place,tied}) => {
                 const inPrizes = place <= dynamic.winner_count
                 return (
                   <li key={run.id} className="rounded-control border border-neo-border p-3">
@@ -296,10 +283,9 @@ function MechanicsPanel({ dynamic, resultsOnly = false }: MechanicsProps) {
           </div>
           <div className="rounded-control border border-neo-border p-3">
             <p className="m-0 mb-2 text-sm font-bold">Premios disponibles</p>
-            {wheelPrizes.map((item) => {
-              const used = spins.filter((spin) => spin.prize_key === item.id).length
-              return <p key={item.id} className="m-0 mt-1 text-sm">{item.label}: {Math.max(0,item.quantity-used)} de {item.quantity}</p>
-            })}
+            {wheelStock.map((item) => (
+              <p key={item.id} className="m-0 mt-1 text-sm">{item.label}: {item.remaining} de {item.quantity}</p>
+            ))}
             {!wheelPrizes.length && <p className="text-sm text-neo-text-secondary">Configura premios y cantidades antes de activarla.</p>}
           </div>
           {!resultsOnly && active && (
