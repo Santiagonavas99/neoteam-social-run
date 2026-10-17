@@ -543,9 +543,9 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
           )}
           <h4 className="m-0 font-bold">Historial de giros ({spins.length})</h4>
           <ul className="space-y-2">
-            {spins.slice(0, 60).map((spin, index) => (
+            {spins.slice(0, 60).map((spin) => (
               <li
-                key={spin.created_at + index}
+                key={spin.registrations?.registration_code ?? spin.created_at}
                 className="flex justify-between gap-3 rounded-control border border-neo-border p-2 text-sm"
               >
                 <span>{participantName(spin.registrations)}</span>
@@ -563,7 +563,7 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
           {options.map((option, index) => (
             <button
               type="button"
-              key={index}
+              key={String.fromCharCode(65 + index)}
               disabled={busy || resultsOnly || !active}
               aria-pressed={choice === index}
               onClick={() => setChoice(index)}
@@ -616,9 +616,9 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
           )}
           <h4 className="m-0 font-bold">Respuestas registradas ({answers.length})</h4>
           <ul className="space-y-2">
-            {answers.slice(0, 60).map((entry, index) => (
+            {answers.slice(0, 60).map((entry) => (
               <li
-                key={entry.created_at + index}
+                key={entry.registrations?.registration_code ?? entry.created_at}
                 className="flex justify-between gap-2 rounded-control border border-neo-border p-2 text-sm"
               >
                 <span>{participantName(entry.registrations)}</span>
