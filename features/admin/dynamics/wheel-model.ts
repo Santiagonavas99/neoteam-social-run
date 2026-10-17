@@ -47,7 +47,7 @@ export function buildWheelSectors(prizes: WheelPrize[], chance: number): WheelSe
     id: item.id,
     label: item.label,
     share: (probability * item.weight) / totalWeight,
-    palette: COLORS[index % COLORS.length],
+    palette: COLORS[index % COLORS.length] ?? NO_PRIZE,
   }))
   if (probability < 1) {
     entries.push({ id: null, label: 'Sin premio', share: 1 - probability, palette: NO_PRIZE })
@@ -78,7 +78,8 @@ export function buildWheelSectors(prizes: WheelPrize[], chance: number): WheelSe
     }
   }
   // Avoid a visible seam from floating-point arithmetic at 360 degrees.
-  if (sectors.length) sectors[sectors.length - 1].end = 360
+  const last = sectors.at(-1)
+  if (last) last.end = 360
   return sectors
 }
 
@@ -92,6 +93,7 @@ export function targetRotation(
   )
   if (!matches.length) return null
   const sector = matches[Math.floor(Math.random() * matches.length)]
+  if (!sector) return null
   const midpoint = (sector.start + sector.end) / 2
   const destination = (360 - midpoint + 360) % 360
   const current = ((previousRotation % 360) + 360) % 360
