@@ -113,9 +113,7 @@ export function DynamicForm({
                 ? values.config.challenge_mode
                 : 'completion'
             }
-            onChange={(e) =>
-              update('config', { ...values.config, challenge_mode: e.target.value })
-            }
+            onChange={(e) => update('config', { ...values.config, challenge_mode: e.target.value })}
           >
             <option value="completion">Completar actividad (QR)</option>
             <option value="timed_max">Resistencia: gana el mayor tiempo</option>
