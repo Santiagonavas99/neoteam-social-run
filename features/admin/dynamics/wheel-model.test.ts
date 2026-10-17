@@ -9,7 +9,7 @@ const prize = (id: string, weight: number, remaining = 2) => ({
 test('a single real prize renders a full segmented wheel', () => {
   const sectors = buildWheelSectors([prize('inscripcion', 1)], 1)
   assert.equal(sectors.length, 8)
-  assert.equal(sectors[0].start, 0)
+  assert.equal(sectors[0]?.start, 0)
   assert.equal(sectors.at(-1)?.end, 360)
   assert.ok(sectors.every((sector) => sector.label === 'inscripcion'))
 })
