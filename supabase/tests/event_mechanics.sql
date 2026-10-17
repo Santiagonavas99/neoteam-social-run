@@ -25,6 +25,7 @@ create table public.dynamic_participations (
  status text not null default 'completed',
  points_awarded integer not null default 0,
  metadata jsonb not null default '{}',
+ completed_at timestamptz,
  unique (dynamic_id,registration_id)
 );
 do $$ begin
