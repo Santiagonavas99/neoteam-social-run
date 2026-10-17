@@ -164,7 +164,7 @@ export function WheelVisual({
               })
             ) : (
               Array.from({ length: 8 }, (_, index) => (
-                <g key={index}>
+                <g key={String.fromCharCode(65 + index)}>
                   <path
                     d={sectorPath(index * 45, (index + 1) * 45)}
                     fill={index % 2 ? '#204640' : '#2D5951'}
