@@ -1,13 +1,15 @@
 'use client'
 import { useState } from 'react'
-import type { DynamicRow } from '../types'
+import type { DynamicRow, LogoItem } from '../types'
 import { dynamicTypes } from '../labels'
 import { filterMobileDynamics, mobilePhaseLabels, type MobilePhase } from './mobile-dynamics'
 
 const phases: MobilePhase[] = ['en-vivo', 'preparar', 'resultados']
 
-export function MobileDynamicsHome({ rows, query, onQueryChange, onOpen }: {
+export function MobileDynamicsHome({ rows, logos, loading, query, onQueryChange, onOpen }: {
   rows: DynamicRow[]
+  logos: LogoItem[]
+  loading: boolean
   query: string
   onQueryChange: (value: string) => void
   onOpen: (row: DynamicRow) => void
@@ -30,9 +32,11 @@ export function MobileDynamicsHome({ rows, query, onQueryChange, onOpen }: {
       <input type="search" value={query} onChange={(e) => onQueryChange(e.target.value)}
         placeholder="Marca, premio o actividad…" className="mt-1 min-h-12" />
     </label>
-    {shown.length ? shown.map((row) => <button type="button" key={row.id} onClick={() => onOpen(row)}
+    {loading ? <p role="status" className="text-sm text-neo-text-secondary">
+      Cargando dinámicas…
+    </p> : shown.length ? shown.map((row) => <button type="button" key={row.id} onClick={() => onOpen(row)}
       className="min-h-24 w-full rounded-card border border-neo-border bg-neo-surface p-4 text-left">
-      <span className="block text-xs text-neo-accent-text">{dynamicTypes[row.type]}</span>
+      <span className="block text-xs text-neo-accent-text">{logos.find((logo) => logo.id === row.config?.sponsor_logo_id)?.name || dynamicTypes[row.type]}</span>
       <strong className="mt-1 block text-base">{row.name}</strong>
       <span className="mt-1 block text-xs text-neo-text-secondary">{row.prize || row.description}</span>
     </button>) : <p className="rounded-card border p-5 text-sm text-neo-text-secondary">

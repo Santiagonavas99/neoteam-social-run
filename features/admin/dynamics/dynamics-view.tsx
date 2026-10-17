@@ -668,7 +668,7 @@ export function DynamicsView() {
         </>
       ) : (
         <>
-          <MobileDynamicsHome rows={rows} query={query} onQueryChange={setQuery} onOpen={open} />
+          <MobileDynamicsHome rows={rows} logos={sponsorLogos.data} loading={loading} query={query} onQueryChange={setQuery} onOpen={open} />
           <div className="hidden flex-col gap-5 md:flex">
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
             {[
