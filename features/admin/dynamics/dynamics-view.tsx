@@ -28,10 +28,10 @@ import { duplicateDynamic } from './duplicate-dynamic'
 import { DynamicCard } from './dynamic-card'
 import { DynamicCreateWizard } from './dynamic-create-wizard'
 import { DynamicForm } from './dynamic-form'
-import { MobileDynamicsHome } from './mobile-dynamics-home'
 import { challengeNeedsRules, groupDynamicsByPhase, orderDynamicsByStatus } from './dynamics-order'
 import styles from './dynamics-tabs.module.css'
 import { GameControlPanel } from './game-control-panel'
+import { MobileDynamicsHome } from './mobile-dynamics-home'
 import { ParticipationPanel } from './participation-panel'
 import { Ranking } from './ranking'
 import { useDynamics } from './use-dynamics'
@@ -108,7 +108,9 @@ export function DynamicsView() {
   const restored = useRef(false)
 
   function writeMobileUrl(id: string | null, section?: DetailTab) {
-    if (typeof window === 'undefined' || !window.matchMedia('(max-width: 767px)').matches) return
+    if (typeof window === 'undefined' || !window.matchMedia('(max-width: 767px)').matches) {
+      return
+    }
     const url = new URL(window.location.href)
     if (id) {
       url.searchParams.set('dinamica', id)
@@ -196,7 +198,13 @@ export function DynamicsView() {
   }
 
   function open(row: DynamicRow, target?: DetailTab) {
-    const nextTab = target ?? (row.status === 'draft' ? 'preparar' : row.status === 'completed' ? 'resultados' : 'en-vivo')
+    const nextTab =
+      target ??
+      (row.status === 'draft'
+        ? 'preparar'
+        : row.status === 'completed'
+          ? 'resultados'
+          : 'en-vivo')
     writeMobileUrl(row.id, nextTab)
     setSelectedId(row.id)
     setTab(
@@ -208,8 +216,13 @@ export function DynamicsView() {
             : 'en-vivo'),
     )
     setCreating(false)
-    setScanning(nextTab === 'en-vivo' && row.status === 'open' && row.type !== 'raffle' &&
-      typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches)
+    setScanning(
+      nextTab === 'en-vivo' &&
+        row.status === 'open' &&
+        row.type !== 'raffle' &&
+        typeof window !== 'undefined' &&
+        window.matchMedia('(max-width: 767px)').matches,
+    )
     setSettingsOpen(false)
     dynamics.setEditor(null)
     dynamics.setWinners(null)
@@ -315,17 +328,29 @@ export function DynamicsView() {
       <Feedback value={feedback} />
       {confirmationPanel}
       {preview && (
-        <div role="dialog" aria-modal="true" aria-label="Vista pública de la dinámica"
-          className="fixed inset-0 z-50 flex flex-col bg-neo-surface">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Vista pública de la dinámica"
+          className="fixed inset-0 z-50 flex flex-col bg-neo-surface"
+        >
           <div className="flex min-h-16 items-center justify-between gap-3 border-b border-neo-border px-4">
-            <strong className="text-sm">Vista pública {preview.rehearsal ? '· Ensayo' : ''}</strong>
-            <button type="button" className="button button-secondary min-h-11"
-              onClick={() => setPreview(null)}>
+            <strong className="text-sm">
+              Vista pública {preview.rehearsal ? '· Ensayo' : ''}
+            </strong>
+            <button
+              type="button"
+              className="button button-secondary min-h-11"
+              onClick={() => setPreview(null)}
+            >
               <ArrowLeft aria-hidden className="size-4" /> Volver al control
             </button>
           </div>
-          <iframe title="Presentación pública integrada" className="min-h-0 w-full flex-1 border-0"
-            src={'/juego/' + preview.id + (preview.rehearsal ? '?ensayo=1' : '')} />
+          <iframe
+            title="Presentación pública integrada"
+            className="min-h-0 w-full flex-1 border-0"
+            src={'/juego/' + preview.id + (preview.rehearsal ? '?ensayo=1' : '')}
+          />
         </div>
       )}
 
@@ -361,13 +386,18 @@ export function DynamicsView() {
           {selected.status === 'open' && rows.filter((row) => row.status === 'open').length > 1 && (
             <label className="md:hidden">
               Cambiar dinámica activa
-              <select value={selected.id} className="mt-1 min-h-12"
+              <select
+                value={selected.id}
+                className="mt-1 min-h-12"
                 onChange={(event) => {
                   const next = rows.find((row) => row.id === event.target.value)
                   if (next) open(next, 'en-vivo')
-                }}>
+                }}
+              >
                 {rows.filter((row) => row.status === 'open').map((row) => (
-                  <option key={row.id} value={row.id}>{row.name}</option>
+                  <option key={row.id} value={row.id}>
+                    {row.name}
+                  </option>
                 ))}
               </select>
             </label>
@@ -410,7 +440,14 @@ export function DynamicsView() {
             </nav>
           </div>
 
-          <section className={tab === 'en-vivo' && scanning ? 'hidden md:flex ' + styles.sectionIntro : styles.sectionIntro} data-kind={tab}>
+          <section
+            className={
+              tab === 'en-vivo' && scanning
+                ? 'hidden md:flex ' + styles.sectionIntro
+                : styles.sectionIntro
+            }
+            data-kind={tab}
+          >
             <div className="flex min-w-0 items-start gap-3">
               {tab === 'preparar' ? (
                 <ClipboardCheck aria-hidden className="mt-0.5 size-5 shrink-0" />
@@ -668,110 +705,117 @@ export function DynamicsView() {
         </>
       ) : (
         <>
-          <MobileDynamicsHome rows={rows} logos={sponsorLogos.data} loading={loading} query={query} onQueryChange={setQuery} onOpen={open} />
+          <MobileDynamicsHome
+            rows={rows}
+            logos={sponsorLogos.data}
+            loading={loading}
+            query={query}
+            onQueryChange={setQuery}
+            onOpen={open}
+          />
           <div className="hidden flex-col gap-5 md:flex">
-          <div className="grid grid-cols-3 gap-2 sm:gap-3">
-            {[
-              { label: 'Activas', count: counts.open, status: 'open' },
-              { label: 'Borradores', count: counts.draft, status: 'draft' },
-              { label: 'Completadas', count: counts.completed, status: 'completed' },
-            ].map((item) => (
-              <div key={item.status} data-status={item.status} className={styles.overviewStat}>
-                <p className="m-0 text-xs text-neo-text-secondary">{item.label}</p>
-                <p className="m-0 mt-1 text-2xl font-black tabular-nums sm:text-3xl">
-                  {item.count}
-                </p>
-              </div>
-            ))}
-          </div>
-          <nav aria-label="Categorías de dinámicas" className="flex flex-wrap gap-2">
-            {(['raffles', 'stands', 'instant'] as Category[]).map((item) => (
-              <button
-                type="button"
-                key={item}
-                aria-pressed={category === item}
-                onClick={() => setCategory(item)}
-                className={
-                  'min-h-11 rounded-control border px-4 text-sm font-bold ' +
-                  (category === item
-                    ? 'border-neo-text bg-neo-text text-neo-surface'
-                    : 'border-neo-border bg-neo-surface hover:bg-neo-muted-bg')
-                }
-              >
-                {categoryLabel(item)} (
-                {rows.filter((row) => categoryTypes[item].includes(row.type)).length})
-              </button>
-            ))}
-          </nav>
-          <label className="max-w-lg">
-            Buscar {categoryLabel(category).toLowerCase()}
-            <input
-              type="search"
-              placeholder="Nombre, premio o actividad…"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-            />
-          </label>
-
-          {loading ? (
-            <LoadingState>Cargando dinámicas…</LoadingState>
-          ) : visible.length ? (
-            <div className="flex flex-col gap-8">
-              {grouped.map((group) => (
-                <section key={group.id} aria-label={group.title} className="flex flex-col gap-3">
-                  <div className={styles.groupHeading}>
-                    <div>
-                      <h3 className="m-0 text-lg font-black">{group.title}</h3>
-                      <p className="m-0 mt-1 text-xs text-neo-text-secondary">
-                        {group.description}
-                      </p>
-                    </div>
-                    <span className={styles.groupCount}>{group.rows.length}</span>
-                  </div>
-                  <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
-                    {group.rows.map((row) => (
-                      <DynamicCard
-                        key={row.id}
-                        row={row}
-                        onOpen={() => open(row)}
-                        onRepeat={() => repeat(row)}
-                        onPreview={() => setPreview({ id: row.id, rehearsal: false })}
-                      />
-                    ))}
-                  </div>
-                </section>
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              {[
+                { label: 'Activas', count: counts.open, status: 'open' },
+                { label: 'Borradores', count: counts.draft, status: 'draft' },
+                { label: 'Completadas', count: counts.completed, status: 'completed' },
+              ].map((item) => (
+                <div key={item.status} data-status={item.status} className={styles.overviewStat}>
+                  <p className="m-0 text-xs text-neo-text-secondary">{item.label}</p>
+                  <p className="m-0 mt-1 text-2xl font-black tabular-nums sm:text-3xl">
+                    {item.count}
+                  </p>
+                </div>
               ))}
             </div>
-          ) : query ? (
-            <NoMatches onClear={() => setQuery('')} />
-          ) : (
-            <EmptyState
-              icon={Zap}
-              title={'Sin ' + categoryLabel(category).toLowerCase()}
-              text="Crea una dinámica con el asistente. Podrás configurarla antes de activarla."
-            />
-          )}
-          {(dynamics.ranking.length > 0 || drafts.length > 0) && (
-            <details className="rounded-control border border-neo-border bg-neo-surface p-4">
-              <summary className="cursor-pointer text-sm font-bold text-neo-text-secondary">
-                Herramientas avanzadas
-              </summary>
-              <div className="mt-4 grid gap-4">
-                {dynamics.ranking.length > 0 && <Ranking runners={dynamics.ranking} />}
-                {drafts.length > 0 && (
-                  <button
-                    type="button"
-                    className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-neo-danger"
-                    disabled={busy}
-                    onClick={() => dynamics.setConfirmation({ action: 'deleteDrafts', drafts })}
-                  >
-                    <Trash2 aria-hidden className="size-4" />
-                    Eliminar borradores ({drafts.length})
-                  </button>
-                )}
+            <nav aria-label="Categorías de dinámicas" className="flex flex-wrap gap-2">
+              {(['raffles', 'stands', 'instant'] as Category[]).map((item) => (
+                <button
+                  type="button"
+                  key={item}
+                  aria-pressed={category === item}
+                  onClick={() => setCategory(item)}
+                  className={
+                    'min-h-11 rounded-control border px-4 text-sm font-bold ' +
+                    (category === item
+                      ? 'border-neo-text bg-neo-text text-neo-surface'
+                      : 'border-neo-border bg-neo-surface hover:bg-neo-muted-bg')
+                  }
+                >
+                  {categoryLabel(item)} (
+                  {rows.filter((row) => categoryTypes[item].includes(row.type)).length})
+                </button>
+              ))}
+            </nav>
+            <label className="max-w-lg">
+              Buscar {categoryLabel(category).toLowerCase()}
+              <input
+                type="search"
+                placeholder="Nombre, premio o actividad…"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+              />
+            </label>
+
+            {loading ? (
+              <LoadingState>Cargando dinámicas…</LoadingState>
+            ) : visible.length ? (
+              <div className="flex flex-col gap-8">
+                {grouped.map((group) => (
+                  <section key={group.id} aria-label={group.title} className="flex flex-col gap-3">
+                    <div className={styles.groupHeading}>
+                      <div>
+                        <h3 className="m-0 text-lg font-black">{group.title}</h3>
+                        <p className="m-0 mt-1 text-xs text-neo-text-secondary">
+                          {group.description}
+                        </p>
+                      </div>
+                      <span className={styles.groupCount}>{group.rows.length}</span>
+                    </div>
+                    <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
+                      {group.rows.map((row) => (
+                        <DynamicCard
+                          key={row.id}
+                          row={row}
+                          onOpen={() => open(row)}
+                          onRepeat={() => repeat(row)}
+                          onPreview={() => setPreview({ id: row.id, rehearsal: false })}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                ))}
               </div>
-            </details>
-          )}
+            ) : query ? (
+              <NoMatches onClear={() => setQuery('')} />
+            ) : (
+              <EmptyState
+                icon={Zap}
+                title={'Sin ' + categoryLabel(category).toLowerCase()}
+                text="Crea una dinámica con el asistente. Podrás configurarla antes de activarla."
+              />
+            )}
+            {(dynamics.ranking.length > 0 || drafts.length > 0) && (
+              <details className="rounded-control border border-neo-border bg-neo-surface p-4">
+                <summary className="cursor-pointer text-sm font-bold text-neo-text-secondary">
+                  Herramientas avanzadas
+                </summary>
+                <div className="mt-4 grid gap-4">
+                  {dynamics.ranking.length > 0 && <Ranking runners={dynamics.ranking} />}
+                  {drafts.length > 0 && (
+                    <button
+                      type="button"
+                      className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-neo-danger"
+                      disabled={busy}
+                      onClick={() => dynamics.setConfirmation({ action: 'deleteDrafts', drafts })}
+                    >
+                      <Trash2 aria-hidden className="size-4" />
+                      Eliminar borradores ({drafts.length})
+                    </button>
+                  )}
+                </div>
+              </details>
+            )}
           </div>
         </>
       )}

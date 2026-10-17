@@ -3,6 +3,7 @@ import { dynamicTypes } from '../labels'
 import type { DynamicRow, DynamicStatus } from '../types'
 
 export type MobilePhase = 'en-vivo' | 'preparar' | 'resultados'
+
 export const mobilePhaseLabels: Record<MobilePhase, string> = {
   'en-vivo': 'En vivo',
   preparar: 'Preparar',
@@ -15,9 +16,15 @@ export function phaseForStatus(status: DynamicStatus): MobilePhase {
   return 'resultados'
 }
 
-export function filterMobileDynamics(rows: DynamicRow[], phase: MobilePhase, query: string): DynamicRow[] {
-  return rows.filter((row) =>
-    phaseForStatus(row.status) === phase &&
-    matchesQuery([row.name, row.description, row.prize, dynamicTypes[row.type]], query),
+/** Search across all dynamic types; only the lifecycle phase filters mobile. */
+export function filterMobileDynamics(
+  rows: DynamicRow[],
+  phase: MobilePhase,
+  query: string,
+): DynamicRow[] {
+  return rows.filter(
+    (row) =>
+      phaseForStatus(row.status) === phase &&
+      matchesQuery([row.name, row.description, row.prize, dynamicTypes[row.type]], query),
   )
 }
