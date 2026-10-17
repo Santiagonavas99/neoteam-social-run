@@ -178,7 +178,7 @@ export function DynamicForm({
               onChange={(e) => update('config', { ...values.config,trivia_question:e.target.value,pending_review:true })} />
           </label>
           {Array.from({ length: Math.max(2,triviaOptions.length) }, (_,index) => (
-            <label key={index}>Opción {String.fromCharCode(65+index)}
+            <label key={String.fromCharCode(65 + index)}>Opción {String.fromCharCode(65+index)}
               <input value={triviaOptions[index] ?? ''} maxLength={150}
                 onChange={(e) => update('config', { ...values.config,pending_review:true,
                   trivia_options:Array.from({length:Math.max(2,triviaOptions.length)},(_,i) => i === index ? e.target.value : triviaOptions[i] ?? ''),
@@ -196,7 +196,7 @@ export function DynamicForm({
               onChange={(e) => update('config', { ...values.config,trivia_correct_index:Number(e.target.value),pending_review:true })}>
               <option value="">Seleccionar respuesta</option>
               {triviaOptions.map((option,index) => (
-                <option key={index} value={index}>{String.fromCharCode(65+index)}. {option}</option>
+                <option key={String.fromCharCode(65 + index)} value={index}>{String.fromCharCode(65+index)}. {option}</option>
               ))}
             </select>
           </label>
