@@ -74,11 +74,9 @@ function ruleDescription(row: DynamicRow, eligible: number | null) {
     row.config?.exclude_winners === true ? 'sin ganadores anteriores' : '',
   ].filter(Boolean)
   return [
-    eligible + ' participantes elegibles',
-    parts.length ? '(' + parts.join(', ') + ')' : '',
-    '· hasta ' +
-      Math.min(row.winner_count, eligible) +
-      ' ganadores. El sorteo real guarda sus resultados.',
+    `${eligible} participantes elegibles`,
+    parts.length ? `(${parts.join(', ')})` : '',
+    `· hasta ${Math.min(row.winner_count, eligible)} ganadores. El sorteo real guarda sus resultados.`,
   ].join(' ')
 }
 
@@ -247,7 +245,7 @@ export function DynamicsView() {
     confirmation?.action === 'draw' ? (
       <ConfirmPanel
         kind="draw"
-        title={'¿Todo listo para “' + confirmation.row.name + '”?'}
+        title={`¿Todo listo para “${confirmation.row.name}”?`}
         text={ruleDescription(confirmation.row, dynamics.eligible)}
         confirmLabel="Confirmar sorteo real"
         busy={busy}
@@ -258,12 +256,8 @@ export function DynamicsView() {
     ) : confirmation?.action === 'redraw' ? (
       <ConfirmPanel
         kind="draw"
-        title={confirmation.winner.firstName + ' no está. ¿Sortear reemplazo?'}
-        text={
-          'Se marcará como ausente y se buscará otra persona para el puesto ' +
-          confirmation.place +
-          '. Los demás ganadores no cambian.'
-        }
+        title={`${confirmation.winner.firstName} no está. ¿Sortear reemplazo?`}
+        text={`Se marcará como ausente y se buscará otra persona para el puesto ${confirmation.place}. Los demás ganadores no cambian.`}
         confirmLabel="Buscar reemplazo"
         busy={busy}
         onCancel={() => dynamics.setConfirmation(null)}
@@ -272,7 +266,7 @@ export function DynamicsView() {
     ) : confirmation?.action === 'delete' ? (
       <ConfirmPanel
         kind="delete"
-        title={'¿Eliminar “' + confirmation.row.name + '” ?'}
+        title={`¿Eliminar “${confirmation.row.name}” ?`}
         text="Se eliminará esta dinámica y todas sus participaciones. No se puede deshacer."
         confirmLabel="Sí, eliminar"
         busy={busy}
@@ -282,7 +276,7 @@ export function DynamicsView() {
     ) : confirmation?.action === 'deleteDrafts' ? (
       <ConfirmPanel
         kind="delete"
-        title={'¿Eliminar los ' + confirmation.drafts.length + ' borradores?'}
+        title={`¿Eliminar los ${confirmation.drafts.length} borradores?`}
         text="Se perderán las configuraciones de los borradores y sus participaciones."
         confirmLabel="Eliminar borradores"
         busy={busy}
@@ -337,7 +331,7 @@ export function DynamicsView() {
           <iframe
             title="Presentación pública integrada"
             className="min-h-0 w-full flex-1 border-0"
-            src={'/juego/' + preview.id + (preview.rehearsal ? '?ensayo=1' : '')}
+            src={`/juego/${preview.id}${preview.rehearsal ? '?ensayo=1' : ''}`}
           />
         </div>
       )}
@@ -433,7 +427,7 @@ export function DynamicsView() {
           <section
             className={
               tab === 'en-vivo' && scanning
-                ? 'hidden md:flex ' + styles.sectionIntro
+                ? `hidden md:flex ${styles.sectionIntro}`
                 : styles.sectionIntro
             }
             data-kind={tab}
@@ -742,10 +736,9 @@ export function DynamicsView() {
                   aria-pressed={category === item}
                   onClick={() => setCategory(item)}
                   className={
-                    'min-h-11 rounded-control border px-4 text-sm font-bold ' +
-                    (category === item
-                      ? 'border-neo-text bg-neo-text text-neo-surface'
-                      : 'border-neo-border bg-neo-surface hover:bg-neo-muted-bg')
+                    `min-h-11 rounded-control border px-4 text-sm font-bold ${category === item
+                    ? 'border-neo-text bg-neo-text text-neo-surface'
+                    : 'border-neo-border bg-neo-surface hover:bg-neo-muted-bg'}`
                   }
                 >
                   {categoryLabel(item)} (
@@ -797,7 +790,7 @@ export function DynamicsView() {
             ) : (
               <EmptyState
                 icon={Zap}
-                title={'Sin ' + categoryLabel(category).toLowerCase()}
+                title={`Sin ${categoryLabel(category).toLowerCase()}`}
                 text="Crea una dinámica con el asistente. Podrás configurarla antes de activarla."
               />
             )}

@@ -4,7 +4,7 @@ import type { DynamicRow } from '../types'
 export function duplicateDynamic(row: DynamicRow): DynamicRow {
   const suffix = ' (copia)'
   return {
-    id: 'new-repeat-' + Date.now(),
+    id: `new-repeat-${Date.now()}`,
     name:
       row.name
         .trim()

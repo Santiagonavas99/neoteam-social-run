@@ -226,7 +226,7 @@ export function DynamicForm({
                 wheel_prizes: [
                   ...wheelPrizes,
                   {
-                    id: 'slot-' + Math.random().toString(36).slice(2, 10),
+                    id: `slot-${Math.random().toString(36).slice(2, 10)}`,
                     label: '',
                     quantity: 1,
                     weight: 1,

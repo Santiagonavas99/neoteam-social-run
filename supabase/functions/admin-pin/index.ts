@@ -613,7 +613,7 @@ Deno.serve(async (req: Request) => {
             })
             const known = mechanicError(error)
             if (known) return known
-            if (error && error.message?.includes('mechanic_tie_unresolved'))
+            if (error?.message?.includes('mechanic_tie_unresolved'))
               return json(
                 {
                   error:
@@ -621,12 +621,12 @@ Deno.serve(async (req: Request) => {
                 },
                 409,
               )
-            if (error && error.message?.includes('mechanic_unfinished_runs'))
+            if (error?.message?.includes('mechanic_unfinished_runs'))
               return json(
                 { error: 'Finaliza todos los cronómetros antes de cerrar la clasificación.' },
                 409,
               )
-            if (error && error.message?.includes('mechanic_finalize_individual_only'))
+            if (error?.message?.includes('mechanic_finalize_individual_only'))
               return json(
                 {
                   error:
@@ -634,7 +634,7 @@ Deno.serve(async (req: Request) => {
                 },
                 409,
               )
-            if (error && error.message?.includes('mechanic_no_results'))
+            if (error?.message?.includes('mechanic_no_results'))
               return json({ error: 'No hay tiempos finalizados.' }, 409)
             if (error) throw error
             return json({ ok: true, finalized: data })
