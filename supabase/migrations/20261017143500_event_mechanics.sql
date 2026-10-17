@@ -265,7 +265,7 @@ grant execute on function public.dynamic_trivia_answer(uuid,uuid,uuid,integer) t
 -- Finalize only individual timed rankings. No tied prize-boundary or unfinished run can be awarded.
 create or replace function public.dynamic_timed_finalize(
   p_event_id uuid,p_dynamic_id uuid
-) returns jsonb language plpgsql security invoker set search_path = '' as $
+) returns jsonb language plpgsql security invoker set search_path = '' as $$
 declare
   d record; v_mode text; v_total integer; v_awards integer; v_cutoff bigint;
   v_next bigint; v_winners integer;
@@ -311,7 +311,7 @@ begin
   if v_winners<>v_awards then raise exception 'mechanic_award_conflict'; end if;
   update public.dynamics set status='completed',updated_at=now() where id=p_dynamic_id;
   return jsonb_build_object('winners',v_winners,'completed',true);
-end $;
+end $$;
 revoke all on function public.dynamic_timed_finalize(uuid,uuid) from public,anon,authenticated;
 grant execute on function public.dynamic_timed_finalize(uuid,uuid) to service_role;
 
