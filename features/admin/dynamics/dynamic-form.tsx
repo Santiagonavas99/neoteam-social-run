@@ -100,6 +100,27 @@ export function DynamicForm({
           </small>
         )}
       </label>
+      {challenge && (
+        <>
+          <label>
+            Modalidad del reto
+            <select
+              value={typeof values.config?.challenge_mode === 'string' ? values.config.challenge_mode : 'completion'}
+              onChange={(e) => update('config', { ...values.config, challenge_mode: e.target.value })}
+            >
+              <option value="completion">Completar actividad (QR)</option>
+              <option value="timed_max">Resistencia: gana el mayor tiempo</option>
+              <option value="timed_min">Velocidad: gana el menor tiempo</option>
+              <option value="team_relay">Relevos por equipos: menor tiempo</option>
+            </select>
+          </label>
+          {values.config?.challenge_mode !== undefined && values.config?.challenge_mode !== 'completion' && (
+            <p className="col-span-full m-0 rounded-control border border-neo-accent-border bg-neo-accent-soft p-4 text-sm text-neo-text-secondary" role="status">
+              Esta modalidad queda documentada, pero el cronómetro, la clasificación por tiempo y la asignación automática de premios aún no están implementados. No actives el reto hasta completar esa integración.
+            </p>
+          )}
+        </>
+      )}
       {cloneMode && (
         <p className="col-span-full m-0 rounded-control bg-neo-muted-bg p-4 text-sm text-neo-text-secondary">
           Esta copia será un borrador sin resultados anteriores. Revisa las reglas y vuelve a
