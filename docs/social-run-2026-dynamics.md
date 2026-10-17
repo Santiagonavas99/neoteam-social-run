@@ -40,7 +40,7 @@ Pendiente: confirmar reglas, preguntas y respuestas, límites de ganadores y des
 5. Trivias con respuestas verificadas, control de intentos y resultados consultables.
 6. Todas las operaciones desde una sola pestaña Mobile, sin romper QR, OTP, permisos, escritorio o resultados históricos.
 
-**Estado al 17/10/2026:** se implementaron y probaron automatizadamente los RPC de cronómetros, ranking individual, ruletas y trivias. Los relevos generan una clasificación por equipo; la entrega de cinco cortesías no se automatiza sin que el organizador confirme el reparto. La ruleta tiene una representación circular básica y revela el premio sorteado por el backend; todavía no tiene sectores gráficos detallados ni una animación sincronizada con un ángulo ganador. No se hicieron pruebas en teléfonos físicos ni de dos operadores compitiendo simultáneamente. Las 15 dinámicas se mantienen en borrador.
+**Estado al 17/10/2026:** se implementaron y probaron automatizadamente los RPC de cronómetros, ranking individual, ruletas y trivias. Los relevos generan una clasificación por equipo; la entrega de cinco cortesías no se automatiza sin que el organizador confirme el reparto. La ruleta incluye sectores proporcionales a la probabilidad configurada, puntero ganador y animación dirigida por el premio adjudicado en el backend. En borrador se muestra la configuración sin consultar APIs aún no publicadas; se permite un ensayo visual sin registrar premios. Cuando no existe inventario revisado, el gráfico se muestra como pendiente y no inventa premios. No se hicieron pruebas en teléfonos físicos ni de dos operadores compitiendo simultáneamente. Las 15 dinámicas se mantienen en borrador.
 
 ## Validación y plan seguro de publicación
 
