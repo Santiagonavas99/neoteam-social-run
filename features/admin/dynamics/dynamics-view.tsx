@@ -32,6 +32,7 @@ import { challengeNeedsRules, groupDynamicsByPhase, orderDynamicsByStatus } from
 import styles from './dynamics-tabs.module.css'
 import { GameControlPanel } from './game-control-panel'
 import { MobileDynamicsHome } from './mobile-dynamics-home'
+import { mechanicKind, MechanicsPanel } from './mechanics-panel'
 import { ParticipationPanel } from './participation-panel'
 import { Ranking } from './ranking'
 import { useDynamics } from './use-dynamics'
@@ -612,15 +613,16 @@ export function DynamicsView() {
 
           {tab === 'en-vivo' && (
             <>
-              <div className={selected.type === 'raffle' ? '' : 'hidden md:block'}>
+              {mechanicKind(selected) && <MechanicsPanel key={selected.id} dynamic={selected} />}
+              {!mechanicKind(selected) && <div className={selected.type === 'raffle' ? '' : 'hidden md:block'}>
                 <GameControlPanel
                   key={selected.id}
                   dynamic={selected}
                   onDraw={() => void dynamics.askDraw(selected)}
                   onPreview={(rehearsal) => setPreview({ id: selected.id, rehearsal })}
                 />
-              </div>
-              {selected.type !== 'raffle' && selected.status === 'open' && (
+              </div>}
+              {!mechanicKind(selected) && selected.type !== 'raffle' && selected.status === 'open' && (
                 <div className={styles.scanPanel}>
                   <div>
                     <h4 className="m-0 text-lg font-black">
@@ -643,7 +645,7 @@ export function DynamicsView() {
                   )}
                 </div>
               )}
-              {selected.type !== 'raffle' && selected.status === 'open' && (
+              {!mechanicKind(selected) && selected.type !== 'raffle' && selected.status === 'open' && (
                 <div className="flex flex-wrap gap-3 md:hidden">
                   <button
                     type="button"
@@ -666,6 +668,7 @@ export function DynamicsView() {
 
           {tab === 'resultados' && (
             <>
+              {mechanicKind(selected) && <MechanicsPanel key={selected.id} dynamic={selected} resultsOnly />}
               {(selected.status === 'completed' || selected.status === 'closed') && (
                 <button
                   type="button"
@@ -691,7 +694,7 @@ export function DynamicsView() {
                   </div>
                 </div>
               )}
-              {winners?.row.id === selected.id ? (
+              {!mechanicKind(selected) && (winners?.row.id === selected.id ? (
                 <DrawResult
                   name={selected.name}
                   winners={winners.list}
@@ -710,7 +713,7 @@ export function DynamicsView() {
                       ? 'Los registros de finalización se contabilizan arriba. Esta versión no determina posiciones ni cronometra automáticamente.'
                       : 'Los resultados aparecerán aquí cuando termine la dinámica.'}
                 </p>
-              )}
+              ))}
             </>
           )}
         </>
