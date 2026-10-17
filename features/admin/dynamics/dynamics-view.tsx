@@ -13,7 +13,7 @@ import {
   Trophy,
   Zap,
 } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { callAdmin, callLogos } from '../api'
 import { matchesQuery } from '../filter'
 import { dynamicStates, dynamicTypes, raffleGenders } from '../labels'
@@ -104,6 +104,59 @@ export function DynamicsView() {
   const [creating, setCreating] = useState(false)
   const [duplicate, setDuplicate] = useState<DynamicRow | null>(null)
   const [scanning, setScanning] = useState(false)
+  const [preview, setPreview] = useState<{ id: string; rehearsal: boolean } | null>(null)
+  const restored = useRef(false)
+
+  function writeMobileUrl(id: string | null, section?: DetailTab) {
+    if (typeof window === 'undefined' || !window.matchMedia('(max-width: 767px)').matches) return
+    const url = new URL(window.location.href)
+    if (id) {
+      url.searchParams.set('dinamica', id)
+      if (section) url.searchParams.set('seccion', section)
+    } else {
+      url.searchParams.delete('dinamica')
+      url.searchParams.delete('seccion')
+    }
+    window.history.pushState(window.history.state, '', url)
+  }
+
+  useEffect(() => {
+    if (restored.current || dynamics.loading) return
+    restored.current = true
+    const params = new URLSearchParams(window.location.search)
+    const row = rows.find((item) => item.id === params.get('dinamica'))
+    const section = params.get('seccion')
+    if (row) {
+      setSelectedId(row.id)
+      setTab(section === 'preparar' || section === 'resultados' ? section : 'en-vivo')
+    }
+  }, [dynamics.loading, rows])
+
+  useEffect(() => {
+    const sync = () => {
+      const params = new URLSearchParams(window.location.search)
+      const row = rows.find((item) => item.id === params.get('dinamica'))
+      const section = params.get('seccion')
+      setSelectedId(row?.id ?? null)
+      setTab(section === 'preparar' || section === 'resultados' ? section : 'en-vivo')
+      setScanning(false)
+      setPreview(null)
+      setSettingsOpen(false)
+      setCreating(false)
+      setDuplicate(null)
+    }
+    window.addEventListener('popstate', sync)
+    return () => window.removeEventListener('popstate', sync)
+  }, [rows])
+
+  useEffect(() => {
+    if (!preview) return
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setPreview(null)
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [preview])
   const loading = dynamics.loading || sponsors.loading || sponsorLogos.loading
   const selected = rows.find((row) => row.id === selectedId) ?? null
   const visible = orderDynamicsByStatus(
@@ -130,6 +183,7 @@ export function DynamicsView() {
   }
 
   function repeat(row: DynamicRow) {
+    writeMobileUrl(null)
     setDuplicate(duplicateDynamic(row))
     setSelectedId(null)
     setCreating(false)
@@ -142,6 +196,8 @@ export function DynamicsView() {
   }
 
   function open(row: DynamicRow, target?: DetailTab) {
+    const nextTab = target ?? (row.status === 'draft' ? 'preparar' : row.status === 'completed' ? 'resultados' : 'en-vivo')
+    writeMobileUrl(row.id, nextTab)
     setSelectedId(row.id)
     setTab(
       target ??
@@ -152,7 +208,8 @@ export function DynamicsView() {
             : 'en-vivo'),
     )
     setCreating(false)
-    setScanning(false)
+    setScanning(nextTab === 'en-vivo' && row.status === 'open' && row.type !== 'raffle' &&
+      typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches)
     setSettingsOpen(false)
     dynamics.setEditor(null)
     dynamics.setWinners(null)
@@ -163,6 +220,7 @@ export function DynamicsView() {
   }
 
   function chooseTab(item: DetailTab, row: DynamicRow) {
+    writeMobileUrl(row.id, item)
     setTab(item)
     setScanning(false)
     setSettingsOpen(false)
@@ -173,6 +231,7 @@ export function DynamicsView() {
   }
 
   function back() {
+    writeMobileUrl(null)
     setSelectedId(null)
     setTab('preparar')
     setScanning(false)
@@ -255,6 +314,20 @@ export function DynamicsView() {
 
       <Feedback value={feedback} />
       {confirmationPanel}
+      {preview && (
+        <div role="dialog" aria-modal="true" aria-label="Vista pública de la dinámica"
+          className="fixed inset-0 z-50 flex flex-col bg-neo-surface">
+          <div className="flex min-h-16 items-center justify-between gap-3 border-b border-neo-border px-4">
+            <strong className="text-sm">Vista pública {preview.rehearsal ? '· Ensayo' : ''}</strong>
+            <button type="button" className="button button-secondary min-h-11"
+              onClick={() => setPreview(null)}>
+              <ArrowLeft aria-hidden className="size-4" /> Volver al control
+            </button>
+          </div>
+          <iframe title="Presentación pública integrada" className="min-h-0 w-full flex-1 border-0"
+            src={'/juego/' + preview.id + (preview.rehearsal ? '?ensayo=1' : '')} />
+        </div>
+      )}
 
       {duplicate ? (
         <div>
@@ -285,6 +358,20 @@ export function DynamicsView() {
           <button type="button" className="text-link self-start" onClick={back}>
             <ArrowLeft aria-hidden className="size-4" /> Volver a dinámicas
           </button>
+          {selected.status === 'open' && rows.filter((row) => row.status === 'open').length > 1 && (
+            <label className="md:hidden">
+              Cambiar dinámica activa
+              <select value={selected.id} className="mt-1 min-h-12"
+                onChange={(event) => {
+                  const next = rows.find((row) => row.id === event.target.value)
+                  if (next) open(next, 'en-vivo')
+                }}>
+                {rows.filter((row) => row.status === 'open').map((row) => (
+                  <option key={row.id} value={row.id}>{row.name}</option>
+                ))}
+              </select>
+            </label>
+          )}
           <div
             className={`${styles.detailHeader} rounded-card border p-5 md:p-7`}
             data-status={selected.status}
@@ -323,7 +410,7 @@ export function DynamicsView() {
             </nav>
           </div>
 
-          <section className={styles.sectionIntro} data-kind={tab}>
+          <section className={tab === 'en-vivo' && scanning ? 'hidden md:flex ' + styles.sectionIntro : styles.sectionIntro} data-kind={tab}>
             <div className="flex min-w-0 items-start gap-3">
               {tab === 'preparar' ? (
                 <ClipboardCheck aria-hidden className="mt-0.5 size-5 shrink-0" />
@@ -495,11 +582,14 @@ export function DynamicsView() {
 
           {tab === 'en-vivo' && (
             <>
-              <GameControlPanel
-                key={selected.id}
-                dynamic={selected}
-                onDraw={() => void dynamics.askDraw(selected)}
-              />
+              <div className={selected.type === 'raffle' ? '' : 'hidden md:block'}>
+                <GameControlPanel
+                  key={selected.id}
+                  dynamic={selected}
+                  onDraw={() => void dynamics.askDraw(selected)}
+                  onPreview={(rehearsal) => setPreview({ id: selected.id, rehearsal })}
+                />
+              </div>
               {selected.type !== 'raffle' && selected.status === 'open' && (
                 <div className={styles.scanPanel}>
                   <div>
@@ -645,6 +735,7 @@ export function DynamicsView() {
                         row={row}
                         onOpen={() => open(row)}
                         onRepeat={() => repeat(row)}
+                        onPreview={() => setPreview({ id: row.id, rehearsal: false })}
                       />
                     ))}
                   </div>

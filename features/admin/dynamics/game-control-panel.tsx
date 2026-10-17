@@ -1,7 +1,6 @@
 'use client'
 
 import { ArrowUpRight, Dices, Eye, MonitorPlay, Play, RotateCcw, Trophy } from 'lucide-react'
-import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { REVEAL_SUSPENSE_MS } from '@/features/dynamics/game-scene'
 import { callAdmin } from '../api'
@@ -15,7 +14,13 @@ const phases: Record<string, string> = {
   finished: 'Juego finalizado',
 }
 
-export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onDraw: () => void }) {
+export function GameControlPanel({
+  dynamic, onDraw, onPreview,
+}: {
+  dynamic: DynamicRow
+  onDraw: () => void
+  onPreview: (rehearsal: boolean) => void
+}) {
   const [stage, setStage] = useState<DynamicStageStatus | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -40,9 +45,10 @@ export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onD
   }, [dynamic.type, dynamic.status, refresh])
 
   useEffect(() => {
+    if (dynamic.type !== 'raffle' || !['open', 'completed'].includes(dynamic.status)) return
     const clock = window.setInterval(() => setNow(Date.now()), 250)
     return () => window.clearInterval(clock)
-  }, [])
+  }, [dynamic.type, dynamic.status])
 
   async function command(action: 'ready' | 'countdown' | 'drawn' | 'next' | 'finish') {
     if (busy || !stage || syncUnavailable) return
@@ -184,28 +190,19 @@ export function GameControlPanel({ dynamic, onDraw }: { dynamic: DynamicRow; onD
         </div>
         <div className="flex flex-wrap items-center gap-4">
           {active && (
-            <Link
-              href={`/juego/${dynamic.id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-link"
-            >
-              Abrir pantalla <ArrowUpRight aria-hidden className="size-4" />
-            </Link>
+            <button type="button" className="text-link" onClick={() => onPreview(false)}>
+              Ver pantalla aquí <ArrowUpRight aria-hidden className="size-4" />
+            </button>
           )}
           <details className="group relative">
             <summary className="cursor-pointer list-none text-sm font-semibold text-neo-text-secondary hover:text-neo-text">
               Más opciones <span aria-hidden>⌄</span>
             </summary>
             <div className="mt-3 flex min-w-56 flex-col gap-3 rounded-control border border-neo-border bg-neo-muted-bg p-4 sm:absolute sm:right-0 sm:z-10 sm:shadow-lg">
-              <Link
-                href={`/juego/${dynamic.id}?ensayo=1`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-link text-sm"
-              >
-                Ensayar con datos ficticios <ArrowUpRight aria-hidden className="size-4" />
-              </Link>
+              <button type="button" className="text-link text-sm"
+                onClick={() => onPreview(true)}>
+                Ensayar aquí con datos ficticios <ArrowUpRight aria-hidden className="size-4" />
+              </button>
               {isRaffle && active && (
                 <>
                   {dynamic.status === 'open' && phase !== 'countdown' && (
