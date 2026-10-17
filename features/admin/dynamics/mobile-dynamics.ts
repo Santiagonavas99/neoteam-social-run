@@ -1,5 +1,5 @@
-import { matchesQuery } from '../filter'
-import { dynamicTypes } from '../labels'
+import { matchesQuery } from '../filter.ts'
+import { dynamicTypes } from '../labels.ts'
 import type { DynamicRow, DynamicStatus } from '../types'
 
 export type MobilePhase = 'en-vivo' | 'preparar' | 'resultados'
