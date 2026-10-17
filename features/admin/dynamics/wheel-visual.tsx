@@ -57,6 +57,10 @@ export function WheelVisual({
   preview: boolean
 }) {
   const sectors = useMemo(() => buildWheelSectors(prizes, probability), [prizes, probability])
+  const sectorsRef = useRef(sectors)
+  useEffect(() => {
+    sectorsRef.current = sectors
+  }, [sectors])
   const [rotation, setRotation] = useState(0)
   const [duration, setDuration] = useState(0)
   const [moving, setMoving] = useState(false)
@@ -73,7 +77,7 @@ export function WheelVisual({
 
     // A settled server result controls the destination. Nothing in the animation
     // is used to choose or persist prizes.
-    const target = targetRotation(sectors, spin.prize, rotationRef.current)
+    const target = targetRotation(sectorsRef.current, spin.prize, rotationRef.current)
     if (target === null) {
       revealRef.current()
       return
@@ -100,7 +104,7 @@ export function WheelVisual({
       window.clearTimeout(start)
       window.clearTimeout(end)
     }
-  }, [spin?.id])
+  }, [spin])
 
   const accessible = prizes
     .filter((prize) => prize.remaining > 0)
