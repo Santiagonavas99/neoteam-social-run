@@ -21,6 +21,7 @@ import {
   participantLookup,
   participantPayload,
 } from '../_shared/participants.ts'
+import { CHECKIN_CLOSED_MESSAGE, isCheckinClosed } from '../_shared/checkin-window.ts'
 import { sendPassEmail } from '../_shared/pass-email.ts'
 import { handlePassEmailQueue } from '../_shared/pass-email-queue.ts'
 import { fromProxy, sha256 } from '../_shared/proxy.ts'
@@ -1194,6 +1195,9 @@ Deno.serve(async (req: Request) => {
             )
           )
             return json({ error: 'Estado de participante inválido.' }, 400)
+          if (safeValues.status === 'checked_in' && isCheckinClosed()) {
+            return json({ error: CHECKIN_CLOSED_MESSAGE }, 409)
+          }
           safeValues.checked_in_at =
             safeValues.status === 'checked_in' ? new Date().toISOString() : null
         } else {
@@ -1308,7 +1312,9 @@ Deno.serve(async (req: Request) => {
         .eq('code', 'SR26')
         .single()
       if (eventError) throw eventError
+      if (isCheckinClosed()) return json({ error: CHECKIN_CLOSED_MESSAGE }, 409)
       const outcome = await checkInParticipant(supabase, event.id, value)
+      if (outcome.result === 'closed') return json({ error: CHECKIN_CLOSED_MESSAGE }, 409)
       if (outcome.result === 'notFound')
         return json({ error: 'No encontramos ese QR o código.' }, 404)
       return json({
@@ -1316,6 +1322,40 @@ Deno.serve(async (req: Request) => {
         result: outcome.result,
         participant: participantPayload(outcome.participant),
       })
+    }
+
+    if (action === 'adminCheckinException') {
+      const id = typeof body?.participantId === 'string' ? body.participantId : ''
+      const reason = typeof body?.reason === 'string' ? body.reason.trim() : ''
+      if (!/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(id)) {
+        return json({ error: 'Participante no válido.' }, 400)
+      }
+      if (reason.length < 10 || reason.length > 400) {
+        return json({ error: 'Explica la excepción en 10 a 400 caracteres.' }, 400)
+      }
+      if (!isCheckinClosed()) {
+        return json({ error: 'El check-in todavía está abierto. Usa el registro normal.' }, 409)
+      }
+      // ADMIN ONLY: this action is absent from STAFF_ACTIONS and uses the verified session.
+      const { data, error } = await supabase.rpc('sr26_admin_checkin_exception', {
+        p_registration_id: id,
+        p_admin_user_id: session.userId,
+        p_reason: reason,
+      })
+      const known = rpcErrorResponse(error, {
+        CHECKIN_AUN_ABIERTO: ['El check-in todavía está abierto.', 409],
+        MOTIVO_INVALIDO: ['Explica la excepción en 10 a 400 caracteres.', 400],
+        ADMIN_NO_AUTORIZADO: ['Se requiere un administrador activo.', 403],
+      })
+      if (known) return known
+      if (error) throw error
+      if (data === 'not_found') return json({ error: 'Participante no encontrado.', 404)
+      if (data === 'not_allowed')
+        return json({ error: 'Este participante no permite check-in.' }, 409)
+      if (data === 'already_checked_in')
+        return json({ error: 'El participante ya había hecho check-in.' }, 409)
+      if (data !== 'checked_in') return json({ error: 'No se pudo registrar la excepción.' }, 409)
+      return json({ ok: true })
     }
 
     if (action === 'updateParticipantProfile') {

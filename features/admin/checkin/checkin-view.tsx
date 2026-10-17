@@ -23,6 +23,9 @@ async function checkIn(code: string): Promise<ScanOutcome> {
 export function CheckinView() {
   return (
     <section className="mx-auto w-full max-w-120">
+      <p className="m-0 mb-3 text-xs text-neo-text-secondary">
+        Cierre automático: domingo 18 de octubre a las 8:00 a. m. (Colombia).
+      </p>
       <ScanStation inputId="checkin-code" onCode={(code) => checkIn(code)} showIntro={false} />
     </section>
   )
