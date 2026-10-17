@@ -39,6 +39,12 @@ export function DynamicForm({
   const raffle = values.type === 'raffle'
   const instantWin = values.type === 'instant_win'
   const challenge = values.type === 'challenge'
+  const trivia = values.type === 'trivia'
+  const wheel = raffle && ['wheel','ruleta_pendiente'].includes(String(values.config?.mechanic))
+  const special = wheel || trivia || (challenge && ['timed_max','timed_min','team_relay'].includes(String(values.config?.challenge_mode)))
+  const wheelPrizes = (Array.isArray(values.config?.wheel_prizes) ? values.config.wheel_prizes : []) as Array<{ id: string; label: string; quantity: number; weight: number }>
+  const triviaOptions = (Array.isArray(values.config?.trivia_options) ? values.config.trivia_options : []) as string[]
+
   const selectedSponsor = dynamicSponsorValue(values)
   const sponsorOptions = dynamicSponsorOptions(brands, logos, selectedSponsor)
 
@@ -95,8 +101,7 @@ export function DynamicForm({
         />
         {challenge && (
           <small>
-            El reto se confirma con un escaneo por corredor. Esta versión no mide tiempos ni calcula
-            el más rápido automáticamente.
+            Si seleccionas resistencia o velocidad, el cronómetro oficial y la clasificación se gestionan desde «En vivo».
           </small>
         )}
       </label>
@@ -120,6 +125,90 @@ export function DynamicForm({
             </p>
           )}
         </>
+      )}
+      {raffle && (
+        <label>
+          Mecánica del premio
+          <select value={wheel ? 'wheel' : 'raffle'}
+            onChange={(event) => update('config', { ...values.config, mechanic: event.target.value, pending_review: true })}>
+            <option value="raffle">Rifa tradicional (ganadores aleatorios)</option>
+            <option value="wheel">Ruleta con premios e inventario</option>
+          </select>
+        </label>
+      )}
+      {wheel && (
+        <div className="col-span-full grid gap-3 rounded-control border border-neo-border p-4">
+          <h3 className="m-0 font-bold">Inventario de la ruleta</h3>
+          <p className="m-0 text-xs text-neo-text-secondary">Cada premio tiene su propio cupo. Al agotarse desaparece del sorteo; el ganador se decide en el servidor.</p>
+          {wheelPrizes.map((prize, index) => (
+            <div key={prize.id} className="grid grid-cols-2 gap-2 rounded-control bg-neo-muted-bg p-3">
+              <label className="col-span-2">Nombre del premio
+                <input value={prize.label} maxLength={100}
+                  onChange={(e) => update('config', { ...values.config, wheel_prizes: wheelPrizes.map((x,i) => i === index ? { ...x,label:e.target.value } : x) })} />
+              </label>
+              <label>Cantidad
+                <input type="number" min={1} max={500} value={prize.quantity}
+                  onChange={(e) => update('config', { ...values.config, wheel_prizes: wheelPrizes.map((x,i) => i === index ? { ...x,quantity:Math.max(1,Math.floor(Number(e.target.value)||1)) } : x) })} />
+              </label>
+              <label>Peso en el mezclado
+                <input type="number" min={1} max={1000} value={prize.weight}
+                  onChange={(e) => update('config', { ...values.config, wheel_prizes: wheelPrizes.map((x,i) => i === index ? { ...x,weight:Math.max(1,Math.floor(Number(e.target.value)||1)) } : x) })} />
+              </label>
+              <button type="button" className="text-link col-span-2 self-start"
+                onClick={() => update('config', { ...values.config, wheel_prizes:wheelPrizes.filter((_,i) => i!==index),pending_review:true })}>Quitar premio</button>
+            </div>
+          ))}
+          <button type="button" className="button button-secondary" disabled={wheelPrizes.length >= 20}
+            onClick={() => update('config', { ...values.config, pending_review:true,
+              wheel_prizes:[...wheelPrizes,{ id:'slot-'+Math.random().toString(36).slice(2,10),label:'',quantity:1,weight:1 }],
+            })}>Añadir tipo de premio</button>
+          <label>Probabilidad de obtener un premio (%)
+            <input type="number" min={0} max={100} step={1}
+              value={Math.round(Number(values.config?.wheel_probability ?? 1)*100)}
+              onChange={(e) => update('config', { ...values.config,
+                wheel_probability: Math.min(1,Math.max(0,Number(e.target.value)/100)),pending_review:true })} />
+          </label>
+        </div>
+      )}
+      {trivia && (
+        <div className="col-span-full grid gap-3 rounded-control border border-neo-border p-4">
+          <h3 className="m-0 font-bold">Pregunta y respuesta verificada</h3>
+          <label>Pregunta
+            <textarea rows={2} maxLength={300} value={String(values.config?.trivia_question ?? '')}
+              onChange={(e) => update('config', { ...values.config,trivia_question:e.target.value,pending_review:true })} />
+          </label>
+          {Array.from({ length: Math.max(2,triviaOptions.length) }, (_,index) => (
+            <label key={index}>Opción {String.fromCharCode(65+index)}
+              <input value={triviaOptions[index] ?? ''} maxLength={150}
+                onChange={(e) => update('config', { ...values.config,pending_review:true,
+                  trivia_options:Array.from({length:Math.max(2,triviaOptions.length)},(_,i) => i === index ? e.target.value : triviaOptions[i] ?? ''),
+                })} />
+            </label>
+          ))}
+          {triviaOptions.length < 8 && (
+            <button type="button" className="button button-secondary"
+              onClick={() => update('config', { ...values.config,trivia_options:[...triviaOptions,''],pending_review:true })}>
+              Añadir opción
+            </button>
+          )}
+          <label>Respuesta correcta (confirmada por organización)
+            <select value={typeof values.config?.trivia_correct_index==='number' ? values.config.trivia_correct_index : ''}
+              onChange={(e) => update('config', { ...values.config,trivia_correct_index:Number(e.target.value),pending_review:true })}>
+              <option value="">Seleccionar respuesta</option>
+              {triviaOptions.map((option,index) => (
+                <option key={index} value={index}>{String.fromCharCode(65+index)}. {option}</option>
+              ))}
+            </select>
+          </label>
+          <p className="m-0 text-xs text-neo-text-secondary">El primer participante que acierte recibe el premio hasta completar el número de ganadores. Una respuesta por QR.</p>
+        </div>
+      )}
+      {special && (
+        <label className="check-label col-span-full rounded-control border border-neo-accent-border bg-neo-accent-soft p-4">
+          <input type="checkbox" checked={values.config?.pending_review === false}
+            onChange={(e) => update('config', { ...values.config, pending_review: !e.target.checked })} />
+          Confirmo que revisé reglas, condiciones, respuestas correctas y cantidades de premios. La actividad puede activarse.
+        </label>
       )}
       {cloneMode && (
         <p className="col-span-full m-0 rounded-control bg-neo-muted-bg p-4 text-sm text-neo-text-secondary">
@@ -159,13 +248,13 @@ export function DynamicForm({
           />
         </label>
       )}
-      {(raffle || instantWin) && (
+      {(raffle || instantWin || trivia || challenge) && (
         <>
           <label>
             Premio
             <input
               value={values.prize ?? ''}
-              required
+              required={!challenge}
               maxLength={240}
               onChange={(e) => update('prize', e.target.value)}
             />
@@ -203,7 +292,7 @@ export function DynamicForm({
           />
         </label>
       )}
-      {raffle && (
+      {raffle && !wheel && (
         <>
           <label>
             Categoría
@@ -226,7 +315,7 @@ export function DynamicForm({
           </label>
         </>
       )}
-      {raffle && (
+      {raffle && !wheel && (
         <label className="col-span-full">
           Participan quienes completaron
           <select
