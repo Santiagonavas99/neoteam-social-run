@@ -174,10 +174,7 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
       }>)
     : []
   const displayedSpins = wheelSnapshot ?? spins
-  const wheelStock = useMemo(
-    () => remainingStock(wheelPrizes, displayedSpins),
-    [wheelPrizes, displayedSpins],
-  )
+  const wheelStock = remainingStock(wheelPrizes, displayedSpins)
   const availableWheelStock = remainingStock(wheelPrizes, spins)
   const wheelProbability = Number(dynamic.config?.wheel_probability ?? 1)
   const wheelPreview = dynamic.status === 'draft' || dynamic.status === 'cancelled'
