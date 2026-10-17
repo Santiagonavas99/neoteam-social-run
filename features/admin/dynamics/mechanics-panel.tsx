@@ -5,6 +5,8 @@ import { callAdmin } from '../api'
 import type { DynamicRow, TimedRun, TriviaAnswer, WheelSpin } from '../types'
 import { ScanStation } from '../ui/scan-station'
 import { formatElapsed, rankTimes, remainingStock } from './mechanics-helpers'
+import { buildWheelSectors } from './wheel-model'
+import { WheelVisual, type SpinVisual } from './wheel-visual'
 
 type Kind = 'timed' | 'wheel' | 'trivia'
 type MechanicsProps = {
@@ -48,6 +50,14 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
   const [choice, setChoice] = useState<number | null>(null)
   const [timed, setTimed] = useState<TimedRun[]>([])
   const [spins, setSpins] = useState<WheelSpin[]>([])
+  const [wheelSnapshot, setWheelSnapshot] = useState<WheelSpin[] | null>(null)
+  const [wheelMotion, setWheelMotion] = useState<SpinVisual | null>(null)
+  const [wheelAnimating, setWheelAnimating] = useState(false)
+  const [pendingWheelResult, setPendingWheelResult] = useState<{
+    already_played: boolean
+    won: boolean
+    prize?: string | null
+  } | null>(null)
   const [answers, setAnswers] = useState<TriviaAnswer[]>([])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -79,10 +89,17 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
   }, [dynamic.id, kind])
 
   useEffect(() => {
-    void reload().catch((cause) =>
-      setError(cause instanceof Error ? cause.message : 'No pudimos consultar resultados.'),
-    )
-  }, [reload])
+    // Drafts never consult the new mechanics API; it is not deployed in production yet.
+    if (dynamic.status === 'draft' || dynamic.status === 'cancelled') return
+    void reload().catch((cause) => {
+      const reason = cause instanceof Error ? cause.message : 'No pudimos consultar resultados.'
+      setError(
+        reason.includes('Operación de dinámica no válida')
+          ? 'Este servidor aún no tiene publicada la función de esta mecánica. La vista previa sigue disponible, pero no es posible registrar participaciones.'
+          : reason,
+      )
+    })
+  }, [reload, dynamic.status])
 
   useEffect(() => {
     if (kind !== 'timed' || resultsOnly || !timed.some((row) => row.status === 'running')) return
@@ -99,7 +116,22 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
     setMessage('')
     try {
       const result = await callAdmin('dynamicData', { operation, id: dynamic.id, ...extra })
-      if (result.mechanicResult) setOutcome(result.mechanicResult)
+      if (result.mechanicResult) {
+        if (operation === 'wheelSpin') {
+          if (result.mechanicResult.already_played) {
+            setOutcome(result.mechanicResult)
+          } else {
+            setWheelAnimating(true)
+            setPendingWheelResult(result.mechanicResult)
+            setWheelMotion((previous) => ({
+              id: (previous?.id ?? 0) + 1,
+              prize: result.mechanicResult?.won ? (result.mechanicResult.prize ?? null) : null,
+            }))
+          }
+        } else {
+          setOutcome(result.mechanicResult)
+        }
+      }
       if (operation === 'timedFinalize') {
         setMessage(
           `Clasificación cerrada: ${result.finalized?.winners ?? 0} ganadores registrados.`,
@@ -141,10 +173,44 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
         weight: number
       }>)
     : []
-  const wheelStock = remainingStock(wheelPrizes, spins)
+  const displayedSpins = wheelSnapshot ?? spins
+  const wheelStock = useMemo(
+    () => remainingStock(wheelPrizes, displayedSpins),
+    [wheelPrizes, displayedSpins],
+  )
+  const availableWheelStock = remainingStock(wheelPrizes, spins)
+  const wheelProbability = Number(dynamic.config?.wheel_probability ?? 1)
+  const wheelPreview = dynamic.status === 'draft' || dynamic.status === 'cancelled'
   const options = Array.isArray(dynamic.config?.trivia_options)
     ? dynamic.config.trivia_options.filter((x): x is string => typeof x === 'string')
     : []
+
+  function rehearseWheel() {
+    const sectors = buildWheelSectors(availableWheelStock, wheelProbability)
+    if (!sectors.length || wheelAnimating || busy) return
+    const angle = Math.random() * 360
+    const winner = sectors.find((sector) => angle >= sector.start && angle < sector.end)
+    setWheelSnapshot(spins)
+    setOutcome(null)
+    setError('')
+    setMessage('')
+    setPendingWheelResult(null)
+    setWheelAnimating(true)
+    setWheelMotion((previous) => ({
+      id: (previous?.id ?? 0) + 1,
+      prize: winner?.id ? (winner.label ?? null) : null,
+      demo: true,
+    }))
+  }
+
+  function revealWheel() {
+    setWheelAnimating(false)
+    if (wheelMotion?.demo) {
+      setMessage('Ensayo visual terminado. No se entregó ni registró ningún premio.')
+    } else if (pendingWheelResult) {
+      setOutcome(pendingWheelResult)
+    }
+  }
 
   return (
     <section
@@ -172,14 +238,18 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
                 : 'Un intento por corredor. La respuesta se valida en el servidor.'}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => void reload()}
-          disabled={busy}
-          className="min-h-11 rounded-control border border-neo-border px-3 text-sm font-bold"
-        >
-          Actualizar
-        </button>
+        {dynamic.status !== 'draft' && dynamic.status !== 'cancelled' && (
+          <button
+            type="button"
+            onClick={() => void reload().catch((cause) => {
+              setError(cause instanceof Error ? cause.message : 'No pudimos actualizar.')
+            })}
+            disabled={busy || wheelAnimating}
+            className="min-h-11 rounded-control border border-neo-border px-3 text-sm font-bold"
+          >
+            Actualizar
+          </button>
+        )}
       </div>
       {!resultsOnly && !active && (
         <p
@@ -476,23 +546,26 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
       )}
       {kind === 'wheel' && (
         <div className="space-y-4">
-          <div
-            className={
-              'mx-auto flex size-48 items-center justify-center rounded-full border-8 border-neo-border-strong bg-neo-accent-soft text-center shadow-lg' +
-              (busy ? ' motion-safe:animate-spin' : '')
-            }
-          >
-            <div className="px-4">
-              <p className="m-0 text-xs font-bold tracking-widest uppercase">Social Run</p>
-              <strong className="mt-2 block text-xl">RULETA</strong>
-              <p className="m-0 mt-2 text-xs text-neo-text-secondary">
-                Resultado oficial desde servidor
-              </p>
-            </div>
-          </div>
+          <WheelVisual
+            prizes={wheelStock}
+            probability={wheelProbability}
+            spin={wheelMotion}
+            onReveal={revealWheel}
+            preview={wheelPreview}
+          />
+          {wheelPreview && availableWheelStock.some((item) => item.remaining > 0) && !resultsOnly && (
+            <button
+              type="button"
+              className="button button-secondary w-full"
+              disabled={wheelAnimating || busy}
+              onClick={rehearseWheel}
+            >
+              {wheelAnimating ? 'Girando…' : 'Ensayar giro sin repartir premios'}
+            </button>
+          )}
           <div className="rounded-control border border-neo-border p-3">
             <p className="m-0 mb-2 text-sm font-bold">Premios disponibles</p>
-            {wheelStock.map((item) => (
+            {availableWheelStock.map((item) => (
               <p key={item.id} className="m-0 mt-1 text-sm">
                 {item.label}: {item.remaining} de {item.quantity}
               </p>
@@ -516,13 +589,15 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
               <button
                 type="button"
                 className="button w-full"
-                disabled={busy || !code.trim()}
+                disabled={busy || wheelAnimating || !code.trim() || availableWheelStock.every((item) => item.remaining <= 0)}
                 onClick={() => {
+                  setWheelSnapshot(spins)
                   setOutcome(null)
+                  setError('')
                   void operate('wheelSpin', { code: code.trim() })
                 }}
               >
-                {busy ? 'Verificando premio…' : 'Girar ruleta y registrar'}
+                {busy ? 'Asignando resultado…' : wheelAnimating ? 'Revelando premio…' : 'Girar ruleta y registrar'}
               </button>
             </div>
           )}
