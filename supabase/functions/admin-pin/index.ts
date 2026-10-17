@@ -619,7 +619,7 @@ Deno.serve(async (req: Request) => {
             if (!['start','pause','resume','finish','correct'].includes(body?.command))
               return json({ error: 'Acción de cronómetro inválida.' }, 400)
             let participantId: string | null = null
-            let memberIds: string[] = []
+            const memberIds: string[] = []
             if (body.command === 'start') {
               const codes = Array.isArray(body?.codes) ? body.codes : [body?.code]
               if (!codes.length || codes.length > 12)
@@ -843,12 +843,12 @@ Deno.serve(async (req: Request) => {
           if (config.mechanic === 'wheel') {
             const prizes = config.wheel_prizes
             if (prizes !== undefined && (!Array.isArray(prizes) || prizes.length > 20 ||
-              prizes.some((item: any) => !item || typeof item.id !== 'string' ||
+              prizes.some((item: Record<string, unknown>) => !item || typeof item.id !== 'string' ||
                 !/^[a-zA-Z0-9_-]{1,60}$/.test(item.id) || typeof item.label !== 'string' ||
                 !item.label.trim() || item.label.length > 100 ||
                 !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 500 ||
                 !Number.isFinite(item.weight) || item.weight <= 0 || item.weight > 1000) ||
-              new Set(prizes.map((item: any) => item.id)).size !== prizes.length)) {
+              new Set(prizes.map((item: Record<string, unknown>) => item.id)).size !== prizes.length)) {
               return json({ error: 'Revisa las cantidades y pesos de los premios de la ruleta.' }, 400)
             }
             const chance = Number(config.wheel_probability ?? 1)
