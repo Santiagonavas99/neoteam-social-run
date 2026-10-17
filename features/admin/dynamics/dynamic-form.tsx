@@ -59,11 +59,7 @@ export function DynamicForm({
   return (
     <EditorForm
       title={cloneMode ? 'Repetir dinámica' : isNew(row) ? 'Nueva dinámica' : `Editar ${row.name}`}
-      hint={
-        challenge
-          ? 'Explica qué debe completar el corredor. El personal verifica y registra el resultado con QR.'
-          : 'Configura cómo participa la gente y qué gana.'
-      }
+      hint="Datos, premios y participación."
       legend="Datos de la dinámica"
       submitLabel="Guardar dinámica"
       busy={busy}
@@ -107,12 +103,6 @@ export function DynamicForm({
           }
           onChange={(e) => update('description', e.target.value)}
         />
-        {challenge && (
-          <small>
-            Si seleccionas resistencia o velocidad, el cronómetro oficial y la clasificación se
-            gestionan desde «En vivo».
-          </small>
-        )}
       </label>
       {challenge && (
         <>
@@ -134,51 +124,56 @@ export function DynamicForm({
               <option value="team_relay">Relevos por equipos: menor tiempo</option>
             </select>
           </label>
-          {values.config?.challenge_mode !== undefined &&
-            values.config?.challenge_mode !== 'completion' && (
-              <p
-                className="col-span-full m-0 rounded-control border border-neo-accent-border bg-neo-accent-soft p-4 text-sm text-neo-text-secondary"
-                role="status"
-              >
-                Esta modalidad queda documentada, pero el cronómetro, la clasificación por tiempo y
-                la asignación automática de premios aún no están implementados. No actives el reto
-                hasta completar esa integración.
-              </p>
-            )}
+
         </>
       )}
       {raffle && (
-        <label>
-          Mecánica del premio
-          <select
-            value={wheel ? 'wheel' : 'raffle'}
-            onChange={(event) =>
-              update('config', {
-                ...values.config,
-                mechanic: event.target.value,
-                pending_review: true,
-              })
-            }
-          >
-            <option value="raffle">Rifa tradicional (ganadores aleatorios)</option>
-            <option value="wheel">Ruleta con premios e inventario</option>
-          </select>
-        </label>
+        <div className="col-span-full">
+          <p id="prize-mode-label" className="m-0 mb-2 text-sm font-semibold">
+            Modalidad
+          </p>
+          <div role="group" aria-labelledby="prize-mode-label" className="grid grid-cols-2 gap-2">
+            {[
+              { value: 'raffle', label: 'Rifa' },
+              { value: 'wheel', label: 'Ruleta' },
+            ].map((option) => {
+              const selected = (wheel ? 'wheel' : 'raffle') === option.value
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={selected}
+                  className={`min-h-12 rounded-control border px-3 text-sm font-bold transition-colors ${
+                    selected
+                      ? 'border-neo-accent-text bg-neo-accent-soft text-neo-text'
+                      : 'border-neo-border bg-neo-muted-bg text-neo-text-secondary'
+                  }`}
+                  onClick={() => {
+                    if (selected) return
+                    update('config', {
+                      ...values.config,
+                      mechanic: option.value,
+                      pending_review: option.value === 'wheel',
+                    })
+                  }}
+                >
+                  {option.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
       )}
       {wheel && (
         <div className="col-span-full grid gap-3 rounded-control border border-neo-border p-4">
-          <h3 className="m-0 font-bold">Inventario de la ruleta</h3>
-          <p className="m-0 text-xs text-neo-text-secondary">
-            Cada premio tiene su propio cupo. Al agotarse desaparece del sorteo; el ganador se
-            decide en el servidor.
-          </p>
+          <h3 className="m-0 text-base font-bold">Premios de la ruleta</h3>
           {wheelPrizes.map((prize, index) => (
             <div
               key={prize.id}
-              className="grid grid-cols-2 gap-2 rounded-control bg-neo-muted-bg p-3"
+              className="grid grid-cols-[minmax(0,1fr)_92px] gap-3 rounded-control bg-neo-muted-bg p-3"
             >
-              <label className="col-span-2">
-                Nombre del premio
+              <label className="min-w-0">
+                Premio
                 <input
                   value={prize.label}
                   maxLength={100}
@@ -211,25 +206,7 @@ export function DynamicForm({
                   }
                 />
               </label>
-              <label>
-                Peso en el mezclado
-                <input
-                  type="number"
-                  min={1}
-                  max={1000}
-                  value={prize.weight}
-                  onChange={(e) =>
-                    update('config', {
-                      ...values.config,
-                      wheel_prizes: wheelPrizes.map((x, i) =>
-                        i === index
-                          ? { ...x, weight: Math.max(1, Math.floor(Number(e.target.value) || 1)) }
-                          : x,
-                      ),
-                    })
-                  }
-                />
-              </label>
+
               <button
                 type="button"
                 className="text-link col-span-2 self-start"
@@ -265,25 +242,55 @@ export function DynamicForm({
               })
             }
           >
-            Añadir tipo de premio
+            Añadir premio
           </button>
-          <label>
-            Probabilidad de obtener un premio (%)
-            <input
-              type="number"
-              min={0}
-              max={100}
-              step={1}
-              value={Math.round(Number(values.config?.wheel_probability ?? 1) * 100)}
-              onChange={(e) =>
-                update('config', {
-                  ...values.config,
-                  wheel_probability: Math.min(1, Math.max(0, Number(e.target.value) / 100)),
-                  pending_review: true,
-                })
-              }
-            />
-          </label>
+          <details className="rounded-control border border-neo-border p-3">
+            <summary className="cursor-pointer text-sm font-semibold text-neo-text-secondary">
+              Ajustes de probabilidad
+            </summary>
+            <div className="mt-3 grid gap-3">
+              <label>
+                Probabilidad de ganar (%)
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={Math.round(Number(values.config?.wheel_probability ?? 1) * 100)}
+                  onChange={(e) =>
+                    update('config', {
+                      ...values.config,
+                      wheel_probability: Math.min(1, Math.max(0, Number(e.target.value) / 100)),
+                      pending_review: true,
+                    })
+                  }
+                />
+              </label>
+              {wheelPrizes.map((prize, index) => (
+                <label key={prize.id}>
+                  Peso · {prize.label || `Premio ${index + 1}`}
+                  <input
+                    type="number"
+                    min={1}
+                    max={1000}
+                    value={prize.weight}
+                    onChange={(e) =>
+                      update('config', {
+                        ...values.config,
+                        wheel_prizes: wheelPrizes.map((item, itemIndex) =>
+                          itemIndex === index
+                            ? { ...item, weight: Math.max(1, Math.floor(Number(e.target.value) || 1)) }
+                            : item,
+                        ),
+                        pending_review: true,
+                      })
+                    }
+                  />
+                </label>
+              ))}
+              <small>Todos los pesos iguales dan la misma oportunidad a cada premio disponible.</small>
+            </div>
+          </details>
         </div>
       )}
       {trivia && (
@@ -396,16 +403,9 @@ export function DynamicForm({
           >
             <LabelOptions labels={dynamicStates} />
           </select>
-          <small>Borrador no recibe participaciones; actívala para escanear o sortear.</small>
         </label>
       )}
-      {challenge && (
-        <p className="col-span-full m-0 rounded-control border border-neo-accent-border bg-neo-accent-soft p-4 text-sm text-neo-text-secondary">
-          <strong className="text-neo-accent-text">Cómo funcionará:</strong> al completar el reto,
-          el personal entra en «En vivo» y escanea el QR del corredor. Cada persona puede registrar
-          la finalización una sola vez.
-        </p>
-      )}
+
       {!raffle && (
         <label>
           Puntos
@@ -419,7 +419,7 @@ export function DynamicForm({
           />
         </label>
       )}
-      {(raffle || instantWin || trivia || challenge) && (
+      {((raffle && !wheel) || instantWin || trivia || challenge) && (
         <>
           <label>
             Premio
