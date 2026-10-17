@@ -735,11 +735,11 @@ export function DynamicsView() {
                   key={item}
                   aria-pressed={category === item}
                   onClick={() => setCategory(item)}
-                  className={
-                    `min-h-11 rounded-control border px-4 text-sm font-bold ${category === item
-                    ? 'border-neo-text bg-neo-text text-neo-surface'
-                    : 'border-neo-border bg-neo-surface hover:bg-neo-muted-bg'}`
-                  }
+                  className={`min-h-11 rounded-control border px-4 text-sm font-bold ${
+                    category === item
+                      ? 'border-neo-text bg-neo-text text-neo-surface'
+                      : 'border-neo-border bg-neo-surface hover:bg-neo-muted-bg'
+                  }`}
                 >
                   {categoryLabel(item)} (
                   {rows.filter((row) => categoryTypes[item].includes(row.type)).length})

@@ -166,9 +166,11 @@ export function DynamicCreateWizard({
                 type="button"
                 aria-pressed={type === option.type}
                 onClick={() => setType(option.type)}
-                className={`min-h-36 rounded-card border p-5 text-left transition-colors ${type === option.type
-                  ? 'border-neo-accent-text bg-neo-accent-soft'
-                  : 'border-neo-border-strong hover:bg-neo-muted-bg'}`}
+                className={`min-h-36 rounded-card border p-5 text-left transition-colors ${
+                  type === option.type
+                    ? 'border-neo-accent-text bg-neo-accent-soft'
+                    : 'border-neo-border-strong hover:bg-neo-muted-bg'
+                }`}
               >
                 <Icon aria-hidden className="mb-3 size-6 text-neo-accent-text" />
                 <strong className="block text-lg">{option.name}</strong>
