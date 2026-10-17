@@ -6,7 +6,7 @@ import type { DynamicRow, TimedRun, TriviaAnswer, WheelSpin } from '../types'
 import { ScanStation } from '../ui/scan-station'
 import { formatElapsed, rankTimes, remainingStock } from './mechanics-helpers'
 import { buildWheelSectors } from './wheel-model'
-import { WheelVisual, type SpinVisual } from './wheel-visual'
+import { type SpinVisual, WheelVisual } from './wheel-visual'
 
 type Kind = 'timed' | 'wheel' | 'trivia'
 type MechanicsProps = {
@@ -238,9 +238,11 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
         {dynamic.status !== 'draft' && dynamic.status !== 'cancelled' && (
           <button
             type="button"
-            onClick={() => void reload().catch((cause) => {
-              setError(cause instanceof Error ? cause.message : 'No pudimos actualizar.')
-            })}
+            onClick={() =>
+              void reload().catch((cause) => {
+                setError(cause instanceof Error ? cause.message : 'No pudimos actualizar.')
+              })
+            }
             disabled={busy || wheelAnimating}
             className="min-h-11 rounded-control border border-neo-border px-3 text-sm font-bold"
           >
@@ -550,16 +552,18 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
             onReveal={revealWheel}
             preview={wheelPreview}
           />
-          {wheelPreview && availableWheelStock.some((item) => item.remaining > 0) && !resultsOnly && (
-            <button
-              type="button"
-              className="button button-secondary w-full"
-              disabled={wheelAnimating || busy}
-              onClick={rehearseWheel}
-            >
-              {wheelAnimating ? 'Girando…' : 'Ensayar giro sin repartir premios'}
-            </button>
-          )}
+          {wheelPreview &&
+            availableWheelStock.some((item) => item.remaining > 0) &&
+            !resultsOnly && (
+              <button
+                type="button"
+                className="button button-secondary w-full"
+                disabled={wheelAnimating || busy}
+                onClick={rehearseWheel}
+              >
+                {wheelAnimating ? 'Girando…' : 'Ensayar giro sin repartir premios'}
+              </button>
+            )}
           <div className="rounded-control border border-neo-border p-3">
             <p className="m-0 mb-2 text-sm font-bold">Premios disponibles</p>
             {availableWheelStock.map((item) => (
@@ -586,7 +590,12 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
               <button
                 type="button"
                 className="button w-full"
-                disabled={busy || wheelAnimating || !code.trim() || availableWheelStock.every((item) => item.remaining <= 0)}
+                disabled={
+                  busy ||
+                  wheelAnimating ||
+                  !code.trim() ||
+                  availableWheelStock.every((item) => item.remaining <= 0)
+                }
                 onClick={() => {
                   setWheelSnapshot(spins)
                   setOutcome(null)
@@ -594,7 +603,11 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
                   void operate('wheelSpin', { code: code.trim() })
                 }}
               >
-                {busy ? 'Asignando resultado…' : wheelAnimating ? 'Revelando premio…' : 'Girar ruleta y registrar'}
+                {busy
+                  ? 'Asignando resultado…'
+                  : wheelAnimating
+                    ? 'Revelando premio…'
+                    : 'Girar ruleta y registrar'}
               </button>
             </div>
           )}

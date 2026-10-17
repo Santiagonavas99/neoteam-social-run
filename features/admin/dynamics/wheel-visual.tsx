@@ -1,11 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  buildWheelSectors,
-  targetRotation,
-  type WheelPrize,
-} from './wheel-model'
+import { buildWheelSectors, targetRotation, type WheelPrize } from './wheel-model'
 
 export type SpinVisual = {
   id: number
@@ -86,14 +82,20 @@ export function WheelVisual({
     const milliseconds = reduceMotion ? 0 : TOTAL_MS
     setMoving(!reduceMotion)
     setDuration(milliseconds)
-    const start = window.setTimeout(() => {
-      rotationRef.current = target
-      setRotation(target)
-    }, reduceMotion ? 0 : 50)
-    const end = window.setTimeout(() => {
-      setMoving(false)
-      revealRef.current()
-    }, milliseconds + (reduceMotion ? 0 : 90))
+    const start = window.setTimeout(
+      () => {
+        rotationRef.current = target
+        setRotation(target)
+      },
+      reduceMotion ? 0 : 50,
+    )
+    const end = window.setTimeout(
+      () => {
+        setMoving(false)
+        revealRef.current()
+      },
+      milliseconds + (reduceMotion ? 0 : 90),
+    )
     return () => {
       window.clearTimeout(start)
       window.clearTimeout(end)
@@ -124,66 +126,91 @@ export function WheelVisual({
             style={{
               transform: `rotate(${rotation}deg)`,
               transformOrigin: '160px 160px',
-              transition: duration > 0 ? `transform ${duration}ms cubic-bezier(0.14, 0.78, 0.13, 1)` : 'none',
+              transition:
+                duration > 0 ? `transform ${duration}ms cubic-bezier(0.14, 0.78, 0.13, 1)` : 'none',
             }}
           >
-            {sectors.length ? (
-              sectors.map((sector, index) => {
-                const midpoint = (sector.start + sector.end) / 2
-                const point = polar(midpoint, 100)
-                const width = sector.end - sector.start
-                const textLines = width >= 24 ? linesFor(sector.label) : []
-                return (
-                  <g key={sector.key}>
+            {sectors.length
+              ? sectors.map((sector, index) => {
+                  const midpoint = (sector.start + sector.end) / 2
+                  const point = polar(midpoint, 100)
+                  const width = sector.end - sector.start
+                  const textLines = width >= 24 ? linesFor(sector.label) : []
+                  return (
+                    <g key={sector.key}>
+                      <path
+                        d={sectorPath(sector.start, sector.end)}
+                        fill={sector.fill}
+                        opacity={index % 2 ? 0.92 : 1}
+                        stroke="#092324"
+                        strokeWidth="2.8"
+                      />
+                      {textLines.length > 0 && (
+                        <text
+                          x={point.x}
+                          y={point.y - (textLines.length - 1) * 6}
+                          textAnchor="middle"
+                          fill={sector.darkText ? '#0C2624' : '#FFFFFF'}
+                          fontSize={width < 40 ? 8 : 10}
+                          fontWeight="800"
+                          letterSpacing="0.15"
+                        >
+                          {textLines.map((line, lineIndex) => (
+                            <tspan key={line} x={point.x} dy={lineIndex ? 12 : 0}>
+                              {line}
+                            </tspan>
+                          ))}
+                        </text>
+                      )}
+                    </g>
+                  )
+                })
+              : Array.from({ length: 8 }, (_, index) => (
+                  <g key={String.fromCharCode(65 + index)}>
                     <path
-                      d={sectorPath(sector.start, sector.end)}
-                      fill={sector.fill}
-                      opacity={index % 2 ? 0.92 : 1}
+                      d={sectorPath(index * 45, (index + 1) * 45)}
+                      fill={index % 2 ? '#204640' : '#2D5951'}
                       stroke="#092324"
-                      strokeWidth="2.8"
+                      strokeWidth="3"
                     />
-                    {textLines.length > 0 && (
-                      <text
-                        x={point.x}
-                        y={point.y - (textLines.length - 1) * 6}
-                        textAnchor="middle"
-                        fill={sector.darkText ? '#0C2624' : '#FFFFFF'}
-                        fontSize={width < 40 ? 8 : 10}
-                        fontWeight="800"
-                        letterSpacing="0.15"
-                      >
-                        {textLines.map((line, lineIndex) => (
-                          <tspan key={line} x={point.x} dy={lineIndex ? 12 : 0}>
-                            {line}
-                          </tspan>
-                        ))}
-                      </text>
-                    )}
                   </g>
-                )
-              })
-            ) : (
-              Array.from({ length: 8 }, (_, index) => (
-                <g key={String.fromCharCode(65 + index)}>
-                  <path
-                    d={sectorPath(index * 45, (index + 1) * 45)}
-                    fill={index % 2 ? '#204640' : '#2D5951'}
-                    stroke="#092324"
-                    strokeWidth="3"
-                  />
-                </g>
-              ))
-            )}
-            <circle cx={CENTER} cy={CENTER} r={136} fill="none" stroke="#FFFFFF" strokeWidth="3" opacity="0.32" />
+                ))}
+            <circle
+              cx={CENTER}
+              cy={CENTER}
+              r={136}
+              fill="none"
+              stroke="#FFFFFF"
+              strokeWidth="3"
+              opacity="0.32"
+            />
           </g>
           <circle cx={CENTER} cy={CENTER} r={57} fill="#082321" stroke="#E0EFE4" strokeWidth="5" />
           <circle cx={CENTER} cy={CENTER} r={49} fill="#0C3430" />
-          <text x={CENTER} y={CENTER - 14} textAnchor="middle" fill="#AFFFE7"
-            fontSize="10" fontWeight="800" letterSpacing="2">NEO TEAM</text>
-          <text x={CENTER} y={CENTER + 10} textAnchor="middle" fill="#FFFFFF"
-            fontSize="18" fontWeight="900">{sectors.length ? 'GIRA' : 'LISTA'}</text>
-          <text x={CENTER} y={CENTER + 28} textAnchor="middle" fill="#C5E8DC"
-            fontSize="9">{sectors.length ? 'Y GANA' : 'SIN PREMIOS'}</text>
+          <text
+            x={CENTER}
+            y={CENTER - 14}
+            textAnchor="middle"
+            fill="#AFFFE7"
+            fontSize="10"
+            fontWeight="800"
+            letterSpacing="2"
+          >
+            NEO TEAM
+          </text>
+          <text
+            x={CENTER}
+            y={CENTER + 10}
+            textAnchor="middle"
+            fill="#FFFFFF"
+            fontSize="18"
+            fontWeight="900"
+          >
+            {sectors.length ? 'GIRA' : 'LISTA'}
+          </text>
+          <text x={CENTER} y={CENTER + 28} textAnchor="middle" fill="#C5E8DC" fontSize="9">
+            {sectors.length ? 'Y GANA' : 'SIN PREMIOS'}
+          </text>
           <path
             d="M 160 29 L 146 4 Q 160 -2 174 4 Z"
             fill="#F5C84B"

@@ -88,8 +88,8 @@ export function targetRotation(
   winnerLabel: string | null,
   previousRotation: number,
 ): number | null {
-  const matches = sectors.filter(
-    (sector) => (winnerLabel === null ? sector.id === null : sector.label === winnerLabel),
+  const matches = sectors.filter((sector) =>
+    winnerLabel === null ? sector.id === null : sector.label === winnerLabel,
   )
   if (!matches.length) return null
   const sector = matches[Math.floor(Math.random() * matches.length)]
