@@ -164,8 +164,39 @@ export type AdminResponse<Row = unknown> = {
   stageReady?: boolean
   ranking?: RankedRunner[]
   alreadyCompleted?: boolean
+  timedRun?: TimedRun
+  timedRuns?: TimedRun[]
+  wheelSpins?: WheelSpin[]
+  triviaAnswers?: TriviaAnswer[]
+  mechanicResult?: { already_played: boolean; won: boolean; prize?: string | null; correct?: boolean }
   won?: boolean
   prize?: string | null
+}
+
+export type TimedRun = {
+  id: string
+  status: 'running' | 'paused' | 'finished'
+  elapsed_ms: number
+  running_at: string | null
+  registration_id: string
+  member_ids: string[]
+  team_name: string | null
+  registrations?: { first_name: string; last_name: string; registration_code: string } | null
+}
+
+export type WheelSpin = {
+  prize_key: string | null
+  prize_label: string | null
+  created_at: string
+  registrations?: { first_name: string; last_name: string; registration_code: string } | null
+}
+
+export type TriviaAnswer = {
+  correct: boolean
+  won: boolean
+  choice_index: number
+  created_at: string
+  registrations?: { first_name: string; last_name: string; registration_code: string } | null
 }
 
 export type FeedbackValue = { kind: 'success' | 'error'; text: string } | null
