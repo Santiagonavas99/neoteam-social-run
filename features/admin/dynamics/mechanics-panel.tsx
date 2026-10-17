@@ -7,7 +7,7 @@ import { formatElapsed, rankTimes, remainingStock } from './mechanics-helpers'
 import type { DynamicRow, TimedRun, TriviaAnswer, WheelSpin } from '../types'
 
 type Kind = 'timed' | 'wheel' | 'trivia'
-type MechanicsProps = { dynamic: DynamicRow; resultsOnly?: boolean }
+type MechanicsProps = { dynamic: DynamicRow; resultsOnly?: boolean; onUpdated?: () => Promise<void> }
 
 export function mechanicKind(row: DynamicRow): Kind | null {
   if (row.type === 'trivia') return 'trivia'
@@ -26,7 +26,7 @@ function duration(run: TimedRun, now: number): number {
   return run.elapsed_ms + Math.max(0, now - Date.parse(run.running_at))
 }
 
-function MechanicsPanel({ dynamic, resultsOnly = false }: MechanicsProps) {
+function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsProps) {
   const kind = mechanicKind(dynamic)
   const mode = String(dynamic.config?.challenge_mode ?? '')
   const isTeam = mode === 'team_relay'
@@ -83,6 +83,10 @@ function MechanicsPanel({ dynamic, resultsOnly = false }: MechanicsProps) {
     try {
       const result = await callAdmin('dynamicData', { operation, id: dynamic.id, ...extra })
       if (result.mechanicResult) setOutcome(result.mechanicResult)
+      if (operation === 'timedFinalize') {
+        setMessage(`Clasificación cerrada: ${result.finalized?.winners ?? 0} ganadores registrados.`)
+        await onUpdated?.()
+      }
       if (operation === 'timedAction') {
         setMessage(extra.command === 'correct' ? 'Corrección registrada con auditoría.' : 'Cronómetro actualizado en el servidor.')
       }
@@ -267,8 +271,22 @@ function MechanicsPanel({ dynamic, resultsOnly = false }: MechanicsProps) {
               })}
             </ol>
           ) : <p className="text-sm text-neo-text-secondary">No hay tiempos finalizados todavía.</p>}
+          {active && !resultsOnly && !isTeam && ranking.length > 0 && (
+            <button type="button" className="button w-full" disabled={busy || timed.some((run) => run.status !== 'finished')}
+              onClick={() => {
+                if (window.confirm('¿Cerrar esta clasificación y registrar oficialmente los ganadores? Esta acción es definitiva.')) {
+                  void operate('timedFinalize', {})
+                }
+              }}>
+              Cerrar clasificación y registrar ganadores
+            </button>
+          )}
           <p className="text-xs text-neo-text-secondary">
-            Los puestos y premios aún no equivalen a premios entregados. Confirma empates y resultados antes de entregar productos.
+            {isTeam
+              ? 'La clasificación de relevos es automática, pero confirma cómo repartir las cortesías antes de entregarlas.'
+              : dynamic.status === 'completed'
+                ? 'Clasificación finalizada; los ganadores quedaron registrados en el historial.'
+                : 'Puestos provisionales. Resuelve empates antes de cerrar y entregar premios.'}
           </p>
         </div>
       )}
