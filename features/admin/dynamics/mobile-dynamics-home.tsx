@@ -75,7 +75,7 @@ export function MobileDynamicsHome({
               value={query}
               onChange={(event) => onQueryChange(event.target.value)}
               placeholder="Buscar marca o dinámica"
-              className="min-h-12 w-full pl-10"
+              className="min-h-12 w-full pl-10!"
             />
           </span>
         </label>
@@ -102,9 +102,9 @@ export function MobileDynamicsHome({
                 type="button"
                 key={row.id}
                 onClick={() => onOpen(row)}
-                className={`flex min-h-28 w-full flex-col gap-3 rounded-card border p-4 text-left transition-colors active:bg-neo-muted-bg ${
+                className={`flex min-h-28 w-full flex-col gap-3 rounded-card border p-4 text-left text-neo-text transition-colors active:bg-neo-muted-bg ${
                   active
-                    ? 'border-neo-accent-border bg-neo-accent-soft'
+                    ? 'border-neo-accent-border bg-neo-surface'
                     : 'border-neo-border bg-neo-surface'
                 }`}
               >
@@ -112,7 +112,13 @@ export function MobileDynamicsHome({
                   <span className="min-w-0 text-xs font-bold tracking-wide text-neo-accent-text uppercase">
                     {brand || mobileMechanicLabel(row)}
                   </span>
-                  <span className="shrink-0 rounded-full border border-neo-border px-2.5 py-1 text-[11px] font-bold">
+                  <span
+                    className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-bold ${
+                      active
+                        ? 'border-neo-accent-border bg-neo-accent-soft text-neo-accent-text'
+                        : 'border-neo-border bg-neo-muted-bg text-neo-text-secondary'
+                    }`}
+                  >
                     {active ? 'Activa' : status === 'draft' ? 'Pendiente' : dynamicStates[status]}
                   </span>
                 </span>
@@ -125,7 +131,7 @@ export function MobileDynamicsHome({
                     {row.prize ? ` · ${row.prize}` : ''}
                   </span>
                 </span>
-                <span className="flex items-center justify-between text-sm font-bold">
+                <span className="flex items-center justify-between text-sm font-bold text-neo-accent-text">
                   <span className="inline-flex items-center gap-2">
                     {active ? (
                       <Zap aria-hidden className="size-4" />
