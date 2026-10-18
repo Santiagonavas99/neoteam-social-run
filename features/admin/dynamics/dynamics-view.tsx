@@ -33,6 +33,7 @@ import styles from './dynamics-tabs.module.css'
 import { GameControlPanel } from './game-control-panel'
 import { MechanicsPanel, mechanicKind } from './mechanics-panel'
 import { MobileDynamicsHome } from './mobile-dynamics-home'
+import { MobileDynamicOperator } from './mobile-dynamic-operator'
 import { ParticipationPanel } from './participation-panel'
 import { Ranking } from './ranking'
 import { useDynamics } from './use-dynamics'
@@ -105,6 +106,14 @@ export function DynamicsView() {
   const [scanning, setScanning] = useState(false)
   const [preview, setPreview] = useState<{ id: string; rehearsal: boolean } | null>(null)
   const restored = useRef(false)
+  const [mobileDevice, setMobileDevice] = useState(false)
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 767px)')
+    const update = () => setMobileDevice(media.matches)
+    update()
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
 
   function writeMobileUrl(id: string | null, section?: DetailTab) {
     if (typeof window === 'undefined' || !window.matchMedia('(max-width: 767px)').matches) {
@@ -293,11 +302,12 @@ export function DynamicsView() {
             NeoTeam · Día del evento
           </p>
           <h2 className="m-0 mt-1 text-2xl font-black tracking-tight sm:text-3xl">Dinámicas</h2>
-          <p className="m-0 mt-2 max-w-xl text-sm text-neo-text-secondary">
+          <p className="m-0 mt-2 hidden max-w-xl text-sm text-neo-text-secondary md:block">
             Identifica lo que está activo, abre el control con PLAY y prepara el resto sin perderte.
           </p>
         </div>
         {!selected && !creating && !duplicate && (
+          <div className="hidden md:block">
           <button
             type="button"
             className="button"
@@ -306,6 +316,7 @@ export function DynamicsView() {
           >
             <Plus aria-hidden className="size-4" /> Nueva dinámica
           </button>
+          </div>
         )}
       </header>
 
@@ -362,6 +373,34 @@ export function DynamicsView() {
         />
       ) : selected ? (
         <>
+          {mobileDevice && (
+            <MobileDynamicOperator
+              key={selected.id}
+              row={selected}
+              rows={rows}
+              brands={sponsors.data}
+              logos={sponsorLogos.data}
+              editing={settingsOpen}
+              busy={busy}
+              confirmationOpen={!!confirmation}
+              winners={winners}
+              onBack={back}
+              onEdit={() => setSettingsOpen(true)}
+              onCancelEdit={() => setSettingsOpen(false)}
+              onSave={save}
+              onActivate={() => dynamics.activate(selected)}
+              onDraw={() => void dynamics.askDraw(selected)}
+              onShowWinners={() => dynamics.showWinners(selected)}
+              onAbsent={(winner, place) =>
+                dynamics.setConfirmation({ row: selected, winner, place, action: 'redraw' })
+              }
+              onCloseWinners={() => dynamics.setWinners(null)}
+              onRepeat={() => repeat(selected)}
+              onReload={dynamics.reload}
+            />
+          )}
+          {!mobileDevice && (
+            <div className="hidden md:contents">
           <button type="button" className="text-link self-start" onClick={back}>
             <ArrowLeft aria-hidden className="size-4" /> Volver a dinámicas
           </button>
@@ -702,6 +741,8 @@ export function DynamicsView() {
                 ))}
             </>
           )}
+            </div>
+          )}
         </>
       ) : (
         <>
@@ -712,6 +753,7 @@ export function DynamicsView() {
             query={query}
             onQueryChange={setQuery}
             onOpen={open}
+            onCreate={() => setCreating(true)}
           />
           <div className="hidden flex-col gap-5 md:flex">
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
