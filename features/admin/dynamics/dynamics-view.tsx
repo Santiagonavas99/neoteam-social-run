@@ -335,7 +335,10 @@ export function DynamicsView() {
       {confirmation?.action === 'draw' && dynamics.eligible === 0 ? (
         <>
           <div className="hidden md:block">{confirmationPanel}</div>
-          <div role="status" className="rounded-card border border-neo-accent-border bg-neo-accent-soft p-4 md:hidden">
+          <div
+            role="status"
+            className="rounded-card border border-neo-accent-border bg-neo-accent-soft p-4 md:hidden"
+          >
             <strong className="block text-base">No hay participantes elegibles todavía</strong>
             <p className="mt-2 text-sm text-neo-text-secondary">
               {ruleDescription(confirmation.row, 0)}
@@ -349,7 +352,9 @@ export function DynamicsView() {
             </button>
           </div>
         </>
-      ) : confirmationPanel}
+      ) : (
+        confirmationPanel
+      )}
       {preview && (
         <div
           role="dialog"
