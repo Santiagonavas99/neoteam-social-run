@@ -877,6 +877,8 @@ Deno.serve(async (req: Request) => {
 
           // Reject incomplete event-day mechanics before a draft can be activated.
           if (values.status === 'open') {
+            if (config.pending_review === true)
+              return json({ error: 'Confirma primero los premios y reglas de esta dinámica.' }, 409)
             const mode = String(config.challenge_mode ?? '')
             const wheel = config.mechanic === 'wheel' || config.mechanic === 'ruleta_pendiente'
             const special =
@@ -1086,6 +1088,8 @@ Deno.serve(async (req: Request) => {
               { error: 'La dinámica debe estar activa para registrar participaciones.' },
               409,
             )
+          if (dynamic.config?.pending_review === true)
+            return json({ error: 'Confirma las reglas antes de registrar participaciones.' }, 409)
           if (dynamic.type === 'raffle')
             return json({ error: 'Los sorteos se ejecutan con el botón Sortear.' }, 400)
           if (
@@ -1182,6 +1186,8 @@ Deno.serve(async (req: Request) => {
 
         if (operation === 'draw') {
           const wheel = await checkedDynamic(body?.id)
+          if (wheel?.config?.pending_review === true)
+            return json({ error: 'Confirma las reglas del sorteo antes de asignar premios.' }, 409)
           if (wheel?.config?.mechanic === 'wheel' || wheel?.config?.mechanic === 'ruleta_pendiente')
             return json(
               { error: 'La ruleta utiliza su propio mecanismo de premios y no un sorteo.' },
