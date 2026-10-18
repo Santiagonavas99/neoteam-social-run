@@ -14,6 +14,7 @@ import {
   Zap,
 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { callAdmin, callLogos } from '../api'
 import { matchesQuery } from '../filter'
 import { dynamicStates, dynamicTypes, raffleGenders } from '../labels'
@@ -106,6 +107,39 @@ export function DynamicsView() {
   const [preview, setPreview] = useState<{ id: string; rehearsal: boolean } | null>(null)
   const restored = useRef(false)
 
+  const openPreview = useCallback((id: string, rehearsal: boolean) => {
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      const url = new URL(window.location.href)
+      url.searchParams.set('dinamica', id)
+      url.searchParams.set('seccion', 'en-vivo')
+      url.searchParams.set('pantalla', '1')
+      if (rehearsal) url.searchParams.set('ensayo', '1')
+      else url.searchParams.delete('ensayo')
+      window.history.pushState({ ...window.history.state, neoteamPublicPreview: true }, '', url)
+    }
+    setPreview({ id, rehearsal })
+  }, [])
+
+  const closePreview = useCallback(() => {
+    if (
+      window.matchMedia('(max-width: 767px)').matches &&
+      window.history.state?.neoteamPublicPreview &&
+      new URLSearchParams(window.location.search).get('pantalla') === '1'
+    ) {
+      setPreview(null)
+      window.history.back()
+      return
+    }
+
+    const url = new URL(window.location.href)
+    if (url.searchParams.has('pantalla')) {
+      url.searchParams.delete('pantalla')
+      url.searchParams.delete('ensayo')
+      window.history.replaceState(window.history.state, '', url)
+    }
+    setPreview(null)
+  }, [])
+
   function writeMobileUrl(id: string | null, section?: DetailTab) {
     if (typeof window === 'undefined' || !window.matchMedia('(max-width: 767px)').matches) {
       return
@@ -118,6 +152,8 @@ export function DynamicsView() {
       url.searchParams.delete('dinamica')
       url.searchParams.delete('seccion')
     }
+    url.searchParams.delete('pantalla')
+    url.searchParams.delete('ensayo')
     window.history.pushState(window.history.state, '', url)
   }
 
@@ -130,6 +166,13 @@ export function DynamicsView() {
     if (row) {
       setSelectedId(row.id)
       setTab(section === 'preparar' || section === 'resultados' ? section : 'en-vivo')
+      if (
+        params.get('pantalla') === '1' &&
+        row.type === 'raffle' &&
+        ['open', 'completed'].includes(row.status)
+      ) {
+        setPreview({ id: row.id, rehearsal: params.get('ensayo') === '1' })
+      }
     }
   }, [dynamics.loading, rows])
 
@@ -141,7 +184,14 @@ export function DynamicsView() {
       setSelectedId(row?.id ?? null)
       setTab(section === 'preparar' || section === 'resultados' ? section : 'en-vivo')
       setScanning(false)
-      setPreview(null)
+      setPreview(
+        row &&
+          params.get('pantalla') === '1' &&
+          row.type === 'raffle' &&
+          ['open', 'completed'].includes(row.status)
+          ? { id: row.id, rehearsal: params.get('ensayo') === '1' }
+          : null,
+      )
       setSettingsOpen(false)
       setCreating(false)
       setDuplicate(null)
@@ -153,11 +203,11 @@ export function DynamicsView() {
   useEffect(() => {
     if (!preview) return
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setPreview(null)
+      if (event.key === 'Escape') closePreview()
     }
     window.addEventListener('keydown', closeOnEscape)
     return () => window.removeEventListener('keydown', closeOnEscape)
-  }, [preview])
+  }, [preview, closePreview])
   const loading = dynamics.loading || sponsors.loading || sponsorLogos.loading
   const selected = rows.find((row) => row.id === selectedId) ?? null
   const visible = orderDynamicsByStatus(
@@ -311,30 +361,42 @@ export function DynamicsView() {
 
       <Feedback value={feedback} />
       {confirmationPanel}
-      {preview && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Vista pública de la dinámica"
-          className="fixed inset-0 z-50 hidden flex-col bg-neo-surface md:flex"
-        >
-          <div className="flex min-h-16 items-center justify-between gap-3 border-b border-neo-border px-4">
-            <strong className="text-sm">Vista pública {preview.rehearsal ? '· Ensayo' : ''}</strong>
-            <button
-              type="button"
-              className="button button-secondary min-h-11"
-              onClick={() => setPreview(null)}
-            >
-              <ArrowLeft aria-hidden className="size-4" /> Volver al control
-            </button>
-          </div>
-          <iframe
-            title="Presentación pública integrada"
-            className="min-h-0 w-full flex-1 border-0"
-            src={`/juego/${preview.id}${preview.rehearsal ? '?ensayo=1' : ''}`}
-          />
-        </div>
-      )}
+      {preview &&
+        typeof document !== 'undefined' &&
+        createPortal(
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Pantalla pública de la dinámica"
+            className="fixed inset-0 z-[100] flex h-[100dvh] min-h-0 flex-col overflow-hidden bg-neo-surface pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+          >
+            <div className="flex min-h-16 shrink-0 items-center justify-between gap-3 border-b border-neo-border px-3 sm:px-4">
+              <div className="min-w-0">
+                <strong className="block truncate text-sm">
+                  Pantalla pública {preview.rehearsal ? '· Ensayo' : '· En vivo'}
+                </strong>
+                <span className="block text-xs text-neo-text-secondary md:hidden">
+                  Mismo celular, misma pestaña
+                </span>
+              </div>
+              <button
+                type="button"
+                className="button button-secondary min-h-11 shrink-0 gap-2 px-3"
+                onClick={closePreview}
+                autoFocus
+              >
+                <ArrowLeft aria-hidden className="size-4" />
+                Volver al control
+              </button>
+            </div>
+            <iframe
+              title="Presentación pública integrada"
+              className="min-h-0 min-w-0 w-full flex-1 border-0"
+              src={`/juego/${preview.id}${preview.rehearsal ? '?ensayo=1' : ''}`}
+            />
+          </div>,
+          document.body,
+        )}
 
       {duplicate ? (
         <div>
@@ -612,7 +674,7 @@ export function DynamicsView() {
                     key={selected.id}
                     dynamic={selected}
                     onDraw={() => void dynamics.askDraw(selected)}
-                    onPreview={(rehearsal) => setPreview({ id: selected.id, rehearsal })}
+                    onPreview={(rehearsal) => openPreview(selected.id, rehearsal)}
                   />
                 </div>
               )}
@@ -778,7 +840,7 @@ export function DynamicsView() {
                           row={row}
                           onOpen={() => open(row)}
                           onRepeat={() => repeat(row)}
-                          onPreview={() => setPreview({ id: row.id, rehearsal: false })}
+                          onPreview={() => openPreview(row.id, false)}
                         />
                       ))}
                     </div>
