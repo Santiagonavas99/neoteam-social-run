@@ -20,7 +20,7 @@ where d.config->>'source' = 'programa_social_run_18_oct_2026'
 -- Improve only obsolete draft descriptions; do not decide unconfirmed rules.
 update public.dynamics d
 set description = case d.config->>'social_run_plan_key'
-  when 'social-run-2026-10-18-mussasg-isometricas' then
+  when 'social-run-2026-10-18-musasg-isometricas' then
     'Resistencia isométrica. El personal registra el tiempo oficial de cada corredor; clasificación por mayor duración. Revisar reglas antes de activar.'
   when 'social-run-2026-10-18-kuulmax-planchas' then
     'Reto de planchas cronometradas. El personal registra tiempos y la clasificación se ordena de mayor a menor. Revisar reglas antes de activar.'
@@ -28,7 +28,7 @@ set description = case d.config->>'social_run_plan_key'
 updated_at = now()
 where d.config->>'source' = 'programa_social_run_18_oct_2026'
   and d.config->>'social_run_plan_key' in (
-    'social-run-2026-10-18-mussasg-isometricas',
+    'social-run-2026-10-18-musasg-isometricas',
     'social-run-2026-10-18-kuulmax-planchas'
   )
   and d.status='draft'
@@ -42,7 +42,7 @@ set config = jsonb_set(
   d.config,
   '{trivia_question}',
   to_jsonb(case d.config->>'social_run_plan_key'
-    when 'social-run-2026-10-18-sa-importaciones-trivia' then
+    when 'social-run-2026-10-18-sa-kipchoge' then
       '¿Cuál fue la última maratón que ganó Eliud Kipchoge?'
     when 'social-run-2026-10-18-sm-shop-trivia' then
       '¿Cuántas ediciones tiene la carrera 10K de la Luz?'
@@ -51,7 +51,7 @@ set config = jsonb_set(
 ), updated_at=now()
 where d.config->>'source' = 'programa_social_run_18_oct_2026'
   and d.config->>'social_run_plan_key' in (
-    'social-run-2026-10-18-sa-importaciones-trivia',
+    'social-run-2026-10-18-sa-kipchoge',
     'social-run-2026-10-18-sm-shop-trivia'
   )
   and d.type='trivia'
