@@ -82,7 +82,7 @@ export function MobileDynamicOperator({
         </div>
         <h3 className="mt-2 mb-0 text-xl font-black tracking-tight break-words">{row.name}</h3>
         {row.prize && <p className="m-0 mt-1 text-sm text-neo-text-secondary">{row.prize}</p>}
-        {!editing && (
+        {!editing && !completed && (
           <button type="button" className="text-link mt-3 min-h-11 text-sm" onClick={onEdit}>
             <Pencil aria-hidden className="size-4" />
             Editar
