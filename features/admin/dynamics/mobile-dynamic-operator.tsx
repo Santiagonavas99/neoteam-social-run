@@ -153,12 +153,17 @@ export function MobileDynamicOperator({
                 <Gift aria-hidden className="size-12 text-neo-accent-text" />
               </div>
               <h4 className="m-0 text-lg font-black">
-                {row.winner_count} {row.winner_count === 1 ? 'ganador de prueba' : 'ganadores de prueba'}
+                {row.winner_count}{' '}
+                {row.winner_count === 1 ? 'ganador de prueba' : 'ganadores de prueba'}
               </h4>
               <ol className="mt-3 space-y-2 text-left">
                 {Array.from({ length: Math.min(row.winner_count, 5) }, (_, index) => (
-                  <li key={String.fromCharCode(65 + index)} className="rounded-control border border-neo-accent-border bg-neo-surface p-3 text-sm font-bold">
-                    {index + 1}. Participante de prueba {(demoNumber - 1) * Math.min(row.winner_count, 5) + index + 1}
+                  <li
+                    key={String.fromCharCode(65 + index)}
+                    className="rounded-control border border-neo-accent-border bg-neo-surface p-3 text-sm font-bold"
+                  >
+                    {index + 1}. Participante de prueba{' '}
+                    {(demoNumber - 1) * Math.min(row.winner_count, 5) + index + 1}
                   </li>
                 ))}
               </ol>
