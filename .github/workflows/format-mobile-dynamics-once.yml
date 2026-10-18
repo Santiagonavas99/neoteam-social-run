@@ -1,0 +1,36 @@
+name: Format Mobile Dynamics Once
+on:
+  push:
+    branches:
+      - feat/dynamics-mobile-one-action
+permissions:
+  contents: write
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Apply Biome safe fixes to Mobile dynamics
+        run: |
+          pnpm exec biome check --write features/admin/dynamics/dynamics-view.tsx features/admin/dynamics/mechanics-panel.tsx features/admin/dynamics/mobile-dynamic-operator.tsx features/admin/dynamics/mobile-dynamics-home.tsx features/admin/dynamics/mobile-dynamics.test.ts features/admin/dynamics/mobile-dynamics.ts || true
+      - name: Save changes to feature branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add features/admin/dynamics/
+          if ! git diff --cached --quiet; then
+            git commit -m "style(dynamics): format minimal Mobile operating workflow"
+            git push origin HEAD:feat/dynamics-mobile-one-action
+          fi
