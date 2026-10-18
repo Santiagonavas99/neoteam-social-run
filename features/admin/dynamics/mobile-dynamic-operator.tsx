@@ -157,7 +157,7 @@ export function MobileDynamicOperator({
               </h4>
               <ol className="mt-3 space-y-2 text-left">
                 {Array.from({ length: Math.min(row.winner_count, 5) }, (_, index) => (
-                  <li key={index + 1} className="rounded-control border border-neo-accent-border bg-neo-surface p-3 text-sm font-bold">
+                  <li key={String.fromCharCode(65 + index)} className="rounded-control border border-neo-accent-border bg-neo-surface p-3 text-sm font-bold">
                     {index + 1}. Participante de prueba {(demoNumber - 1) * Math.min(row.winner_count, 5) + index + 1}
                   </li>
                 ))}
