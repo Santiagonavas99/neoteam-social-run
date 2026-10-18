@@ -185,6 +185,22 @@ export function GameControlPanel({
         </div>
       )}
 
+      {isRaffle && active && (
+        <div className="mt-4 md:hidden">
+          <button
+            type="button"
+            className="button button-secondary min-h-12 w-full justify-center gap-2"
+            onClick={() => onPreview(false)}
+          >
+            <MonitorPlay aria-hidden className="size-5" />
+            Ver pantalla pública
+          </button>
+          <p className="m-0 mt-2 text-center text-xs text-neo-text-secondary">
+            Se abre aquí mismo. Vuelve al control con un toque.
+          </p>
+        </div>
+      )}
+
       <div className="mt-6 hidden flex-wrap items-center justify-between gap-3 border-t border-neo-border pt-5 md:flex">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <MonitorPlay aria-hidden className="size-4 text-neo-accent-text" />
