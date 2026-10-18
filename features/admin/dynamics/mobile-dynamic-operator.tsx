@@ -143,8 +143,8 @@ export function MobileDynamicOperator({
               <Trophy aria-hidden className="size-8 text-neo-accent-text" />
               <h4 className="m-0 text-lg font-black">Todo listo para sortear</h4>
               <p className="m-0 text-sm text-neo-text-secondary">
-                {row.winner_count} {row.winner_count === 1 ? 'ganador' : 'ganadores'}.
-                El resultado aparecerá aquí mismo.
+                {row.winner_count} {row.winner_count === 1 ? 'ganador' : 'ganadores'}. El resultado
+                aparecerá aquí mismo.
               </p>
               <button
                 type="button"
@@ -181,11 +181,7 @@ export function MobileDynamicOperator({
       ) : open ? (
         <div className="rounded-card border border-neo-border bg-neo-surface p-4">
           <h4 className="m-0 text-lg font-black">Registrar participación</h4>
-          <ParticipationPanel
-            key={row.id}
-            dynamic={row}
-            onClose={onBack}
-          />
+          <ParticipationPanel key={row.id} dynamic={row} onClose={onBack} />
         </div>
       ) : (
         <div className="rounded-card border border-neo-border bg-neo-surface p-5">

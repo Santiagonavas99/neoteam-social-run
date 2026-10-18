@@ -15,6 +15,8 @@ export function sortMobileDynamics(rows: DynamicRow[], query: string): DynamicRo
     .filter((row) =>
       matchesQuery([row.name, row.description, row.prize, dynamicTypes[row.type]], query),
     )
-    .sort((a, b) => (priority[a.status] ?? 9) - (priority[b.status] ?? 9) ||
-      a.name.localeCompare(b.name, 'es'))
+    .sort(
+      (a, b) =>
+        (priority[a.status] ?? 9) - (priority[b.status] ?? 9) || a.name.localeCompare(b.name, 'es'),
+    )
 }

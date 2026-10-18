@@ -39,7 +39,12 @@ function duration(run: TimedRun, now: number): number {
   return run.elapsed_ms + Math.max(0, now - Date.parse(run.running_at))
 }
 
-function MechanicsPanel({ dynamic, resultsOnly = false, compact = false, onUpdated }: MechanicsProps) {
+function MechanicsPanel({
+  dynamic,
+  resultsOnly = false,
+  compact = false,
+  onUpdated,
+}: MechanicsProps) {
   const kind = mechanicKind(dynamic)
   const mode = String(dynamic.config?.challenge_mode ?? '')
   const isTeam = mode === 'team_relay'
@@ -215,42 +220,44 @@ function MechanicsPanel({ dynamic, resultsOnly = false, compact = false, onUpdat
       className="rounded-card border border-neo-border bg-neo-surface p-4 md:p-6"
       aria-label="Mecánica de la dinámica"
     >
-      {!compact && <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h3 className="m-0 text-lg font-black">
-            {kind === 'timed'
-              ? isTeam
-                ? 'Cronómetro de relevos'
-                : 'Cronómetro de reto'
-              : kind === 'wheel'
-                ? 'Ruleta de premios'
-                : 'Trivia presencial'}
-          </h3>
-          <p className="m-0 mt-1 text-sm text-neo-text-secondary">
-            {kind === 'timed'
-              ? isFastest
-                ? 'Gana el menor tiempo válido.'
-                : 'Gana el mayor tiempo válido.'
-              : kind === 'wheel'
-                ? 'El servidor determina y guarda cada premio antes de revelarlo.'
-                : 'Un intento por corredor. La respuesta se valida en el servidor.'}
-          </p>
+      {!compact && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 className="m-0 text-lg font-black">
+              {kind === 'timed'
+                ? isTeam
+                  ? 'Cronómetro de relevos'
+                  : 'Cronómetro de reto'
+                : kind === 'wheel'
+                  ? 'Ruleta de premios'
+                  : 'Trivia presencial'}
+            </h3>
+            <p className="m-0 mt-1 text-sm text-neo-text-secondary">
+              {kind === 'timed'
+                ? isFastest
+                  ? 'Gana el menor tiempo válido.'
+                  : 'Gana el mayor tiempo válido.'
+                : kind === 'wheel'
+                  ? 'El servidor determina y guarda cada premio antes de revelarlo.'
+                  : 'Un intento por corredor. La respuesta se valida en el servidor.'}
+            </p>
+          </div>
+          {dynamic.status !== 'draft' && dynamic.status !== 'cancelled' && (
+            <button
+              type="button"
+              onClick={() =>
+                void reload().catch((cause) => {
+                  setError(cause instanceof Error ? cause.message : 'No pudimos actualizar.')
+                })
+              }
+              disabled={busy || wheelAnimating}
+              className="min-h-11 rounded-control border border-neo-border px-3 text-sm font-bold"
+            >
+              Actualizar
+            </button>
+          )}
         </div>
-        {dynamic.status !== 'draft' && dynamic.status !== 'cancelled' && (
-          <button
-            type="button"
-            onClick={() =>
-              void reload().catch((cause) => {
-                setError(cause instanceof Error ? cause.message : 'No pudimos actualizar.')
-              })
-            }
-            disabled={busy || wheelAnimating}
-            className="min-h-11 rounded-control border border-neo-border px-3 text-sm font-bold"
-          >
-            Actualizar
-          </button>
-        )}
-      </div>}
+      )}
       {!resultsOnly && !active && (
         <p
           role="status"
@@ -566,19 +573,19 @@ function MechanicsPanel({ dynamic, resultsOnly = false, compact = false, onUpdat
               </button>
             )}
           {!compact && (
-          <div className="rounded-control border border-neo-border p-3">
-            <p className="m-0 mb-2 text-sm font-bold">Premios disponibles</p>
-            {availableWheelStock.map((item) => (
-              <p key={item.id} className="m-0 mt-1 text-sm">
-                {item.label}: {item.remaining} de {item.quantity}
-              </p>
-            ))}
-            {!wheelPrizes.length && (
-              <p className="text-sm text-neo-text-secondary">
-                Configura premios y cantidades antes de activarla.
-              </p>
-            )}
-          </div>
+            <div className="rounded-control border border-neo-border p-3">
+              <p className="m-0 mb-2 text-sm font-bold">Premios disponibles</p>
+              {availableWheelStock.map((item) => (
+                <p key={item.id} className="m-0 mt-1 text-sm">
+                  {item.label}: {item.remaining} de {item.quantity}
+                </p>
+              ))}
+              {!wheelPrizes.length && (
+                <p className="text-sm text-neo-text-secondary">
+                  Configura premios y cantidades antes de activarla.
+                </p>
+              )}
+            </div>
           )}
           {!resultsOnly && active && (
             <div className="grid gap-3">
@@ -631,11 +638,15 @@ function MechanicsPanel({ dynamic, resultsOnly = false, compact = false, onUpdat
           )}
           {compact ? (
             <details className="rounded-control border border-neo-border p-3">
-              <summary className="cursor-pointer text-sm font-semibold">Historial · {spins.length} giros</summary>
+              <summary className="cursor-pointer text-sm font-semibold">
+                Historial · {spins.length} giros
+              </summary>
               <ul className="mt-3 space-y-2">
                 {spins.slice(0, 60).map((spin) => (
-                  <li key={spin.registrations?.registration_code ?? spin.created_at}
-                    className="flex justify-between gap-2 border-b border-neo-border py-2 text-sm">
+                  <li
+                    key={spin.registrations?.registration_code ?? spin.created_at}
+                    className="flex justify-between gap-2 border-b border-neo-border py-2 text-sm"
+                  >
                     <span>{participantName(spin.registrations)}</span>
                     <strong>{spin.prize_label || 'Sin premio'}</strong>
                   </li>
@@ -644,18 +655,18 @@ function MechanicsPanel({ dynamic, resultsOnly = false, compact = false, onUpdat
             </details>
           ) : (
             <>
-          <h4 className="m-0 font-bold">Historial de giros ({spins.length})</h4>
-          <ul className="space-y-2">
-            {spins.slice(0, 60).map((spin) => (
-              <li
-                key={spin.registrations?.registration_code ?? spin.created_at}
-                className="flex justify-between gap-3 rounded-control border border-neo-border p-2 text-sm"
-              >
-                <span>{participantName(spin.registrations)}</span>
-                <strong>{spin.prize_label || 'Sin premio'}</strong>
-              </li>
-            ))}
-          </ul>
+              <h4 className="m-0 font-bold">Historial de giros ({spins.length})</h4>
+              <ul className="space-y-2">
+                {spins.slice(0, 60).map((spin) => (
+                  <li
+                    key={spin.registrations?.registration_code ?? spin.created_at}
+                    className="flex justify-between gap-3 rounded-control border border-neo-border p-2 text-sm"
+                  >
+                    <span>{participantName(spin.registrations)}</span>
+                    <strong>{spin.prize_label || 'Sin premio'}</strong>
+                  </li>
+                ))}
+              </ul>
             </>
           )}
         </div>
@@ -726,8 +737,10 @@ function MechanicsPanel({ dynamic, resultsOnly = false, compact = false, onUpdat
               </summary>
               <ul className="mt-3 space-y-2">
                 {answers.slice(0, 60).map((entry) => (
-                  <li key={entry.registrations?.registration_code ?? entry.created_at}
-                    className="flex justify-between gap-2 border-b border-neo-border py-2 text-sm">
+                  <li
+                    key={entry.registrations?.registration_code ?? entry.created_at}
+                    className="flex justify-between gap-2 border-b border-neo-border py-2 text-sm"
+                  >
                     <span>{participantName(entry.registrations)}</span>
                     <span>{entry.won ? 'Ganó' : entry.correct ? 'Correcta' : 'Incorrecta'}</span>
                   </li>
@@ -736,18 +749,18 @@ function MechanicsPanel({ dynamic, resultsOnly = false, compact = false, onUpdat
             </details>
           ) : (
             <>
-          <h4 className="m-0 font-bold">Respuestas registradas ({answers.length})</h4>
-          <ul className="space-y-2">
-            {answers.slice(0, 60).map((entry) => (
-              <li
-                key={entry.registrations?.registration_code ?? entry.created_at}
-                className="flex justify-between gap-2 rounded-control border border-neo-border p-2 text-sm"
-              >
-                <span>{participantName(entry.registrations)}</span>
-                <span>{entry.won ? 'Ganó' : entry.correct ? 'Correcta' : 'Incorrecta'}</span>
-              </li>
-            ))}
-          </ul>
+              <h4 className="m-0 font-bold">Respuestas registradas ({answers.length})</h4>
+              <ul className="space-y-2">
+                {answers.slice(0, 60).map((entry) => (
+                  <li
+                    key={entry.registrations?.registration_code ?? entry.created_at}
+                    className="flex justify-between gap-2 rounded-control border border-neo-border p-2 text-sm"
+                  >
+                    <span>{participantName(entry.registrations)}</span>
+                    <span>{entry.won ? 'Ganó' : entry.correct ? 'Correcta' : 'Incorrecta'}</span>
+                  </li>
+                ))}
+              </ul>
             </>
           )}
         </div>

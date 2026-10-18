@@ -51,7 +51,10 @@ export function MobileDynamicsHome({
           { label: 'Pendientes', value: draftCount },
           { label: 'Finalizadas', value: finishedCount },
         ].map((item) => (
-          <div key={item.label} className="rounded-card border border-neo-border bg-neo-surface p-3">
+          <div
+            key={item.label}
+            className="rounded-card border border-neo-border bg-neo-surface p-3"
+          >
             <strong className="block text-2xl font-black tabular-nums">{item.value}</strong>
             <span className="mt-1 block text-xs text-neo-text-secondary">{item.label}</span>
           </div>
@@ -61,7 +64,10 @@ export function MobileDynamicsHome({
         <label className="min-w-0 flex-1">
           <span className="sr-only">Buscar dinámica</span>
           <span className="relative block">
-            <Search aria-hidden className="absolute top-3.5 left-3 size-5 text-neo-text-secondary" />
+            <Search
+              aria-hidden
+              className="absolute top-3.5 left-3 size-5 text-neo-text-secondary"
+            />
             <input
               type="search"
               value={query}
@@ -80,7 +86,9 @@ export function MobileDynamicsHome({
         </button>
       </div>
       {loading ? (
-        <p role="status" className="text-sm text-neo-text-secondary">Cargando dinámicas…</p>
+        <p role="status" className="text-sm text-neo-text-secondary">
+          Cargando dinámicas…
+        </p>
       ) : shown.length > 0 ? (
         <div className="flex flex-col gap-3">
           {shown.map((row) => {
@@ -111,7 +119,8 @@ export function MobileDynamicsHome({
                     {row.name}
                   </strong>
                   <span className="mt-1 block text-sm text-neo-text-secondary">
-                    {mobileMechanicLabel(row)}{row.prize ? ` · ${row.prize}` : ''}
+                    {mobileMechanicLabel(row)}
+                    {row.prize ? ` · ${row.prize}` : ''}
                   </span>
                 </span>
                 <span className="flex items-center justify-between text-sm font-bold">

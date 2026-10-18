@@ -23,9 +23,13 @@ test('one mobile list shows all activities with active first and preserves histo
     row('Cancelada', 'raffle', 'cancelled'),
   ]
   const sorted = sortMobileDynamics(rows, '')
-  assert.deepEqual(sorted.map((entry) => entry.status), [
-    'open', 'open', 'draft', 'completed', 'closed', 'cancelled',
-  ])
-  assert.deepEqual(sortMobileDynamics(rows, 'planchas').map((entry) => entry.name), ['Planchas'])
+  assert.deepEqual(
+    sorted.map((entry) => entry.status),
+    ['open', 'open', 'draft', 'completed', 'closed', 'cancelled'],
+  )
+  assert.deepEqual(
+    sortMobileDynamics(rows, 'planchas').map((entry) => entry.name),
+    ['Planchas'],
+  )
   assert.equal(rows[0]?.status, 'completed')
 })

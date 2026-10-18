@@ -32,8 +32,8 @@ import { challengeNeedsRules, groupDynamicsByPhase, orderDynamicsByStatus } from
 import styles from './dynamics-tabs.module.css'
 import { GameControlPanel } from './game-control-panel'
 import { MechanicsPanel, mechanicKind } from './mechanics-panel'
-import { MobileDynamicsHome } from './mobile-dynamics-home'
 import { MobileDynamicOperator } from './mobile-dynamic-operator'
+import { MobileDynamicsHome } from './mobile-dynamics-home'
 import { ParticipationPanel } from './participation-panel'
 import { Ranking } from './ranking'
 import { useDynamics } from './use-dynamics'
@@ -308,14 +308,14 @@ export function DynamicsView() {
         </div>
         {!selected && !creating && !duplicate && (
           <div className="hidden md:block">
-          <button
-            type="button"
-            className="button"
-            disabled={busy}
-            onClick={() => setCreating(true)}
-          >
-            <Plus aria-hidden className="size-4" /> Nueva dinámica
-          </button>
+            <button
+              type="button"
+              className="button"
+              disabled={busy}
+              onClick={() => setCreating(true)}
+            >
+              <Plus aria-hidden className="size-4" /> Nueva dinámica
+            </button>
           </div>
         )}
       </header>
@@ -401,346 +401,363 @@ export function DynamicsView() {
           )}
           {!mobileDevice && (
             <div className="hidden md:contents">
-          <button type="button" className="text-link self-start" onClick={back}>
-            <ArrowLeft aria-hidden className="size-4" /> Volver a dinámicas
-          </button>
-          {selected.status === 'open' && rows.filter((row) => row.status === 'open').length > 1 && (
-            <label className="md:hidden">
-              Cambiar dinámica activa
-              <select
-                value={selected.id}
-                className="mt-1 min-h-12"
-                onChange={(event) => {
-                  const next = rows.find((row) => row.id === event.target.value)
-                  if (next) open(next, 'en-vivo')
-                }}
-              >
-                {rows
-                  .filter((row) => row.status === 'open')
-                  .map((row) => (
-                    <option key={row.id} value={row.id}>
-                      {row.name}
-                    </option>
-                  ))}
-              </select>
-            </label>
-          )}
-          <div
-            className={`${styles.detailHeader} rounded-card border p-5 md:p-7`}
-            data-status={selected.status}
-          >
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="m-0 text-xs font-bold text-neo-accent-text uppercase">
-                  {dynamicTypes[selected.type]}
-                </p>
-                <h3 className="m-0 mt-2 text-2xl font-black tracking-tight break-words">
-                  {selected.name}
-                </h3>
-                {selected.prize && (
-                  <p className="m-0 mt-1 text-sm text-neo-text-secondary">{selected.prize}</p>
+              <button type="button" className="text-link self-start" onClick={back}>
+                <ArrowLeft aria-hidden className="size-4" /> Volver a dinámicas
+              </button>
+              {selected.status === 'open' &&
+                rows.filter((row) => row.status === 'open').length > 1 && (
+                  <label className="md:hidden">
+                    Cambiar dinámica activa
+                    <select
+                      value={selected.id}
+                      className="mt-1 min-h-12"
+                      onChange={(event) => {
+                        const next = rows.find((row) => row.id === event.target.value)
+                        if (next) open(next, 'en-vivo')
+                      }}
+                    >
+                      {rows
+                        .filter((row) => row.status === 'open')
+                        .map((row) => (
+                          <option key={row.id} value={row.id}>
+                            {row.name}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
                 )}
-              </div>
-              <StatusBadge status={selected.status} label={dynamicStates[selected.status]} />
-            </div>
-            <nav className={styles.tabs} aria-label="Secciones de la dinámica">
-              {(Object.keys(tabLabels) as DetailTab[]).map((item) => {
-                const TabIcon = tabIcons[item]
-                return (
-                  <button
-                    type="button"
-                    key={item}
-                    aria-current={tab === item ? 'page' : undefined}
-                    data-kind={item}
-                    onClick={() => chooseTab(item, selected)}
-                    className={styles.tab}
-                  >
-                    <TabIcon aria-hidden className="size-4 shrink-0" />
-                    {tabLabels[item]}
-                  </button>
-                )
-              })}
-            </nav>
-          </div>
-
-          <section
-            className={
-              tab === 'en-vivo' && scanning
-                ? `hidden md:flex ${styles.sectionIntro}`
-                : styles.sectionIntro
-            }
-            data-kind={tab}
-          >
-            <div className="flex min-w-0 items-start gap-3">
-              {tab === 'preparar' ? (
-                <ClipboardCheck aria-hidden className="mt-0.5 size-5 shrink-0" />
-              ) : tab === 'en-vivo' ? (
-                <Play aria-hidden className="mt-0.5 size-5 shrink-0" />
-              ) : (
-                <Trophy aria-hidden className="mt-0.5 size-5 shrink-0" />
-              )}
-              <div>
-                <h4 className="m-0 font-black">
-                  {tab === 'preparar'
-                    ? selectedNeedsRules
-                      ? 'Falta definir cómo se completa este reto'
-                      : 'Todo listo para preparar'
-                    : tab === 'en-vivo'
-                      ? selected.status === 'draft'
-                        ? 'Primero debes activar la dinámica'
-                        : 'Zona de ejecución'
-                      : 'Resultados y seguimiento'}
-                </h4>
-                <p className="m-0 mt-1 text-sm text-neo-text-secondary">
-                  {tab === 'preparar'
-                    ? selectedNeedsRules
-                      ? 'Explica qué tiene que lograr el corredor antes de activar el reto.'
-                      : 'Revisa las reglas, el acceso y los datos antes de activar.'
-                    : tab === 'en-vivo'
-                      ? selected.type === 'raffle'
-                        ? 'Controla la cuenta atrás y revela a cada ganador desde aquí.'
-                        : 'Cuando alguien termine, escanea su pase para registrar la participación.'
-                      : selected.type === 'raffle'
-                        ? 'Consulta los ganadores después del sorteo.'
-                        : 'Revisa las participaciones completadas. No hay clasificación automática por tiempo.'}
-                </p>
-              </div>
-            </div>
-            {tab === 'preparar' && selectedNeedsRules && (
-              <button
-                className="button button-secondary shrink-0"
-                type="button"
-                onClick={() => setSettingsOpen(true)}
+              <div
+                className={`${styles.detailHeader} rounded-card border p-5 md:p-7`}
+                data-status={selected.status}
               >
-                <Settings2 aria-hidden className="size-4" /> Completar reglas
-              </button>
-            )}
-            {tab === 'en-vivo' && selected.status === 'draft' && (
-              <button
-                className="button button-secondary shrink-0"
-                type="button"
-                onClick={() => chooseTab('preparar', selected)}
-              >
-                Ir a preparación
-              </button>
-            )}
-          </section>
-
-          {tab === 'preparar' && (
-            <div className="flex flex-col gap-4">
-              {settingsOpen ? (
-                <DynamicForm
-                  key={selected.id}
-                  row={editor?.id === selected.id ? editor : selected}
-                  brands={sponsors.data}
-                  logos={sponsorLogos.data}
-                  dynamics={rows}
-                  onSave={save}
-                  onCancel={() => setSettingsOpen(false)}
-                />
-              ) : (
-                <>
-                  <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                    {[
-                      ['Participaciones', String(selected.participations_count ?? 0)],
-                      [
-                        selected.type === 'raffle' ? 'Ganadores' : 'Completados',
-                        String(
-                          selected.type === 'raffle'
-                            ? (selected.winners_count ?? 0)
-                            : (selected.participations_count ?? 0),
-                        ),
-                      ],
-                      ['Check-in', selected.requires_checkin ? 'Sí' : 'No'],
-                    ].map(([title, value]) => (
-                      <div
-                        key={title}
-                        className="min-w-0 rounded-card border border-neo-border bg-neo-surface p-3 sm:p-5"
-                      >
-                        <p className="m-0 text-xs font-bold text-neo-text-secondary">{title}</p>
-                        <p className="m-0 mt-2 text-2xl font-black">{value}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex flex-wrap items-center justify-between gap-4 rounded-card border border-neo-border bg-neo-surface p-5">
-                    {selected.status === 'draft' ? (
-                      <>
-                        <div className="max-w-lg">
-                          <p className="m-0 font-bold">
-                            {selectedNeedsRules
-                              ? 'Termina la configuración primero'
-                              : 'Lista para activar'}
-                          </p>
-                          <p className="m-0 mt-1 text-xs text-neo-text-secondary">
-                            {selectedNeedsRules
-                              ? 'Especifica el objetivo y el criterio de finalización. Luego podrás activar el reto.'
-                              : 'Al activar, el personal podrá registrar participantes. Revisa las reglas antes.'}
-                          </p>
-                        </div>
-                        {selectedNeedsRules ? (
-                          <button
-                            type="button"
-                            className="button"
-                            onClick={() => setSettingsOpen(true)}
-                          >
-                            <Settings2 aria-hidden className="size-4" /> Configurar reto
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="button"
-                            disabled={busy}
-                            onClick={() => void dynamics.activate(selected)}
-                          >
-                            <Play aria-hidden className="size-4" /> Activar dinámica
-                          </button>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <p className="m-0 text-sm text-neo-text-secondary">
-                          {selected.status === 'open'
-                            ? 'La dinámica está activa. Dirígela desde «En vivo».'
-                            : 'Esta dinámica ya tiene un estado registrado.'}
-                        </p>
-                        {selected.status === 'open' && (
-                          <button
-                            className="button"
-                            type="button"
-                            onClick={() => chooseTab('en-vivo', selected)}
-                          >
-                            <Play aria-hidden className="size-4" /> PLAY · En vivo
-                          </button>
-                        )}
-                      </>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="m-0 text-xs font-bold text-neo-accent-text uppercase">
+                      {dynamicTypes[selected.type]}
+                    </p>
+                    <h3 className="m-0 mt-2 text-2xl font-black tracking-tight break-words">
+                      {selected.name}
+                    </h3>
+                    {selected.prize && (
+                      <p className="m-0 mt-1 text-sm text-neo-text-secondary">{selected.prize}</p>
                     )}
+                  </div>
+                  <StatusBadge status={selected.status} label={dynamicStates[selected.status]} />
+                </div>
+                <nav className={styles.tabs} aria-label="Secciones de la dinámica">
+                  {(Object.keys(tabLabels) as DetailTab[]).map((item) => {
+                    const TabIcon = tabIcons[item]
+                    return (
+                      <button
+                        type="button"
+                        key={item}
+                        aria-current={tab === item ? 'page' : undefined}
+                        data-kind={item}
+                        onClick={() => chooseTab(item, selected)}
+                        className={styles.tab}
+                      >
+                        <TabIcon aria-hidden className="size-4 shrink-0" />
+                        {tabLabels[item]}
+                      </button>
+                    )
+                  })}
+                </nav>
+              </div>
+
+              <section
+                className={
+                  tab === 'en-vivo' && scanning
+                    ? `hidden md:flex ${styles.sectionIntro}`
+                    : styles.sectionIntro
+                }
+                data-kind={tab}
+              >
+                <div className="flex min-w-0 items-start gap-3">
+                  {tab === 'preparar' ? (
+                    <ClipboardCheck aria-hidden className="mt-0.5 size-5 shrink-0" />
+                  ) : tab === 'en-vivo' ? (
+                    <Play aria-hidden className="mt-0.5 size-5 shrink-0" />
+                  ) : (
+                    <Trophy aria-hidden className="mt-0.5 size-5 shrink-0" />
+                  )}
+                  <div>
+                    <h4 className="m-0 font-black">
+                      {tab === 'preparar'
+                        ? selectedNeedsRules
+                          ? 'Falta definir cómo se completa este reto'
+                          : 'Todo listo para preparar'
+                        : tab === 'en-vivo'
+                          ? selected.status === 'draft'
+                            ? 'Primero debes activar la dinámica'
+                            : 'Zona de ejecución'
+                          : 'Resultados y seguimiento'}
+                    </h4>
+                    <p className="m-0 mt-1 text-sm text-neo-text-secondary">
+                      {tab === 'preparar'
+                        ? selectedNeedsRules
+                          ? 'Explica qué tiene que lograr el corredor antes de activar el reto.'
+                          : 'Revisa las reglas, el acceso y los datos antes de activar.'
+                        : tab === 'en-vivo'
+                          ? selected.type === 'raffle'
+                            ? 'Controla la cuenta atrás y revela a cada ganador desde aquí.'
+                            : 'Cuando alguien termine, escanea su pase para registrar la participación.'
+                          : selected.type === 'raffle'
+                            ? 'Consulta los ganadores después del sorteo.'
+                            : 'Revisa las participaciones completadas. No hay clasificación automática por tiempo.'}
+                    </p>
+                  </div>
+                </div>
+                {tab === 'preparar' && selectedNeedsRules && (
+                  <button
+                    className="button button-secondary shrink-0"
+                    type="button"
+                    onClick={() => setSettingsOpen(true)}
+                  >
+                    <Settings2 aria-hidden className="size-4" /> Completar reglas
+                  </button>
+                )}
+                {tab === 'en-vivo' && selected.status === 'draft' && (
+                  <button
+                    className="button button-secondary shrink-0"
+                    type="button"
+                    onClick={() => chooseTab('preparar', selected)}
+                  >
+                    Ir a preparación
+                  </button>
+                )}
+              </section>
+
+              {tab === 'preparar' && (
+                <div className="flex flex-col gap-4">
+                  {settingsOpen ? (
+                    <DynamicForm
+                      key={selected.id}
+                      row={editor?.id === selected.id ? editor : selected}
+                      brands={sponsors.data}
+                      logos={sponsorLogos.data}
+                      dynamics={rows}
+                      onSave={save}
+                      onCancel={() => setSettingsOpen(false)}
+                    />
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                        {[
+                          ['Participaciones', String(selected.participations_count ?? 0)],
+                          [
+                            selected.type === 'raffle' ? 'Ganadores' : 'Completados',
+                            String(
+                              selected.type === 'raffle'
+                                ? (selected.winners_count ?? 0)
+                                : (selected.participations_count ?? 0),
+                            ),
+                          ],
+                          ['Check-in', selected.requires_checkin ? 'Sí' : 'No'],
+                        ].map(([title, value]) => (
+                          <div
+                            key={title}
+                            className="min-w-0 rounded-card border border-neo-border bg-neo-surface p-3 sm:p-5"
+                          >
+                            <p className="m-0 text-xs font-bold text-neo-text-secondary">{title}</p>
+                            <p className="m-0 mt-2 text-2xl font-black">{value}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex flex-wrap items-center justify-between gap-4 rounded-card border border-neo-border bg-neo-surface p-5">
+                        {selected.status === 'draft' ? (
+                          <>
+                            <div className="max-w-lg">
+                              <p className="m-0 font-bold">
+                                {selectedNeedsRules
+                                  ? 'Termina la configuración primero'
+                                  : 'Lista para activar'}
+                              </p>
+                              <p className="m-0 mt-1 text-xs text-neo-text-secondary">
+                                {selectedNeedsRules
+                                  ? 'Especifica el objetivo y el criterio de finalización. Luego podrás activar el reto.'
+                                  : 'Al activar, el personal podrá registrar participantes. Revisa las reglas antes.'}
+                              </p>
+                            </div>
+                            {selectedNeedsRules ? (
+                              <button
+                                type="button"
+                                className="button"
+                                onClick={() => setSettingsOpen(true)}
+                              >
+                                <Settings2 aria-hidden className="size-4" /> Configurar reto
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                className="button"
+                                disabled={busy}
+                                onClick={() => void dynamics.activate(selected)}
+                              >
+                                <Play aria-hidden className="size-4" /> Activar dinámica
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <p className="m-0 text-sm text-neo-text-secondary">
+                              {selected.status === 'open'
+                                ? 'La dinámica está activa. Dirígela desde «En vivo».'
+                                : 'Esta dinámica ya tiene un estado registrado.'}
+                            </p>
+                            {selected.status === 'open' && (
+                              <button
+                                className="button"
+                                type="button"
+                                onClick={() => chooseTab('en-vivo', selected)}
+                              >
+                                <Play aria-hidden className="size-4" /> PLAY · En vivo
+                              </button>
+                            )}
+                          </>
+                        )}
+                        <button
+                          type="button"
+                          className="text-link"
+                          onClick={() => setSettingsOpen(true)}
+                        >
+                          <Settings2 aria-hidden className="size-4" /> Editar ajustes
+                        </button>
+                      </div>
+                    </>
+                  )}
+                  <details className="rounded-control border border-neo-border bg-neo-surface p-4">
+                    <summary className="cursor-pointer text-xs font-bold text-neo-text-secondary">
+                      Opciones avanzadas
+                    </summary>
                     <button
                       type="button"
-                      className="text-link"
-                      onClick={() => setSettingsOpen(true)}
+                      className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-neo-danger"
+                      disabled={busy}
+                      onClick={() => dynamics.setConfirmation({ row: selected, action: 'delete' })}
                     >
-                      <Settings2 aria-hidden className="size-4" /> Editar ajustes
+                      <Trash2 aria-hidden className="size-4" /> Eliminar dinámica
                     </button>
-                  </div>
+                  </details>
+                </div>
+              )}
+
+              {tab === 'en-vivo' && (
+                <>
+                  {mechanicKind(selected) && (
+                    <MechanicsPanel
+                      key={selected.id}
+                      dynamic={selected}
+                      onUpdated={dynamics.reload}
+                    />
+                  )}
+                  {!mechanicKind(selected) && (
+                    <div className={selected.type === 'raffle' ? '' : 'hidden md:block'}>
+                      <GameControlPanel
+                        key={selected.id}
+                        dynamic={selected}
+                        onDraw={() => void dynamics.askDraw(selected)}
+                        onPreview={(rehearsal) => setPreview({ id: selected.id, rehearsal })}
+                      />
+                    </div>
+                  )}
+                  {!mechanicKind(selected) &&
+                    selected.type !== 'raffle' &&
+                    selected.status === 'open' && (
+                      <div className={styles.scanPanel}>
+                        <div>
+                          <h4 className="m-0 text-lg font-black">
+                            {selected.type === 'challenge'
+                              ? 'Validar reto completado'
+                              : 'Registrar participación'}
+                          </h4>
+                          <p className="m-0 mt-1 max-w-lg text-sm text-neo-text-secondary">
+                            {selected.type === 'challenge'
+                              ? 'Cuando el personal confirme que el corredor completó el reto, escanea su pase. Un registro por corredor.'
+                              : 'Escanea el QR del corredor para registrar su participación.'}
+                          </p>
+                        </div>
+                        {!scanning ? (
+                          <button
+                            type="button"
+                            className="button"
+                            onClick={() => setScanning(true)}
+                          >
+                            <Play aria-hidden className="size-4" /> PLAY · Abrir escáner
+                          </button>
+                        ) : (
+                          <ParticipationPanel
+                            dynamic={selected}
+                            onClose={() => setScanning(false)}
+                          />
+                        )}
+                      </div>
+                    )}
                 </>
               )}
-              <details className="rounded-control border border-neo-border bg-neo-surface p-4">
-                <summary className="cursor-pointer text-xs font-bold text-neo-text-secondary">
-                  Opciones avanzadas
-                </summary>
-                <button
-                  type="button"
-                  className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-neo-danger"
-                  disabled={busy}
-                  onClick={() => dynamics.setConfirmation({ row: selected, action: 'delete' })}
-                >
-                  <Trash2 aria-hidden className="size-4" /> Eliminar dinámica
-                </button>
-              </details>
-            </div>
-          )}
 
-          {tab === 'en-vivo' && (
-            <>
-              {mechanicKind(selected) && (
-                <MechanicsPanel key={selected.id} dynamic={selected} onUpdated={dynamics.reload} />
-              )}
-              {!mechanicKind(selected) && (
-                <div className={selected.type === 'raffle' ? '' : 'hidden md:block'}>
-                  <GameControlPanel
-                    key={selected.id}
-                    dynamic={selected}
-                    onDraw={() => void dynamics.askDraw(selected)}
-                    onPreview={(rehearsal) => setPreview({ id: selected.id, rehearsal })}
-                  />
-                </div>
-              )}
-              {!mechanicKind(selected) &&
-                selected.type !== 'raffle' &&
-                selected.status === 'open' && (
-                  <div className={styles.scanPanel}>
-                    <div>
-                      <h4 className="m-0 text-lg font-black">
-                        {selected.type === 'challenge'
-                          ? 'Validar reto completado'
-                          : 'Registrar participación'}
-                      </h4>
-                      <p className="m-0 mt-1 max-w-lg text-sm text-neo-text-secondary">
-                        {selected.type === 'challenge'
-                          ? 'Cuando el personal confirme que el corredor completó el reto, escanea su pase. Un registro por corredor.'
-                          : 'Escanea el QR del corredor para registrar su participación.'}
-                      </p>
+              {tab === 'resultados' && (
+                <>
+                  {mechanicKind(selected) && (
+                    <MechanicsPanel
+                      key={selected.id}
+                      dynamic={selected}
+                      resultsOnly
+                      onUpdated={dynamics.reload}
+                    />
+                  )}
+                  {(selected.status === 'completed' || selected.status === 'closed') && (
+                    <button
+                      type="button"
+                      className="button button-secondary self-start"
+                      onClick={() => repeat(selected)}
+                    >
+                      <Copy aria-hidden className="size-4" /> Repetir dinámica
+                    </button>
+                  )}
+                  {selected.type !== 'raffle' && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-card border border-neo-border bg-neo-surface p-5">
+                        <p className="m-0 text-sm text-neo-text-secondary">
+                          Participaciones registradas
+                        </p>
+                        <p className="m-0 mt-2 text-3xl font-black tabular-nums">
+                          {selected.participations_count ?? 0}
+                        </p>
+                      </div>
+                      <div className="rounded-card border border-neo-border bg-neo-surface p-5">
+                        <p className="m-0 text-sm text-neo-text-secondary">Estado</p>
+                        <p className="m-0 mt-2 font-black">{dynamicStates[selected.status]}</p>
+                      </div>
                     </div>
-                    {!scanning ? (
-                      <button type="button" className="button" onClick={() => setScanning(true)}>
-                        <Play aria-hidden className="size-4" /> PLAY · Abrir escáner
-                      </button>
+                  )}
+                  {!mechanicKind(selected) &&
+                    (winners?.row.id === selected.id ? (
+                      <DrawResult
+                        name={selected.name}
+                        winners={winners.list}
+                        reveal={false}
+                        busy={busy || !!confirmation}
+                        onAbsent={(winner, place) =>
+                          dynamics.setConfirmation({
+                            row: selected,
+                            winner,
+                            place,
+                            action: 'redraw',
+                          })
+                        }
+                        onClose={() => dynamics.setWinners(null)}
+                      />
                     ) : (
-                      <ParticipationPanel dynamic={selected} onClose={() => setScanning(false)} />
-                    )}
-                  </div>
-                )}
-            </>
-          )}
-
-          {tab === 'resultados' && (
-            <>
-              {mechanicKind(selected) && (
-                <MechanicsPanel
-                  key={selected.id}
-                  dynamic={selected}
-                  resultsOnly
-                  onUpdated={dynamics.reload}
-                />
+                      <p className="rounded-card border border-neo-border bg-neo-surface p-6 text-sm text-neo-text-secondary">
+                        {selected.status === 'completed' && selected.type === 'raffle'
+                          ? 'Cargando ganadores…'
+                          : selected.type !== 'raffle'
+                            ? 'Los registros de finalización se contabilizan arriba. Esta versión no determina posiciones ni cronometra automáticamente.'
+                            : 'Los resultados aparecerán aquí cuando termine la dinámica.'}
+                      </p>
+                    ))}
+                </>
               )}
-              {(selected.status === 'completed' || selected.status === 'closed') && (
-                <button
-                  type="button"
-                  className="button button-secondary self-start"
-                  onClick={() => repeat(selected)}
-                >
-                  <Copy aria-hidden className="size-4" /> Repetir dinámica
-                </button>
-              )}
-              {selected.type !== 'raffle' && (
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-card border border-neo-border bg-neo-surface p-5">
-                    <p className="m-0 text-sm text-neo-text-secondary">
-                      Participaciones registradas
-                    </p>
-                    <p className="m-0 mt-2 text-3xl font-black tabular-nums">
-                      {selected.participations_count ?? 0}
-                    </p>
-                  </div>
-                  <div className="rounded-card border border-neo-border bg-neo-surface p-5">
-                    <p className="m-0 text-sm text-neo-text-secondary">Estado</p>
-                    <p className="m-0 mt-2 font-black">{dynamicStates[selected.status]}</p>
-                  </div>
-                </div>
-              )}
-              {!mechanicKind(selected) &&
-                (winners?.row.id === selected.id ? (
-                  <DrawResult
-                    name={selected.name}
-                    winners={winners.list}
-                    reveal={false}
-                    busy={busy || !!confirmation}
-                    onAbsent={(winner, place) =>
-                      dynamics.setConfirmation({ row: selected, winner, place, action: 'redraw' })
-                    }
-                    onClose={() => dynamics.setWinners(null)}
-                  />
-                ) : (
-                  <p className="rounded-card border border-neo-border bg-neo-surface p-6 text-sm text-neo-text-secondary">
-                    {selected.status === 'completed' && selected.type === 'raffle'
-                      ? 'Cargando ganadores…'
-                      : selected.type !== 'raffle'
-                        ? 'Los registros de finalización se contabilizan arriba. Esta versión no determina posiciones ni cronometra automáticamente.'
-                        : 'Los resultados aparecerán aquí cuando termine la dinámica.'}
-                  </p>
-                ))}
-            </>
-          )}
             </div>
           )}
         </>
