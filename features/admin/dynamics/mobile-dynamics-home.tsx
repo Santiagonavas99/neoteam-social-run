@@ -112,11 +112,13 @@ export function MobileDynamicsHome({
                   <span className="min-w-0 text-xs font-bold tracking-wide text-neo-accent-text uppercase">
                     {brand || mobileMechanicLabel(row)}
                   </span>
-                  <span className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-bold ${
+                  <span
+                    className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-bold ${
                       active
                         ? 'border-neo-accent-border bg-neo-accent-soft text-neo-accent-text'
                         : 'border-neo-border bg-neo-muted-bg text-neo-text-secondary'
-                    }`}>
+                    }`}
+                  >
                     {active ? 'Activa' : status === 'draft' ? 'Pendiente' : dynamicStates[status]}
                   </span>
                 </span>
