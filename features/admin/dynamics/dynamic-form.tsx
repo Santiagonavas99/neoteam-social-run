@@ -11,6 +11,7 @@ import {
 import { EditorForm, useEditor } from '../ui/editor-form'
 import { LabelOptions } from '../ui/label-options'
 import { dynamicSponsorOptions, dynamicSponsorValue, sponsorFields } from './dynamic-sponsors'
+import { isSocialRunWheelDraw } from './event-draw-mode'
 import { percentToProbability, probabilityToPercent } from './probability'
 
 export function DynamicForm({
@@ -40,9 +41,12 @@ export function DynamicForm({
   const instantWin = values.type === 'instant_win'
   const challenge = values.type === 'challenge'
   const trivia = values.type === 'trivia'
-  const wheel = raffle && ['wheel', 'ruleta_pendiente'].includes(String(values.config?.mechanic))
+  const eventWheelDraw = isSocialRunWheelDraw(values)
+  const wheel = raffle && !eventWheelDraw && ['wheel', 'ruleta_pendiente'].includes(String(values.config?.mechanic))
   const special =
     wheel ||
+    eventWheelDraw ||
+    values.config?.pending_review === true ||
     trivia ||
     (challenge &&
       ['timed_max', 'timed_min', 'team_relay'].includes(String(values.config?.challenge_mode)))
@@ -122,13 +126,21 @@ export function DynamicForm({
           </select>
         </label>
       )}
-      {raffle && (
+      {eventWheelDraw && (
+        <div className="col-span-full rounded-control border border-neo-accent-border bg-neo-accent-soft p-3">
+          <strong className="block text-sm">Ruleta = sorteo aleatorio</strong>
+          <p className="m-0 mt-1 text-xs text-neo-text-secondary">
+            Un sorteo elige los ganadores; la ruleta solo los presenta. No hace falta escanear un QR por giro.
+          </p>
+        </div>
+      )}
+      {raffle && !eventWheelDraw && (
         <fieldset className="col-span-full min-w-0">
           <legend className="mb-2 text-sm font-semibold">Modalidad</legend>
           <div className="grid grid-cols-2 gap-2">
             {[
-              { value: 'raffle', label: 'Rifa' },
-              { value: 'wheel', label: 'Ruleta' },
+              { value: 'raffle', label: 'Sortear ganadores' },
+              { value: 'wheel', label: 'Premio por QR' },
             ].map((option) => {
               const selected = (wheel ? 'wheel' : 'raffle') === option.value
               return (
@@ -146,7 +158,7 @@ export function DynamicForm({
                     update('config', {
                       ...values.config,
                       mechanic: option.value,
-                      pending_review: option.value === 'wheel',
+                      pending_review: values.config?.pending_review === true || option.value === 'wheel',
                     })
                   }}
                 >
