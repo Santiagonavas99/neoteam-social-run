@@ -109,25 +109,18 @@ export function DynamicsView() {
   const [preview, setPreview] = useState<{ id: string; rehearsal: boolean } | null>(null)
   const restored = useRef(false)
 
-  const openPreview = useCallback(
-    (id: string, rehearsal: boolean) => {
-      if (window.matchMedia('(max-width: 767px)').matches) {
-        const url = new URL(window.location.href)
-        url.searchParams.set('dinamica', id)
-        url.searchParams.set('seccion', 'en-vivo')
-        url.searchParams.set('pantalla', '1')
-        if (rehearsal) url.searchParams.set('ensayo', '1')
-        else url.searchParams.delete('ensayo')
-        window.history.pushState(
-          { ...window.history.state, neoteamPublicPreview: true },
-          '',
-          url,
-        )
-      }
-      setPreview({ id, rehearsal })
-    },
-    [],
-  )
+  const openPreview = useCallback((id: string, rehearsal: boolean) => {
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      const url = new URL(window.location.href)
+      url.searchParams.set('dinamica', id)
+      url.searchParams.set('seccion', 'en-vivo')
+      url.searchParams.set('pantalla', '1')
+      if (rehearsal) url.searchParams.set('ensayo', '1')
+      else url.searchParams.delete('ensayo')
+      window.history.pushState({ ...window.history.state, neoteamPublicPreview: true }, '', url)
+    }
+    setPreview({ id, rehearsal })
+  }, [])
 
   const closePreview = useCallback(() => {
     if (
@@ -148,7 +141,6 @@ export function DynamicsView() {
     }
     setPreview(null)
   }, [])
-
 
   function writeMobileUrl(id: string | null, section?: DetailTab) {
     if (typeof window === 'undefined' || !window.matchMedia('(max-width: 767px)').matches) {
@@ -176,7 +168,11 @@ export function DynamicsView() {
     if (row) {
       setSelectedId(row.id)
       setTab(section === 'preparar' || section === 'resultados' ? section : 'en-vivo')
-      if (params.get('pantalla') === '1' && row.type === 'raffle' && ['open', 'completed'].includes(row.status)) {
+      if (
+        params.get('pantalla') === '1' &&
+        row.type === 'raffle' &&
+        ['open', 'completed'].includes(row.status)
+      ) {
         setPreview({ id: row.id, rehearsal: params.get('ensayo') === '1' })
       }
     }
@@ -191,7 +187,9 @@ export function DynamicsView() {
       setTab(section === 'preparar' || section === 'resultados' ? section : 'en-vivo')
       setScanning(false)
       setPreview(
-        row && params.get('pantalla') === '1' && row.type === 'raffle' &&
+        row &&
+          params.get('pantalla') === '1' &&
+          row.type === 'raffle' &&
           ['open', 'completed'].includes(row.status)
           ? { id: row.id, rehearsal: params.get('ensayo') === '1' }
           : null,
