@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import type { DynamicRow } from '../types'
-import { filterMobileDynamics, phaseForStatus } from './mobile-dynamics.ts'
+import { sortMobileDynamics } from './mobile-dynamics.ts'
 
 const row = (name: string, type: DynamicRow['type'], status: DynamicRow['status']): DynamicRow => ({
   id: name,
@@ -13,27 +13,19 @@ const row = (name: string, type: DynamicRow['type'], status: DynamicRow['status'
   requires_checkin: true,
 })
 
-test('mobile phases work across all types and preserve completed history', () => {
+test('one mobile list shows all activities with active first and preserves history', () => {
   const rows = [
-    row('Sorteo', 'raffle', 'open'),
+    row('Premio anterior', 'raffle', 'completed'),
     row('Planchas', 'challenge', 'open'),
-    row('Trivia', 'trivia', 'draft'),
-    row('Ruleta', 'instant_win', 'completed'),
-    row('Relevo', 'challenge', 'closed'),
+    row('Trivia nueva', 'trivia', 'draft'),
+    row('Sorteo activo', 'raffle', 'open'),
+    row('Stand pasado', 'qr', 'closed'),
     row('Cancelada', 'raffle', 'cancelled'),
   ]
-  assert.deepEqual(
-    filterMobileDynamics(rows, 'en-vivo', '').map((item) => item.name),
-    ['Sorteo', 'Planchas'],
-  )
-  assert.deepEqual(
-    filterMobileDynamics(rows, 'preparar', '').map((item) => item.name),
-    ['Trivia'],
-  )
-  assert.equal(filterMobileDynamics(rows, 'resultados', '').length, 3)
-  assert.deepEqual(
-    filterMobileDynamics(rows, 'en-vivo', 'planchas').map((item) => item.name),
-    ['Planchas'],
-  )
-  assert.equal(phaseForStatus('completed'), 'resultados')
+  const sorted = sortMobileDynamics(rows, '')
+  assert.deepEqual(sorted.map((entry) => entry.status), [
+    'open', 'open', 'draft', 'completed', 'closed', 'cancelled',
+  ])
+  assert.deepEqual(sortMobileDynamics(rows, 'planchas').map((entry) => entry.name), ['Planchas'])
+  assert.equal(rows[0]?.status, 'completed')
 })
