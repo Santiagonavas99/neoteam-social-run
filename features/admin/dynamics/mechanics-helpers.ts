@@ -10,14 +10,14 @@ export function formatElapsed(ms: number): string {
   const hours = Math.floor(secs / 3600)
   const minutes = Math.floor((secs % 3600) / 60)
   const seconds = secs % 60
-  return (
-    (hours ? String(hours).padStart(2, '0') + ':' : '') +
-    String(minutes).padStart(2, '0') +
-    ':' +
-    String(seconds).padStart(2, '0') +
-    '.' +
-    String(centis % 100).padStart(2, '0')
-  )
+  return [
+    hours ? `${String(hours).padStart(2, '0')}:` : '',
+    String(minutes).padStart(2, '0'),
+    ':',
+    String(seconds).padStart(2, '0'),
+    '.',
+    String(centis % 100).padStart(2, '0'),
+  ].join('')
 }
 
 export function rankTimes<T extends TimedScore>(runs: T[], direction: 'min' | 'max') {

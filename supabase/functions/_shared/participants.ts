@@ -46,7 +46,7 @@ export function participantPayload(row: ParticipantRow) {
 
 export type CheckinOutcome =
   | { result: 'checkedIn' | 'alreadyCheckedIn' | 'cancelled'; participant: ParticipantRow }
-  | { result: 'notFound' }
+  | { result: 'notFound' | 'closed' }
 
 export async function checkInParticipant(
   supabase: SupabaseClient,
@@ -64,6 +64,7 @@ export async function checkInParticipant(
     .in('status', ['registered', 'no_show'])
     .select(participantFields)
     .maybeSingle()
+  if (updateError?.message?.includes('CHECKIN_CERRADO')) return { result: 'closed' }
   if (updateError) throw updateError
   if (updated) return { result: 'checkedIn', participant: updated }
 
