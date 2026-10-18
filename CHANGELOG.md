@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.36.2] - 2026-10-18
+
+### Fixed
+- **Check-in abierto hasta las 10:00 a. m.:** el escáner y Participantes vuelven a registrar llegadas hasta las 10:00 a. m. (Colombia) del domingo 18; antes cerraban a las 8:00 a. m.
+
 ## [0.36.1] - 2026-10-18
 
 ### Fixed

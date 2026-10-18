@@ -544,7 +544,7 @@ export function ParticipantsView() {
               Check-in excepcional · {fullName(exceptionFor)}
             </h3>
             <p className="m-0 mt-2 text-sm text-neo-text-secondary">
-              El check-in cerró el domingo 18 a las 8:00 a. m. (Colombia). Solo administradores
+              El check-in cerró el domingo 18 a las 10:00 a. m. (Colombia). Solo administradores
               pueden registrar una llegada excepcional. El motivo, la hora y la cuenta responsable
               quedarán auditados.
             </p>
