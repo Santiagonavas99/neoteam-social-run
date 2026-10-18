@@ -12,6 +12,7 @@ type Kind = 'timed' | 'wheel' | 'trivia'
 type MechanicsProps = {
   dynamic: DynamicRow
   resultsOnly?: boolean
+  compact?: boolean
   onUpdated?: () => Promise<void>
 }
 
@@ -38,7 +39,7 @@ function duration(run: TimedRun, now: number): number {
   return run.elapsed_ms + Math.max(0, now - Date.parse(run.running_at))
 }
 
-function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsProps) {
+function MechanicsPanel({ dynamic, resultsOnly = false, compact = false, onUpdated }: MechanicsProps) {
   const kind = mechanicKind(dynamic)
   const mode = String(dynamic.config?.challenge_mode ?? '')
   const isTeam = mode === 'team_relay'
@@ -214,7 +215,7 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
       className="rounded-card border border-neo-border bg-neo-surface p-4 md:p-6"
       aria-label="Mecánica de la dinámica"
     >
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+      {!compact && <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <div>
           <h3 className="m-0 text-lg font-black">
             {kind === 'timed'
@@ -249,7 +250,7 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
             Actualizar
           </button>
         )}
-      </div>
+      </div>}
       {!resultsOnly && !active && (
         <p
           role="status"
@@ -257,7 +258,7 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
         >
           {configured
             ? 'Esta actividad debe estar activa para operar.'
-            : 'Antes de activarla, confirma las reglas, preguntas y premios en Preparación.'}
+            : 'Confirma reglas y premios en Editar antes de activar.'}
         </p>
       )}
       {!resultsOnly && active && (
@@ -564,6 +565,7 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
                 {wheelAnimating ? 'Girando…' : 'Ensayar giro sin repartir premios'}
               </button>
             )}
+          {!compact && (
           <div className="rounded-control border border-neo-border p-3">
             <p className="m-0 mb-2 text-sm font-bold">Premios disponibles</p>
             {availableWheelStock.map((item) => (
@@ -577,6 +579,7 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
               </p>
             )}
           </div>
+          )}
           {!resultsOnly && active && (
             <div className="grid gap-3">
               <label>
@@ -626,6 +629,21 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
               )}
             </div>
           )}
+          {compact ? (
+            <details className="rounded-control border border-neo-border p-3">
+              <summary className="cursor-pointer text-sm font-semibold">Historial · {spins.length} giros</summary>
+              <ul className="mt-3 space-y-2">
+                {spins.slice(0, 60).map((spin) => (
+                  <li key={spin.registrations?.registration_code ?? spin.created_at}
+                    className="flex justify-between gap-2 border-b border-neo-border py-2 text-sm">
+                    <span>{participantName(spin.registrations)}</span>
+                    <strong>{spin.prize_label || 'Sin premio'}</strong>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ) : (
+            <>
           <h4 className="m-0 font-bold">Historial de giros ({spins.length})</h4>
           <ul className="space-y-2">
             {spins.slice(0, 60).map((spin) => (
@@ -638,6 +656,8 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
               </li>
             ))}
           </ul>
+            </>
+          )}
         </div>
       )}
       {kind === 'trivia' && (
@@ -699,6 +719,23 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
                     : 'Respuesta correcta, pero sin premio disponible.'}
             </p>
           )}
+          {compact ? (
+            <details className="rounded-control border border-neo-border p-3">
+              <summary className="cursor-pointer text-sm font-semibold">
+                Historial · {answers.length} respuestas
+              </summary>
+              <ul className="mt-3 space-y-2">
+                {answers.slice(0, 60).map((entry) => (
+                  <li key={entry.registrations?.registration_code ?? entry.created_at}
+                    className="flex justify-between gap-2 border-b border-neo-border py-2 text-sm">
+                    <span>{participantName(entry.registrations)}</span>
+                    <span>{entry.won ? 'Ganó' : entry.correct ? 'Correcta' : 'Incorrecta'}</span>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ) : (
+            <>
           <h4 className="m-0 font-bold">Respuestas registradas ({answers.length})</h4>
           <ul className="space-y-2">
             {answers.slice(0, 60).map((entry) => (
@@ -711,6 +748,8 @@ function MechanicsPanel({ dynamic, resultsOnly = false, onUpdated }: MechanicsPr
               </li>
             ))}
           </ul>
+            </>
+          )}
         </div>
       )}
     </section>
