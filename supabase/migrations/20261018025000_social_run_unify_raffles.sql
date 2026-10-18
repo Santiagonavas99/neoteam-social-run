@@ -58,3 +58,19 @@ where d.config->>'source' = 'programa_social_run_18_oct_2026'
   and d.status='draft'
   and nullif(trim(d.config->>'trivia_question'), '') is null
   and not exists (select 1 from public.dynamic_trivia_answers t where t.dynamic_id=d.id);
+
+-- TOXIC was marked active with no relay mode and pending review. Match the
+-- announced mechanics but keep its state and review blocker unchanged.
+-- No existing participants/results are modified.
+update public.dynamics d
+set config = jsonb_set(d.config, '{challenge_mode}', '"team_relay"'::jsonb, true),
+    description = 'Relevos cronometrados por equipos. La clasificación ordena el menor tiempo. Cinco cortesías: la entrega por integrante requiere confirmación.',
+    updated_at = now()
+where d.config->>'source'='programa_social_run_18_oct_2026'
+  and d.config->>'social_run_plan_key'='social-run-2026-10-18-toxic-relevos'
+  and d.type='challenge'
+  and d.status='open'
+  and d.config->>'pending_review'='true'
+  and coalesce(d.config->>'challenge_mode','') not in ('timed_min','timed_max','team_relay')
+  and not exists (select 1 from public.dynamic_participations p where p.dynamic_id=d.id)
+  and not exists (select 1 from public.dynamic_timed_runs t where t.dynamic_id=d.id);
