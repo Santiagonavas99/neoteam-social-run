@@ -152,7 +152,21 @@ export function MobileDynamicOperator({
               <div className="mx-auto my-5 flex size-28 items-center justify-center rounded-full border-[7px] border-dashed border-neo-accent-text motion-safe:animate-[reveal_400ms_ease-out]">
                 <Gift aria-hidden className="size-12 text-neo-accent-text" />
               </div>
-              <h4 className="m-0 text-2xl font-black">Participante de prueba {demoNumber}</h4>
+              <h4 className="m-0 text-lg font-black">
+                {row.winner_count} {row.winner_count === 1 ? 'ganador de prueba' : 'ganadores de prueba'}
+              </h4>
+              <ol className="mt-3 space-y-2 text-left">
+                {Array.from({ length: Math.min(row.winner_count, 5) }, (_, index) => (
+                  <li key={index + 1} className="rounded-control border border-neo-accent-border bg-neo-surface p-3 text-sm font-bold">
+                    {index + 1}. Participante de prueba {(demoNumber - 1) * Math.min(row.winner_count, 5) + index + 1}
+                  </li>
+                ))}
+              </ol>
+              {row.winner_count > 5 && (
+                <p className="mt-2 text-xs text-neo-text-secondary">
+                  Vista previa de 5 de {row.winner_count} ganadores posibles.
+                </p>
+              )}
               <p className="mt-2 text-sm text-neo-text-secondary">
                 Simulación visual: no se eligió un corredor real ni se guardó ningún premio.
               </p>
