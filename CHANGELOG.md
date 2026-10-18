@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.36.1] - 2026-10-18
+
+### Fixed
+- **Dinámicas en iPhone:** los títulos, estados y acciones ya no heredan el azul nativo de Safari; mantienen contraste correcto tanto en tema claro como oscuro.
+- **Tarjetas activas más legibles:** fondo neutro, borde y estado turquesa; conserva la distinción rápida sin teñir toda la tarjeta.
+- **Buscador móvil:** el campo respeta el espacio para el icono de búsqueda en Safari y evita la superposición con el texto.
+
 ## [0.36.0] - 2026-10-15
 
 ### Added
