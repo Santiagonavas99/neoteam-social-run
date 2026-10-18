@@ -1,10 +1,12 @@
 'use client'
 
-import { ArrowLeft, CheckCircle2, Copy, Pencil, Play, Trophy, Zap } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, Copy, Gift, Pencil, Play, Trophy, Zap } from 'lucide-react'
+import { useState } from 'react'
 import { dynamicStates } from '../labels'
 import type { CommunityRecord, DynamicRow, LogoItem, ScannedParticipant } from '../types'
 import { DrawResult } from './draw-result'
 import { DynamicForm } from './dynamic-form'
+import { isRaffleDraw, isSocialRunWheelDraw, normalizeEventWheelDraw } from './event-draw-mode'
 import { MechanicsPanel, mechanicKind } from './mechanics-panel'
 import { mobileMechanicLabel } from './mobile-dynamics-home'
 import { ParticipationPanel } from './participation-panel'
@@ -52,14 +54,17 @@ export function MobileDynamicOperator({
   onRepeat: () => void
   onReload: () => Promise<void>
 }) {
+  const [demoNumber, setDemoNumber] = useState<number | null>(null)
   const completed = row.status === 'completed' || row.status === 'closed'
   const draft = row.status === 'draft'
   const open = row.status === 'open'
   const mechanic = mechanicKind(row)
-  const raffle = row.type === 'raffle' && !mechanic
+  const raffle = isRaffleDraw(row)
+  const rouletteStyle = isSocialRunWheelDraw(row)
   const currentWinners = winners?.row.id === row.id ? winners : null
   const needsReview = row.config?.pending_review === true
   const canActivate = !needsReview && !(row.type === 'challenge' && !row.description?.trim())
+  const blocked = open && needsReview
 
   return (
     <section className="flex flex-col gap-4 md:hidden" aria-label={`Operar ${row.name}`}>
@@ -88,7 +93,7 @@ export function MobileDynamicOperator({
       {editing ? (
         <DynamicForm
           key={row.id}
-          row={row}
+          row={normalizeEventWheelDraw(row)}
           brands={brands}
           logos={logos}
           dynamics={rows}
@@ -126,14 +131,49 @@ export function MobileDynamicOperator({
             )}
           </button>
         </div>
+      ) : blocked ? (
+        <div className="flex flex-col gap-3 rounded-card border border-neo-accent-border bg-neo-accent-soft p-4">
+          <strong className="text-lg">Revisar antes de operar</strong>
+          <p className="m-0 text-sm">
+            Esta actividad está marcada para revisión. Confirma las reglas y premios antes de
+            registrar participantes o asignar ganadores.
+          </p>
+          <button type="button" className="button min-h-12 justify-center" onClick={onEdit}>
+            <Pencil aria-hidden className="size-4" /> Revisar configuración
+          </button>
+        </div>
       ) : raffle ? (
         <>
-          {currentWinners ? (
+          {demoNumber !== null ? (
+            <div className="rounded-card border border-neo-accent-border bg-neo-accent-soft p-5 text-center">
+              <span className="inline-flex rounded-full border border-neo-accent-border px-3 py-1 text-xs font-black tracking-wide uppercase">
+                Ensayo · Sin premios reales
+              </span>
+              <div className="mx-auto my-5 flex size-28 items-center justify-center rounded-full border-[7px] border-dashed border-neo-accent-text motion-safe:animate-[reveal_400ms_ease-out]">
+                <Gift aria-hidden className="size-12 text-neo-accent-text" />
+              </div>
+              <h4 className="m-0 text-2xl font-black">Participante de prueba {demoNumber}</h4>
+              <p className="mt-2 text-sm text-neo-text-secondary">
+                Simulación visual: no se eligió un corredor real ni se guardó ningún premio.
+              </p>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <button type="button" className="button button-secondary min-h-12 justify-center"
+                  onClick={() => setDemoNumber(null)}>
+                  Volver
+                </button>
+                <button type="button" className="button min-h-12 justify-center"
+                  onClick={() => setDemoNumber((current) => current === 3 ? 1 : (current ?? 0) + 1)}>
+                  Otra prueba
+                </button>
+              </div>
+            </div>
+          ) : currentWinners ? (
             <DrawResult
               key={row.id}
               name={row.name}
               winners={currentWinners.list}
               reveal={currentWinners.reveal}
+              presentation={rouletteStyle ? 'wheel' : 'raffle'}
               busy={busy || confirmationOpen}
               onAbsent={onAbsent}
               onClose={onCloseWinners}
@@ -141,10 +181,14 @@ export function MobileDynamicOperator({
           ) : open ? (
             <div className="flex flex-col gap-3 rounded-card border border-neo-border bg-neo-surface p-5">
               <Trophy aria-hidden className="size-8 text-neo-accent-text" />
-              <h4 className="m-0 text-lg font-black">Todo listo para sortear</h4>
+              <h4 className="m-0 text-lg font-black">Sorteo aleatorio</h4>
               <p className="m-0 text-sm text-neo-text-secondary">
-                {row.winner_count} {row.winner_count === 1 ? 'ganador' : 'ganadores'}. El resultado
-                aparecerá aquí mismo.
+                {row.winner_count} {row.winner_count === 1 ? 'ganador' : 'ganadores'}.
+                {rouletteStyle ? ' La ruleta muestra al ganador, no exige un QR por giro.' : ''}
+              </p>
+              <p className="m-0 text-xs text-neo-text-secondary">
+                Elegibles: {row.requires_checkin ? 'con check-in' : 'personas inscritas'}
+                {row.config?.exclude_winners === true ? ' · sin ganadores anteriores' : ''}.
               </p>
               <button
                 type="button"
@@ -152,7 +196,14 @@ export function MobileDynamicOperator({
                 onClick={onDraw}
                 className="button min-h-14 w-full justify-center text-base"
               >
-                <Zap aria-hidden className="size-5" /> Realizar sorteo
+                <Zap aria-hidden className="size-5" /> Sortear ganadores
+              </button>
+              <button
+                type="button"
+                className="min-h-12 w-full text-sm font-bold text-neo-accent-text underline underline-offset-4"
+                onClick={() => setDemoNumber(1)}
+              >
+                Ensayar sin entregar premios
               </button>
             </div>
           ) : (
