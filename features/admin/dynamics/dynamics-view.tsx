@@ -25,6 +25,7 @@ import { LoadingState } from '../ui/loading-state'
 import { useAdminData } from '../ui/use-admin-data'
 import { DrawResult } from './draw-result'
 import { duplicateDynamic } from './duplicate-dynamic'
+import { normalizeEventWheelDraw } from './event-draw-mode'
 import { DynamicCard } from './dynamic-card'
 import { DynamicCreateWizard } from './dynamic-create-wizard'
 import { DynamicForm } from './dynamic-form'
@@ -66,8 +67,14 @@ function categoryLabel(category: Category) {
 
 function ruleDescription(row: DynamicRow, eligible: number | null) {
   if (eligible === null) return 'Calculando participantes elegibles…'
-  if (eligible === 0)
-    return 'Todavía no hay corredores elegibles. Revisa las condiciones y el check-in.'
+  if (eligible === 0) {
+    const rules = [
+      row.requires_checkin ? 'check-in obligatorio' : 'inscripción válida',
+      row.config?.exclude_winners === true ? 'excluye a quienes ya ganaron' : '',
+      row.eligibility_dynamic_id ? 'requiere haber completado otra dinámica' : '',
+    ].filter(Boolean)
+    return `No hay participantes que cumplan todas las condiciones: ${rules.join(' · ')}. No se hará ningún sorteo real. Para probar la pantalla usa «Ensayar sin entregar premios».`
+  }
   const parts = [
     row.requires_checkin ? 'con check-in' : 'inscritos',
     row.config?.gender ? raffleGenders[String(row.config.gender)]?.toLowerCase() : '',
@@ -186,7 +193,7 @@ export function DynamicsView() {
   }
 
   async function save(row: DynamicRow) {
-    await dynamics.save(row)
+    await dynamics.save(normalizeEventWheelDraw(row))
     setCreating(false)
     setDuplicate(null)
     setSettingsOpen(false)
