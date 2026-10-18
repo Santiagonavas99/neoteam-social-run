@@ -157,12 +157,20 @@ export function MobileDynamicOperator({
                 Simulación visual: no se eligió un corredor real ni se guardó ningún premio.
               </p>
               <div className="mt-4 grid grid-cols-2 gap-2">
-                <button type="button" className="button button-secondary min-h-12 justify-center"
-                  onClick={() => setDemoNumber(null)}>
+                <button
+                  type="button"
+                  className="button button-secondary min-h-12 justify-center"
+                  onClick={() => setDemoNumber(null)}
+                >
                   Volver
                 </button>
-                <button type="button" className="button min-h-12 justify-center"
-                  onClick={() => setDemoNumber((current) => current === 3 ? 1 : (current ?? 0) + 1)}>
+                <button
+                  type="button"
+                  className="button min-h-12 justify-center"
+                  onClick={() =>
+                    setDemoNumber((current) => (current === 3 ? 1 : (current ?? 0) + 1))
+                  }
+                >
                   Otra prueba
                 </button>
               </div>

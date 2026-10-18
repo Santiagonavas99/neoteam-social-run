@@ -52,7 +52,10 @@ export function DrawResult({
       </div>
       {presentation === 'wheel' && winners.length > 0 && (
         <div className="mt-4 flex items-center gap-3 rounded-control border border-neo-accent-border bg-neo-accent-soft p-3 md:hidden">
-          <span aria-hidden className="flex size-14 shrink-0 items-center justify-center rounded-full border-[5px] border-dashed border-neo-accent-text">
+          <span
+            aria-hidden
+            className="flex size-14 shrink-0 items-center justify-center rounded-full border-[5px] border-dashed border-neo-accent-text"
+          >
             <Trophy className="size-6 text-neo-accent-text" />
           </span>
           <p className="m-0 text-sm font-bold">Ganadores elegidos mediante el sorteo oficial.</p>

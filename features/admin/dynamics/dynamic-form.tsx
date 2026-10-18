@@ -42,7 +42,10 @@ export function DynamicForm({
   const challenge = values.type === 'challenge'
   const trivia = values.type === 'trivia'
   const eventWheelDraw = isSocialRunWheelDraw(values)
-  const wheel = raffle && !eventWheelDraw && ['wheel', 'ruleta_pendiente'].includes(String(values.config?.mechanic))
+  const wheel =
+    raffle &&
+    !eventWheelDraw &&
+    ['wheel', 'ruleta_pendiente'].includes(String(values.config?.mechanic))
   const special =
     wheel ||
     eventWheelDraw ||
@@ -130,7 +133,8 @@ export function DynamicForm({
         <div className="col-span-full rounded-control border border-neo-accent-border bg-neo-accent-soft p-3">
           <strong className="block text-sm">Ruleta = sorteo aleatorio</strong>
           <p className="m-0 mt-1 text-xs text-neo-text-secondary">
-            Un sorteo elige los ganadores; la ruleta solo los presenta. No hace falta escanear un QR por giro.
+            Un sorteo elige los ganadores; la ruleta solo los presenta. No hace falta escanear un QR
+            por giro.
           </p>
         </div>
       )}
@@ -158,7 +162,8 @@ export function DynamicForm({
                     update('config', {
                       ...values.config,
                       mechanic: option.value,
-                      pending_review: values.config?.pending_review === true || option.value === 'wheel',
+                      pending_review:
+                        values.config?.pending_review === true || option.value === 'wheel',
                     })
                   }}
                 >

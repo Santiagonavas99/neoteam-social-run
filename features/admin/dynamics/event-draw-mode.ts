@@ -8,9 +8,11 @@ const SOCIAL_RUN_WHEEL_KEYS = new Set([
 
 /** A wheel-shaped *reveal* is not a per-person prize-inventory wheel. */
 export function isSocialRunWheelDraw(row: Pick<DynamicRow, 'type' | 'config'>): boolean {
-  return row.type === 'raffle' &&
+  return (
+    row.type === 'raffle' &&
     row.config?.source === 'programa_social_run_18_oct_2026' &&
     SOCIAL_RUN_WHEEL_KEYS.has(String(row.config?.social_run_plan_key ?? ''))
+  )
 }
 
 export function isRaffleDraw(row: Pick<DynamicRow, 'type' | 'config'>): boolean {
