@@ -10,6 +10,7 @@ export function DrawResult({
   name,
   winners,
   reveal,
+  presentation = 'raffle',
   busy,
   onAbsent,
   onClose,
@@ -17,6 +18,7 @@ export function DrawResult({
   name: string
   winners: ScannedParticipant[]
   reveal: boolean
+  presentation?: 'raffle' | 'wheel'
   busy: boolean
   onAbsent: (winner: ScannedParticipant, place: number) => void
   onClose: () => void
@@ -37,7 +39,7 @@ export function DrawResult({
           className="m-0 flex items-center gap-2 text-base font-bold text-neo-accent-text"
         >
           <Trophy aria-hidden className="size-5 shrink-0" />
-          Ganadores · {name}
+          {presentation === 'wheel' ? 'Ganadores de la ruleta' : 'Ganadores'} · {name}
         </h2>
         <button
           type="button"
@@ -48,6 +50,14 @@ export function DrawResult({
           <X aria-hidden className="size-5" />
         </button>
       </div>
+      {presentation === 'wheel' && winners.length > 0 && (
+        <div className="mt-4 flex items-center gap-3 rounded-control border border-neo-accent-border bg-neo-accent-soft p-3 md:hidden">
+          <span aria-hidden className="flex size-14 shrink-0 items-center justify-center rounded-full border-[5px] border-dashed border-neo-accent-text">
+            <Trophy className="size-6 text-neo-accent-text" />
+          </span>
+          <p className="m-0 text-sm font-bold">Ganadores elegidos mediante el sorteo oficial.</p>
+        </div>
+      )}
       {winners.length ? (
         <ol aria-live="polite" className="m-0 mt-3 flex list-none flex-col gap-4 p-0">
           {winners.slice(0, shown).map((winner, index) => (
