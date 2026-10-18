@@ -261,7 +261,11 @@ export function DynamicsView() {
     confirmation?.action === 'draw' ? (
       <ConfirmPanel
         kind="draw"
-        title={`¿Todo listo para “${confirmation.row.name}”?`}
+        title={
+          dynamics.eligible === 0
+            ? 'Todavía no hay participantes elegibles'
+            : `¿Todo listo para “${confirmation.row.name}”?`
+        }
         text={ruleDescription(confirmation.row, dynamics.eligible)}
         confirmLabel="Confirmar sorteo real"
         busy={busy}
@@ -328,7 +332,24 @@ export function DynamicsView() {
       </header>
 
       <Feedback value={feedback} />
-      {confirmationPanel}
+      {confirmation?.action === 'draw' && dynamics.eligible === 0 ? (
+        <>
+          <div className="hidden md:block">{confirmationPanel}</div>
+          <div role="status" className="rounded-card border border-neo-accent-border bg-neo-accent-soft p-4 md:hidden">
+            <strong className="block text-base">No hay participantes elegibles todavía</strong>
+            <p className="mt-2 text-sm text-neo-text-secondary">
+              {ruleDescription(confirmation.row, 0)}
+            </p>
+            <button
+              type="button"
+              className="button button-secondary mt-3 min-h-11"
+              onClick={() => dynamics.setConfirmation(null)}
+            >
+              Volver a la dinámica
+            </button>
+          </div>
+        </>
+      ) : confirmationPanel}
       {preview && (
         <div
           role="dialog"
