@@ -4,10 +4,12 @@ import { ArrowRight, Plus, Search, Trophy, Zap } from 'lucide-react'
 import { dynamicStates, dynamicTypes } from '../labels'
 import type { DynamicRow, LogoItem } from '../types'
 import { sortMobileDynamics } from './mobile-dynamics'
+import { isSocialRunWheelDraw } from './event-draw-mode'
 
 export function mobileMechanicLabel(row: DynamicRow): string {
-  if (row.type === 'raffle' && row.config?.mechanic === 'wheel') return 'Ruleta'
-  if (row.type === 'raffle') return 'Rifa'
+  if (isSocialRunWheelDraw(row)) return 'Ruleta · sorteo'
+  if (row.type === 'raffle' && row.config?.mechanic === 'wheel') return 'Premio por QR'
+  if (row.type === 'raffle') return 'Sorteo'
   if (row.type === 'challenge') {
     if (row.config?.challenge_mode === 'timed_max') return 'Resistencia'
     if (row.config?.challenge_mode === 'timed_min') return 'Tiempo'
